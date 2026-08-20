@@ -119,9 +119,6 @@ body::before {
 .lessonExercise strong { color: var(--green); }
 .lessonExercise p { margin: 7px 0 0; color: #d8e4f0; }
 .lessonNav { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; }
-.lessonNotes { display: grid; gap: 9px; margin-top: 18px; }
-.lessonNotes label { color: var(--green); font-weight: 850; }
-.lessonNotes textarea { width: 100%; min-height: 110px; resize: vertical; padding: 12px; border: 1px solid var(--line); border-radius: 13px; color: var(--text); background: #081523; font: inherit; line-height: 1.5; }
 
 .toolGrid { display: grid; gap: 12px; }
 .toolCard { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
