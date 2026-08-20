@@ -80,6 +80,13 @@ body::before {
 .quickCard strong { display: block; font-size: 15px; }
 .quickCard small { display: block; margin-top: 5px; color: var(--muted); line-height: 1.35; }
 
+.visitorIntro { width: 100%; display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 16px; border: 1px solid rgba(48,230,166,.34); border-radius: 20px; color: var(--text); text-align: left; background: linear-gradient(135deg, rgba(48,230,166,.16), rgba(74,140,255,.15)); box-shadow: var(--shadow); }
+.visitorIntroIcon { display: grid; place-items: center; width: 52px; height: 52px; flex: 0 0 52px; border-radius: 17px; background: rgba(48,230,166,.14); font-size: 27px; }
+.visitorIntro strong, .visitorIntro small, .visitorIntro b { display: block; }
+.visitorIntro strong { font-size: 16px; }
+.visitorIntro small { margin-top: 4px; color: #b7c9dc; line-height: 1.4; }
+.visitorIntro b { margin-top: 9px; color: var(--green); font-size: 12px; }
+
 .cardList { display: grid; gap: 12px; }
 .itemCard { border: 1px solid var(--line); border-radius: 20px; padding: 16px; background: rgba(13,27,45,.92); box-shadow: 0 10px 25px rgba(0,0,0,.12); }
 .itemTop { display: flex; gap: 12px; align-items: flex-start; }
@@ -171,6 +178,30 @@ body::before {
 .projectionRow { display: flex; justify-content: space-between; gap: 12px; padding: 11px; border-radius: 12px; background: rgba(74,140,255,.1); }
 .projectionRow strong { color: var(--green); text-align: right; }
 .disclaimer { margin-top: 13px; padding: 12px; border-radius: 12px; background: rgba(255,200,92,.1); color: #ffe2a1; font-size: 12px; line-height: 1.5; }
+
+.presentationBack { margin-bottom: 10px; }
+.presentationHero { padding: 24px 20px; border: 1px solid rgba(48,230,166,.3); border-radius: 24px; background: linear-gradient(145deg, #123b42, #10243d 58%, #172149); box-shadow: var(--shadow); }
+.presentationHero h1 { margin: 10px 0; font-size: clamp(27px, 7.6vw, 39px); line-height: 1.08; }
+.presentationHero > p { margin: 0; color: #c2d2e4; line-height: 1.58; }
+.inviteRegistered { margin: 17px 0 14px; padding: 11px 12px; border-radius: 13px; color: #c8ffec; background: rgba(48,230,166,.11); font-size: 12px; line-height: 1.45; }
+.presentationSection { margin-top: 27px; }
+.presentationSection > h2, .networkHighlight h2, .presentationFinal h2 { margin: 0 0 13px; font-size: 21px; }
+.presentationBenefits, .presentationSteps { display: grid; gap: 10px; }
+.presentationBenefits article, .presentationSteps article { display: flex; gap: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 17px; background: rgba(13,27,45,.9); }
+.presentationBenefits article > span { font-size: 25px; }
+.presentationBenefits h3, .presentationSteps h3 { margin: 0 0 4px; font-size: 15px; }
+.presentationBenefits p, .presentationSteps p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.48; }
+.presentationSteps article > b { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%; color: #05151b; background: var(--green); }
+.networkHighlight { margin-top: 27px; padding: 20px; border: 1px solid rgba(255,200,92,.28); border-radius: 21px; background: linear-gradient(145deg, rgba(255,200,92,.13), rgba(13,27,45,.96)); }
+.networkHighlight > span { font-size: 30px; }
+.networkHighlight h2 { margin-top: 9px; }
+.networkHighlight p { color: #dce7f2; line-height: 1.58; }
+.networkHighlight small { display: block; color: #ffe2a1; line-height: 1.5; }
+.goalGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.goalGrid span { padding: 13px 10px; border: 1px solid rgba(74,140,255,.22); border-radius: 14px; color: #caddff; background: rgba(74,140,255,.1); font-size: 12px; font-weight: 800; text-align: center; }
+.presentationFinal { margin-top: 27px; padding: 21px; border-radius: 21px; text-align: center; background: var(--surface); border: 1px solid var(--line); }
+.presentationFinal p { color: var(--muted); line-height: 1.55; }
+.presentationFinal small { display: block; margin-top: 11px; color: var(--muted); line-height: 1.45; }
 
 @media (min-width: 620px) {
   .quickGrid { grid-template-columns: repeat(3, 1fr); }
