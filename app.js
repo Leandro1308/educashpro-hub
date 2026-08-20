@@ -76,11 +76,6 @@
     }
   };
 
-  Object.assign(EXTRA_COPY.pt, { lessonNotes: "Minhas anotações", notesPlaceholder: "Escreva como você aplicará esta aula…", saveNotes: "Salvar no celular", notesSaved: "Anotação salva no celular" });
-  Object.assign(EXTRA_COPY.en, { lessonNotes: "My notes", notesPlaceholder: "Write how you will apply this lesson…", saveNotes: "Save on phone", notesSaved: "Note saved on your phone" });
-  Object.assign(EXTRA_COPY.es, { lessonNotes: "Mis anotaciones", notesPlaceholder: "Escribe cómo aplicarás esta lección…", saveNotes: "Guardar en el celular", notesSaved: "Anotación guardada en el celular" });
-  Object.assign(EXTRA_COPY.ru, { lessonNotes: "Мои заметки", notesPlaceholder: "Напишите, как вы примените этот урок…", saveNotes: "Сохранить на телефоне", notesSaved: "Заметка сохранена на телефоне" });
-
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
@@ -285,16 +280,10 @@
     state.currentLesson = index;
     saveProgress(course.id, Math.max(getProgress(course.id), index));
     const chapter = course.chapters.find((item) => Number(item.id) === Number(lesson.ch));
-    const noteKey = `educashpro:lesson-note:${state.profile?.tgId || "guest"}:${course.id}:${index}`;
-    const savedNote = localStorage.getItem(noteKey) || "";
-    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNotes"><label for="lessonNote">📝 ${escapeHtml(t("lessonNotes"))}</label><textarea id="lessonNote" placeholder="${escapeHtml(t("notesPlaceholder"))}">${escapeHtml(savedNote)}</textarea><button id="saveLessonNote" class="secondaryButton">${escapeHtml(t("saveNotes"))}</button></div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
+    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
-    document.getElementById("saveLessonNote").onclick = () => {
-      localStorage.setItem(noteKey, document.getElementById("lessonNote").value.slice(0, 4000));
-      showToast(t("notesSaved"));
-    };
   }
 
   function renderNetworkProjection() {
