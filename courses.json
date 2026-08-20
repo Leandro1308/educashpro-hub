@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "courses": [
+    {
+      "id": "apresentacao",
+      "icon": "✨",
+      "image": "./assets/educashpro-product.svg",
+      "category": "introduction",
+      "access": "free",
+      "link": "",
+      "order": 1,
+      "title": { "pt": "Conheça o EduCashPro", "en": "Discover EduCashPro", "es": "Conoce EduCashPro", "ru": "Познакомьтесь с EduCashPro" },
+      "description": { "pt": "Apresentação completa da plataforma, seus recursos e possibilidades.", "en": "A complete introduction to the platform, its resources and possibilities.", "es": "Presentación completa de la plataforma, sus recursos y posibilidades.", "ru": "Полное знакомство с платформой, её ресурсами и возможностями." },
+      "preview": { "pt": ["Entenda a proposta do EduCashPro", "Conheça cursos, ferramentas e comunidades", "Veja como funciona a assinatura e o Programa de Afiliados"], "en": ["Understand the EduCashPro proposal", "Discover courses, tools and communities", "See how the subscription and Affiliate Program work"], "es": ["Comprende la propuesta de EduCashPro", "Conoce cursos, herramientas y comunidades", "Descubre cómo funcionan la suscripción y el Programa de Afiliados"], "ru": ["Поймите идею EduCashPro", "Познакомьтесь с курсами, инструментами и сообществами", "Узнайте, как работают подписка и партнёрская программа"] }
+    },
+    {
+      "id": "fundamentos_marketing_rede",
+      "icon": "🌱",
+      "category": "network_marketing",
+      "access": "free",
+      "link": "",
+      "order": 2,
+      "title": { "pt": "Fundamentos do Marketing de Rede", "en": "Network Marketing Fundamentals", "es": "Fundamentos del Marketing de Red", "ru": "Основы сетевого маркетинга" },
+      "description": { "pt": "Formação gratuita sobre produto, relacionamento, ética e construção profissional.", "en": "Free training on product, relationships, ethics and professional development.", "es": "Formación gratuita sobre producto, relaciones, ética y desarrollo profesional.", "ru": "Бесплатный курс о продукте, отношениях, этике и профессиональном развитии." },
+      "preview": { "pt": ["Marketing de rede com produto real", "Comunicação sem pressão", "Plano prático de sete dias"], "en": ["Network marketing with a real product", "Communication without pressure", "A practical seven-day plan"], "es": ["Marketing de red con producto real", "Comunicación sin presión", "Plan práctico de siete días"], "ru": ["Сетевой маркетинг с реальным продуктом", "Общение без давления", "Практический план на семь дней"] }
+    },
+    {
+      "id": "marketing_rede_educashpro",
+      "icon": "🌐",
+      "image": "./assets/network-marketing.svg",
+      "category": "network_marketing",
+      "access": "subscriber",
+      "link": "",
+      "order": 3,
+      "tool": "network_projection",
+      "title": { "pt": "Marketing de Rede com EduCashPro", "en": "Network Marketing with EduCashPro", "es": "Marketing de Red con EduCashPro", "ru": "Сетевой маркетинг с EduCashPro" },
+      "description": { "pt": "Formação profissional para apresentar o produto, construir relacionamentos e desenvolver uma rede pelo Telegram.", "en": "Professional training to present the product, build relationships and develop a network through Telegram.", "es": "Formación profesional para presentar el producto, crear relaciones y desarrollar una red por Telegram.", "ru": "Профессиональное обучение презентации продукта, построению отношений и развитию сети через Telegram." },
+      "preview": { "pt": ["Plano de compensação explicado", "Prospecção, apresentação e acompanhamento", "Liderança, duplicação e plano de 30 dias", "Calculadora de projeção de ganhos"], "en": ["Compensation plan explained", "Prospecting, presentation and follow-up", "Leadership, duplication and a 30-day plan", "Earnings projection calculator"], "es": ["Plan de compensación explicado", "Prospección, presentación y seguimiento", "Liderazgo, duplicación y plan de 30 días", "Calculadora de proyección de ganancias"], "ru": ["Разбор плана вознаграждений", "Поиск, презентация и сопровождение", "Лидерство, дубликация и план на 30 дней", "Калькулятор прогноза дохода"] }
+    },
+    {
+      "id": "profissionalize_telegram",
+      "icon": "🚀",
+      "image": "./assets/professional-telegram.svg",
+      "category": "telegram",
+      "access": "subscriber",
+      "link": "",
+      "order": 4,
+      "title": { "pt": "Profissionalize seu Telegram", "en": "Professionalize Your Telegram", "es": "Profesionaliza tu Telegram", "ru": "Профессиональный Telegram" },
+      "description": { "pt": "Crie, organize, proteja, desenvolva e monetize responsavelmente grupos, canais e projetos digitais.", "en": "Create, organize, protect, develop and responsibly monetize groups, channels and digital projects.", "es": "Crea, organiza, protege, desarrolla y monetiza responsablemente grupos, canales y proyectos digitales.", "ru": "Создавайте, организуйте, защищайте, развивайте и ответственно монетизируйте группы, каналы и цифровые проекты." },
+      "preview": { "pt": ["Posicionamento e identidade", "Conteúdo, moderação e crescimento", "Bots, segurança e monetização", "Plano de execução de 30 dias"], "en": ["Positioning and identity", "Content, moderation and growth", "Bots, security and monetization", "A 30-day execution plan"], "es": ["Posicionamiento e identidad", "Contenido, moderación y crecimiento", "Bots, seguridad y monetización", "Plan de ejecución de 30 días"], "ru": ["Позиционирование и идентичность", "Контент, модерация и рост", "Боты, безопасность и монетизация", "План действий на 30 дней"] }
+    },
+    {
+      "id": "liberdade_financeira_assinantes",
+      "icon": "🎓",
+      "category": "financial_education",
+      "access": "subscriber",
+      "link": "",
+      "order": 5,
+      "title": { "pt": "EduCashPro Academy", "en": "EduCashPro Academy", "es": "EduCashPro Academy", "ru": "EduCashPro Academy" },
+      "description": { "pt": "Educação financeira, economia digital, Web3, Telegram e desenvolvimento de ativos digitais.", "en": "Financial education, digital economy, Web3, Telegram and digital asset development.", "es": "Educación financiera, economía digital, Web3, Telegram y desarrollo de activos digitales.", "ru": "Финансовая грамотность, цифровая экономика, Web3, Telegram и развитие цифровых активов." },
+      "preview": { "pt": ["Educação e mentalidade financeira", "Web3, TON e USDT", "Ativos e comunidades digitais"], "en": ["Financial education and mindset", "Web3, TON and USDT", "Digital assets and communities"], "es": ["Educación y mentalidad financiera", "Web3, TON y USDT", "Activos y comunidades digitales"], "ru": ["Финансовая грамотность и мышление", "Web3, TON и USDT", "Цифровые активы и сообщества"] }
+    }
+  ]
+}
