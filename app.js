@@ -14,6 +14,7 @@
     profile: null,
     affiliateLink: "",
     subscribeUrl: "",
+    referrerId: "",
     planPriceUsdt: 12,
     botUrl: "",
     language: "pt",
@@ -76,7 +77,147 @@
     }
   };
 
+  const PRESENTATION_COPY = {
+    pt: {
+      homeTitle: "Conheça o EduCashPro em 1 minuto",
+      homeText: "Veja rapidamente o que você recebe, como funciona e por que tudo acontece dentro do Telegram.",
+      homeButton: "Conhecer agora",
+      back: "Voltar",
+      kicker: "Direto ao ponto",
+      title: "Mais conhecimento, oportunidades e presença digital em um só lugar.",
+      lead: "O EduCashPro organiza cursos, ferramentas, benefícios e projetos para você aprender, desenvolver e aproveitar melhor o Telegram.",
+      invite: "Seu convite está registrado. Ao assinar, o vínculo correto será preservado.",
+      ready: "Seu acesso está pronto para ser ativado.",
+      includedTitle: "O que você encontra",
+      included: [
+        ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
+        ["🔎", "Descoberta organizada", "Grupos, canais, bots, páginas e projetos selecionados."],
+        ["🎁", "Benefícios exclusivos", "Vantagens e parcerias disponibilizadas aos assinantes ativos."],
+        ["🚀", "Espaço para crescer", "Divulgue seus projetos e desenvolva sua presença dentro do Telegram."],
+      ],
+      worksTitle: "Como funciona",
+      works: [
+        ["1", "Ative sua assinatura", "Tenha acesso à experiência completa do EduCashPro."],
+        ["2", "Aprenda e utilize", "Escolha cursos, ferramentas, projetos e benefícios de acordo com seu objetivo."],
+        ["3", "Compartilhe seu link", "Como assinante ativo, você recebe um link pessoal para apresentar o EduCashPro."],
+      ],
+      networkTitle: "Um benefício que também pode gerar renda",
+      networkText: "O assinante ativo pode receber 60% sobre novas assinaturas diretas e participar das renovações em até cinco níveis, conforme atividade, qualificações e regras vigentes.",
+      networkNote: "Não é promessa de ganhos. Os resultados dependem de assinaturas e renovações reais, qualificação e atuação individual.",
+      chooseTitle: "O que você quer desenvolver?",
+      goals: ["💰 Renda extra", "📱 Telegram profissional", "🎓 Novas habilidades", "🚀 Projeto digital"],
+      finalTitle: "Comece pelo que faz sentido para você",
+      finalText: "Ative sua assinatura e encontre tudo organizado em uma única experiência dentro do Telegram.",
+      subscribe: "Assinar por {price} USDT",
+      reactivate: "Reativar por {price} USDT",
+      details: "Pagamento e ativação são concluídos com segurança pelo bot do EduCashPro.",
+    },
+    en: {
+      homeTitle: "Discover EduCashPro in 1 minute",
+      homeText: "Quickly see what you get, how it works and why everything happens inside Telegram.",
+      homeButton: "Discover now",
+      back: "Back",
+      kicker: "Straight to the point",
+      title: "Knowledge, opportunities and digital presence in one place.",
+      lead: "EduCashPro organizes courses, tools, benefits and projects so you can learn, develop and make better use of Telegram.",
+      invite: "Your invitation is registered. The correct referral will be preserved when you subscribe.",
+      ready: "Your access is ready to be activated.",
+      includedTitle: "What you will find",
+      included: [
+        ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
+        ["🔎", "Organized discovery", "Selected groups, channels, bots, pages and projects."],
+        ["🎁", "Exclusive benefits", "Advantages and partnerships available to active subscribers."],
+        ["🚀", "Room to grow", "Promote projects and develop your presence inside Telegram."],
+      ],
+      worksTitle: "How it works",
+      works: [
+        ["1", "Activate your subscription", "Access the complete EduCashPro experience."],
+        ["2", "Learn and use", "Choose courses, tools, projects and benefits according to your goal."],
+        ["3", "Share your link", "As an active subscriber, you receive a personal link to introduce EduCashPro."],
+      ],
+      networkTitle: "A benefit that can also generate income",
+      networkText: "Active subscribers may receive 60% on new direct subscriptions and participate in renewals through up to five levels, subject to activity, qualifications and current rules.",
+      networkNote: "This is not an earnings promise. Results depend on real subscriptions and renewals, qualification and individual effort.",
+      chooseTitle: "What do you want to develop?",
+      goals: ["💰 Extra income", "📱 Professional Telegram", "🎓 New skills", "🚀 Digital project"],
+      finalTitle: "Start with what makes sense for you",
+      finalText: "Activate your subscription and find everything organized in one Telegram experience.",
+      subscribe: "Subscribe for {price} USDT",
+      reactivate: "Reactivate for {price} USDT",
+      details: "Payment and activation are securely completed through the EduCashPro bot.",
+    },
+    es: {
+      homeTitle: "Conoce EduCashPro en 1 minuto",
+      homeText: "Descubre rápidamente qué recibes, cómo funciona y por qué todo sucede dentro de Telegram.",
+      homeButton: "Conocer ahora",
+      back: "Volver",
+      kicker: "Directo al punto",
+      title: "Conocimiento, oportunidades y presencia digital en un solo lugar.",
+      lead: "EduCashPro organiza cursos, herramientas, beneficios y proyectos para que aprendas, te desarrolles y aproveches mejor Telegram.",
+      invite: "Tu invitación está registrada. Al suscribirte se conservará la referencia correcta.",
+      ready: "Tu acceso está listo para ser activado.",
+      includedTitle: "Lo que encontrarás",
+      included: [
+        ["🎓", "Aprendizaje práctico", "Educación financiera, Telegram, marketing de red y habilidades digitales."],
+        ["🔎", "Descubrimiento organizado", "Grupos, canales, bots, páginas y proyectos seleccionados."],
+        ["🎁", "Beneficios exclusivos", "Ventajas y alianzas disponibles para suscriptores activos."],
+        ["🚀", "Espacio para crecer", "Promociona proyectos y desarrolla tu presencia dentro de Telegram."],
+      ],
+      worksTitle: "Cómo funciona",
+      works: [
+        ["1", "Activa tu suscripción", "Accede a la experiencia completa de EduCashPro."],
+        ["2", "Aprende y utiliza", "Elige cursos, herramientas, proyectos y beneficios según tu objetivo."],
+        ["3", "Comparte tu enlace", "Como suscriptor activo, recibes un enlace personal para presentar EduCashPro."],
+      ],
+      networkTitle: "Un beneficio que también puede generar ingresos",
+      networkText: "El suscriptor activo puede recibir el 60% de nuevas suscripciones directas y participar en renovaciones de hasta cinco niveles, según actividad, calificaciones y reglas vigentes.",
+      networkNote: "No es una promesa de ganancias. Los resultados dependen de suscripciones y renovaciones reales, calificación y actuación individual.",
+      chooseTitle: "¿Qué quieres desarrollar?",
+      goals: ["💰 Ingresos extra", "📱 Telegram profesional", "🎓 Nuevas habilidades", "🚀 Proyecto digital"],
+      finalTitle: "Empieza por lo que tiene sentido para ti",
+      finalText: "Activa tu suscripción y encuentra todo organizado en una única experiencia dentro de Telegram.",
+      subscribe: "Suscribirme por {price} USDT",
+      reactivate: "Reactivar por {price} USDT",
+      details: "El pago y la activación se completan de forma segura mediante el bot de EduCashPro.",
+    },
+    ru: {
+      homeTitle: "Познакомьтесь с EduCashPro за 1 минуту",
+      homeText: "Быстро узнайте, что вы получите, как всё работает и почему сервис находится внутри Telegram.",
+      homeButton: "Узнать сейчас",
+      back: "Назад",
+      kicker: "Коротко и по делу",
+      title: "Знания, возможности и цифровое присутствие в одном месте.",
+      lead: "EduCashPro объединяет курсы, инструменты, преимущества и проекты, чтобы вы могли учиться, развиваться и эффективнее использовать Telegram.",
+      invite: "Ваше приглашение зарегистрировано. При подписке правильная реферальная связь сохранится.",
+      ready: "Ваш доступ готов к активации.",
+      includedTitle: "Что вы найдёте",
+      included: [
+        ["🎓", "Практическое обучение", "Финансовая грамотность, Telegram, сетевой маркетинг и цифровые навыки."],
+        ["🔎", "Удобный каталог", "Отобранные группы, каналы, боты, страницы и проекты."],
+        ["🎁", "Эксклюзивные преимущества", "Преимущества и партнёрства для активных подписчиков."],
+        ["🚀", "Пространство для роста", "Продвигайте проекты и развивайте своё присутствие в Telegram."],
+      ],
+      worksTitle: "Как это работает",
+      works: [
+        ["1", "Активируйте подписку", "Получите доступ ко всем возможностям EduCashPro."],
+        ["2", "Учитесь и используйте", "Выбирайте курсы, инструменты, проекты и преимущества под свою цель."],
+        ["3", "Делитесь своей ссылкой", "Активный подписчик получает личную ссылку для знакомства с EduCashPro."],
+      ],
+      networkTitle: "Преимущество, которое также может приносить доход",
+      networkText: "Активный подписчик может получать 60% от новых прямых подписок и участвовать в продлениях до пяти уровней при соблюдении требований активности, квалификации и действующих правил.",
+      networkNote: "Это не обещание дохода. Результаты зависят от реальных подписок и продлений, квалификации и личной работы.",
+      chooseTitle: "Что вы хотите развивать?",
+      goals: ["💰 Дополнительный доход", "📱 Профессиональный Telegram", "🎓 Новые навыки", "🚀 Цифровой проект"],
+      finalTitle: "Начните с того, что важно именно вам",
+      finalText: "Активируйте подписку и получите всё необходимое в едином пространстве Telegram.",
+      subscribe: "Подписаться за {price} USDT",
+      reactivate: "Возобновить за {price} USDT",
+      details: "Оплата и активация безопасно выполняются через бот EduCashPro.",
+    },
+  };
+
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
+  function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
@@ -162,7 +303,6 @@
       ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
       ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
     const inactiveCards = `
-      ${quickCard("course:apresentacao", "✨", t("discoverPlatform"), t("presentationDesc"))}
       ${quickCard("course:fundamentos_marketing_rede", "🌱", t("freeCourse"), localized(state.courseCatalog.find((item) => item.id === "fundamentos_marketing_rede")?.title))}
       ${lockedExperienceCard("communities", "👥", t("lockedGroups"), t("lockedGroupsDesc"))}
       ${lockedExperienceCard("bots", "🤖", t("lockedBots"), t("lockedBotsDesc"))}
@@ -176,16 +316,69 @@
         <p>${escapeHtml(p.active ? t("heroActive") : t("heroInactive"))}</p>
         <span class="statusPill ${p.active ? "" : "inactive"}">${p.active ? "●" : "○"} ${escapeHtml(p.active ? t("active") : t("inactive"))}</span>
       </section>
+      ${p.active ? "" : `<button id="openPresentation" class="visitorIntro"><span class="visitorIntroIcon">✨</span><span><strong>${escapeHtml(presentationCopy("homeTitle"))}</strong><small>${escapeHtml(presentationCopy("homeText"))}</small><b>${escapeHtml(presentationCopy("homeButton"))} →</b></span></button>`}
       <div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2><p>${escapeHtml(t("yourSpaceSub"))}</p></div></div>
       <section class="quickGrid">
         ${p.active ? activeCards : inactiveCards}
       </section>`;
+    document.getElementById("openPresentation")?.addEventListener("click", renderPresentation);
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
       else if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
+  }
+
+  function presentationPriceText() {
+    const price = Number(state.planPriceUsdt || 12);
+    const formattedPrice = Number.isInteger(price) ? String(price) : price.toFixed(2);
+    const key = state.profile?.activeUntil ? "reactivate" : "subscribe";
+    return String(presentationCopy(key)).replace("{price}", formattedPrice);
+  }
+
+  function renderPresentation() {
+    if (state.profile?.active) return setView("home");
+    const included = presentationCopy("included");
+    const works = presentationCopy("works");
+    const goals = presentationCopy("goals");
+    state.view = "presentation";
+    updateNav();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    content.innerHTML = `
+      <button id="presentationBack" class="textButton presentationBack">← ${escapeHtml(presentationCopy("back"))}</button>
+      <section class="presentationHero">
+        <span class="eyebrow">${escapeHtml(presentationCopy("kicker"))}</span>
+        <h1>${escapeHtml(presentationCopy("title"))}</h1>
+        <p>${escapeHtml(presentationCopy("lead"))}</p>
+        <div class="inviteRegistered">✅ ${escapeHtml(state.referrerId ? presentationCopy("invite") : presentationCopy("ready"))}</div>
+        <button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button>
+      </section>
+      <section class="presentationSection">
+        <h2>${escapeHtml(presentationCopy("includedTitle"))}</h2>
+        <div class="presentationBenefits">${included.map(([icon, title, description]) => `<article><span>${icon}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div></article>`).join("")}</div>
+      </section>
+      <section class="presentationSection">
+        <h2>${escapeHtml(presentationCopy("worksTitle"))}</h2>
+        <div class="presentationSteps">${works.map(([number, title, description]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div></article>`).join("")}</div>
+      </section>
+      <section class="networkHighlight">
+        <span>💰</span><h2>${escapeHtml(presentationCopy("networkTitle"))}</h2>
+        <p>${escapeHtml(presentationCopy("networkText"))}</p>
+        <small>⚠️ ${escapeHtml(presentationCopy("networkNote"))}</small>
+      </section>
+      <section class="presentationSection">
+        <h2>${escapeHtml(presentationCopy("chooseTitle"))}</h2>
+        <div class="goalGrid">${goals.map((goal) => `<span>${escapeHtml(goal)}</span>`).join("")}</div>
+      </section>
+      <section class="presentationFinal">
+        <h2>${escapeHtml(presentationCopy("finalTitle"))}</h2>
+        <p>${escapeHtml(presentationCopy("finalText"))}</p>
+        <button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button>
+        <small>${escapeHtml(presentationCopy("details"))}</small>
+      </section>`;
+    document.getElementById("presentationBack").onclick = () => setView("home");
+    content.querySelectorAll(".presentationSubscribe").forEach((button) => button.onclick = subscribeNow);
   }
 
   function quickCard(target, icon, title, sub) {
@@ -439,6 +632,7 @@
       state.profile = session.profile;
       state.affiliateLink = session.affiliateLink;
       state.subscribeUrl = session.subscribeUrl || session.botUrl;
+      state.referrerId = String(session.referrerId || "");
       state.planPriceUsdt = Number(session.planPriceUsdt || 12);
       state.botUrl = session.botUrl;
       state.language = session.profile.language || "pt";
