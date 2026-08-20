@@ -13,6 +13,8 @@
     token: "",
     profile: null,
     affiliateLink: "",
+    subscribeUrl: "",
+    planPriceUsdt: 12,
     botUrl: "",
     language: "pt",
     view: "home",
@@ -23,6 +25,7 @@
     projects: null,
     currentCourse: null,
     currentLesson: 0,
+    courseCatalog: [],
   };
 
   const COPY = {
@@ -58,7 +61,27 @@
     },
   };
 
-  function t(key) { return COPY[state.language]?.[key] || COPY.pt[key] || key; }
+  const EXTRA_COPY = {
+    pt: {
+      discoverPlatform: "Conheça o EduCashPro", freeCourse: "Curso gratuito", subscriberExperiences: "Experiências exclusivas", subscriberExperiencesSub: "Toque para descobrir o que assinantes aprendem e utilizam.", subscribe: "Assinar", close: "Agora não", whatYouLearn: "O que você vai aprender", catalogOffline: "Catálogo salvo no celular", projection: "Calculadora de projeção", projectionDesc: "Simule cenários com as regras atuais do EduCashPro.", price: "Valor da assinatura (USDT)", newDirect: "Novas adesões diretas", activeDirect: "Diretos ativos", levelMembers: "Renovações no nível", projectedDirect: "Adesões diretas", projectedRenewals: "Renovações liberadas", projectedLocked: "Projeção bloqueada", projectedTotal: "Projeção total", levelsUnlocked: "Níveis liberados", projectionDisclaimer: "Simulação educacional, não promessa de ganhos. Resultados dependem de vendas e renovações reais, assinatura ativa, qualificação, atuação individual e regras vigentes.", lockedGroups: "Comunidades profissionais", lockedGroupsDesc: "Descubra grupos e comunidades selecionados para aprendizado, negócios e desenvolvimento.", lockedBots: "Bots e ferramentas", lockedBotsDesc: "Conheça automações, bots e recursos que ajudam a produzir e trabalhar melhor.", lockedChannels: "Canais e oportunidades", lockedChannelsDesc: "Acesse canais organizados com conteúdo, projetos e oportunidades digitais.", lockedBenefits: "Benefícios do assinante", lockedBenefitsDesc: "Tenha acesso às vantagens e parcerias disponibilizadas aos membros ativos.", continueLearning: "Continuar aprendendo"
+    },
+    en: {
+      discoverPlatform: "Discover EduCashPro", freeCourse: "Free course", subscriberExperiences: "Exclusive experiences", subscriberExperiencesSub: "Tap to discover what subscribers learn and use.", subscribe: "Subscribe", close: "Not now", whatYouLearn: "What you will learn", catalogOffline: "Catalog saved on your phone", projection: "Projection calculator", projectionDesc: "Simulate scenarios using the current EduCashPro rules.", price: "Subscription price (USDT)", newDirect: "New direct subscriptions", activeDirect: "Active direct referrals", levelMembers: "Renewals at level", projectedDirect: "Direct subscriptions", projectedRenewals: "Eligible renewals", projectedLocked: "Locked projection", projectedTotal: "Total projection", levelsUnlocked: "Unlocked levels", projectionDisclaimer: "Educational simulation, not an earnings promise. Results depend on real sales and renewals, active subscription, qualification, individual effort and current rules.", lockedGroups: "Professional communities", lockedGroupsDesc: "Discover selected groups and communities for learning, business and development.", lockedBots: "Bots and tools", lockedBotsDesc: "Discover automation, bots and resources that help people produce and work better.", lockedChannels: "Channels and opportunities", lockedChannelsDesc: "Access organized channels with content, projects and digital opportunities.", lockedBenefits: "Subscriber benefits", lockedBenefitsDesc: "Access advantages and partnerships made available to active members.", continueLearning: "Continue learning"
+    },
+    es: {
+      discoverPlatform: "Conoce EduCashPro", freeCourse: "Curso gratuito", subscriberExperiences: "Experiencias exclusivas", subscriberExperiencesSub: "Toca para descubrir lo que aprenden y utilizan los suscriptores.", subscribe: "Suscribirme", close: "Ahora no", whatYouLearn: "Lo que vas a aprender", catalogOffline: "Catálogo guardado en el celular", projection: "Calculadora de proyección", projectionDesc: "Simula escenarios con las reglas actuales de EduCashPro.", price: "Valor de la suscripción (USDT)", newDirect: "Nuevas adhesiones directas", activeDirect: "Directos activos", levelMembers: "Renovaciones en el nivel", projectedDirect: "Adhesiones directas", projectedRenewals: "Renovaciones liberadas", projectedLocked: "Proyección bloqueada", projectedTotal: "Proyección total", levelsUnlocked: "Niveles liberados", projectionDisclaimer: "Simulación educativa, no promesa de ganancias. Los resultados dependen de ventas y renovaciones reales, suscripción activa, calificación, esfuerzo individual y reglas vigentes.", lockedGroups: "Comunidades profesionales", lockedGroupsDesc: "Descubre grupos y comunidades seleccionados para aprendizaje, negocios y desarrollo.", lockedBots: "Bots y herramientas", lockedBotsDesc: "Conoce automatizaciones, bots y recursos para producir y trabajar mejor.", lockedChannels: "Canales y oportunidades", lockedChannelsDesc: "Accede a canales organizados con contenidos, proyectos y oportunidades digitales.", lockedBenefits: "Beneficios del suscriptor", lockedBenefitsDesc: "Accede a ventajas y alianzas disponibles para miembros activos.", continueLearning: "Continuar aprendiendo"
+    },
+    ru: {
+      discoverPlatform: "Познакомиться с EduCashPro", freeCourse: "Бесплатный курс", subscriberExperiences: "Эксклюзивные возможности", subscriberExperiencesSub: "Нажмите, чтобы узнать, чему учатся и чем пользуются подписчики.", subscribe: "Подписаться", close: "Не сейчас", whatYouLearn: "Чему вы научитесь", catalogOffline: "Каталог сохранён на телефоне", projection: "Калькулятор прогноза", projectionDesc: "Моделируйте сценарии по текущим правилам EduCashPro.", price: "Стоимость подписки (USDT)", newDirect: "Новые прямые подписки", activeDirect: "Активные прямые", levelMembers: "Продления на уровне", projectedDirect: "Прямые подписки", projectedRenewals: "Доступные продления", projectedLocked: "Заблокированный прогноз", projectedTotal: "Общий прогноз", levelsUnlocked: "Открытые уровни", projectionDisclaimer: "Учебная симуляция, а не обещание дохода. Результаты зависят от реальных продаж и продлений, активной подписки, квалификации, личной работы и действующих правил.", lockedGroups: "Профессиональные сообщества", lockedGroupsDesc: "Откройте отобранные группы и сообщества для обучения, бизнеса и развития.", lockedBots: "Боты и инструменты", lockedBotsDesc: "Изучите автоматизацию, ботов и ресурсы для более эффективной работы.", lockedChannels: "Каналы и возможности", lockedChannelsDesc: "Получите доступ к каналам с контентом, проектами и цифровыми возможностями.", lockedBenefits: "Преимущества подписчика", lockedBenefitsDesc: "Используйте преимущества и партнёрства для активных участников.", continueLearning: "Продолжить обучение"
+    }
+  };
+
+  Object.assign(EXTRA_COPY.pt, { lessonNotes: "Minhas anotações", notesPlaceholder: "Escreva como você aplicará esta aula…", saveNotes: "Salvar no celular", notesSaved: "Anotação salva no celular" });
+  Object.assign(EXTRA_COPY.en, { lessonNotes: "My notes", notesPlaceholder: "Write how you will apply this lesson…", saveNotes: "Save on phone", notesSaved: "Note saved on your phone" });
+  Object.assign(EXTRA_COPY.es, { lessonNotes: "Mis anotaciones", notesPlaceholder: "Escribe cómo aplicarás esta lección…", saveNotes: "Guardar en el celular", notesSaved: "Anotación guardada en el celular" });
+  Object.assign(EXTRA_COPY.ru, { lessonNotes: "Мои заметки", notesPlaceholder: "Напишите, как вы примените этот урок…", saveNotes: "Сохранить на телефоне", notesSaved: "Заметка сохранена на телефоне" });
+
+  function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
@@ -67,6 +90,44 @@
   function getProgress(courseId) { return Math.max(0, Number(localStorage.getItem(localKey(courseId)) || 0)); }
   function saveProgress(courseId, index) { localStorage.setItem(localKey(courseId), String(Math.max(0, index))); }
   function openUrl(url) { if (!url) return; if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener"); }
+  function localized(value) { return value?.[state.language] || value?.pt || ""; }
+  function catalogKey() { return "educashpro:courses:catalog:v1"; }
+  function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
+
+  async function loadCourseCatalog() {
+    let cached = null;
+    try {
+      cached = JSON.parse(localStorage.getItem(catalogKey()) || "null");
+      if (Array.isArray(cached?.courses)) state.courseCatalog = cached.courses;
+      if (Date.now() - Number(cached?.savedAt || 0) < 60 * 60 * 1000) return;
+    } catch {}
+    try {
+      const response = await fetch(`./courses.json?v=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("catalog");
+      const data = await response.json();
+      state.courseCatalog = Array.isArray(data?.courses) ? data.courses.sort((a, b) => Number(a.order) - Number(b.order)) : [];
+      localStorage.setItem(catalogKey(), JSON.stringify({ savedAt: Date.now(), courses: state.courseCatalog }));
+    } catch {
+      if (!state.courseCatalog.length) state.courseCatalog = [];
+    }
+  }
+
+  function subscribeNow() { openUrl(state.subscribeUrl || state.botUrl); }
+
+  function showLockedInfo(item) {
+    const modal = document.getElementById("accessModal");
+    document.getElementById("modalIcon").textContent = item.icon || "🔒";
+    document.getElementById("modalTitle").textContent = localized(item.title) || item.title || t("locked");
+    document.getElementById("modalDescription").textContent = localized(item.description) || item.description || t("locked");
+    const points = Array.isArray(item.preview?.[state.language]) ? item.preview[state.language] : Array.isArray(item.preview?.pt) ? item.preview.pt : [];
+    document.getElementById("modalLearning").innerHTML = points.map((point) => `<li>${escapeHtml(point)}</li>`).join("");
+    document.getElementById("modalSubscribe").textContent = `⚡ ${t("subscribe")}`;
+    document.querySelector(".modalCancel").textContent = t("close");
+    document.getElementById("modalSubscribe").onclick = subscribeNow;
+    modal.classList.remove("hidden");
+  }
+
+  function closeModal() { document.getElementById("accessModal").classList.add("hidden"); }
 
   async function api(path, payload = {}) {
     const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store" });
@@ -81,6 +142,11 @@
   }
 
   function setView(view) {
+    if (!state.profile?.active && ["explore", "benefits", "area"].includes(view)) {
+      const lockedId = view === "explore" ? "communities" : view === "benefits" ? "benefits" : "courses";
+      showLockedInfo(lockedExperience(lockedId));
+      return;
+    }
     state.view = view;
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -93,6 +159,21 @@
 
   function renderHome() {
     const p = state.profile;
+    const activeCards = `
+      ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
+      ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
+      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}
+      ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
+      ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
+      ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
+    const inactiveCards = `
+      ${quickCard("course:apresentacao", "✨", t("discoverPlatform"), t("presentationDesc"))}
+      ${quickCard("course:fundamentos_marketing_rede", "🌱", t("freeCourse"), localized(state.courseCatalog.find((item) => item.id === "fundamentos_marketing_rede")?.title))}
+      ${lockedExperienceCard("communities", "👥", t("lockedGroups"), t("lockedGroupsDesc"))}
+      ${lockedExperienceCard("bots", "🤖", t("lockedBots"), t("lockedBotsDesc"))}
+      ${lockedExperienceCard("channels", "📣", t("lockedChannels"), t("lockedChannelsDesc"))}
+      ${lockedExperienceCard("courses", "🎓", t("courses"), t("learnDesc"))}
+      ${lockedExperienceCard("benefits", "🎁", t("lockedBenefits"), t("lockedBenefitsDesc"))}`;
     content.innerHTML = `
       <section class="hero">
         <span class="eyebrow">${escapeHtml(t("welcome"))}</span>
@@ -102,44 +183,58 @@
       </section>
       <div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2><p>${escapeHtml(t("yourSpaceSub"))}</p></div></div>
       <section class="quickGrid">
-        ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
-        ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
-        ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}
-        ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
-        ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
-        ${quickCard("share", "💰", t("network"), t("networkSub"))}
+        ${p.active ? activeCards : inactiveCards}
       </section>`;
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
-      if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else setView(target);
+      if (target.startsWith("course:")) openCourse(target.split(":")[1]);
+      else if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else setView(target);
     });
+    content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
 
   function quickCard(target, icon, title, sub) {
     return `<button class="quickCard" data-target="${target}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(sub)}</small></button>`;
   }
 
+  function lockedExperienceCard(id, icon, title, sub) {
+    return `<button class="quickCard lockedExperience" data-locked-experience="${id}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(sub)}</small></button>`;
+  }
+
+  function lockedExperience(id) {
+    const map = {
+      communities: { icon: "👥", title: t("lockedGroups"), description: t("lockedGroupsDesc"), preview: { [state.language]: [t("exploreSub"), t("rateAction"), t("subscriberExperiences")] } },
+      bots: { icon: "🤖", title: t("lockedBots"), description: t("lockedBotsDesc"), preview: { [state.language]: [t("toolsSub"), t("continueLearning"), t("subscriberExperiences")] } },
+      channels: { icon: "📣", title: t("lockedChannels"), description: t("lockedChannelsDesc"), preview: { [state.language]: [t("exploreSub"), t("officialCommunity"), t("subscriberExperiences")] } },
+      courses: { icon: "🎓", title: t("courses"), description: t("learnDesc"), preview: { [state.language]: state.courseCatalog.filter((item) => item.access === "subscriber").slice(0, 4).map((item) => localized(item.title)) } },
+      benefits: { icon: "🎁", title: t("lockedBenefits"), description: t("lockedBenefitsDesc"), preview: { [state.language]: [t("benefitsDesc"), t("subscriberExperiences"), t("continueLearning")] } },
+    };
+    return map[id];
+  }
+
   function renderLearn() {
     const active = state.profile.active;
+    const visibleCourses = state.courseCatalog.length ? state.courseCatalog : [];
     content.innerHTML = `
       <section class="courseHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
       <div class="sectionHead"><div><h2>${escapeHtml(t("courses"))}</h2><p>${escapeHtml(t("continue"))}</p></div></div>
       <div class="cardList">
-        ${courseCard("apresentacao", "🚀", t("presentation"), t("presentationDesc"), false)}
-        ${courseCard("liberdade_financeira_assinantes", "🎓", t("academy"), t("academyDesc"), !active)}
+        ${visibleCourses.map((item) => courseCard(item, item.access === "subscriber" && !active)).join("") || loadingCard()}
       </div>
       <div class="sectionHead"><div><h2>${escapeHtml(t("toolsTitle"))}</h2></div></div>
       <button id="openTools" class="wideButton">🧮 ${escapeHtml(t("tools"))}</button>`;
     content.querySelectorAll("[data-course]").forEach((button) => button.onclick = () => {
-      if (button.dataset.locked === "true") return openUrl(state.botUrl);
+      const item = state.courseCatalog.find((course) => course.id === button.dataset.course);
+      if (button.dataset.locked === "true") return showLockedInfo(item);
+      if (item?.link) return openUrl(item.link);
       openCourse(button.dataset.course);
     });
     document.getElementById("openTools").onclick = renderTools;
   }
 
-  function courseCard(id, icon, title, description, locked) {
-    const progress = getProgress(id);
-    return `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${icon}</div><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div></div><div class="progressTrack"><span style="width:${Math.min(100, progress * 5)}%"></span></div><div class="cardActions"><button class="${locked ? "secondaryButton lockedButton" : "primaryButton"}" data-course="${id}" data-locked="${locked}">${escapeHtml(locked ? t("locked") : t("openCourse"))}</button><button class="secondaryButton" data-course="${id}" data-locked="${locked}">${escapeHtml(t("chapters"))}</button></div></article>`;
+  function courseCard(item, locked) {
+    const progress = getProgress(item.id);
+    return `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${item.icon || "🎓"}</div><div><h3>${escapeHtml(localized(item.title))}</h3><p>${escapeHtml(localized(item.description))}</p><div class="meta"><span class="chip">${escapeHtml(item.access === "free" ? t("freeCourse") : t("subscriberExperiences"))}</span></div></div></div><div class="progressTrack"><span style="width:${Math.min(100, progress * 6.67)}%"></span></div><div class="cardActions"><button class="${locked ? "secondaryButton lockedButton" : "primaryButton"}" data-course="${item.id}" data-locked="${locked}">${escapeHtml(locked ? t("locked") : t("openCourse"))}</button><button class="secondaryButton" data-course="${item.id}" data-locked="${locked}">${escapeHtml(t("chapters"))}</button></div></article>`;
   }
 
   async function openCourse(courseId) {
@@ -147,22 +242,40 @@
     try {
       const data = await api("/api/hub/course", { token: state.token, courseId });
       state.currentCourse = data.course;
+      try { localStorage.setItem(courseCacheKey(courseId), JSON.stringify(data.course)); } catch {}
       state.currentLesson = Math.min(getProgress(courseId), Math.max(0, data.course.lessons.length - 1));
       renderCourseIndex();
-    } catch (error) { handleError(error); }
+    } catch (error) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(courseCacheKey(courseId)) || "null");
+        const meta = state.courseCatalog.find((item) => item.id === courseId);
+        if (cached && (meta?.access === "free" || state.profile.active)) {
+          state.currentCourse = cached;
+          state.currentLesson = Math.min(getProgress(courseId), Math.max(0, cached.lessons.length - 1));
+          renderCourseIndex();
+          return;
+        }
+      } catch {}
+      handleError(error);
+    }
   }
 
   function renderCourseIndex() {
     const course = state.currentCourse;
+    const courseMeta = state.courseCatalog.find((item) => item.id === course.id);
     const completed = getProgress(course.id);
     const percent = course.lessons.length ? Math.round((Math.min(completed + 1, course.lessons.length) / course.lessons.length) * 100) : 0;
-    content.innerHTML = `<button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero"><span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div><div class="progressTrack"><span style="width:${percent}%"></span></div></section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}`;
+    const visual = `<div class="courseVisual"><span>📚 ${escapeHtml(t("continueLearning"))}</span><span>✅ ${percent}%</span><span>💾 ${escapeHtml(t("catalogOffline"))}</span></div>`;
+    const calculatorButton = course.id === "marketing_rede_educashpro" ? `<button id="openProjection" class="wideButton" style="margin-top:14px">📊 ${escapeHtml(t("projection"))}</button>` : "";
+    const cover = courseMeta?.image ? `<img class="courseCover" src="${escapeHtml(courseMeta.image)}" alt="${escapeHtml(course.title)}">` : "";
+    content.innerHTML = `<button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span></div>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}`;
     document.getElementById("courseBack").onclick = renderLearn;
     content.querySelectorAll("[data-chapter]").forEach((button) => button.onclick = () => {
       const index = course.lessons.findIndex((lesson) => Number(lesson.ch) === Number(button.dataset.chapter));
       if (index >= 0) renderLesson(index);
     });
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
+    document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
   }
 
   function renderLesson(index) {
@@ -172,10 +285,46 @@
     state.currentLesson = index;
     saveProgress(course.id, Math.max(getProgress(course.id), index));
     const chapter = course.chapters.find((item) => Number(item.id) === Number(lesson.ch));
-    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
+    const noteKey = `educashpro:lesson-note:${state.profile?.tgId || "guest"}:${course.id}:${index}`;
+    const savedNote = localStorage.getItem(noteKey) || "";
+    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNotes"><label for="lessonNote">📝 ${escapeHtml(t("lessonNotes"))}</label><textarea id="lessonNote" placeholder="${escapeHtml(t("notesPlaceholder"))}">${escapeHtml(savedNote)}</textarea><button id="saveLessonNote" class="secondaryButton">${escapeHtml(t("saveNotes"))}</button></div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
+    document.getElementById("saveLessonNote").onclick = () => {
+      localStorage.setItem(noteKey, document.getElementById("lessonNote").value.slice(0, 4000));
+      showToast(t("notesSaved"));
+    };
+  }
+
+  function renderNetworkProjection() {
+    const saved = (() => { try { return JSON.parse(localStorage.getItem("educashpro:network-projection") || "{}"); } catch { return {}; } })();
+    const levelFields = [1, 2, 3, 4, 5].map((level) => `<div class="field"><label>${escapeHtml(t("levelMembers"))} ${level}</label><input id="level${level}" inputmode="numeric" value="${Math.max(0, Number(saved[`level${level}`] || 0))}"></div>`).join("");
+    content.innerHTML = `<button id="projectionBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero"><span class="eyebrow">EDUCASHPRO</span><h2>📊 ${escapeHtml(t("projection"))}</h2><p>${escapeHtml(t("projectionDesc"))}</p></section><article class="toolCard" style="margin-top:14px"><div class="fieldGrid"><div class="field"><label>${escapeHtml(t("price"))}</label><input id="projectionPrice" inputmode="decimal" value="${Number(saved.price || state.planPriceUsdt || 12)}"></div><div class="field"><label>${escapeHtml(t("newDirect"))}</label><input id="newDirect" inputmode="numeric" value="${Math.max(0, Number(saved.newDirect || 0))}"></div><div class="field"><label>${escapeHtml(t("activeDirect"))}</label><input id="activeDirect" inputmode="numeric" value="${Math.max(0, Number(saved.activeDirect || 0))}"></div>${levelFields}</div><button id="calculateProjection" class="wideButton" style="margin-top:14px">${escapeHtml(t("calculate"))}</button><div id="projectionResult" class="resultBox hidden"></div><div class="disclaimer">⚠️ ${escapeHtml(t("projectionDisclaimer"))}</div></article>`;
+    document.getElementById("projectionBack").onclick = renderCourseIndex;
+    document.getElementById("calculateProjection").onclick = calculateNetworkProjection;
+  }
+
+  function calculateNetworkProjection() {
+    const read = (id) => Math.max(0, Number(String(document.getElementById(id).value || "0").replace(",", ".")) || 0);
+    const data = { price: read("projectionPrice"), newDirect: Math.trunc(read("newDirect")), activeDirect: Math.trunc(read("activeDirect")) };
+    for (let level = 1; level <= 5; level += 1) data[`level${level}`] = Math.trunc(read(`level${level}`));
+    localStorage.setItem("educashpro:network-projection", JSON.stringify(data));
+    const rates = [0.30, 0.20, 0.10, 0.05, 0.05];
+    const required = [0, 5, 10, 15, 20];
+    const directValue = data.newDirect * data.price * 0.60;
+    let renewalValue = 0;
+    let lockedValue = 0;
+    const unlocked = [];
+    rates.forEach((rate, index) => {
+      const value = data[`level${index + 1}`] * data.price * rate;
+      if (data.activeDirect >= required[index]) { renewalValue += value; unlocked.push(index + 1); }
+      else lockedValue += value;
+    });
+    const format = (value) => `${value.toFixed(2)} USDT`;
+    const result = document.getElementById("projectionResult");
+    result.innerHTML = `<div class="projectionSummary"><div class="projectionRow"><span>${escapeHtml(t("projectedDirect"))}</span><strong>${format(directValue)}</strong></div><div class="projectionRow"><span>${escapeHtml(t("projectedRenewals"))}</span><strong>${format(renewalValue)}</strong></div><div class="projectionRow"><span>${escapeHtml(t("projectedLocked"))}</span><strong>${format(lockedValue)}</strong></div><div class="projectionRow"><span>${escapeHtml(t("projectedTotal"))}</span><strong>${format(directValue + renewalValue)}</strong></div><div class="projectionRow"><span>${escapeHtml(t("levelsUnlocked"))}</span><strong>${unlocked.join(", ") || "—"}</strong></div></div>`;
+    result.classList.remove("hidden");
   }
 
   async function renderExplore() {
@@ -287,6 +436,7 @@
     tg?.ready?.();
     tg?.expand?.();
     document.getElementById("closeButton").onclick = () => tg?.close?.();
+    document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
     bottomNav.querySelectorAll("button").forEach((button) => button.onclick = () => setView(button.dataset.view));
 
     if (!tg?.initData) {
@@ -299,8 +449,11 @@
       state.token = session.token;
       state.profile = session.profile;
       state.affiliateLink = session.affiliateLink;
+      state.subscribeUrl = session.subscribeUrl || session.botUrl;
+      state.planPriceUsdt = Number(session.planPriceUsdt || 12);
       state.botUrl = session.botUrl;
       state.language = session.profile.language || "pt";
+      await loadCourseCatalog();
       applyLanguage();
       bottomNav.classList.remove("hidden");
       renderHome();
