@@ -132,7 +132,8 @@ body::before {
 .toolCard h3 { margin: 0 0 11px; }
 .fieldGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .field label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 5px; }
-.field input { width: 100%; border: 1px solid var(--line); border-radius: 11px; padding: 11px; background: #081523; color: var(--text); }
+.field input, .field select { width: 100%; border: 1px solid var(--line); border-radius: 11px; padding: 11px; background: #081523; color: var(--text); }
+.fullField { grid-column: 1 / -1; }
 .resultBox { margin-top: 12px; border-radius: 12px; padding: 12px; background: rgba(48,230,166,.09); color: var(--green); font-weight: 850; }
 .quizOption { width: 100%; text-align: left; margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; color: var(--text); background: var(--surface2); }
 
@@ -202,8 +203,43 @@ body::before {
 .presentationFinal { margin-top: 27px; padding: 21px; border-radius: 21px; text-align: center; background: var(--surface); border: 1px solid var(--line); }
 .presentationFinal p { color: var(--muted); line-height: 1.55; }
 .presentationFinal small { display: block; margin-top: 11px; color: var(--muted); line-height: 1.45; }
+.presentationPair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 27px; }
+.presentationPair article { padding: 17px; border: 1px solid var(--line); border-radius: 18px; background: rgba(13,27,45,.92); }
+.presentationPair article > span { font-size: 27px; }
+.presentationPair h2 { margin: 10px 0 7px; font-size: 17px; }
+.presentationPair p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.52; }
+.directCommission { display: flex; align-items: center; gap: 13px; margin: 15px 0; padding: 14px; border-radius: 16px; background: rgba(48,230,166,.12); }
+.directCommission b { color: var(--green); font-size: 31px; }
+.directCommission span { color: #dcefe8; font-size: 13px; line-height: 1.4; }
+.networkHighlight h3 { margin: 17px 0 9px; font-size: 14px; }
+.planGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.planGrid span, .qualificationList span { padding: 9px; border-radius: 11px; background: rgba(255,255,255,.06); color: #e8f0f7; font-size: 12px; }
+.qualificationList { display: grid; gap: 6px; }
+.automaticPayment { padding: 12px; border-radius: 12px; background: rgba(74,140,255,.11); font-size: 12px; }
+.presentationDetails { margin-top: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+.presentationDetails summary { cursor: pointer; color: #dce8f5; font-weight: 850; }
+.presentationDetails ul { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.presentationDetails li + li { margin-top: 7px; }
+.benefitOffer { display: grid; gap: 12px; margin-top: 14px; padding: 17px; border: 1px solid rgba(48,230,166,.25); border-radius: 19px; background: rgba(48,230,166,.07); }
+.benefitOffer span { font-size: 27px; }
+.benefitOffer h2 { margin: 7px 0 5px; font-size: 17px; }
+.benefitOffer p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.providerLine { display: grid; gap: 7px; margin-top: 13px; padding: 11px; border-radius: 12px; background: rgba(74,140,255,.08); color: #c7d8ea; font-size: 11px; line-height: 1.4; }
+.freeChip { color: #bff9e5; background: rgba(48,230,166,.11); }
+.marginTool > p { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.qrCard { text-align: center; }
+.qrCanvas { width: 264px; min-height: 264px; margin: 18px auto; padding: 12px; border-radius: 20px; background: #fff; display: grid; place-items: center; }
+.qrCanvas img, .qrCanvas canvas { max-width: 240px !important; width: 100% !important; height: auto !important; }
+.qrCard > p { overflow-wrap: anywhere; }
+.verificationCard { max-width: 520px; margin: 48px auto; text-align: center; }
+.verificationIcon { margin-bottom: 14px; font-size: 64px; }
+.verificationCard h1 { margin: 8px 0 18px; }
 
 @media (min-width: 620px) {
   .quickGrid { grid-template-columns: repeat(3, 1fr); }
   .toolGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .presentationPair { grid-template-columns: 1fr; }
 }
