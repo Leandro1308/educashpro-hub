@@ -65,6 +65,14 @@
     },
   };
 
+  const FORM_COPY = {
+    pt: { back: "Voltar", save: "Enviar para avaliação", saving: "Enviando…", sent: "Cadastro enviado para avaliação.", remove: "Excluir", confirmRemove: "Deseja excluir este cadastro definitivamente?", removed: "Cadastro excluído.", required: "Preencha todos os campos obrigatórios.", project: "Cadastrar projeto", benefit: "Oferecer benefício gratuito", partner: "Cadastrar parceiro", name: "Nome", description: "Descrição", url: "Link completo (https://)", type: "Tipo", category: "Categoria", language: "Idioma", company: "Nome da empresa", segment: "Segmento", discount: "Faixa de desconto", rules: "Regras do desconto", storeType: "Atendimento", city: "Cidade", region: "Estado/Região", contact: "Contato", affiliate: "Link de afiliado ou grupo exclusivo (opcional)", deleteError: "Não foi possível excluir." },
+    en: { back: "Back", save: "Submit for review", saving: "Submitting…", sent: "Submission sent for review.", remove: "Delete", confirmRemove: "Permanently delete this submission?", removed: "Submission deleted.", required: "Complete all required fields.", project: "Submit project", benefit: "Offer a free benefit", partner: "Register partner", name: "Name", description: "Description", url: "Full link (https://)", type: "Type", category: "Category", language: "Language", company: "Company name", segment: "Segment", discount: "Discount range", rules: "Discount rules", storeType: "Service type", city: "City", region: "State/Region", contact: "Contact", affiliate: "Affiliate or exclusive group link (optional)", deleteError: "Unable to delete." },
+    es: { back: "Volver", save: "Enviar para evaluación", saving: "Enviando…", sent: "Registro enviado para evaluación.", remove: "Eliminar", confirmRemove: "¿Eliminar este registro definitivamente?", removed: "Registro eliminado.", required: "Completa todos los campos obligatorios.", project: "Registrar proyecto", benefit: "Ofrecer beneficio gratuito", partner: "Registrar socio", name: "Nombre", description: "Descripción", url: "Enlace completo (https://)", type: "Tipo", category: "Categoría", language: "Idioma", company: "Nombre de la empresa", segment: "Segmento", discount: "Rango de descuento", rules: "Reglas del descuento", storeType: "Atención", city: "Ciudad", region: "Estado/Región", contact: "Contacto", affiliate: "Enlace de afiliado o grupo exclusivo (opcional)", deleteError: "No fue posible eliminar." },
+    ru: { back: "Назад", save: "Отправить на проверку", saving: "Отправка…", sent: "Заявка отправлена на проверку.", remove: "Удалить", confirmRemove: "Удалить эту заявку навсегда?", removed: "Заявка удалена.", required: "Заполните все обязательные поля.", project: "Добавить проект", benefit: "Предложить бесплатное преимущество", partner: "Добавить партнёра", name: "Название", description: "Описание", url: "Полная ссылка (https://)", type: "Тип", category: "Категория", language: "Язык", company: "Название компании", segment: "Сегмент", discount: "Размер скидки", rules: "Правила скидки", storeType: "Формат обслуживания", city: "Город", region: "Регион", contact: "Контакт", affiliate: "Партнёрская ссылка или закрытая группа (необязательно)", deleteError: "Не удалось удалить." },
+  };
+  const fc = (key) => (FORM_COPY[state.language] || FORM_COPY.pt)[key] || FORM_COPY.pt[key] || key;
+
   const EXTRA_COPY = {
     pt: {
       discoverPlatform: "Conheça o EduCashPro", freeCourse: "Curso gratuito", subscriberExperiences: "Experiências exclusivas", subscriberExperiencesSub: "Toque para descobrir o que assinantes aprendem e utilizam.", subscribe: "Assinar", close: "Agora não", whatYouLearn: "O que você vai aprender", catalogOffline: "Catálogo salvo no celular", projection: "Calculadora de projeção", projectionDesc: "Simule cenários com as regras atuais do EduCashPro.", price: "Valor da assinatura (USDT)", newDirect: "Novas adesões diretas", activeDirect: "Diretos ativos", levelMembers: "Renovações no nível", projectedDirect: "Adesões diretas", projectedRenewals: "Renovações liberadas", projectedLocked: "Projeção bloqueada", projectedTotal: "Projeção total", levelsUnlocked: "Níveis liberados", projectionDisclaimer: "Simulação educacional, não promessa de ganhos. Resultados dependem de vendas e renovações reais, assinatura ativa, qualificação, atuação individual e regras vigentes.", lockedGroups: "Comunidades profissionais", lockedGroupsDesc: "Descubra grupos e comunidades selecionados para aprendizado, negócios e desenvolvimento.", lockedBots: "Bots e ferramentas", lockedBotsDesc: "Conheça automações, bots e recursos que ajudam a produzir e trabalhar melhor.", lockedChannels: "Canais e oportunidades", lockedChannelsDesc: "Acesse canais organizados com conteúdo, projetos e oportunidades digitais.", lockedBenefits: "Benefícios do assinante", lockedBenefitsDesc: "Tenha acesso às vantagens e parcerias disponibilizadas aos membros ativos.", continueLearning: "Continuar aprendendo"
@@ -649,10 +657,43 @@
     try { await api("/api/hub/rate", { token: state.token, communityId, rating: value }); showToast(t("ratingSaved")); await loadDirectory(); } catch (error) { handleError(error); }
   }
 
+  function field(id, label, kind = "input", required = true, options = []) {
+    if (kind === "select") return `<div class="field fullField"><label for="${id}">${escapeHtml(label)}${required ? " *" : ""}</label><select id="${id}">${options.map(([value, text]) => `<option value="${value}">${escapeHtml(text)}</option>`).join("")}</select></div>`;
+    if (kind === "textarea") return `<div class="field fullField"><label for="${id}">${escapeHtml(label)}${required ? " *" : ""}</label><textarea id="${id}" rows="4" ${required ? "required" : ""}></textarea></div>`;
+    return `<div class="field fullField"><label for="${id}">${escapeHtml(label)}${required ? " *" : ""}</label><input id="${id}" ${id.toLowerCase().includes("url") || id === "affiliateLink" ? 'inputmode="url"' : ""} ${required ? "required" : ""}></div>`;
+  }
+
+  function renderSubmissionForm(kind) {
+    if (!state.profile?.active) return openUrl(state.botUrl);
+    const title = fc(kind);
+    const common = field("description", fc("description"), "textarea") + field("destinationUrl", fc("url"));
+    const fields = kind === "project"
+      ? field("name", fc("name")) + field("type", fc("type"), "select", true, [["group", "Grupo / Group"], ["channel", "Canal / Channel"], ["bot", "Bot"], ["page", "Site / Page"]]) + field("category", fc("category")) + common
+      : kind === "benefit"
+        ? field("name", fc("name")) + common
+        : field("companyName", fc("company")) + field("segment", fc("segment")) + common + field("discountRange", fc("discount")) + field("discountRules", fc("rules"), "textarea") + field("storeType", fc("storeType"), "select", true, [["physical", "Físico / Physical"], ["online", "Online"], ["both", "Ambos / Both"]]) + field("city", fc("city"), "input", false) + field("region", fc("region"), "input", false) + field("contact", fc("contact"), "input", false) + field("affiliateLink", fc("affiliate"), "input", false);
+    content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
+    document.getElementById("language").value = state.language;
+    document.getElementById("formBack").onclick = kind === "project" ? renderArea : renderBenefits;
+    document.getElementById("submissionForm").onsubmit = async (event) => {
+      event.preventDefault();
+      const values = Object.fromEntries(Array.from(event.currentTarget.querySelectorAll("input,textarea,select")).map((el) => [el.id, el.value.trim()]));
+      const button = document.getElementById("submitForm"); button.disabled = true; button.textContent = fc("saving");
+      try { await api("/api/hub/submit", { token: state.token, kind, ...values }); state.projects = state.benefits = state.partners = null; showToast(fc("sent")); kind === "project" ? await renderArea() : await renderBenefits(); }
+      catch (error) { handleError(error); button.disabled = false; button.textContent = fc("save"); }
+    };
+  }
+
+  async function removeOwnItem(kind, id) {
+    if (!window.confirm(fc("confirmRemove"))) return;
+    try { await api("/api/hub/delete", { token: state.token, kind, id }); state.projects = null; showToast(fc("removed")); await renderArea(); }
+    catch { showToast(fc("deleteError")); }
+  }
+
   async function renderBenefits() {
     content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div><div class="sectionHead"><div><h2>🤝 ${escapeHtml(featureCopy("partnersTitle"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div></div><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
-    document.getElementById("offerBenefit").onclick = () => openUrl(`${state.botUrl}?start=benefit_add`);
-    document.getElementById("registerPartner").onclick = () => openUrl(`${state.botUrl}?start=partner_add`);
+    document.getElementById("offerBenefit").onclick = () => renderSubmissionForm("benefit");
+    document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
     const container = document.getElementById("benefitList");
     try {
       const data = state.benefits || await api("/api/hub/benefits", { token: state.token });
@@ -675,15 +716,17 @@
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
     document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
     document.getElementById("membershipProof")?.addEventListener("click", renderMembershipProof);
-    document.getElementById("manageProjects").onclick = () => openUrl(state.botUrl);
+    document.getElementById("manageProjects").textContent = fc("project");
+    document.getElementById("manageProjects").onclick = () => renderSubmissionForm("project");
     document.getElementById("reactivate")?.addEventListener("click", () => openUrl(state.botUrl));
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
     const container = document.getElementById("projectList");
     try {
       const data = state.projects || await api("/api/hub/projects", { token: state.token });
       state.projects = data;
-      container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${typeIcon(item.type)}</div><div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.status)}</span><span class="chip">⭐ ${item.ratingAvg || "—"}</span></div></div></div>${item.url ? `<div class="cardActions" style="grid-template-columns:1fr"><button class="secondaryButton" data-project-url="${escapeHtml(item.url)}">${escapeHtml(t("access"))}</button></div>` : ""}</article>`).join("") : `<div class="empty">${escapeHtml(t("noProjects"))}</div>`;
+      container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${typeIcon(item.type)}</div><div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.status)}</span>${item.kind === "project" ? `<span class="chip">⭐ ${item.ratingAvg || "—"}</span>` : ""}</div></div></div><div class="cardActions">${item.url ? `<button class="secondaryButton" data-project-url="${escapeHtml(item.url)}">${escapeHtml(t("access"))}</button>` : ""}<button class="secondaryButton" data-delete-kind="${escapeHtml(item.kind || "project")}" data-delete-id="${escapeHtml(item.id)}">🗑️ ${escapeHtml(fc("remove"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noProjects"))}</div>`;
       container.querySelectorAll("[data-project-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.projectUrl));
+      container.querySelectorAll("[data-delete-id]").forEach((button) => button.onclick = () => removeOwnItem(button.dataset.deleteKind, button.dataset.deleteId));
     } catch (error) { handleError(error, container); }
   }
 
