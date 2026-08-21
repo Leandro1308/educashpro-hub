@@ -8,6 +8,7 @@
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "";
   const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
+  const MEMBERSHIP_PUBLIC_KEY_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeIVIbmPd6xtE6PECnwl9SdqUThN0MGYDulK88/0vzgDJIRFiU53leJ9hLflBm4fSwvbEGUIniofTmHgWylwAPA==";
 
   const state = {
     token: "",
@@ -23,6 +24,8 @@
     directoryType: "",
     directoryData: null,
     benefits: null,
+    partners: null,
+    membershipCredential: "",
     projects: null,
     currentCourse: null,
     currentLesson: 0,
@@ -79,15 +82,16 @@
 
   const PRESENTATION_COPY = {
     pt: {
-      homeTitle: "Conheça o EduCashPro em 1 minuto",
+      homeTitle: "APRESENTAÇÃO EDUCASHPRO",
       homeText: "Veja rapidamente o que você recebe, como funciona e por que tudo acontece dentro do Telegram.",
-      homeButton: "Conhecer agora",
+      homeButton: "ABRIR APRESENTAÇÃO",
       back: "Voltar",
       kicker: "Direto ao ponto",
       title: "Mais conhecimento, oportunidades e presença digital em um só lugar.",
       lead: "O EduCashPro organiza cursos, ferramentas, benefícios e projetos para você aprender, desenvolver e aproveitar melhor o Telegram.",
       invite: "Seu convite está registrado. Ao assinar, o vínculo correto será preservado.",
       ready: "Seu acesso está pronto para ser ativado.",
+      activeReady: "Sua assinatura está ativa. Conheça todos os recursos e possibilidades do EduCashPro.",
       includedTitle: "O que você encontra",
       included: [
         ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
@@ -108,20 +112,22 @@
       goals: ["💰 Renda extra", "📱 Telegram profissional", "🎓 Novas habilidades", "🚀 Projeto digital"],
       finalTitle: "Comece pelo que faz sentido para você",
       finalText: "Ative sua assinatura e encontre tudo organizado em uma única experiência dentro do Telegram.",
+      finalTextActive: "Sua experiência completa já está liberada. Use a apresentação sempre que quiser conhecer melhor ou explicar o EduCashPro.",
       subscribe: "Assinar por {price} USDT",
       reactivate: "Reativar por {price} USDT",
       details: "Pagamento e ativação são concluídos com segurança pelo bot do EduCashPro.",
     },
     en: {
-      homeTitle: "Discover EduCashPro in 1 minute",
+      homeTitle: "EDUCASHPRO PRESENTATION",
       homeText: "Quickly see what you get, how it works and why everything happens inside Telegram.",
-      homeButton: "Discover now",
+      homeButton: "OPEN PRESENTATION",
       back: "Back",
       kicker: "Straight to the point",
       title: "Knowledge, opportunities and digital presence in one place.",
       lead: "EduCashPro organizes courses, tools, benefits and projects so you can learn, develop and make better use of Telegram.",
       invite: "Your invitation is registered. The correct referral will be preserved when you subscribe.",
       ready: "Your access is ready to be activated.",
+      activeReady: "Your subscription is active. Discover all EduCashPro resources and possibilities.",
       includedTitle: "What you will find",
       included: [
         ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
@@ -142,20 +148,22 @@
       goals: ["💰 Extra income", "📱 Professional Telegram", "🎓 New skills", "🚀 Digital project"],
       finalTitle: "Start with what makes sense for you",
       finalText: "Activate your subscription and find everything organized in one Telegram experience.",
+      finalTextActive: "Your complete experience is already unlocked. Revisit this presentation whenever you want to understand or introduce EduCashPro.",
       subscribe: "Subscribe for {price} USDT",
       reactivate: "Reactivate for {price} USDT",
       details: "Payment and activation are securely completed through the EduCashPro bot.",
     },
     es: {
-      homeTitle: "Conoce EduCashPro en 1 minuto",
+      homeTitle: "PRESENTACIÓN EDUCASHPRO",
       homeText: "Descubre rápidamente qué recibes, cómo funciona y por qué todo sucede dentro de Telegram.",
-      homeButton: "Conocer ahora",
+      homeButton: "ABRIR PRESENTACIÓN",
       back: "Volver",
       kicker: "Directo al punto",
       title: "Conocimiento, oportunidades y presencia digital en un solo lugar.",
       lead: "EduCashPro organiza cursos, herramientas, beneficios y proyectos para que aprendas, te desarrolles y aproveches mejor Telegram.",
       invite: "Tu invitación está registrada. Al suscribirte se conservará la referencia correcta.",
       ready: "Tu acceso está listo para ser activado.",
+      activeReady: "Tu suscripción está activa. Conoce todos los recursos y posibilidades de EduCashPro.",
       includedTitle: "Lo que encontrarás",
       included: [
         ["🎓", "Aprendizaje práctico", "Educación financiera, Telegram, marketing de red y habilidades digitales."],
@@ -176,20 +184,22 @@
       goals: ["💰 Ingresos extra", "📱 Telegram profesional", "🎓 Nuevas habilidades", "🚀 Proyecto digital"],
       finalTitle: "Empieza por lo que tiene sentido para ti",
       finalText: "Activa tu suscripción y encuentra todo organizado en una única experiencia dentro de Telegram.",
+      finalTextActive: "Tu experiencia completa ya está habilitada. Consulta esta presentación cuando quieras conocer o presentar mejor EduCashPro.",
       subscribe: "Suscribirme por {price} USDT",
       reactivate: "Reactivar por {price} USDT",
       details: "El pago y la activación se completan de forma segura mediante el bot de EduCashPro.",
     },
     ru: {
-      homeTitle: "Познакомьтесь с EduCashPro за 1 минуту",
+      homeTitle: "ПРЕЗЕНТАЦИЯ EDUCASHPRO",
       homeText: "Быстро узнайте, что вы получите, как всё работает и почему сервис находится внутри Telegram.",
-      homeButton: "Узнать сейчас",
+      homeButton: "ОТКРЫТЬ ПРЕЗЕНТАЦИЮ",
       back: "Назад",
       kicker: "Коротко и по делу",
       title: "Знания, возможности и цифровое присутствие в одном месте.",
       lead: "EduCashPro объединяет курсы, инструменты, преимущества и проекты, чтобы вы могли учиться, развиваться и эффективнее использовать Telegram.",
       invite: "Ваше приглашение зарегистрировано. При подписке правильная реферальная связь сохранится.",
       ready: "Ваш доступ готов к активации.",
+      activeReady: "Ваша подписка активна. Познакомьтесь со всеми ресурсами и возможностями EduCashPro.",
       includedTitle: "Что вы найдёте",
       included: [
         ["🎓", "Практическое обучение", "Финансовая грамотность, Telegram, сетевой маркетинг и цифровые навыки."],
@@ -210,14 +220,82 @@
       goals: ["💰 Дополнительный доход", "📱 Профессиональный Telegram", "🎓 Новые навыки", "🚀 Цифровой проект"],
       finalTitle: "Начните с того, что важно именно вам",
       finalText: "Активируйте подписку и получите всё необходимое в едином пространстве Telegram.",
+      finalTextActive: "Все возможности уже доступны. Возвращайтесь к презентации, чтобы лучше узнать EduCashPro или рассказать о нём другим.",
       subscribe: "Подписаться за {price} USDT",
       reactivate: "Возобновить за {price} USDT",
       details: "Оплата и активация безопасно выполняются через бот EduCashPro.",
     },
   };
 
+  const FEATURE_COPY = {
+    pt: {
+      topicsTitle: "Conteúdo para aprender e aplicar",
+      topics: ["💰 Educação financeira", "🌐 Web3 e Blockchain", "💵 USDT, carteiras e exchanges", "🤖 IA aplicada aos negócios", "📱 Telegram, grupos, canais e bots", "🚀 Empreendedorismo e marketing digital"],
+      creatorTitle: "Para quem cria",
+      creatorText: "Assinantes podem cadastrar grupos, canais, bots, sites e páginas para avaliação. Projetos aprovados entram no diretório e alcançam usuários interessados.",
+      directoryTitle: "Diretório com curadoria",
+      directoryText: "Os projetos são organizados por tipo, categoria e idioma. A proposta é conectar conhecimento, ferramentas e oportunidades sem encher o chat com mensagens.",
+      planTitle: "Plano de ganhos do assinante ativo",
+      planIntro: "O programa de indicação é um benefício opcional. Enquanto a assinatura estiver ativa, pessoas que assinarem pelo link válido são vinculadas à rede. O produto principal continua sendo a experiência EduCashPro.",
+      direct: "da primeira assinatura de cada indicado direto válido",
+      renewalsTitle: "Renovações da rede",
+      renewals: ["Nível 1 · 30%", "Nível 2 · 20%", "Nível 3 · 10%", "Nível 4 · 5%", "Nível 5 · 5%"],
+      qualificationsTitle: "Qualificação para liberar níveis",
+      qualifications: ["Nível 1 · liberado", "Nível 2 · 5 diretos ativos", "Nível 3 · 10 diretos ativos", "Nível 4 · 15 diretos ativos", "Nível 5 · 20 diretos ativos"],
+      automatic: "As comissões elegíveis são distribuídas em USDT diretamente para as carteiras conectadas, sem solicitação de saque.",
+      inactiveTitle: "Se a assinatura ficar inativa",
+      inactiveRules: ["Não recebe novas comissões durante a inatividade.", "A rede já construída permanece vinculada.", "Novas pessoas que entrarem durante a inatividade não serão adicionadas à rede, nem posteriormente.", "Valores do período inativo não acumulam nem são pagos retroativamente.", "Após reativar, volta a participar dos resultados futuros da rede preservada."],
+      profitTitle: "Calculadora de margem e markup",
+      profitDesc: "Descubra o lucro bruto, a margem sobre a venda e o markup sobre o custo.",
+      cost: "Custo de compra", sale: "Preço de venda", currency: "Moeda", gross: "Lucro bruto", margin: "Margem de lucro", markup: "Markup sobre o custo", calculateMargin: "Calcular margem", invalidMargin: "Informe custo e preço de venda maiores que zero.",
+      offerBenefit: "Oferecer benefício gratuito",
+      offerBenefitDesc: "Cadastre uma vantagem que o usuário receba sem pagar nada a você. A publicação depende de avaliação do EduCashPro.",
+      freeBenefit: "Benefício gratuito", offeredBy: "Oferecido por", reviewed: "Avaliado e autorizado pelo EduCashPro", accessBenefit: "Acessar benefício", partnersTitle: "Parceiros com desconto", partnersDesc: "Empresas avaliadas que oferecem descontos aos assinantes ativos.", registerPartner: "Cadastrar parceiro", discount: "Desconto", rules: "Regras", location: "Abrir localização ou site", activeProof: "Comprovar assinatura", affiliateQr: "QR Code do meu link", createQr: "Criar QR Code", downloadQr: "Baixar QR Code", credentialUpdated: "Assinatura renovada em", credentialUntil: "Válida até", credentialActive: "ASSINATURA ATIVA", credentialExpired: "ASSINATURA VENCIDA", authentic: "Credencial autêntica do EduCashPro", invalidCredential: "Credencial inválida ou alterada", proofHelp: "Mostre este QR Code ao parceiro. A validação não consulta Render nem MongoDB.",
+    },
+    en: {
+      topicsTitle: "Content to learn and apply",
+      topics: ["💰 Financial education", "🌐 Web3 and Blockchain", "💵 USDT, wallets and exchanges", "🤖 AI applied to business", "📱 Telegram, groups, channels and bots", "🚀 Entrepreneurship and digital marketing"],
+      creatorTitle: "For creators", creatorText: "Subscribers can submit groups, channels, bots, websites and pages for review. Approved projects enter the directory and reach interested users.",
+      directoryTitle: "Curated directory", directoryText: "Projects are organized by type, category and language, connecting knowledge, tools and opportunities without flooding the chat.",
+      planTitle: "Active subscriber earnings plan", planIntro: "The referral program is optional. While the subscription is active, people subscribing through the valid link are linked to the network. The EduCashPro experience remains the main product.",
+      direct: "of the first subscription from each valid direct referral", renewalsTitle: "Network renewals", renewals: ["Level 1 · 30%", "Level 2 · 20%", "Level 3 · 10%", "Level 4 · 5%", "Level 5 · 5%"],
+      qualificationsTitle: "Qualifications to unlock levels", qualifications: ["Level 1 · unlocked", "Level 2 · 5 active directs", "Level 3 · 10 active directs", "Level 4 · 15 active directs", "Level 5 · 20 active directs"],
+      automatic: "Eligible commissions are distributed in USDT directly to connected wallets, with no withdrawal request.",
+      inactiveTitle: "If the subscription becomes inactive", inactiveRules: ["No new commissions are received during inactivity.", "The existing network remains linked.", "People joining during inactivity are not added to the network, either then or later.", "Amounts from the inactive period do not accumulate or receive retroactive payment.", "After reactivation, future participation from the preserved network resumes."],
+      profitTitle: "Margin and markup calculator", profitDesc: "Calculate gross profit, sales margin and markup over cost.", cost: "Purchase cost", sale: "Sale price", currency: "Currency", gross: "Gross profit", margin: "Profit margin", markup: "Markup over cost", calculateMargin: "Calculate margin", invalidMargin: "Enter cost and sale price greater than zero.",
+      offerBenefit: "Offer a free benefit", offerBenefitDesc: "Submit an advantage users receive without paying you. Publication requires EduCashPro review.", freeBenefit: "Free benefit", offeredBy: "Offered by", reviewed: "Reviewed and authorized by EduCashPro", accessBenefit: "Access benefit", partnersTitle: "Discount partners", partnersDesc: "Reviewed companies offering discounts to active subscribers.", registerPartner: "Register partner", discount: "Discount", rules: "Rules", location: "Open location or website", activeProof: "Prove subscription", affiliateQr: "My referral QR Code", createQr: "Create QR Code", downloadQr: "Download QR Code", credentialUpdated: "Subscription renewed on", credentialUntil: "Valid until", credentialActive: "ACTIVE SUBSCRIPTION", credentialExpired: "EXPIRED SUBSCRIPTION", authentic: "Authentic EduCashPro credential", invalidCredential: "Invalid or altered credential", proofHelp: "Show this QR Code to the partner. Validation does not query Render or MongoDB.",
+    },
+    es: {
+      topicsTitle: "Contenido para aprender y aplicar",
+      topics: ["💰 Educación financiera", "🌐 Web3 y Blockchain", "💵 USDT, billeteras y exchanges", "🤖 IA aplicada a los negocios", "📱 Telegram, grupos, canales y bots", "🚀 Emprendimiento y marketing digital"],
+      creatorTitle: "Para creadores", creatorText: "Los suscriptores pueden registrar grupos, canales, bots, sitios y páginas para evaluación. Los proyectos aprobados ingresan al directorio.",
+      directoryTitle: "Directorio con curaduría", directoryText: "Los proyectos se organizan por tipo, categoría e idioma para conectar conocimientos, herramientas y oportunidades sin llenar el chat.",
+      planTitle: "Plan de ganancias del suscriptor activo", planIntro: "El programa de recomendación es opcional. Mientras la suscripción esté activa, quienes se suscriban mediante el enlace válido quedan vinculados a la red. La experiencia EduCashPro sigue siendo el producto principal.",
+      direct: "de la primera suscripción de cada referido directo válido", renewalsTitle: "Renovaciones de la red", renewals: ["Nivel 1 · 30%", "Nivel 2 · 20%", "Nivel 3 · 10%", "Nivel 4 · 5%", "Nivel 5 · 5%"],
+      qualificationsTitle: "Calificación para liberar niveles", qualifications: ["Nivel 1 · liberado", "Nivel 2 · 5 directos activos", "Nivel 3 · 10 directos activos", "Nivel 4 · 15 directos activos", "Nivel 5 · 20 directos activos"],
+      automatic: "Las comisiones elegibles se distribuyen en USDT directamente a las billeteras conectadas, sin solicitud de retiro.",
+      inactiveTitle: "Si la suscripción queda inactiva", inactiveRules: ["No recibe nuevas comisiones durante la inactividad.", "La red ya construida permanece vinculada.", "Quienes ingresen durante la inactividad no se agregan a la red, ni entonces ni posteriormente.", "Los valores del período inactivo no se acumulan ni se pagan retroactivamente.", "Después de reactivar, vuelve a participar en resultados futuros de la red preservada."],
+      profitTitle: "Calculadora de margen y markup", profitDesc: "Calcula el beneficio bruto, el margen sobre la venta y el markup sobre el costo.", cost: "Costo de compra", sale: "Precio de venta", currency: "Moneda", gross: "Beneficio bruto", margin: "Margen de beneficio", markup: "Markup sobre el costo", calculateMargin: "Calcular margen", invalidMargin: "Introduce costo y precio de venta mayores que cero.",
+      offerBenefit: "Ofrecer beneficio gratuito", offerBenefitDesc: "Registra una ventaja que el usuario reciba sin pagarte. La publicación requiere evaluación de EduCashPro.", freeBenefit: "Beneficio gratuito", offeredBy: "Ofrecido por", reviewed: "Evaluado y autorizado por EduCashPro", accessBenefit: "Acceder al beneficio", partnersTitle: "Socios con descuento", partnersDesc: "Empresas evaluadas que ofrecen descuentos a suscriptores activos.", registerPartner: "Registrar socio", discount: "Descuento", rules: "Reglas", location: "Abrir ubicación o sitio", activeProof: "Comprobar suscripción", affiliateQr: "QR de mi enlace", createQr: "Crear QR", downloadQr: "Descargar QR", credentialUpdated: "Suscripción renovada el", credentialUntil: "Válida hasta", credentialActive: "SUSCRIPCIÓN ACTIVA", credentialExpired: "SUSCRIPCIÓN VENCIDA", authentic: "Credencial auténtica de EduCashPro", invalidCredential: "Credencial inválida o alterada", proofHelp: "Muestra este QR al socio. La validación no consulta Render ni MongoDB.",
+    },
+    ru: {
+      topicsTitle: "Материалы для обучения и применения",
+      topics: ["💰 Финансовая грамотность", "🌐 Web3 и Blockchain", "💵 USDT, кошельки и биржи", "🤖 ИИ для бизнеса", "📱 Telegram, группы, каналы и боты", "🚀 Предпринимательство и цифровой маркетинг"],
+      creatorTitle: "Для авторов", creatorText: "Подписчики могут отправлять группы, каналы, ботов, сайты и страницы на проверку. Одобренные проекты попадают в каталог.",
+      directoryTitle: "Проверенный каталог", directoryText: "Проекты организованы по типу, категории и языку, чтобы объединять знания, инструменты и возможности без лишних сообщений.",
+      planTitle: "План вознаграждений активного подписчика", planIntro: "Реферальная программа является дополнительной возможностью. Пока подписка активна, пользователи, оформившие подписку по действующей ссылке, привязываются к сети. Главный продукт — экосистема EduCashPro.",
+      direct: "от первой подписки каждого действительного прямого участника", renewalsTitle: "Продления сети", renewals: ["Уровень 1 · 30%", "Уровень 2 · 20%", "Уровень 3 · 10%", "Уровень 4 · 5%", "Уровень 5 · 5%"],
+      qualificationsTitle: "Условия открытия уровней", qualifications: ["Уровень 1 · открыт", "Уровень 2 · 5 активных прямых", "Уровень 3 · 10 активных прямых", "Уровень 4 · 15 активных прямых", "Уровень 5 · 20 активных прямых"],
+      automatic: "Доступные комиссионные распределяются в USDT прямо на подключённые кошельки без запроса на вывод.",
+      inactiveTitle: "Если подписка неактивна", inactiveRules: ["Во время неактивности новые комиссионные не начисляются.", "Ранее созданная сеть остаётся привязанной.", "Новые пользователи периода неактивности не добавляются в сеть ни тогда, ни позднее.", "Суммы этого периода не накапливаются и не выплачиваются задним числом.", "После повторной активации возобновляется участие в будущих результатах сохранённой сети."],
+      profitTitle: "Калькулятор маржи и наценки", profitDesc: "Рассчитайте валовую прибыль, маржу продаж и наценку к себестоимости.", cost: "Закупочная стоимость", sale: "Цена продажи", currency: "Валюта", gross: "Валовая прибыль", margin: "Маржа прибыли", markup: "Наценка к себестоимости", calculateMargin: "Рассчитать", invalidMargin: "Введите стоимость и цену продажи больше нуля.",
+      offerBenefit: "Предложить бесплатное преимущество", offerBenefitDesc: "Добавьте преимущество, которое пользователь получает без оплаты вам. Публикация требует проверки EduCashPro.", freeBenefit: "Бесплатное преимущество", offeredBy: "Предлагает", reviewed: "Проверено и разрешено EduCashPro", accessBenefit: "Открыть преимущество", partnersTitle: "Партнёры со скидками", partnersDesc: "Проверенные компании со скидками для активных подписчиков.", registerPartner: "Добавить партнёра", discount: "Скидка", rules: "Правила", location: "Открыть адрес или сайт", activeProof: "Подтвердить подписку", affiliateQr: "QR моей ссылки", createQr: "Создать QR", downloadQr: "Скачать QR", credentialUpdated: "Подписка продлена", credentialUntil: "Действует до", credentialActive: "ПОДПИСКА АКТИВНА", credentialExpired: "ПОДПИСКА ИСТЕКЛА", authentic: "Подлинная учётная запись EduCashPro", invalidCredential: "Недействительная или изменённая учётная запись", proofHelp: "Покажите QR партнёру. Проверка не обращается к Render или MongoDB.",
+    },
+  };
+
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
+  function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
@@ -225,7 +303,7 @@
   function localKey(courseId) { return `educashpro:progress:${state.profile?.tgId || "guest"}:${courseId}`; }
   function getProgress(courseId) { return Math.max(0, Number(localStorage.getItem(localKey(courseId)) || 0)); }
   function saveProgress(courseId, index) { localStorage.setItem(localKey(courseId), String(Math.max(0, index))); }
-  function openUrl(url) { if (!url) return; if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener"); }
+  function openUrl(url) { if (!url) return; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url); else if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener"); }
   function localized(value) { return value?.[state.language] || value?.pt || ""; }
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
@@ -278,7 +356,7 @@
   }
 
   function setView(view) {
-    if (!state.profile?.active && ["explore", "benefits", "area"].includes(view)) {
+    if (!state.profile?.active && ["explore", "benefits"].includes(view)) {
       const lockedId = view === "explore" ? "communities" : view === "benefits" ? "benefits" : "courses";
       showLockedInfo(lockedExperience(lockedId));
       return;
@@ -316,7 +394,7 @@
         <p>${escapeHtml(p.active ? t("heroActive") : t("heroInactive"))}</p>
         <span class="statusPill ${p.active ? "" : "inactive"}">${p.active ? "●" : "○"} ${escapeHtml(p.active ? t("active") : t("inactive"))}</span>
       </section>
-      ${p.active ? "" : `<button id="openPresentation" class="visitorIntro"><span class="visitorIntroIcon">✨</span><span><strong>${escapeHtml(presentationCopy("homeTitle"))}</strong><small>${escapeHtml(presentationCopy("homeText"))}</small><b>${escapeHtml(presentationCopy("homeButton"))} →</b></span></button>`}
+      <button id="openPresentation" class="visitorIntro"><span class="visitorIntroIcon">✨</span><span><strong>${escapeHtml(presentationCopy("homeTitle"))}</strong><small>${escapeHtml(presentationCopy("homeText"))}</small><b>${escapeHtml(presentationCopy("homeButton"))} →</b></span></button>
       <div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2><p>${escapeHtml(t("yourSpaceSub"))}</p></div></div>
       <section class="quickGrid">
         ${p.active ? activeCards : inactiveCards}
@@ -338,7 +416,7 @@
   }
 
   function renderPresentation() {
-    if (state.profile?.active) return setView("home");
+    const isActive = Boolean(state.profile?.active);
     const included = presentationCopy("included");
     const works = presentationCopy("works");
     const goals = presentationCopy("goals");
@@ -351,31 +429,48 @@
         <span class="eyebrow">${escapeHtml(presentationCopy("kicker"))}</span>
         <h1>${escapeHtml(presentationCopy("title"))}</h1>
         <p>${escapeHtml(presentationCopy("lead"))}</p>
-        <div class="inviteRegistered">✅ ${escapeHtml(state.referrerId ? presentationCopy("invite") : presentationCopy("ready"))}</div>
-        <button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button>
+        <div class="inviteRegistered">✅ ${escapeHtml(isActive ? presentationCopy("activeReady") : state.referrerId ? presentationCopy("invite") : presentationCopy("ready"))}</div>
+        ${isActive ? "" : `<button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button>`}
       </section>
       <section class="presentationSection">
         <h2>${escapeHtml(presentationCopy("includedTitle"))}</h2>
         <div class="presentationBenefits">${included.map(([icon, title, description]) => `<article><span>${icon}</span><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div></article>`).join("")}</div>
       </section>
       <section class="presentationSection">
+        <h2>${escapeHtml(featureCopy("topicsTitle"))}</h2>
+        <div class="goalGrid">${featureCopy("topics").map((topic) => `<span>${escapeHtml(topic)}</span>`).join("")}</div>
+      </section>
+      <section class="presentationPair">
+        <article><span>👨‍💻</span><h2>${escapeHtml(featureCopy("creatorTitle"))}</h2><p>${escapeHtml(featureCopy("creatorText"))}</p></article>
+        <article><span>🔎</span><h2>${escapeHtml(featureCopy("directoryTitle"))}</h2><p>${escapeHtml(featureCopy("directoryText"))}</p></article>
+      </section>
+      <section class="presentationSection">
         <h2>${escapeHtml(presentationCopy("worksTitle"))}</h2>
         <div class="presentationSteps">${works.map(([number, title, description]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div></article>`).join("")}</div>
       </section>
       <section class="networkHighlight">
-        <span>💰</span><h2>${escapeHtml(presentationCopy("networkTitle"))}</h2>
-        <p>${escapeHtml(presentationCopy("networkText"))}</p>
+        <span>💰</span><h2>${escapeHtml(featureCopy("planTitle"))}</h2>
+        <p>${escapeHtml(featureCopy("planIntro"))}</p>
+        <div class="directCommission"><b>60%</b><span>${escapeHtml(featureCopy("direct"))}</span></div>
+        <h3>${escapeHtml(featureCopy("renewalsTitle"))}</h3>
+        <div class="planGrid">${featureCopy("renewals").map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        <h3>${escapeHtml(featureCopy("qualificationsTitle"))}</h3>
+        <div class="qualificationList">${featureCopy("qualifications").map((item) => `<span>✓ ${escapeHtml(item)}</span>`).join("")}</div>
+        <p class="automaticPayment">💵 ${escapeHtml(featureCopy("automatic"))}</p>
         <small>⚠️ ${escapeHtml(presentationCopy("networkNote"))}</small>
       </section>
+      <details class="presentationDetails">
+        <summary>🔒 ${escapeHtml(featureCopy("inactiveTitle"))}</summary>
+        <ul>${featureCopy("inactiveRules").map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+      </details>
       <section class="presentationSection">
         <h2>${escapeHtml(presentationCopy("chooseTitle"))}</h2>
         <div class="goalGrid">${goals.map((goal) => `<span>${escapeHtml(goal)}</span>`).join("")}</div>
       </section>
       <section class="presentationFinal">
         <h2>${escapeHtml(presentationCopy("finalTitle"))}</h2>
-        <p>${escapeHtml(presentationCopy("finalText"))}</p>
-        <button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button>
-        <small>${escapeHtml(presentationCopy("details"))}</small>
+        <p>${escapeHtml(presentationCopy(isActive ? "finalTextActive" : "finalText"))}</p>
+        ${isActive ? "" : `<button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button><small>${escapeHtml(presentationCopy("details"))}</small>`}
       </section>`;
     document.getElementById("presentationBack").onclick = () => setView("home");
     content.querySelectorAll(".presentationSubscribe").forEach((button) => button.onclick = subscribeNow);
@@ -555,20 +650,31 @@
   }
 
   async function renderBenefits() {
-    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div><div class="sectionHead"><div><h2>🤝 ${escapeHtml(featureCopy("partnersTitle"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div></div><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    document.getElementById("offerBenefit").onclick = () => openUrl(`${state.botUrl}?start=benefit_add`);
+    document.getElementById("registerPartner").onclick = () => openUrl(`${state.botUrl}?start=partner_add`);
     const container = document.getElementById("benefitList");
     try {
       const data = state.benefits || await api("/api/hub/benefits", { token: state.token });
       state.benefits = data;
-      container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">🎁</div><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.category)}</span></div></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-benefit="${escapeHtml(item.url)}" data-locked="${item.locked}">${escapeHtml(item.locked ? t("unlock") : t("openBenefit"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
+      container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard benefitCard"><div class="itemTop"><div class="itemIcon">🎁</div><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip freeChip">✓ ${escapeHtml(featureCopy("freeBenefit"))}</span></div></div></div><div class="providerLine"><span>👤 <b>${escapeHtml(featureCopy("offeredBy"))}:</b> ${escapeHtml(item.offeredBy)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-benefit="${escapeHtml(item.url)}" data-locked="${item.locked}">${escapeHtml(item.locked ? t("unlock") : featureCopy("accessBenefit"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
       container.querySelectorAll("[data-benefit]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openUrl(state.botUrl) : openUrl(button.dataset.benefit));
     } catch (error) { handleError(error, container); }
+    const partnerContainer = document.getElementById("partnerList");
+    try {
+      const data = state.partners || await api("/api/hub/partners", { token: state.token });
+      state.partners = data;
+      partnerContainer.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.segment)}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-partner="${escapeHtml(item.destinationUrl)}">📍 ${escapeHtml(featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
+      partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.partner));
+    } catch (error) { handleError(error, partnerContainer); }
   }
 
   async function renderArea() {
     const p = state.profile;
-    content.innerHTML = `<section class="profileCard"><div class="avatar">${escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase())}</div><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><button id="copyLink" class="wideButton" style="margin-top:10px">${escapeHtml(t("copy"))}</button>` : ""}</section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
+    content.innerHTML = `<section class="profileCard"><div class="avatar">${escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase())}</div><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${p.active && state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div>` : ""}${state.membershipCredential ? `<button id="membershipProof" class="wideButton" style="margin-top:10px">✅ ${escapeHtml(featureCopy("activeProof"))}</button>` : ""}</section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
+    document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
+    document.getElementById("membershipProof")?.addEventListener("click", renderMembershipProof);
     document.getElementById("manageProjects").onclick = () => openUrl(state.botUrl);
     document.getElementById("reactivate")?.addEventListener("click", () => openUrl(state.botUrl));
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
@@ -582,10 +688,36 @@
   }
 
   function renderTools() {
-    content.innerHTML = `<button id="toolsBack" class="textButton">← ${escapeHtml(t("back"))}</button><div class="sectionHead"><div><h2>${escapeHtml(t("toolsTitle"))}</h2></div></div><section class="toolGrid"><article class="toolCard"><h3>📈 ${escapeHtml(t("interest"))}</h3><div class="fieldGrid"><div class="field"><label>${escapeHtml(t("initial"))}</label><input id="initialValue" inputmode="decimal" value="1000"></div><div class="field"><label>${escapeHtml(t("monthly"))}</label><input id="monthlyValue" inputmode="decimal" value="100"></div><div class="field"><label>${escapeHtml(t("rate"))}</label><input id="rateValue" inputmode="decimal" value="1"></div><div class="field"><label>${escapeHtml(t("months"))}</label><input id="monthsValue" inputmode="numeric" value="24"></div></div><button id="calculateButton" class="wideButton" style="margin-top:12px">${escapeHtml(t("calculate"))}</button><div id="interestResult" class="resultBox hidden"></div></article><article class="toolCard"><h3>🧠 ${escapeHtml(t("quiz"))}</h3><p>${escapeHtml(t("quizQuestion"))}</p><button class="quizOption" data-answer="wrong">A. ${escapeHtml(t("quizA"))}</button><button class="quizOption" data-answer="correct">B. ${escapeHtml(t("quizB"))}</button><button class="quizOption" data-answer="wrong">C. ${escapeHtml(t("quizC"))}</button><div id="quizResult" class="resultBox hidden"></div></article></section>`;
+    const savedMargin = (() => { try { return JSON.parse(localStorage.getItem("educashpro:profit-margin") || "{}"); } catch { return {}; } })();
+    const selectedCurrency = ["BRL", "USD", "USDT", "EUR"].includes(savedMargin.currency) ? savedMargin.currency : "BRL";
+    content.innerHTML = `<button id="toolsBack" class="textButton">← ${escapeHtml(t("back"))}</button><div class="sectionHead"><div><h2>${escapeHtml(t("toolsTitle"))}</h2></div></div><section class="toolGrid"><article class="toolCard marginTool"><h3>📊 ${escapeHtml(featureCopy("profitTitle"))}</h3><p>${escapeHtml(featureCopy("profitDesc"))}</p><div class="fieldGrid"><div class="field"><label>${escapeHtml(featureCopy("cost"))}</label><input id="costValue" inputmode="decimal" value="${escapeHtml(savedMargin.cost ?? "0.89")}"></div><div class="field"><label>${escapeHtml(featureCopy("sale"))}</label><input id="saleValue" inputmode="decimal" value="${escapeHtml(savedMargin.sale ?? "2.00")}"></div><div class="field fullField"><label>${escapeHtml(featureCopy("currency"))}</label><select id="marginCurrency">${["BRL", "USD", "USDT", "EUR"].map((currency) => `<option value="${currency}" ${currency === selectedCurrency ? "selected" : ""}>${currency}</option>`).join("")}</select></div></div><button id="calculateMargin" class="wideButton" style="margin-top:12px">${escapeHtml(featureCopy("calculateMargin"))}</button><div id="marginResult" class="resultBox hidden"></div></article><article class="toolCard"><h3>📈 ${escapeHtml(t("interest"))}</h3><div class="fieldGrid"><div class="field"><label>${escapeHtml(t("initial"))}</label><input id="initialValue" inputmode="decimal" value="1000"></div><div class="field"><label>${escapeHtml(t("monthly"))}</label><input id="monthlyValue" inputmode="decimal" value="100"></div><div class="field"><label>${escapeHtml(t("rate"))}</label><input id="rateValue" inputmode="decimal" value="1"></div><div class="field"><label>${escapeHtml(t("months"))}</label><input id="monthsValue" inputmode="numeric" value="24"></div></div><button id="calculateButton" class="wideButton" style="margin-top:12px">${escapeHtml(t("calculate"))}</button><div id="interestResult" class="resultBox hidden"></div></article><article class="toolCard"><h3>🧠 ${escapeHtml(t("quiz"))}</h3><p>${escapeHtml(t("quizQuestion"))}</p><button class="quizOption" data-answer="wrong">A. ${escapeHtml(t("quizA"))}</button><button class="quizOption" data-answer="correct">B. ${escapeHtml(t("quizB"))}</button><button class="quizOption" data-answer="wrong">C. ${escapeHtml(t("quizC"))}</button><div id="quizResult" class="resultBox hidden"></div></article></section>`;
     document.getElementById("toolsBack").onclick = () => setView("learn");
+    document.getElementById("calculateMargin").onclick = calculateProfitMargin;
     document.getElementById("calculateButton").onclick = calculateInterest;
     content.querySelectorAll("[data-answer]").forEach((button) => button.onclick = () => { const result = document.getElementById("quizResult"); result.textContent = t(button.dataset.answer); result.classList.remove("hidden"); });
+  }
+
+  function calculateProfitMargin() {
+    const read = (id) => Number(String(document.getElementById(id).value || "0").replace(",", "."));
+    const cost = read("costValue");
+    const sale = read("saleValue");
+    const currency = document.getElementById("marginCurrency").value;
+    const result = document.getElementById("marginResult");
+    if (!(cost > 0) || !(sale > 0)) {
+      result.textContent = featureCopy("invalidMargin");
+      result.classList.remove("hidden");
+      return;
+    }
+    localStorage.setItem("educashpro:profit-margin", JSON.stringify({ cost, sale, currency }));
+    const gross = sale - cost;
+    const margin = (gross / sale) * 100;
+    const markup = (gross / cost) * 100;
+    const money = (value) => {
+      if (currency === "USDT") return `${value.toFixed(2)} USDT`;
+      return new Intl.NumberFormat(state.language === "pt" ? "pt-BR" : state.language, { style: "currency", currency }).format(value);
+    };
+    result.innerHTML = `<div class="projectionSummary"><div class="projectionRow"><span>${escapeHtml(featureCopy("cost"))}</span><strong>${escapeHtml(money(cost))}</strong></div><div class="projectionRow"><span>${escapeHtml(featureCopy("sale"))}</span><strong>${escapeHtml(money(sale))}</strong></div><div class="projectionRow"><span>${escapeHtml(featureCopy("gross"))}</span><strong>${escapeHtml(money(gross))}</strong></div><div class="projectionRow"><span>${escapeHtml(featureCopy("margin"))}</span><strong>${margin.toFixed(2)}%</strong></div><div class="projectionRow"><span>${escapeHtml(featureCopy("markup"))}</span><strong>${markup.toFixed(2)}%</strong></div></div>`;
+    result.classList.remove("hidden");
   }
 
   function calculateInterest() {
@@ -605,6 +737,65 @@
     try { await navigator.clipboard.writeText(state.affiliateLink); showToast(t("copied")); } catch { openUrl(state.affiliateLink); }
   }
 
+  function base64UrlBytes(value) {
+    const base64 = String(value || "").replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(String(value || "").length / 4) * 4, "=");
+    return Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+  }
+
+  function decodeCredential(value) {
+    try {
+      const [body] = String(value || "").split(".");
+      return JSON.parse(new TextDecoder().decode(base64UrlBytes(body)));
+    } catch { return null; }
+  }
+
+  function createQr(element, text) {
+    element.innerHTML = "";
+    if (!window.QRCode) { element.textContent = text; return; }
+    new window.QRCode(element, { text, width: 240, height: 240, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+  }
+
+  function downloadQr(container, filename) {
+    const canvas = container.querySelector("canvas");
+    const image = container.querySelector("img");
+    const href = canvas?.toDataURL("image/png") || image?.src;
+    if (!href) return;
+    const link = document.createElement("a"); link.href = href; link.download = filename; link.click();
+  }
+
+  function renderQrScreen(value, title, backAction) {
+    content.innerHTML = `<button id="qrBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><h2>${escapeHtml(title)}</h2><div id="qrCanvas" class="qrCanvas"></div><p>${escapeHtml(value)}</p><button id="downloadQr" class="wideButton">⬇️ ${escapeHtml(featureCopy("downloadQr"))}</button></section>`;
+    const container = document.getElementById("qrCanvas"); createQr(container, value);
+    document.getElementById("qrBack").onclick = backAction;
+    document.getElementById("downloadQr").onclick = () => downloadQr(container, "educashpro-qrcode.png");
+  }
+
+  function renderMembershipProof() {
+    const credential = state.membershipCredential;
+    const payload = decodeCredential(credential);
+    if (!credential || !payload) return;
+    const verificationUrl = `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(state.language)}`;
+    content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
+    createQr(document.getElementById("proofQr"), verificationUrl);
+    document.getElementById("proofBack").onclick = renderArea;
+  }
+
+  async function verifyMembershipCredential(credential, language) {
+    state.language = ["pt", "en", "es", "ru"].includes(language) ? language : "pt";
+    applyLanguage();
+    const parts = String(credential || "").split(".");
+    const payload = decodeCredential(credential);
+    let authentic = false;
+    try {
+      const key = await crypto.subtle.importKey("spki", Uint8Array.from(atob(MEMBERSHIP_PUBLIC_KEY_B64), (c) => c.charCodeAt(0)), { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+      authentic = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, base64UrlBytes(parts[1]), new TextEncoder().encode(parts[0]));
+    } catch { authentic = false; }
+    const active = authentic && Number(payload?.validUntil || 0) > Date.now() / 1000;
+    document.getElementById("closeButton").classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    content.innerHTML = `<section class="profileCard verificationCard"><div class="verificationIcon">${authentic ? active ? "✅" : "❌" : "⚠️"}</div><h1>${escapeHtml(authentic ? active ? featureCopy("credentialActive") : featureCopy("credentialExpired") : featureCopy("invalidCredential"))}</h1>${authentic ? `<h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div class="providerLine"><span>🛡️ ${escapeHtml(featureCopy("authentic"))}</span></div>` : ""}</section>`;
+  }
+
   function loadingCard() { return `<div class="empty"><div class="loader" style="margin:auto"><span></span></div></div>`; }
   function handleError(error, target = content) { const message = error?.message === "SESSION" ? t("expires") : t("error"); target.innerHTML = `<div class="empty error">${escapeHtml(message)}</div>`; }
 
@@ -615,6 +806,9 @@
   }
 
   async function init() {
+    const publicParams = new URL(window.location.href).searchParams;
+    const credentialToVerify = publicParams.get("credential");
+    if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
     tg?.ready?.();
     tg?.expand?.();
     document.getElementById("closeButton").onclick = () => tg?.close?.();
@@ -635,6 +829,12 @@
       state.referrerId = String(session.referrerId || "");
       state.planPriceUsdt = Number(session.planPriceUsdt || 12);
       state.botUrl = session.botUrl;
+      const receivedCredential = String(session.membershipCredential || "");
+      const cachedCredential = String(localStorage.getItem("educashpro:membership-credential") || "");
+      const receivedPayload = decodeCredential(receivedCredential);
+      const cachedPayload = decodeCredential(cachedCredential);
+      if (receivedCredential && Number(receivedPayload?.validUntil || 0) !== Number(cachedPayload?.validUntil || 0)) localStorage.setItem("educashpro:membership-credential", receivedCredential);
+      state.membershipCredential = Number(cachedPayload?.validUntil || 0) === Number(receivedPayload?.validUntil || 0) && cachedCredential ? cachedCredential : receivedCredential;
       state.language = session.profile.language || "pt";
       await loadCourseCatalog();
       applyLanguage();
