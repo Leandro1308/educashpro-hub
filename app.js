@@ -312,6 +312,19 @@
   function getProgress(courseId) { return Math.max(0, Number(localStorage.getItem(localKey(courseId)) || 0)); }
   function saveProgress(courseId, index) { localStorage.setItem(localKey(courseId), String(Math.max(0, index))); }
   function openUrl(url) { if (!url) return; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url); else if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener"); }
+
+  function openSubscription() {
+    const url = String(state.subscribeUrl || state.botUrl || "").trim();
+    if (!url) return;
+
+    if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) {
+      tg.openTelegramLink(url);
+      window.setTimeout(() => tg?.close?.(), 180);
+      return;
+    }
+
+    openUrl(url);
+  }
   function localized(value) { return value?.[state.language] || value?.pt || ""; }
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
@@ -334,7 +347,7 @@
     }
   }
 
-  function subscribeNow() { openUrl(state.subscribeUrl || state.botUrl); }
+  function subscribeNow() { openSubscription(); }
 
   function showLockedInfo(item) {
     const modal = document.getElementById("accessModal");
@@ -569,6 +582,16 @@
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
   }
 
+  function cleanLessonBody(html, visibleTitle = "") {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = String(html || "");
+    wrapper.querySelectorAll(".lessonExercise").forEach((node) => node.remove());
+    const firstHeading = wrapper.querySelector("h1, h2, h3, h4");
+    const normalize = (value) => String(value || "").replace(/^\s*\d+[.)-]?\s*/, "").trim().toLocaleLowerCase();
+    if (firstHeading && normalize(firstHeading.textContent) === normalize(visibleTitle)) firstHeading.remove();
+    return wrapper.innerHTML;
+  }
+
   function renderLesson(index) {
     const course = state.currentCourse;
     const lesson = course.lessons[index];
@@ -576,7 +599,9 @@
     state.currentLesson = index;
     saveProgress(course.id, Math.max(getProgress(course.id), index));
     const chapter = course.chapters.find((item) => Number(item.id) === Number(lesson.ch));
-    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
+    const visibleTitle = chapter?.title || course.title;
+    const lessonBody = cleanLessonBody(lesson.body, visibleTitle);
+    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(visibleTitle)}</h3><div class="lessonBody">${lessonBody}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
@@ -651,7 +676,7 @@
   }
 
   async function rateItem(communityId) {
-    if (!state.profile.active) return openUrl(state.botUrl);
+    if (!state.profile.active) return openSubscription();
     const value = Number(window.prompt(`${t("ratingPrompt")} (1–5)`, "5"));
     if (!Number.isInteger(value) || value < 1 || value > 5) return;
     try { await api("/api/hub/rate", { token: state.token, communityId, rating: value }); showToast(t("ratingSaved")); await loadDirectory(); } catch (error) { handleError(error); }
@@ -664,7 +689,7 @@
   }
 
   function renderSubmissionForm(kind) {
-    if (!state.profile?.active) return openUrl(state.botUrl);
+    if (!state.profile?.active) return openSubscription();
     const title = fc(kind);
     const common = field("description", fc("description"), "textarea") + field("destinationUrl", fc("url"));
     const fields = kind === "project"
@@ -699,7 +724,7 @@
       const data = state.benefits || await api("/api/hub/benefits", { token: state.token });
       state.benefits = data;
       container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard benefitCard"><div class="itemTop"><div class="itemIcon">🎁</div><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip freeChip">✓ ${escapeHtml(featureCopy("freeBenefit"))}</span></div></div></div><div class="providerLine"><span>👤 <b>${escapeHtml(featureCopy("offeredBy"))}:</b> ${escapeHtml(item.offeredBy)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-benefit="${escapeHtml(item.url)}" data-locked="${item.locked}">${escapeHtml(item.locked ? t("unlock") : featureCopy("accessBenefit"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
-      container.querySelectorAll("[data-benefit]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openUrl(state.botUrl) : openUrl(button.dataset.benefit));
+      container.querySelectorAll("[data-benefit]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.benefit));
     } catch (error) { handleError(error, container); }
     const partnerContainer = document.getElementById("partnerList");
     try {
@@ -718,7 +743,7 @@
     document.getElementById("membershipProof")?.addEventListener("click", renderMembershipProof);
     document.getElementById("manageProjects").textContent = fc("project");
     document.getElementById("manageProjects").onclick = () => renderSubmissionForm("project");
-    document.getElementById("reactivate")?.addEventListener("click", () => openUrl(state.botUrl));
+    document.getElementById("reactivate")?.addEventListener("click", openSubscription);
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
     const container = document.getElementById("projectList");
     try {
