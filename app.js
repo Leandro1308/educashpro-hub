@@ -569,6 +569,16 @@
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
   }
 
+  function cleanLessonBody(html, visibleTitle = "") {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = String(html || "");
+    wrapper.querySelectorAll(".lessonExercise").forEach((node) => node.remove());
+    const firstHeading = wrapper.querySelector("h1, h2, h3, h4");
+    const normalize = (value) => String(value || "").replace(/^\s*\d+[.)-]?\s*/, "").trim().toLocaleLowerCase();
+    if (firstHeading && normalize(firstHeading.textContent) === normalize(visibleTitle)) firstHeading.remove();
+    return wrapper.innerHTML;
+  }
+
   function renderLesson(index) {
     const course = state.currentCourse;
     const lesson = course.lessons[index];
@@ -576,7 +586,9 @@
     state.currentLesson = index;
     saveProgress(course.id, Math.max(getProgress(course.id), index));
     const chapter = course.chapters.find((item) => Number(item.id) === Number(lesson.ch));
-    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(chapter?.title || course.title)}</h3><div class="lessonBody">${lesson.body}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
+    const visibleTitle = chapter?.title || course.title;
+    const lessonBody = cleanLessonBody(lesson.body, visibleTitle);
+    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(visibleTitle)}</h3><div class="lessonBody">${lessonBody}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
