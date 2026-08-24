@@ -1,3 +1,6 @@
+
+
+
 (function () {
   const tg = window.Telegram?.WebApp;
   const content = document.getElementById("content");
