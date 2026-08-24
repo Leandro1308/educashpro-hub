@@ -544,6 +544,15 @@
   async function openCourse(courseId) {
     content.innerHTML = loadingCard();
     try {
+      const localTechnicalCourse = window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
+      if (courseId === localTechnicalCourse?.id) {
+        const course = localTechnicalCourse.getCourseData(state.language);
+        state.currentCourse = course;
+        try { localStorage.setItem(courseCacheKey(courseId), JSON.stringify(course)); } catch {}
+        state.currentLesson = Math.min(getProgress(courseId), Math.max(0, course.lessons.length - 1));
+        renderCourseIndex();
+        return;
+      }
       const data = await api("/api/hub/course", { token: state.token, courseId });
       state.currentCourse = data.course;
       try { localStorage.setItem(courseCacheKey(courseId), JSON.stringify(data.course)); } catch {}
@@ -572,7 +581,8 @@
     const visual = `<div class="courseVisual"><span>📚 ${escapeHtml(t("continueLearning"))}</span><span>✅ ${percent}%</span><span>💾 ${escapeHtml(t("catalogOffline"))}</span></div>`;
     const calculatorButton = course.id === "marketing_rede_educashpro" ? `<button id="openProjection" class="wideButton" style="margin-top:14px">📊 ${escapeHtml(t("projection"))}</button>` : "";
     const cover = courseMeta?.image ? `<img class="courseCover" src="${escapeHtml(courseMeta.image)}" alt="${escapeHtml(course.title)}">` : "";
-    content.innerHTML = `<button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span></div>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}`;
+    const themeClass = course.theme === "exness" ? " technicalCourse" : "";
+    content.innerHTML = `<div class="${themeClass.trim()}"><button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span></div>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}${renderCoursePartnerCta(course)}</div>`;
     document.getElementById("courseBack").onclick = renderLearn;
     content.querySelectorAll("[data-chapter]").forEach((button) => button.onclick = () => {
       const index = course.lessons.findIndex((lesson) => Number(lesson.ch) === Number(button.dataset.chapter));
@@ -580,6 +590,13 @@
     });
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
+    document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
+  }
+
+  function renderCoursePartnerCta(course) {
+    const partner = course?.partner;
+    if (!partner?.url) return "";
+    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
   }
 
   function cleanLessonBody(html, visibleTitle = "") {
@@ -601,10 +618,12 @@
     const chapter = course.chapters.find((item) => Number(item.id) === Number(lesson.ch));
     const visibleTitle = chapter?.title || course.title;
     const lessonBody = cleanLessonBody(lesson.body, visibleTitle);
-    content.innerHTML = `<button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(visibleTitle)}</h3><div class="lessonBody">${lessonBody}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>`;
+    const themeClass = course.theme === "exness" ? "technicalCourse" : "";
+    content.innerHTML = `<div class="${themeClass}"><button id="lessonBack" class="textButton">← ${escapeHtml(t("chapters"))}</button><article class="itemCard lesson"><span class="eyebrow">${escapeHtml(t("lesson"))} ${lesson.part}/${lesson.totalParts}</span><h3>${escapeHtml(visibleTitle)}</h3><div class="lessonBody">${lessonBody}</div><div class="lessonNav"><button id="prevLesson" class="secondaryButton" ${index <= 0 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><button id="nextLesson" class="primaryButton" ${index >= course.lessons.length - 1 ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div></article>${renderCoursePartnerCta(course)}</div>`;
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
+    document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
   }
 
   function renderNetworkProjection() {
