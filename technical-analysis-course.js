@@ -15,15 +15,58 @@
     })[char]);
   }
 
-  function chart(kind = "trend") {
-    const visuals = {
-      trend: '<div class="taChart taTrend"><i></i><i></i><i></i><i></i><i></i><i></i><b></b></div>',
-      range: '<div class="taChart taRange"><span></span><span></span><i></i><i></i><i></i><i></i><i></i></div>',
-      candle: '<div class="taChart taCandles"><i class="up"></i><i class="up"></i><i class="down"></i><i class="up"></i><i class="down"></i><i class="up"></i></div>',
-      indicator: '<div class="taChart taIndicator"><i></i><b></b><span></span></div>',
-      risk: '<div class="taChart taRisk"><span class="riskStop">STOP</span><span class="riskEntry">ENTRY</span><span class="riskTarget">TARGET</span></div>',
+  const FIGURE_PRICES = [
+    [32,34,33,38,43,47,45,50,56,61,58,64,69,66,72,77,74,80,77,83],
+    [42,46,44,49,45,52,48,55,51,58,54,61,57,65,60,68,63,71,67,74],
+    [45,52,49,58,53,61,57,64,59,69,65,72,68,76,71,80,75,78,73,82],
+    [28,35,42,39,48,55,51,62,58,69,64,73,68,62,55,49,43,38,34,31],
+    [50,63,57,70,61,73,66,75,64,72,60,68,55,65,52,62,49,59,47,56],
+    [30,35,42,39,47,53,49,59,55,64,60,69,64,74,70,79,74,84,79,88],
+    [26,34,43,51,46,41,49,58,67,62,56,64,73,82,77,71,79,88,84,92],
+    [30,45,57,68,64,59,61,63,62,65,66,64,67,72,78,85,82,88,93,96],
+    [77,73,75,69,66,70,63,58,61,54,48,52,45,39,43,35,30,34,27,31],
+    [31,36,42,49,55,61,58,63,68,72,69,75,80,77,84,88,85,91,94,97],
+    [43,48,53,58,62,67,63,70,74,78,75,80,84,87,83,88,91,89,93,96],
+    [33,37,42,48,53,59,55,62,67,73,69,76,81,78,85,89,86,92,95,98],
+    [58,65,61,70,76,68,82,73,88,79,91,84,76,87,71,83,68,79,64,75],
+    [46,48,47,49,48,50,49,51,50,52,51,53,52,54,68,82,73,76,71,74],
+    [40,44,49,54,59,56,62,67,64,70,74,71,77,82,78,85,88,84,91,94],
+    [35,41,47,53,50,57,63,59,67,72,68,76,81,78,86,90,87,93,96,94],
+    [34,38,43,49,54,60,57,64,70,76,72,79,84,81,88,92,89,94,96,98],
+    [30,37,43,50,56,52,61,68,64,73,79,75,84,89,85,92,95,91,97,99],
+    [29,37,45,54,62,58,55,57,60,64,69,75,82,88,84,90,94,91,96,99],
+    [44,49,46,53,57,55,61,66,63,70,68,74,79,76,82,86,83,89,92,95],
+    [37,42,48,45,53,59,56,64,69,66,74,79,76,84,88,85,91,94,90,96],
+  ];
+
+  function chart(kind = "trend", chapter = 1, caption = "") {
+    const values = FIGURE_PRICES[(chapter - 1) % FIGURE_PRICES.length];
+    const W = 640, H = 300, left = 28, top = 24, plotH = 220, step = 28;
+    const min = Math.min(...values) - 8, max = Math.max(...values) + 8;
+    const y = (value) => top + (max - value) * plotH / (max - min);
+    const closePoints = values.map((value, i) => `${left + i * step},${y(value)}`).join(" ");
+    const ema = (period) => {
+      const k = 2 / (period + 1); let current = values[0];
+      return values.map((value, i) => { current = i ? value * k + current * (1 - k) : value; return `${left + i * step},${y(current)}`; }).join(" ");
     };
-    return visuals[kind] || visuals.trend;
+    const candles = values.map((close, i) => {
+      const open = i ? values[i - 1] + ((i % 3) - 1) * 2 : close - 3;
+      const high = Math.max(open, close) + 3 + (i % 2) * 2;
+      const low = Math.min(open, close) - 3 - ((i + 1) % 3);
+      const x = left + i * step, up = close >= open, color = up ? "#20c985" : "#ef4655";
+      const bodyY = Math.min(y(open), y(close)), bodyH = Math.max(3, Math.abs(y(open) - y(close)));
+      return `<line x1="${x}" y1="${y(high)}" x2="${x}" y2="${y(low)}" stroke="${color}" stroke-width="2"/><rect x="${x - 6}" y="${bodyY}" width="12" height="${bodyH}" rx="1.5" fill="${color}"/>`;
+    }).join("");
+    const line = (x1, y1, x2, y2, color = "#ffde02", dash = "") => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="3" ${dash ? `stroke-dasharray="${dash}"` : ""}/>`;
+    let overlay = "";
+    if ([1,4,6,7,12,19,21].includes(chapter)) overlay = `<polyline points="${closePoints}" fill="none" stroke="#46a6ff" stroke-width="4" stroke-linejoin="round" opacity=".78"/><path d="M72 230 L185 130 L165 135 M185 130 L180 151 M205 145 L275 205 L261 198 M275 205 L270 186 M300 190 L430 75 L407 82 M430 75 L424 98" fill="none" stroke="#ffde02" stroke-width="5"/>`;
+    if ([2,3].includes(chapter)) overlay = `<g opacity=".95">${line(118,50,118,238,"#f8f9fa")}${line(86,112,150,112,"#f8f9fa")}${line(282,72,282,236,"#f8f9fa")}${line(250,145,314,145,"#f8f9fa")}<circle cx="118" cy="112" r="36" fill="none" stroke="#ffde02" stroke-width="3"/><circle cx="282" cy="145" r="36" fill="none" stroke="#ffde02" stroke-width="3"/></g>`;
+    if ([5,14].includes(chapter)) overlay = `<rect x="20" y="58" width="570" height="38" fill="#ef4655" opacity=".14" stroke="#ef4655" stroke-width="2"/><rect x="20" y="208" width="570" height="38" fill="#20c985" opacity=".14" stroke="#20c985" stroke-width="2"/>${line(20,77,590,77,"#ef4655","10 8")}${line(20,227,590,227,"#20c985","10 8")}`;
+    if (chapter === 8) overlay = `<path d="M180 207 L285 100 L390 207 Z" fill="#20c985" opacity=".16" stroke="#20c985" stroke-width="3"/><path d="M395 105 L490 128 L395 180 Z" fill="#ffde02" opacity=".16" stroke="#ffde02" stroke-width="3"/>`;
+    if ([9,11,20].includes(chapter)) overlay = `<g opacity=".75">${values.map((v,i)=>`<rect x="${left+i*step-6}" y="${250-(i%5)*8}" width="12" height="${22+(i%5)*8}" fill="#41d9dc"/>`).join("")}</g><polyline points="${ema(5)}" fill="none" stroke="#ffde02" stroke-width="4"/><polyline points="${ema(10)}" fill="none" stroke="#a870ff" stroke-width="4"/>`;
+    if (chapter === 10) overlay = `<polyline points="${ema(4)}" fill="none" stroke="#ffde02" stroke-width="5"/><polyline points="${ema(9)}" fill="none" stroke="#61a8ff" stroke-width="5"/><circle cx="365" cy="${y(values[12])}" r="16" fill="none" stroke="#fff" stroke-width="3"/>`;
+    if ([13,15,16,17,18].includes(chapter)) overlay = `<rect x="344" y="44" width="236" height="62" fill="#20c985" opacity=".17" stroke="#20c985" stroke-width="2"/><rect x="344" y="106" width="236" height="32" fill="#ffde02" opacity=".18" stroke="#ffde02" stroke-width="2"/><rect x="344" y="138" width="236" height="72" fill="#ef4655" opacity=".15" stroke="#ef4655" stroke-width="2"/>${line(330,106,590,106,"#20c985")}${line(330,138,590,138,"#ffde02")}${line(330,210,590,210,"#ef4655")}`;
+    return `<figure class="taFigure"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(caption)}" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid${chapter}" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity=".055"/></pattern><linearGradient id="fade${chapter}" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#101923"/><stop offset="1" stop-color="#080b0f"/></linearGradient></defs><rect width="640" height="300" rx="18" fill="url(#fade${chapter})"/><rect width="640" height="300" rx="18" fill="url(#grid${chapter})"/>${candles}${overlay}<g fill="#9ba8b8" font-family="system-ui,sans-serif" font-size="12"><text x="596" y="45">H</text><text x="596" y="148">M</text><text x="596" y="242">L</text></g></svg><figcaption>${escapeHtml(caption)}</figcaption></figure>`;
   }
 
   function lessonBody(lesson, labels) {
@@ -37,7 +80,7 @@
     const warning = lesson.w
       ? `<div class="taWarning"><strong>${escapeHtml(labels.warning)}</strong><p>${escapeHtml(lesson.w)}</p></div>`
       : "";
-    return `${chart(lesson.v)}${paragraphs}${bullets}${example}${warning}`;
+    return `${chart(lesson.v, lesson.index, lesson.t)}${paragraphs}${bullets}${example}${warning}`;
   }
 
   const DATA = {
@@ -177,7 +220,7 @@
       theme: "exness",
       partner: pack.partner,
       chapters: lessons.map((lesson, index) => ({ id: index + 1, title: `${index + 1}. ${lesson.t}` })),
-      lessons: lessons.map((lesson, index) => ({ ch: index + 1, part: 1, totalParts: 1, body: lessonBody(lesson, pack.labels) })),
+      lessons: lessons.map((lesson, index) => ({ ch: index + 1, part: 1, totalParts: 1, body: lessonBody({ ...lesson, index: index + 1 }, pack.labels) })),
       books: [],
     };
   }
