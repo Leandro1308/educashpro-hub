@@ -335,6 +335,43 @@
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
+  const APP_BUILD_KEY = "educashpro:app-build";
+  let updateCheckPromise = null;
+
+  function clearPublishedContentCache() {
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key === catalogKey() || key.startsWith("educashpro:course-cache:")) localStorage.removeItem(key);
+      });
+    } catch {}
+  }
+
+  async function checkForUpdates() {
+    if (updateCheckPromise) return updateCheckPromise;
+    updateCheckPromise = (async () => {
+      try {
+        const response = await fetch(`./version.json?fresh=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) return false;
+        const data = await response.json();
+        const publishedBuild = String(data?.build || "").trim();
+        if (!publishedBuild) return false;
+        const currentBuild = String(localStorage.getItem(APP_BUILD_KEY) || "");
+        localStorage.setItem(APP_BUILD_KEY, publishedBuild);
+        if (!currentBuild || currentBuild === publishedBuild) return false;
+        clearPublishedContentCache();
+        const url = new URL(window.location.href);
+        url.searchParams.set("release", publishedBuild);
+        window.location.replace(url.toString());
+        return true;
+      } catch {
+        return false;
+      } finally {
+        window.setTimeout(() => { updateCheckPromise = null; }, 1000);
+      }
+    })();
+    return updateCheckPromise;
+  }
+
   async function loadCourseCatalog() {
     let cached = null;
     try {
@@ -663,31 +700,17 @@
     });
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
-    bindCoursePartnerActions(course);
+    bindCoursePartnerAction();
   }
 
-  function partnerCtaStorageKey(course) {
-    return `educashpro:partner-cta-closed:${course?.id || "course"}`;
-  }
-
-  function bindCoursePartnerActions(course) {
+  function bindCoursePartnerAction() {
     document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
-    document.querySelectorAll("[data-course-partner-close]").forEach((button) => button.onclick = () => {
-      try { sessionStorage.setItem(partnerCtaStorageKey(course), "1"); } catch {}
-      const footer = button.closest(".coursePartnerCta");
-      if (footer) {
-        footer.classList.add("isClosing");
-        window.setTimeout(() => footer.remove(), 180);
-      }
-    });
   }
 
   function renderCoursePartnerCta(course) {
     const partner = course?.partner;
     if (!partner?.url) return "";
-    try { if (sessionStorage.getItem(partnerCtaStorageKey(course)) === "1") return ""; } catch {}
-    const closeLabel = ({ pt: "Fechar", en: "Close", es: "Cerrar", ru: "Закрыть" })[state.language] || "Fechar";
-    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><button class="coursePartnerClose" type="button" data-course-partner-close aria-label="${escapeHtml(closeLabel)}" title="${escapeHtml(closeLabel)}">×</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
+    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
   }
 
   function cleanLessonBody(html, visibleTitle = "") {
@@ -714,7 +737,7 @@
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
-    bindCoursePartnerActions(course);
+    bindCoursePartnerAction();
   }
 
   function renderNetworkProjection() {
@@ -984,6 +1007,7 @@
   }
 
   async function init() {
+    if (await checkForUpdates()) return;
     const publicParams = new URL(window.location.href).searchParams;
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
@@ -1023,5 +1047,12 @@
     }
   }
 
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") checkForUpdates();
+  });
+  window.addEventListener("focus", checkForUpdates);
+  window.setInterval(() => {
+    if (document.visibilityState === "visible") checkForUpdates();
+  }, 60000);
   document.addEventListener("DOMContentLoaded", init);
 })();
