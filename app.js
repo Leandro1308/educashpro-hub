@@ -1,6 +1,3 @@
-
-
-
 (function () {
   const tg = window.Telegram?.WebApp;
   const content = document.getElementById("content");
@@ -311,6 +308,12 @@
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
   function showToast(message) { toast.textContent = message; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2300); }
+  function freshAssetUrl(url) {
+    const value = String(url || "");
+    if (!value || /^(?:https?:|data:|blob:)/i.test(value)) return value;
+    const separator = value.includes("?") ? "&" : "?";
+    return `${value}${separator}fresh=${encodeURIComponent(window.EDUCASHPRO_ASSET_VERSION || Date.now().toString(36))}`;
+  }
   function localKey(courseId) { return `educashpro:progress:${state.profile?.tgId || "guest"}:${courseId}`; }
   function getProgress(courseId) { return Math.max(0, Number(localStorage.getItem(localKey(courseId)) || 0)); }
   function saveProgress(courseId, index) { localStorage.setItem(localKey(courseId), String(Math.max(0, index))); }
@@ -337,10 +340,10 @@
     try {
       cached = JSON.parse(localStorage.getItem(catalogKey()) || "null");
       if (Array.isArray(cached?.courses)) state.courseCatalog = cached.courses;
-      if (Date.now() - Number(cached?.savedAt || 0) < 60 * 60 * 1000) return;
     } catch {}
     try {
-      const response = await fetch(`./courses.json?v=${Date.now()}`, { cache: "no-store" });
+      const assetVersion = window.EDUCASHPRO_ASSET_VERSION || Date.now().toString(36);
+      const response = await fetch(`./courses.json?fresh=${assetVersion}`, { cache: "no-store" });
       if (!response.ok) throw new Error("catalog");
       const data = await response.json();
       state.courseCatalog = Array.isArray(data?.courses) ? data.courses.sort((a, b) => Number(a.order) - Number(b.order)) : [];
@@ -519,24 +522,91 @@
     return map[id];
   }
 
+  function academyMenuCopy() {
+    const copy = {
+      pt: {
+        choose: "Escolha uma área",
+        chooseSub: "Conteúdos separados por assunto para você encontrar o que precisa.",
+        categories: [
+          ["introduction", "✨", "Comece por aqui", "Conheça o EduCashPro e os fundamentos da plataforma."],
+          ["network_marketing", "🤝", "Afiliados e Marketing de Rede", "Produto, indicação, relacionamento, liderança e desenvolvimento de rede."],
+          ["technical_analysis", "📈", "Análise Técnica", "Gráficos, Price Action, indicadores, XAUUSD, estratégias e risco."],
+          ["financial_education", "💰", "Renda Extra, Finanças e Web3", "Educação financeira, nova economia e desenvolvimento de ativos digitais."],
+          ["telegram", "✈️", "Telegram Profissional", "Grupos, canais, bots, segurança, crescimento e monetização responsável."],
+          ["tools", "🧮", "Ferramentas", "Calculadoras, simuladores e recursos educativos."],
+        ],
+      },
+      en: {
+        choose: "Choose an area",
+        chooseSub: "Content separated by topic so you can quickly find what you need.",
+        categories: [
+          ["introduction", "✨", "Start here", "Discover EduCashPro and the platform fundamentals."],
+          ["network_marketing", "🤝", "Affiliates and Network Marketing", "Product, referrals, relationships, leadership and network development."],
+          ["technical_analysis", "📈", "Technical Analysis", "Charts, Price Action, indicators, XAUUSD, strategies and risk."],
+          ["financial_education", "💰", "Extra Income, Finance and Web3", "Financial education, the new economy and digital asset development."],
+          ["telegram", "✈️", "Professional Telegram", "Groups, channels, bots, safety, growth and responsible monetization."],
+          ["tools", "🧮", "Tools", "Calculators, simulators and educational resources."],
+        ],
+      },
+      es: {
+        choose: "Elige un área",
+        chooseSub: "Contenidos separados por tema para encontrar rápidamente lo que necesitas.",
+        categories: [
+          ["introduction", "✨", "Empieza aquí", "Conoce EduCashPro y los fundamentos de la plataforma."],
+          ["network_marketing", "🤝", "Afiliados y Marketing de Red", "Producto, referidos, relaciones, liderazgo y desarrollo de red."],
+          ["technical_analysis", "📈", "Análisis Técnico", "Gráficos, Price Action, indicadores, XAUUSD, estrategias y riesgo."],
+          ["financial_education", "💰", "Ingresos Extra, Finanzas y Web3", "Educación financiera, nueva economía y activos digitales."],
+          ["telegram", "✈️", "Telegram Profesional", "Grupos, canales, bots, seguridad, crecimiento y monetización responsable."],
+          ["tools", "🧮", "Herramientas", "Calculadoras, simuladores y recursos educativos."],
+        ],
+      },
+      ru: {
+        choose: "Выберите направление",
+        chooseSub: "Материалы разделены по темам, чтобы быстро найти нужное.",
+        categories: [
+          ["introduction", "✨", "Начните здесь", "Познакомьтесь с EduCashPro и основами платформы."],
+          ["network_marketing", "🤝", "Партнёрство и сетевой маркетинг", "Продукт, рекомендации, отношения, лидерство и развитие сети."],
+          ["technical_analysis", "📈", "Технический анализ", "Графики, Price Action, индикаторы, XAUUSD, стратегии и риск."],
+          ["financial_education", "💰", "Дополнительный доход, финансы и Web3", "Финансовая грамотность, новая экономика и цифровые активы."],
+          ["telegram", "✈️", "Профессиональный Telegram", "Группы, каналы, боты, безопасность, рост и ответственная монетизация."],
+          ["tools", "🧮", "Инструменты", "Калькуляторы, симуляторы и образовательные ресурсы."],
+        ],
+      },
+    };
+    return copy[state.language] || copy.pt;
+  }
+
   function renderLearn() {
-    const active = state.profile.active;
-    const visibleCourses = state.courseCatalog.length ? state.courseCatalog : [];
+    const menu = academyMenuCopy();
     content.innerHTML = `
       <section class="courseHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
+      <div class="sectionHead"><div><h2>${escapeHtml(menu.choose)}</h2><p>${escapeHtml(menu.chooseSub)}</p></div></div>
+      <section class="quickGrid academyGrid">
+        ${menu.categories.map(([id, icon, title, description]) => `<button class="quickCard academyCategoryCard" data-academy-category="${escapeHtml(id)}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></button>`).join("")}
+      </section>`;
+    content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
+      if (button.dataset.academyCategory === "tools") return renderTools();
+      renderCourseCategory(button.dataset.academyCategory);
+    });
+  }
+
+  function renderCourseCategory(category) {
+    const active = state.profile.active;
+    const menu = academyMenuCopy();
+    const categoryCopy = menu.categories.find(([id]) => id === category);
+    const visibleCourses = state.courseCatalog.filter((item) => item.category === category);
+    content.innerHTML = `
+      <button id="academyBack" class="textButton">← ${escapeHtml(t("back"))}</button>
+      <section class="academyCategoryHero"><span>${categoryCopy?.[1] || "🎓"}</span><div><h2>${escapeHtml(categoryCopy?.[2] || t("courses"))}</h2><p>${escapeHtml(categoryCopy?.[3] || t("learnDesc"))}</p></div></section>
       <div class="sectionHead"><div><h2>${escapeHtml(t("courses"))}</h2><p>${escapeHtml(t("continue"))}</p></div></div>
-      <div class="cardList">
-        ${visibleCourses.map((item) => courseCard(item, item.access === "subscriber" && !active)).join("") || loadingCard()}
-      </div>
-      <div class="sectionHead"><div><h2>${escapeHtml(t("toolsTitle"))}</h2></div></div>
-      <button id="openTools" class="wideButton">🧮 ${escapeHtml(t("tools"))}</button>`;
+      <div class="cardList">${visibleCourses.map((item) => courseCard(item, item.access === "subscriber" && !active)).join("") || `<div class="empty">${escapeHtml(t("noItems"))}</div>`}</div>`;
+    document.getElementById("academyBack").onclick = renderLearn;
     content.querySelectorAll("[data-course]").forEach((button) => button.onclick = () => {
       const item = state.courseCatalog.find((course) => course.id === button.dataset.course);
       if (button.dataset.locked === "true") return showLockedInfo(item);
       if (item?.link) return openUrl(item.link);
       openCourse(button.dataset.course);
     });
-    document.getElementById("openTools").onclick = renderTools;
   }
 
   function courseCard(item, locked) {
@@ -583,7 +653,7 @@
     const percent = course.lessons.length ? Math.round((Math.min(completed + 1, course.lessons.length) / course.lessons.length) * 100) : 0;
     const visual = `<div class="courseVisual"><span>📚 ${escapeHtml(t("continueLearning"))}</span><span>✅ ${percent}%</span><span>💾 ${escapeHtml(t("catalogOffline"))}</span></div>`;
     const calculatorButton = course.id === "marketing_rede_educashpro" ? `<button id="openProjection" class="wideButton" style="margin-top:14px">📊 ${escapeHtml(t("projection"))}</button>` : "";
-    const cover = courseMeta?.image ? `<img class="courseCover" src="${escapeHtml(courseMeta.image)}" alt="${escapeHtml(course.title)}">` : "";
+    const cover = courseMeta?.image ? `<img class="courseCover" src="${escapeHtml(freshAssetUrl(courseMeta.image))}" alt="${escapeHtml(course.title)}">` : "";
     const themeClass = course.theme === "exness" ? " technicalCourse" : "";
     content.innerHTML = `<div class="${themeClass.trim()}"><button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span></div>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}${renderCoursePartnerCta(course)}</div>`;
     document.getElementById("courseBack").onclick = renderLearn;
@@ -593,13 +663,31 @@
     });
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
+    bindCoursePartnerActions(course);
+  }
+
+  function partnerCtaStorageKey(course) {
+    return `educashpro:partner-cta-closed:${course?.id || "course"}`;
+  }
+
+  function bindCoursePartnerActions(course) {
     document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
+    document.querySelectorAll("[data-course-partner-close]").forEach((button) => button.onclick = () => {
+      try { sessionStorage.setItem(partnerCtaStorageKey(course), "1"); } catch {}
+      const footer = button.closest(".coursePartnerCta");
+      if (footer) {
+        footer.classList.add("isClosing");
+        window.setTimeout(() => footer.remove(), 180);
+      }
+    });
   }
 
   function renderCoursePartnerCta(course) {
     const partner = course?.partner;
     if (!partner?.url) return "";
-    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
+    try { if (sessionStorage.getItem(partnerCtaStorageKey(course)) === "1") return ""; } catch {}
+    const closeLabel = ({ pt: "Fechar", en: "Close", es: "Cerrar", ru: "Закрыть" })[state.language] || "Fechar";
+    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><button class="coursePartnerClose" type="button" data-course-partner-close aria-label="${escapeHtml(closeLabel)}" title="${escapeHtml(closeLabel)}">×</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
   }
 
   function cleanLessonBody(html, visibleTitle = "") {
@@ -626,7 +714,7 @@
     document.getElementById("lessonBack").onclick = renderCourseIndex;
     document.getElementById("prevLesson").onclick = () => renderLesson(index - 1);
     document.getElementById("nextLesson").onclick = () => renderLesson(index + 1);
-    document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
+    bindCoursePartnerActions(course);
   }
 
   function renderNetworkProjection() {
