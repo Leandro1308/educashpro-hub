@@ -127,6 +127,48 @@ body::before {
 .lessonExercise p { margin: 7px 0 0; color: #d8e4f0; }
 .lessonNav { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 18px; }
 
+/* Curso de Análise Técnica — identidade independente inspirada na paleta Exness */
+.technicalCourse { --ta-yellow: #ffde02; --ta-black: #111; --ta-paper: #f7f7f2; color: #f7f7f2; }
+.technicalCourse .courseHero { border-color: rgba(255,222,2,.42); background: linear-gradient(145deg, #080808, #171717 62%, #24220a); }
+.technicalCourse .courseHero p, .technicalCourse .lessonBody { color: #e8e8e2; }
+.technicalCourse .eyebrow { color: var(--ta-yellow); }
+.technicalCourse .chapter { border-color: rgba(255,222,2,.22); background: #151515; }
+.technicalCourse .chapter button { color: #f8f8f3; }
+.technicalCourse .chapter button span:last-child { color: var(--ta-yellow); }
+.technicalCourse .progressTrack span { background: var(--ta-yellow); }
+.technicalCourse .courseVisual span { color: #191600; background: var(--ta-yellow); }
+.technicalCourse .itemCard.lesson { border-color: rgba(255,222,2,.28); background: #121212; }
+.technicalCourse .lessonBody h4 { margin: 22px 0 8px; color: var(--ta-yellow); font-size: 15px; }
+.technicalCourse .lessonBody ul { margin: 8px 0 18px; padding-left: 21px; }
+.technicalCourse .lessonBody li { margin: 7px 0; }
+.technicalCourse .primaryButton { color: #151300; background: var(--ta-yellow); }
+.technicalCourse .secondaryButton { color: #f6f6ef; background: #252525; border-color: #3a3a36; }
+.coursePartnerCta { position: sticky; z-index: 12; bottom: calc(70px + env(safe-area-inset-bottom)); margin: 22px 0 10px; padding: 18px; border: 1px solid rgba(255,222,2,.5); border-radius: 20px; background: rgba(12,12,12,.96); box-shadow: 0 16px 38px rgba(0,0,0,.45); backdrop-filter: blur(14px); }
+.coursePartnerCta > span { display: block; color: var(--ta-yellow, #ffde02); font-size: 10px; font-weight: 950; letter-spacing: .12em; }
+.coursePartnerCta h3 { margin: 7px 0 5px; color: #fff; font-size: 18px; }
+.coursePartnerCta p { margin: 0 0 12px; color: #d8d8d0; font-size: 12px; line-height: 1.5; }
+.coursePartnerCta small { display: block; margin-top: 10px; color: #a9a9a2; font-size: 9px; line-height: 1.45; }
+.coursePartnerButton { width: 100%; min-height: 48px; border: 0; border-radius: 13px; color: #171400; background: var(--ta-yellow, #ffde02); font-weight: 950; letter-spacing: .04em; }
+.taChart { position: relative; height: 154px; margin: 5px 0 20px; overflow: hidden; border: 1px solid rgba(255,222,2,.22); border-radius: 16px; background-color: #0b0b0b; background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px); background-size: 28px 28px; }
+.taCandles { display: flex; align-items: center; justify-content: center; gap: 19px; }
+.taCandles i { position: relative; display: block; width: 13px; height: 47px; border-radius: 2px; background: #ef4a55; }
+.taCandles i::before { content: ""; position: absolute; left: 6px; top: -18px; width: 1px; height: 82px; background: inherit; }
+.taCandles i.up { height: 58px; background: #21ca83; transform: translateY(-11px); }
+.taCandles i:nth-child(3) { height: 31px; transform: translateY(-21px); }
+.taCandles i:nth-child(5) { height: 44px; transform: translateY(17px); }
+.taTrend i { position: absolute; width: 12px; border-radius: 2px; background: #21ca83; }
+.taTrend i::after { content: ""; position: absolute; left: 5px; top: -12px; width: 2px; height: calc(100% + 24px); background: #21ca83; }
+.taTrend i:nth-child(1) { left: 12%; bottom: 22px; height: 30px; }.taTrend i:nth-child(2) { left: 26%; bottom: 42px; height: 40px; }.taTrend i:nth-child(3) { left: 40%; bottom: 34px; height: 28px; background:#ef4a55; }.taTrend i:nth-child(3)::after { background:#ef4a55; }.taTrend i:nth-child(4) { left: 54%; bottom: 64px; height: 43px; }.taTrend i:nth-child(5) { left: 68%; bottom: 57px; height: 27px; background:#ef4a55; }.taTrend i:nth-child(5)::after { background:#ef4a55; }.taTrend i:nth-child(6) { left: 82%; bottom: 90px; height: 39px; }
+.taTrend b { position: absolute; left: 8%; right: 7%; bottom: 24px; height: 3px; background: var(--ta-yellow); transform: rotate(-25deg); transform-origin: left; box-shadow: 0 0 12px rgba(255,222,2,.45); }
+.taRange span { position:absolute; left:7%; right:7%; height:2px; background:var(--ta-yellow); }.taRange span:first-child{top:31px}.taRange span:nth-child(2){bottom:30px}.taRange i{position:absolute;width:11px;height:38px;background:#21ca83;bottom:38px}.taRange i:nth-of-type(1){left:14%;}.taRange i:nth-of-type(2){left:31%;bottom:70px;background:#ef4a55}.taRange i:nth-of-type(3){left:48%;bottom:47px}.taRange i:nth-of-type(4){left:65%;bottom:73px;background:#ef4a55}.taRange i:nth-of-type(5){left:82%;bottom:44px}
+.taIndicator i,.taIndicator b { position:absolute; left:7%; right:7%; height:3px; border-radius:50%; }.taIndicator i{top:53px;background:#21ca83;transform:rotate(-8deg)}.taIndicator b{top:82px;background:#ef4a55;transform:rotate(7deg)}.taIndicator span{position:absolute;left:7%;right:7%;bottom:25px;height:28px;border-top:2px solid var(--ta-yellow);border-radius:50%}
+.taRisk span { position:absolute; left:7%; right:7%; padding:4px 8px; border-radius:6px; font-size:10px; font-weight:900; }.taRisk .riskStop{bottom:18px;color:#ffadb3;border-top:2px solid #ef4a55}.taRisk .riskEntry{bottom:67px;color:#111;background:var(--ta-yellow)}.taRisk .riskTarget{top:18px;color:#8ff1c3;border-bottom:2px solid #21ca83}
+
+@media (max-width: 420px) {
+  .coursePartnerCta { bottom: calc(66px + env(safe-area-inset-bottom)); }
+  .taChart { height: 132px; }
+}
+
 .toolGrid { display: grid; gap: 12px; }
 .toolCard { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
 .toolCard h3 { margin: 0 0 11px; }
