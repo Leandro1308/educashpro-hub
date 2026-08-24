@@ -336,6 +336,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
+  const APP_RELOAD_GUARD_KEY = "educashpro:reload-build";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -349,16 +350,21 @@
   async function checkForUpdates() {
     if (updateCheckPromise) return updateCheckPromise;
     updateCheckPromise = (async () => {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 3500);
       try {
-        const response = await fetch(`./version.json?fresh=${Date.now()}`, { cache: "no-store" });
+        const response = await fetch(`./version.json?fresh=${Date.now()}`, { cache: "no-store", signal: controller.signal });
         if (!response.ok) return false;
         const data = await response.json();
         const publishedBuild = String(data?.build || "").trim();
         if (!publishedBuild) return false;
         const currentBuild = String(localStorage.getItem(APP_BUILD_KEY) || "");
+        const requestedBuild = String(new URL(window.location.href).searchParams.get("release") || "");
+        const guardedBuild = String(sessionStorage.getItem(APP_RELOAD_GUARD_KEY) || "");
         localStorage.setItem(APP_BUILD_KEY, publishedBuild);
-        if (!currentBuild || currentBuild === publishedBuild) return false;
+        if (!currentBuild || currentBuild === publishedBuild || requestedBuild === publishedBuild || guardedBuild === publishedBuild) return false;
         clearPublishedContentCache();
+        sessionStorage.setItem(APP_RELOAD_GUARD_KEY, publishedBuild);
         const url = new URL(window.location.href);
         url.searchParams.set("release", publishedBuild);
         window.location.replace(url.toString());
@@ -366,6 +372,7 @@
       } catch {
         return false;
       } finally {
+        window.clearTimeout(timeout);
         window.setTimeout(() => { updateCheckPromise = null; }, 1000);
       }
     })();
@@ -705,12 +712,14 @@
 
   function bindCoursePartnerAction() {
     document.querySelectorAll("[data-course-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.coursePartner));
+    document.querySelectorAll("[data-course-video]").forEach((button) => button.onclick = () => openUrl(button.dataset.courseVideo));
   }
 
   function renderCoursePartnerCta(course) {
     const partner = course?.partner;
     if (!partner?.url) return "";
-    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button><small>${escapeHtml(partner.disclosure)}</small></footer>`;
+    const videoLink = partner.videoUrl && partner.videoText ? `<button class="courseVideoLink" type="button" data-course-video="${escapeHtml(partner.videoUrl)}">▶ ${escapeHtml(partner.videoText)}</button>` : "";
+    return `<footer class="coursePartnerCta"><span>${escapeHtml(partner.eyebrow)}</span><h3>${escapeHtml(partner.title)}</h3><p>${escapeHtml(partner.text)}</p><div class="coursePartnerActions"><button class="coursePartnerButton" data-course-partner="${escapeHtml(partner.url)}">${escapeHtml(partner.button)}</button>${videoLink}</div><small>${escapeHtml(partner.disclosure)}</small></footer>`;
   }
 
   function cleanLessonBody(html, visibleTitle = "") {
@@ -1007,7 +1016,6 @@
   }
 
   async function init() {
-    if (await checkForUpdates()) return;
     const publicParams = new URL(window.location.href).searchParams;
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
@@ -1042,6 +1050,7 @@
       applyLanguage();
       bottomNav.classList.remove("hidden");
       renderHome();
+      checkForUpdates();
     } catch (error) {
       content.innerHTML = `<section class="splash"><div class="splashLogo">E</div><h1>EduCashPro</h1><p class="error">${escapeHtml(error?.message === "SESSION" ? COPY.pt.telegramOnly : COPY.pt.error)}</p></section>`;
     }
@@ -1051,8 +1060,5 @@
     if (document.visibilityState === "visible") checkForUpdates();
   });
   window.addEventListener("focus", checkForUpdates);
-  window.setInterval(() => {
-    if (document.visibilityState === "visible") checkForUpdates();
-  }, 60000);
   document.addEventListener("DOMContentLoaded", init);
 })();
