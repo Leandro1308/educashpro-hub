@@ -3,6 +3,7 @@
 
   const COURSE_ID = "analise_tecnica_completa";
   const EXNESS_URL = "https://one.exnessonelink.com/a/93bgo7jpfo/?campaign=43340";
+  const VIDEO_COURSE_URL = "https://t.me/boost?c=3706880680";
 
   function normalizeLanguage(value) {
     const language = String(value || "pt").toLowerCase();
@@ -92,7 +93,9 @@
         eyebrow: "PRATIQUE COM RESPONSABILIDADE",
         title: "Teste primeiro em uma conta demonstrativa",
         text: "Abra a plataforma da Exness pelo link do parceiro EduCashPro. O cadastro e a verificação acontecem diretamente no ambiente seguro da Exness.",
-        button: "CADASTRE-SE",
+        button: "CADASTRE-SE GRÁTIS",
+        videoText: "Assista o curso completo em vídeo aula",
+        videoUrl: VIDEO_COURSE_URL,
         disclosure: "Link de parceiro. CFDs envolvem alto risco e podem gerar perdas. Este conteúdo é educacional e não constitui recomendação de investimento.",
         url: EXNESS_URL,
       },
@@ -124,7 +127,7 @@
       title: "Complete Technical Analysis",
       home: "<p>A progressive course for reading charts, recognizing market conditions and turning observations into decisions with controlled risk. It covers foundations, XAUUSD, strategies, backtesting and a Demo-account operating plan.</p><p>Technical analysis works with probabilities, not certainty. No candle, indicator or pattern guarantees a result. Always define invalidation and protect capital.</p>",
       labels: { keyPoints: "Key points", example: "Example", warning: "Warning" },
-      partner: { eyebrow: "PRACTICE RESPONSIBLY", title: "Start with a Demo account", text: "Open Exness through the EduCashPro partner link. Registration and verification take place directly in Exness's secure environment.", button: "SIGN UP", disclosure: "Partner link. CFDs carry a high risk of loss. Educational content only; not investment advice.", url: EXNESS_URL },
+      partner: { eyebrow: "PRACTICE RESPONSIBLY", title: "Start with a Demo account", text: "Open Exness through the EduCashPro partner link. Registration and verification take place directly in Exness's secure environment.", button: "SIGN UP FREE", videoText: "Watch the complete video course", videoUrl: VIDEO_COURSE_URL, disclosure: "Partner link. CFDs carry a high risk of loss. Educational content only; not investment advice.", url: EXNESS_URL },
       lessons: [
         ["What technical analysis really does","Technical analysis studies price, time and available volume to build scenarios, not guaranteed predictions.","Context, entry, invalidation, target and position size must be known before an order.","Probability replaces certainty|Context matters more than one signal|Risk comes before reward","A pullback into defended support may offer better risk than chasing an extended candle.","A valid setup can still reach its stop.","trend"],
         ["Charts, price and timeframes","A candle contains open, high, low and close for a selected interval. Different timeframes reveal different parts of the same auction.","Use higher periods for direction and lower periods for execution detail.","1h for context, 5m for setup, 1m only for precision|Wait for candle close when the rule depends on it|Know platform time and sessions","A 1-minute decline can be a small pullback inside a 1-hour uptrend.","Do not change timeframes until one agrees with your bias.","candle"],
@@ -157,13 +160,13 @@
         title: "Análisis Técnico Completo",
         home: "<p>Formación progresiva para leer gráficos, reconocer contextos y convertir observaciones en decisiones con riesgo controlado. Incluye fundamentos, XAUUSD, estrategias, backtest y plan en cuenta Demo.</p><p>El análisis técnico trabaja con probabilidades. Ninguna vela, indicador o patrón garantiza resultados.</p>",
         labels: { keyPoints: "Puntos esenciales", example: "Ejemplo", warning: "Atención" },
-        partner: { eyebrow: "PRACTICA CON RESPONSABILIDAD", title: "Comienza con una cuenta Demo", text: "Abre Exness mediante el enlace de socio de EduCashPro. El registro y la verificación ocurren directamente en el entorno seguro de Exness.", button: "REGÍSTRATE", disclosure: "Enlace de socio. Los CFD implican alto riesgo de pérdida. Contenido educativo; no es asesoramiento de inversión.", url: EXNESS_URL },
+        partner: { eyebrow: "PRACTICA CON RESPONSABILIDAD", title: "Comienza con una cuenta Demo", text: "Abre Exness mediante el enlace de socio de EduCashPro. El registro y la verificación ocurren directamente en el entorno seguro de Exness.", button: "REGÍSTRATE GRATIS", videoText: "Mira el curso completo en video", videoUrl: VIDEO_COURSE_URL, disclosure: "Enlace de socio. Los CFD implican alto riesgo de pérdida. Contenido educativo; no es asesoramiento de inversión.", url: EXNESS_URL },
       },
       ru: {
         title: "Полный курс технического анализа",
         home: "<p>Последовательный курс по чтению графика, определению рыночного контекста и принятию решений с контролируемым риском. Включает основы, XAUUSD, стратегии, бэктест и план работы на демо-счёте.</p><p>Технический анализ основан на вероятностях. Ни одна свеча, фигура или индикатор не гарантирует результат.</p>",
         labels: { keyPoints: "Главное", example: "Пример", warning: "Внимание" },
-        partner: { eyebrow: "ТРЕНИРУЙТЕСЬ ОТВЕТСТВЕННО", title: "Начните с демо-счёта", text: "Откройте Exness по партнёрской ссылке EduCashPro. Регистрация и проверка проходят непосредственно в защищённой среде Exness.", button: "ЗАРЕГИСТРИРОВАТЬСЯ", disclosure: "Партнёрская ссылка. CFD связаны с высоким риском потерь. Материал носит образовательный характер и не является инвестиционной рекомендацией.", url: EXNESS_URL },
+        partner: { eyebrow: "ТРЕНИРУЙТЕСЬ ОТВЕТСТВЕННО", title: "Начните с демо-счёта", text: "Откройте Exness по партнёрской ссылке EduCashPro. Регистрация и проверка проходят непосредственно в защищённой среде Exness.", button: "БЕСПЛАТНАЯ РЕГИСТРАЦИЯ", videoText: "Смотреть полный видеокурс", videoUrl: VIDEO_COURSE_URL, disclosure: "Партнёрская ссылка. CFD связаны с высоким риском потерь. Материал носит образовательный характер и не является инвестиционной рекомендацией.", url: EXNESS_URL },
       },
     };
     const translated = dictionaries[language];
