@@ -304,6 +304,15 @@
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
+  function benefitNavigationCopy(key) {
+    const copy = {
+      pt: { exclusive: "Benefícios Exclusivos", exclusiveSub: "Vantagens gratuitas e oportunidades aprovadas.", stores: "Lojas Parceiras", storesSub: "Empresas, descontos e condições para assinantes." },
+      en: { exclusive: "Exclusive Benefits", exclusiveSub: "Approved free advantages and opportunities.", stores: "Partner Stores", storesSub: "Companies, discounts and subscriber conditions." },
+      es: { exclusive: "Beneficios Exclusivos", exclusiveSub: "Ventajas gratuitas y oportunidades aprobadas.", stores: "Tiendas Asociadas", storesSub: "Empresas, descuentos y condiciones para suscriptores." },
+      ru: { exclusive: "Эксклюзивные преимущества", exclusiveSub: "Одобренные бесплатные возможности.", stores: "Магазины-партнёры", storesSub: "Компании, скидки и условия для подписчиков." },
+    };
+    return copy[state.language]?.[key] || copy.pt[key] || key;
+  }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
@@ -447,7 +456,8 @@
     const activeCards = `
       ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
-      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}
+      ${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}
+      ${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}
       ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
       ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
       ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
@@ -474,7 +484,7 @@
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else setView(target);
+      else if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
@@ -841,12 +851,12 @@
         : field("companyName", fc("company")) + field("segment", fc("segment")) + common + field("discountRange", fc("discount")) + field("discountRules", fc("rules"), "textarea") + field("storeType", fc("storeType"), "select", true, [["physical", "Físico / Physical"], ["online", "Online"], ["both", "Ambos / Both"]]) + field("city", fc("city"), "input", false) + field("region", fc("region"), "input", false) + field("contact", fc("contact"), "input", false) + field("affiliateLink", fc("affiliate"), "input", false);
     content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
     document.getElementById("language").value = state.language;
-    document.getElementById("formBack").onclick = kind === "project" ? renderArea : renderBenefits;
+    document.getElementById("formBack").onclick = kind === "project" ? renderArea : kind === "partner" ? renderPartnerStores : renderExclusiveBenefits;
     document.getElementById("submissionForm").onsubmit = async (event) => {
       event.preventDefault();
       const values = Object.fromEntries(Array.from(event.currentTarget.querySelectorAll("input,textarea,select")).map((el) => [el.id, el.value.trim()]));
       const button = document.getElementById("submitForm"); button.disabled = true; button.textContent = fc("saving");
-      try { await api("/api/hub/submit", { token: state.token, kind, ...values }); state.projects = state.benefits = state.partners = null; showToast(fc("sent")); kind === "project" ? await renderArea() : await renderBenefits(); }
+      try { await api("/api/hub/submit", { token: state.token, kind, ...values }); state.projects = state.benefits = state.partners = null; showToast(fc("sent")); kind === "project" ? await renderArea() : kind === "partner" ? await renderPartnerStores() : await renderExclusiveBenefits(); }
       catch (error) { handleError(error); button.disabled = false; button.textContent = fc("save"); }
     };
   }
@@ -858,19 +868,37 @@
   }
 
   async function renderBenefits() {
-    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div><div class="sectionHead"><div><h2>🤝 ${escapeHtml(featureCopy("partnersTitle"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div></div><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
+    content.querySelector('[data-target="exclusive-benefits"]').onclick = renderExclusiveBenefits;
+    content.querySelector('[data-target="partner-stores"]').onclick = renderPartnerStores;
+  }
+
+  async function renderExclusiveBenefits() {
+    state.view = "benefits";
+    updateNav();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    document.getElementById("benefitsBack").onclick = renderBenefits;
     document.getElementById("offerBenefit").onclick = () => renderSubmissionForm("benefit");
-    document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
     const container = document.getElementById("benefitList");
     try {
-      const data = state.benefits || await api("/api/hub/benefits", { token: state.token });
+      const data = await api("/api/hub/benefits", { token: state.token });
       state.benefits = data;
       container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard benefitCard"><div class="itemTop"><div class="itemIcon">🎁</div><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip freeChip">✓ ${escapeHtml(featureCopy("freeBenefit"))}</span></div></div></div><div class="providerLine"><span>👤 <b>${escapeHtml(featureCopy("offeredBy"))}:</b> ${escapeHtml(item.offeredBy)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-benefit="${escapeHtml(item.url)}" data-locked="${item.locked}">${escapeHtml(item.locked ? t("unlock") : featureCopy("accessBenefit"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
       container.querySelectorAll("[data-benefit]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.benefit));
     } catch (error) { handleError(error, container); }
+  }
+
+  async function renderPartnerStores() {
+    state.view = "benefits";
+    updateNav();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    content.innerHTML = `<button id="partnersBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🏪 ${escapeHtml(benefitNavigationCopy("stores"))}</h1><p>${escapeHtml(benefitNavigationCopy("storesSub"))}</p></section><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    document.getElementById("partnersBack").onclick = renderBenefits;
+    document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
     const partnerContainer = document.getElementById("partnerList");
     try {
-      const data = state.partners || await api("/api/hub/partners", { token: state.token });
+      const data = await api("/api/hub/partners", { token: state.token });
       state.partners = data;
       partnerContainer.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.segment)}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-partner="${escapeHtml(item.destinationUrl)}">📍 ${escapeHtml(featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
       partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.partner));
