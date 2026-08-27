@@ -25,6 +25,8 @@
     directoryData: null,
     benefits: null,
     partners: null,
+    partnerSegment: "",
+    partnerPage: 1,
     membershipCredential: "",
     projects: null,
     currentCourse: null,
@@ -72,6 +74,15 @@
     ru: { back: "Назад", save: "Отправить на проверку", saving: "Отправка…", sent: "Заявка отправлена на проверку.", remove: "Удалить", confirmRemove: "Удалить эту заявку навсегда?", removed: "Заявка удалена.", required: "Заполните все обязательные поля.", project: "Добавить проект", benefit: "Предложить бесплатное преимущество", partner: "Добавить партнёра", name: "Название", description: "Описание", url: "Полная ссылка (https://)", type: "Тип", category: "Категория", language: "Язык", company: "Название компании", segment: "Сегмент", discount: "Размер скидки", rules: "Правила скидки", storeType: "Формат обслуживания", city: "Город", region: "Регион", contact: "Контакт", affiliate: "Партнёрская ссылка или закрытая группа (необязательно)", deleteError: "Не удалось удалить." },
   };
   const fc = (key) => (FORM_COPY[state.language] || FORM_COPY.pt)[key] || FORM_COPY.pt[key] || key;
+  const PARTNER_SEGMENTS = ["pharmacy", "clinic", "physiotherapy", "gym", "dental", "laboratory", "nutrition", "psychology", "beauty", "education", "restaurants", "retail", "services", "technology", "other"];
+  const PARTNER_SEGMENT_COPY = {
+    pt: { all: "Todos", pharmacy: "Farmácias", clinic: "Clínicas", physiotherapy: "Fisioterapia", gym: "Academias", dental: "Odontologia", laboratory: "Laboratórios", nutrition: "Nutrição", psychology: "Psicologia", beauty: "Beleza e estética", education: "Educação", restaurants: "Alimentação", retail: "Comércio", services: "Serviços", technology: "Tecnologia", other: "Outros" },
+    en: { all: "All", pharmacy: "Pharmacies", clinic: "Clinics", physiotherapy: "Physiotherapy", gym: "Gyms", dental: "Dental", laboratory: "Laboratories", nutrition: "Nutrition", psychology: "Psychology", beauty: "Beauty & wellness", education: "Education", restaurants: "Food & dining", retail: "Retail", services: "Services", technology: "Technology", other: "Other" },
+    es: { all: "Todos", pharmacy: "Farmacias", clinic: "Clínicas", physiotherapy: "Fisioterapia", gym: "Gimnasios", dental: "Odontología", laboratory: "Laboratorios", nutrition: "Nutrición", psychology: "Psicología", beauty: "Belleza y estética", education: "Educación", restaurants: "Alimentación", retail: "Comercio", services: "Servicios", technology: "Tecnología", other: "Otros" },
+    ru: { all: "Все", pharmacy: "Аптеки", clinic: "Клиники", physiotherapy: "Физиотерапия", gym: "Спортзалы", dental: "Стоматология", laboratory: "Лаборатории", nutrition: "Питание", psychology: "Психология", beauty: "Красота и уход", education: "Образование", restaurants: "Питание", retail: "Торговля", services: "Услуги", technology: "Технологии", other: "Другое" },
+  };
+  const partnerSegmentLabel = (segment) => (PARTNER_SEGMENT_COPY[state.language] || PARTNER_SEGMENT_COPY.pt)[segment] || PARTNER_SEGMENT_COPY.pt[segment] || segment;
+  const partnerSegmentOptions = () => PARTNER_SEGMENTS.map((segment) => [segment, partnerSegmentLabel(segment)]);
 
   const EXTRA_COPY = {
     pt: {
@@ -848,7 +859,7 @@
       ? field("name", fc("name")) + field("type", fc("type"), "select", true, [["group", "Grupo / Group"], ["channel", "Canal / Channel"], ["bot", "Bot"], ["page", "Site / Page"]]) + field("category", fc("category")) + common
       : kind === "benefit"
         ? field("name", fc("name")) + common
-        : field("companyName", fc("company")) + field("segment", fc("segment")) + common + field("discountRange", fc("discount")) + field("discountRules", fc("rules"), "textarea") + field("storeType", fc("storeType"), "select", true, [["physical", "Físico / Physical"], ["online", "Online"], ["both", "Ambos / Both"]]) + field("city", fc("city"), "input", false) + field("region", fc("region"), "input", false) + field("contact", fc("contact"), "input", false) + field("affiliateLink", fc("affiliate"), "input", false);
+        : field("companyName", fc("company")) + field("segment", fc("segment"), "select", true, partnerSegmentOptions()) + common + field("discountRange", fc("discount")) + field("discountRules", fc("rules"), "textarea") + field("storeType", fc("storeType"), "select", true, [["physical", "Físico / Physical"], ["online", "Online"], ["both", "Ambos / Both"]]) + field("city", fc("city"), "input", false) + field("region", fc("region"), "input", false) + field("contact", fc("contact"), "input", false) + field("affiliateLink", fc("affiliate"), "input", false);
     content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
     document.getElementById("language").value = state.language;
     document.getElementById("formBack").onclick = kind === "project" ? renderArea : kind === "partner" ? renderPartnerStores : renderExclusiveBenefits;
@@ -889,19 +900,31 @@
     } catch (error) { handleError(error, container); }
   }
 
-  async function renderPartnerStores() {
+  async function renderPartnerStores({ segment = state.partnerSegment, page = state.partnerPage } = {}) {
     state.view = "benefits";
+    state.partnerSegment = PARTNER_SEGMENTS.includes(segment) ? segment : "";
+    state.partnerPage = Math.max(1, Number(page || 1));
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    content.innerHTML = `<button id="partnersBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🏪 ${escapeHtml(benefitNavigationCopy("stores"))}</h1><p>${escapeHtml(benefitNavigationCopy("storesSub"))}</p></section><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    const filters = [["", partnerSegmentLabel("all")], ...partnerSegmentOptions()]
+      .map(([value, label]) => `<button class="filter ${state.partnerSegment === value ? "active" : ""}" data-partner-segment="${escapeHtml(value)}">${escapeHtml(label)}</button>`)
+      .join("");
+    content.innerHTML = `<button id="partnersBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🏪 ${escapeHtml(benefitNavigationCopy("stores"))}</h1><p>${escapeHtml(benefitNavigationCopy("storesSub"))}</p></section><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div class="filters" style="margin-top:14px">${filters}</div><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
     document.getElementById("partnersBack").onclick = renderBenefits;
     document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
+    content.querySelectorAll("[data-partner-segment]").forEach((button) => {
+      button.onclick = () => renderPartnerStores({ segment: button.dataset.partnerSegment, page: 1 });
+    });
     const partnerContainer = document.getElementById("partnerList");
     try {
-      const data = await api("/api/hub/partners", { token: state.token });
+      const data = await api("/api/hub/partners", { token: state.token, segment: state.partnerSegment, page: state.partnerPage });
       state.partners = data;
-      partnerContainer.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.segment)}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-partner="${escapeHtml(item.destinationUrl)}">📍 ${escapeHtml(featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
-      partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => openUrl(button.dataset.partner));
+      const cards = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(partnerSegmentLabel(item.segment))}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-partner="${escapeHtml(item.destinationUrl)}" data-locked="${item.locked}">📍 ${escapeHtml(item.locked ? t("unlock") : featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
+      const pager = data.page > 1 || data.hasMore ? `<div class="pager"><button id="partnerPrev" ${data.page <= 1 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><span>${escapeHtml(t("page"))} ${data.page}</span><button id="partnerNext" ${!data.hasMore ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div>` : "";
+      partnerContainer.innerHTML = cards + pager;
+      partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.partner));
+      document.getElementById("partnerPrev")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page - 1 }));
+      document.getElementById("partnerNext")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page + 1 }));
     } catch (error) { handleError(error, partnerContainer); }
   }
 
