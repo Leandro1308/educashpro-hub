@@ -1,6 +1,9 @@
 (function () {
   const tg = window.Telegram?.WebApp;
-  const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
+  // Link antigo permanece apenas para localizar os botões já renderizados pelo app.
+  const LEGACY_OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
+  // Link real de entrada no Canal Oficial. Não depende de API, bot admin ou geração de convite.
+  const OFFICIAL_CHANNEL_ACCESS_URL = "https://t.me/+1mP5ad7vJH5lOGNh";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
   const apiBaseFromUrl = String(new URL(window.location.href).searchParams.get("api") || "").replace(/\/+$/, "");
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "";
@@ -19,16 +22,16 @@
       groupButton: "👥 Entrar no grupo exclusivo",
       groupLocked: "🔒 Exclusivo para assinantes",
       subscribe: "⚡ Ativar assinatura",
-      inviteError: "Não foi possível abrir o acesso agora. Verifique se o bot é administrador do canal ou grupo.",
+      inviteError: "Não foi possível abrir o acesso agora.",
     },
     en: {
-      free: "FREE ACCESS", channelTitle: "Official Education Channel", channelText: "Free educational content for subscribers and visitors.", channelButton: "📚 Join free channel", groupTitle: "Subscribers-Only Group", groupText: "Ready-to-share materials and exclusive content for active subscribers.", groupButton: "👥 Join exclusive group", groupLocked: "🔒 Subscribers only", subscribe: "⚡ Activate subscription", inviteError: "Unable to open access right now. Check that the bot is an administrator of the channel or group.",
+      free: "FREE ACCESS", channelTitle: "Official Education Channel", channelText: "Free educational content for subscribers and visitors.", channelButton: "📚 Join free channel", groupTitle: "Subscribers-Only Group", groupText: "Ready-to-share materials and exclusive content for active subscribers.", groupButton: "👥 Join exclusive group", groupLocked: "🔒 Subscribers only", subscribe: "⚡ Activate subscription", inviteError: "Unable to open access right now.",
     },
     es: {
-      free: "ACCESO LIBRE", channelTitle: "Canal Oficial de Educación", channelText: "Contenido educativo gratuito para suscriptores y visitantes.", channelButton: "📚 Entrar al canal gratuito", groupTitle: "Grupo Exclusivo para Suscriptores", groupText: "Materiales listos para divulgar y contenido exclusivo para suscriptores activos.", groupButton: "👥 Entrar al grupo exclusivo", groupLocked: "🔒 Solo suscriptores", subscribe: "⚡ Activar suscripción", inviteError: "No fue posible abrir el acceso ahora. Verifica que el bot sea administrador del canal o grupo.",
+      free: "ACCESO LIBRE", channelTitle: "Canal Oficial de Educación", channelText: "Contenido educativo gratuito para suscriptores y visitantes.", channelButton: "📚 Entrar al canal gratuito", groupTitle: "Grupo Exclusivo para Suscriptores", groupText: "Materiales listos para divulgar y contenido exclusivo para suscriptores activos.", groupButton: "👥 Entrar al grupo exclusivo", groupLocked: "🔒 Solo suscriptores", subscribe: "⚡ Activar suscripción", inviteError: "No fue posible abrir el acceso ahora.",
     },
     ru: {
-      free: "СВОБОДНЫЙ ДОСТУП", channelTitle: "Официальный образовательный канал", channelText: "Бесплатные образовательные материалы для подписчиков и гостей.", channelButton: "📚 Войти в бесплатный канал", groupTitle: "Эксклюзивная группа подписчиков", groupText: "Готовые материалы для публикации и эксклюзивный контент для активных подписчиков.", groupButton: "👥 Войти в закрытую группу", groupLocked: "🔒 Только для подписчиков", subscribe: "⚡ Активировать подписку", inviteError: "Сейчас не удалось открыть доступ. Проверьте, что бот является администратором канала или группы.",
+      free: "СВОБОДНЫЙ ДОСТУП", channelTitle: "Официальный образовательный канал", channelText: "Бесплатные образовательные материалы для подписчиков и гостей.", channelButton: "📚 Войти в бесплатный канал", groupTitle: "Эксклюзивная группа подписчиков", groupText: "Готовые материалы для публикации и эксклюзивный контент для активных подписчиков.", groupButton: "👥 Войти в закрытую группу", groupLocked: "🔒 Только для подписчиков", subscribe: "⚡ Активировать подписку", inviteError: "Сейчас не удалось открыть доступ.",
     },
   };
 
@@ -50,9 +53,13 @@
 
   function openTelegram(url) {
     if (!url) return;
-    if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url);
-    if (tg?.openLink) return tg.openLink(url);
-    window.open(url, "_blank", "noopener");
+    try {
+      if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url);
+      if (tg?.openLink) return tg.openLink(url);
+      window.open(url, "_blank", "noopener");
+    } catch {
+      window.open(url, "_blank", "noopener");
+    }
   }
 
   function openSubscription() {
@@ -72,12 +79,11 @@
     return data.accessUrl || data.inviteUrl;
   }
 
-  async function openOfficialChannel() {
-    try {
-      openTelegram(await requestAccess("/api/hub/official-channel-access"));
-    } catch {
-      showAccessError();
-    }
+  function openOfficialChannel(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    // O Canal Oficial é livre. Abrimos diretamente o convite fornecido pelo administrador.
+    openTelegram(OFFICIAL_CHANNEL_ACCESS_URL);
   }
 
   async function openSubscriberGroup() {
@@ -106,17 +112,18 @@
   };
 
   function decorateOfficialArea() {
-    document.querySelectorAll(`[data-official-url="${OFFICIAL_CHANNEL_URL}"]`).forEach((button) => {
+    document.querySelectorAll(`[data-official-url="${LEGACY_OFFICIAL_CHANNEL_URL}"]`).forEach((button) => {
       const card = button.closest(".itemCard");
       card?.querySelector("h3") && (card.querySelector("h3").textContent = tr("channelTitle"));
       card?.querySelector("p") && (card.querySelector("p").textContent = tr("channelText"));
       button.textContent = tr("channelButton");
+      button.dataset.officialDirectUrl = OFFICIAL_CHANNEL_ACCESS_URL;
       if (button.dataset.communityBound !== "1") {
         button.dataset.communityBound = "1";
         button.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopImmediatePropagation();
-          openOfficialChannel();
+          openOfficialChannel(event);
         }, true);
       }
     });
@@ -149,6 +156,7 @@
     card.id = "officialEducationFreeCard";
     card.type = "button";
     card.className = "quickCard officialEducationFreeCard";
+    card.dataset.officialDirectUrl = OFFICIAL_CHANNEL_ACCESS_URL;
     card.innerHTML = `<span class="emoji">📚</span><strong>${escapeHtml(tr("channelTitle"))}</strong><small>${escapeHtml(tr("channelText"))}</small><span style="font-size:11px;font-weight:800;opacity:.8">${escapeHtml(tr("free"))}</span>`;
     card.addEventListener("click", openOfficialChannel);
     grid.prepend(card);
