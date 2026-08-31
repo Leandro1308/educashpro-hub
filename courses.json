@@ -71,6 +71,17 @@
       "title": { "pt": "EduCashPro Academy", "en": "EduCashPro Academy", "es": "EduCashPro Academy", "ru": "EduCashPro Academy" },
       "description": { "pt": "Educação financeira, economia digital, Web3, Telegram e desenvolvimento de ativos digitais.", "en": "Financial education, digital economy, Web3, Telegram and digital asset development.", "es": "Educación financiera, economía digital, Web3, Telegram y desarrollo de activos digitales.", "ru": "Финансовая грамотность, цифровая экономика, Web3, Telegram и развитие цифровых активов." },
       "preview": { "pt": ["Educação e mentalidade financeira", "Web3, TON e USDT", "Ativos e comunidades digitais"], "en": ["Financial education and mindset", "Web3, TON and USDT", "Digital assets and communities"], "es": ["Educación y mentalidad financiera", "Web3, TON y USDT", "Activos y comunidades digitales"], "ru": ["Финансовая грамотность и мышление", "Web3, TON и USDT", "Цифровые активы и сообщества"] }
+    },
+    {
+      "id": "negocio_seculo_xxi",
+      "icon": "🏗️",
+      "category": "network_marketing",
+      "access": "subscriber",
+      "link": "",
+      "order": 7,
+      "title": { "pt": "Construindo Ativos no Século XXI", "en": "Building Assets in the 21st Century", "es": "Construyendo Activos en el Siglo XXI", "ru": "Создание активов в XXI веке" },
+      "description": { "pt": "Curso exclusivo sobre educação financeira, empreendedorismo, construção de ativos, liderança, duplicação e marketing de rede.", "en": "Subscriber course on financial education, entrepreneurship, asset building, leadership, duplication and network marketing.", "es": "Curso exclusivo sobre educación financiera, emprendimiento, construcción de activos, liderazgo, duplicación y marketing de red.", "ru": "Эксклюзивный курс по финансовой грамотности, предпринимательству, активам, лидерству, дублированию и сетевому маркетингу." },
+      "preview": { "pt": ["Renda, ativos e modelos de geração de valor", "Os oito ativos da construção de rede", "Duplicação, sistemas e liderança", "Escolha responsável e plano prático de 30 dias"], "en": ["Income, assets and value creation models", "Eight assets of network building", "Duplication, systems and leadership", "Responsible choice and a practical 30-day plan"], "es": ["Ingresos, activos y creación de valor", "Ocho activos de construcción de red", "Duplicación, sistemas y liderazgo", "Elección responsable y plan de 30 días"], "ru": ["Доход, активы и создание ценности", "Восемь активов построения сети", "Дублирование, системы и лидерство", "Осознанный выбор и план на 30 дней"] }
     }
   ]
 }
