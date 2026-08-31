@@ -16,98 +16,287 @@
     return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   }
 
-  const COPY = {
-    pt: {
-      title: "Construindo Ativos no Século XXI",
-      subtitle: "Educação financeira, empreendedorismo e marketing de rede",
-      intro: "Curso exclusivo para assinantes, desenvolvido a partir dos conceitos estudados em O Negócio do Século XXI, de Robert T. Kiyosaki com John Fleming e Kim Kiyosaki. O conteúdo foi reorganizado em linguagem própria, prática e atual, sem reproduzir o livro. A proposta central é compreender que crescimento financeiro depende menos de promessas de renda e mais da construção de ativos, habilidades, sistemas, relacionamentos e liderança.",
-      source: "Referência de estudo: Robert T. Kiyosaki, John Fleming e Kim Kiyosaki — O Negócio do Século XXI.",
-      back: "Voltar para a Academy", next: "Próxima aula", prev: "Aula anterior", lesson: "Aula", of: "de", apply: "Aplicação prática", key: "Ideia central", warning: "Importante",
-      disclaimer: "Conteúdo educacional. Marketing de rede não garante renda. Resultados dependem de produto ou serviço real, mercado, vendas, relacionamento, liderança, execução, custos e regras do negócio. Não contraia dívidas para participar de uma oportunidade.",
-      lessons: [
-        ["Assuma o controle do seu futuro financeiro","A primeira mudança é de responsabilidade: parar de tratar salário, empresa ou economia como únicas fontes de segurança. Educação financeira começa quando você entende de onde vem sua renda, para onde ela vai e o que está construindo com ela.","O objetivo não é abandonar um emprego, mas reduzir dependência de uma única fonte de renda e desenvolver capacidade de decisão.","Liste suas fontes de renda atuais e marque quais dependem diretamente das suas horas de trabalho."],
-        ["Os quatro modos de gerar renda","Uma forma útil de analisar a renda é separar quem trabalha como empregado, quem trabalha por conta própria, quem constrói sistemas de negócio e quem utiliza capital em investimentos. Cada posição exige habilidades e responsabilidades diferentes.","Ganhar mais não significa automaticamente mudar de modelo. Um autônomo muito bem pago ainda pode depender totalmente da própria presença.","Pergunte: se eu parar de trabalhar por 30 dias, quais rendas continuam existindo?"],
-        ["Mentalidade empreendedora","Empreender significa identificar problemas, criar valor e assumir responsabilidade pela execução. Não é apenas abrir uma empresa. A mudança começa quando a pessoa deixa de esperar condições perfeitas e passa a aprender, testar, medir e corrigir.","Empreendedorismo combina iniciativa com disciplina. Coragem sem análise vira imprudência; análise sem ação vira paralisia.","Escolha um problema real que você saiba ajudar a resolver e escreva uma solução simples em uma frase."],
-        ["Renda é diferente de ativo","O livro enfatiza uma distinção importante: renda do trabalho é limitada pelo tempo, enquanto um ativo ou sistema produtivo pode continuar gerando valor além de uma única hora trabalhada. Em educação financeira, é importante também distinguir esse uso popular do conceito de ativo da definição contábil formal.","O foco estratégico não deve ser apenas quanto entra neste mês, mas o que está sendo construído para produzir valor no futuro.","Faça duas colunas: renda gerada pelo seu esforço direto e estruturas que podem continuar produzindo valor."],
-        ["Ativo 1 — Educação empresarial real","Construir um negócio exige habilidades que dificilmente aparecem apenas na teoria: comunicação, vendas, apresentação, negociação, organização, acompanhamento, solução de problemas e leitura de pessoas.","A experiência prática funciona como laboratório. O objetivo é aprender com pequenas ações repetidas, não esperar domínio completo antes de começar.","Escolha uma habilidade comercial que hoje limita você e pratique-a deliberadamente durante sete dias."],
-        ["Ativo 2 — Desenvolvimento pessoal","O crescimento de um negócio frequentemente expõe medos, inseguranças e hábitos. Aprender a lidar com rejeição, disciplina, consistência, comunicação e autoconfiança faz parte da construção do próprio ativo.","Desenvolvimento pessoal não substitui estratégia, mas amplia a capacidade de executá-la.","Identifique uma situação comercial que você evita e defina uma ação pequena para enfrentá-la nesta semana."],
-        ["Ativo 3 — Ambiente e relacionamentos","Pessoas próximas influenciam padrões de comportamento, expectativas e decisões. Um ambiente de aprendizado, responsabilidade e metas compartilhadas pode acelerar desenvolvimento profissional.","Rede de apoio não significa concordância automática. Bons relacionamentos também oferecem feedback, responsabilidade e perspectivas diferentes.","Liste três pessoas com quem você pode trocar aprendizado de negócios de maneira construtiva."],
-        ["Ativo 4 — O poder da rede","Uma rede amplia distribuição. Uma pessoa possui limites de tempo e alcance; várias pessoas capacitadas conseguem atender, comunicar e ensinar em escala maior. O valor, porém, depende de relações reais, clientes, atividade e confiança.","Uma lista de nomes não é um ativo. Uma rede ativa, treinada, ética e capaz de gerar valor pode se tornar parte de uma organização comercial.","Desenhe sua rede atual em três grupos: clientes, parceiros potenciais e pessoas que podem indicar outras pessoas."],
-        ["Ativo 5 — Duplicação e escalabilidade","No marketing de rede, processos simples tendem a ser mais duplicáveis que técnicas dependentes de um vendedor excepcional. O sistema precisa poder ser aprendido e repetido por pessoas comuns com treinamento adequado.","Escala não é copiar mensagens em massa. É transformar boas práticas em processos simples, mensuráveis e ensináveis.","Escreva seu processo em quatro etapas: convidar, apresentar, acompanhar e treinar. Reduza cada etapa ao essencial."],
-        ["Ativo 6 — Liderança","Liderança não é controlar pessoas. É criar clareza, exemplo, confiança, desenvolvimento e responsabilidade. Uma rede cresce de maneira mais sustentável quando novos membros aprendem a liderar outros, e não apenas a depender de quem os indicou.","Liderança é o elo que transforma indivíduos em equipe e processo em cultura.","Escolha uma pessoa da sua rede e ajude-a a dominar uma habilidade específica, em vez de fazer por ela."],
-        ["Ativo 7 — Sistemas que produzem valor","A construção de riqueza empresarial depende de sistemas: aquisição de clientes, atendimento, acompanhamento, treinamento, comunicação e gestão. Um bom sistema reduz improviso e dependência de uma única pessoa.","Tecnologia e automação podem apoiar o sistema, mas não substituem confiança e relacionamento humano.","Escolha uma tarefa repetitiva do seu processo e documente como executá-la de forma padronizada."],
-        ["Ativo 8 — Propósito e visão","Metas financeiras são mais sustentáveis quando conectadas a um motivo claro. O livro associa grandes sonhos à disposição para aprender, mudar e persistir. A visão orienta decisões, mas precisa ser traduzida em ações mensuráveis.","Sonho sem plano vira desejo; plano sem propósito tende a perder energia.","Defina uma meta de 12 meses e escreva por que ela importa, qual habilidade precisa desenvolver e qual primeira ação executará."],
-        ["Escolha com sabedoria","Antes de participar de qualquer empresa de venda direta ou marketing de rede, pesquise. Avalie produto ou serviço, demanda real, preços, reputação, suporte, contrato, custos, política de cancelamento, plano de remuneração e se a receita depende de vendas legítimas.","Não escolha uma empresa apenas por histórias de grandes ganhos. Produto real, clientes e sustentabilidade importam mais que promessa.","Crie um checklist com pelo menos dez critérios e só tome decisão depois de verificar cada um."],
-        ["Você não precisa ser um vendedor nato","Uma rede sustentável depende mais de comunicação, ensino, acompanhamento e formação de equipe do que de uma pessoa capaz de vender tudo sozinha. Habilidades básicas podem ser treinadas e duplicadas.","O objetivo é formar pessoas competentes, não criar dependência de um único líder ou vendedor.","Pratique uma apresentação de dois minutos explicando valor, público e próximo passo sem usar promessa de renda."],
-        ["Convidar, apresentar, acompanhar e treinar","A construção de rede pode ser organizada em quatro movimentos simples. Convidar abre a conversa; apresentar explica a proposta; acompanhar respeita o tempo de decisão; treinar ajuda quem entrou a executar o processo com autonomia.","Ferramentas podem ajudar na apresentação e no treinamento, mas conexão humana, escuta e confiança continuam sendo tarefas centrais.","Crie um roteiro curto para cada uma das quatro etapas e elimine qualquer pressão, exagero ou promessa."],
-        ["Plano de 30 dias — aprender, aplicar, ensinar e duplicar","O fechamento do curso transforma conceitos em rotina. Escolha poucas ações, acompanhe números simples e melhore semanalmente. Uma rede cresce pela repetição consistente de comportamentos éticos e ensináveis.","A sequência mais útil é: aprender, aplicar, medir, corrigir, ensinar e duplicar. Crescimento sustentável vem de processo, não de pressa.","Nos próximos 30 dias, defina metas semanais de contatos qualificados, apresentações, acompanhamentos, clientes atendidos e pessoas treinadas. Revise os resultados sem prometer ganhos."],
-      ],
-    },
-    en: {
-      title: "Building Assets in the 21st Century", subtitle: "Financial education, entrepreneurship and network marketing", intro: "Subscriber-only course developed from concepts studied in The Business of the 21st Century by Robert T. Kiyosaki with John Fleming and Kim Kiyosaki. The material is reorganized in original, practical language and does not reproduce the book. The core idea is to focus on building assets, skills, systems, relationships and leadership rather than income promises.", source: "Study reference: Robert T. Kiyosaki, John Fleming and Kim Kiyosaki — The Business of the 21st Century.", back:"Back to Academy",next:"Next lesson",prev:"Previous lesson",lesson:"Lesson",of:"of",apply:"Practical application",key:"Core idea",warning:"Important",disclaimer:"Educational content. Network marketing does not guarantee income. Results depend on a real product or service, market, sales, relationships, leadership, execution, costs and business rules. Do not borrow money to join an opportunity.", lessons: [
-        ["Take control of your financial future","Financial education starts by understanding where income comes from, where it goes and what you are building with it.","The goal is not to quit a job, but to reduce dependence on a single source and improve decision-making.","List your income sources and mark which ones depend directly on your hours."],
-        ["Four ways of generating income","Compare employment, self-employment, business systems and investing. Each model requires different skills, risks and responsibilities.","Higher income does not automatically mean a different model; a highly paid self-employed person may still depend entirely on personal presence.","Ask what income would continue if you stopped working for 30 days."],
-        ["Entrepreneurial mindset","Entrepreneurship is identifying problems, creating value and taking responsibility for execution through learning, testing and adjustment.","Courage without analysis is recklessness; analysis without action becomes paralysis.","Choose one real problem you can help solve and describe your solution in one sentence."],
-        ["Income is different from an asset","Work income is tied to time, while productive assets or systems can continue creating value. Keep the popular cash-flow use of asset distinct from formal accounting definitions.","Ask not only what you earn this month, but what you are building for the future.","Separate direct-work income from structures that may continue producing value."],
-        ["Asset 1 — Real-world business education","Business skills include communication, sales, presentation, negotiation, organization, follow-up and problem solving.","Practice is a laboratory; do not wait for perfect mastery before learning through small actions.","Pick one commercial skill and practice it deliberately for seven days."],
-        ["Asset 2 — Personal development","Business growth exposes fear, rejection, discipline and communication habits. Personal development increases your ability to execute strategy.","Mindset does not replace strategy, but it can strengthen execution.","Identify one business situation you avoid and take one small action this week."],
-        ["Asset 3 — Environment and relationships","A learning-oriented environment can improve standards, feedback and accountability.","Supportive relationships are not blind agreement; they can challenge and develop you.","List three people with whom you can exchange constructive business learning."],
-        ["Asset 4 — The power of a network","A network expands distribution beyond one person's time, but its value depends on real activity, customers, competence and trust.","A contact list alone is not an asset. An active, trained and ethical organization can become economically valuable.","Map customers, potential partners and referral sources."],
-        ["Asset 5 — Duplication and scalability","Simple processes duplicate better than techniques that require an exceptional salesperson.","Scale is not mass messaging; it is making good practices simple, measurable and teachable.","Write four steps: invite, present, follow up and train."],
-        ["Asset 6 — Leadership","Leadership creates clarity, example, trust, development and accountability. Sustainable teams develop new leaders.","Leadership connects individuals, systems and culture.","Help one person master a skill instead of doing the task for them."],
-        ["Asset 7 — Systems that create value","Customer acquisition, service, follow-up, training and communication should become documented systems.","Technology can support systems but cannot replace trust and human connection.","Document one recurring task as a simple repeatable process."],
-        ["Asset 8 — Purpose and vision","Financial goals become more durable when connected to meaningful reasons and measurable action.","A dream without a plan is a wish; a plan without purpose loses energy.","Define a 12-month goal, why it matters and the first action."],
-        ["Choose wisely","Research product, real demand, pricing, reputation, contracts, costs, cancellation terms, support and compensation before joining a direct-selling company.","Do not choose mainly because of large-income stories. Real customers and sustainable value matter more.","Build a ten-point due-diligence checklist."],
-        ["You do not need to be a born salesperson","Communication, teaching, follow-up and team development are more duplicable than relying on one superstar seller.","Build competent people rather than dependency on one leader.","Practice a two-minute value presentation with no income claims."],
-        ["Invite, present, follow up and train","These four movements organize relationship-based growth while preserving respect for the other person's decision.","Tools can help presentations and training; human listening and trust remain essential.","Create a short ethical script for each of the four stages."],
-        ["30-day plan — learn, apply, teach and duplicate","Use a few measurable actions, review them weekly and improve the process instead of chasing fast results.","Learn, apply, measure, correct, teach and duplicate.","Track qualified contacts, presentations, follow-ups, customers served and people trained for 30 days."],
-      ],
-    },
-    es: {
-      title:"Construyendo Activos en el Siglo XXI",subtitle:"Educación financiera, emprendimiento y marketing de red",intro:"Curso exclusivo para suscriptores desarrollado a partir de conceptos estudiados en El negocio del siglo XXI, de Robert T. Kiyosaki con John Fleming y Kim Kiyosaki. El contenido está reorganizado con lenguaje propio y práctico, sin reproducir el libro.",source:"Referencia de estudio: Robert T. Kiyosaki, John Fleming y Kim Kiyosaki — El negocio del siglo XXI.",back:"Volver a Academy",next:"Siguiente lección",prev:"Lección anterior",lesson:"Lección",of:"de",apply:"Aplicación práctica",key:"Idea central",warning:"Importante",disclaimer:"Contenido educativo. El marketing de red no garantiza ingresos. Los resultados dependen de producto o servicio real, mercado, ventas, relaciones, liderazgo, ejecución, costos y reglas del negocio. No se endeude para participar.", lessons: [
-        ["Toma el control de tu futuro financiero","La educación financiera comienza al comprender de dónde viene el dinero, adónde va y qué estás construyendo con él.","El objetivo no es abandonar un empleo, sino reducir la dependencia de una sola fuente.","Enumera tus fuentes de ingresos y marca cuáles dependen de tus horas."],
-        ["Cuatro formas de generar ingresos","Compara empleo, trabajo por cuenta propia, sistemas empresariales e inversión.","Ganar más no significa necesariamente cambiar de modelo.","Pregunta qué ingresos seguirían si dejaras de trabajar 30 días."],
-        ["Mentalidad emprendedora","Emprender es identificar problemas, crear valor y responsabilizarse por la ejecución.","Valor sin análisis es imprudencia; análisis sin acción es parálisis.","Elige un problema real y escribe una solución en una frase."],
-        ["Ingreso no es lo mismo que activo","El ingreso laboral depende del tiempo; un activo o sistema productivo puede seguir creando valor.","Distingue el uso popular de activo de la definición contable formal.","Separa ingresos directos de estructuras que pueden producir valor."],
-        ["Activo 1 — Educación empresarial real","Comunicación, ventas, presentación, negociación y seguimiento se desarrollan con práctica.","La experiencia funciona como laboratorio.","Practica una habilidad comercial durante siete días."],
-        ["Activo 2 — Desarrollo personal","El negocio revela miedos, hábitos y capacidad para manejar el rechazo.","El desarrollo personal fortalece la ejecución, no sustituye la estrategia.","Enfrenta una situación comercial que sueles evitar."],
-        ["Activo 3 — Entorno y relaciones","Un entorno de aprendizaje mejora estándares, apoyo y responsabilidad.","Buenas relaciones también ofrecen crítica útil.","Elige tres personas para intercambiar aprendizaje empresarial."],
-        ["Activo 4 — El poder de la red","Una red amplía la distribución, pero su valor depende de clientes, actividad, formación y confianza.","Una lista de nombres no es un activo.","Organiza tu red en clientes, socios potenciales y fuentes de recomendación."],
-        ["Activo 5 — Duplicación y escala","Los procesos simples se duplican mejor que las técnicas que dependen de vendedores excepcionales.","Escalar es hacer el proceso enseñable y medible.","Resume tu proceso en invitar, presentar, seguir y entrenar."],
-        ["Activo 6 — Liderazgo","Liderar es crear claridad, ejemplo, confianza y desarrollo de nuevas personas.","Una red sana forma nuevos líderes.","Ayuda a una persona a dominar una habilidad."],
-        ["Activo 7 — Sistemas que crean valor","Adquisición de clientes, servicio, seguimiento y formación deben convertirse en sistemas.","La automatización ayuda, pero no sustituye la confianza.","Documenta una tarea repetitiva."],
-        ["Activo 8 — Propósito y visión","Las metas financieras se sostienen mejor cuando tienen un motivo claro y acciones medibles.","Sueño sin plan es deseo.","Define una meta de 12 meses y la primera acción."],
-        ["Elige con sabiduría","Investiga producto, demanda, precio, reputación, contrato, costos, soporte y plan de compensación.","No elijas por historias de grandes ganancias.","Crea una lista de diez criterios de evaluación."],
-        ["No necesitas ser un vendedor nato","Comunicación, enseñanza, seguimiento y formación de equipo pueden aprenderse y duplicarse.","Forma personas competentes, no dependientes.","Practica una presentación de dos minutos sin promesas de ingresos."],
-        ["Invitar, presentar, acompañar y entrenar","Estas cuatro etapas organizan un crecimiento basado en relaciones.","La tecnología ayuda, pero la escucha y la confianza son humanas.","Crea un guion ético para cada etapa."],
-        ["Plan de 30 días — aprender, aplicar, enseñar y duplicar","Mide pocas acciones y mejora cada semana.","Aprender, aplicar, medir, corregir, enseñar y duplicar.","Registra contactos cualificados, presentaciones, seguimientos, clientes y personas entrenadas durante 30 días."],
-      ],
-    },
-    ru: {
-      title:"Создание активов в XXI веке",subtitle:"Финансовая грамотность, предпринимательство и сетевой маркетинг",intro:"Эксклюзивный курс для подписчиков, созданный на основе изучения идей книги Роберта Т. Кийосаки, Джона Флеминга и Ким Кийосаки «Бизнес XXI века». Материал изложен заново и не воспроизводит книгу.",source:"Учебный источник: Robert T. Kiyosaki, John Fleming, Kim Kiyosaki — The Business of the 21st Century.",back:"Назад в Academy",next:"Следующий урок",prev:"Предыдущий урок",lesson:"Урок",of:"из",apply:"Практика",key:"Главная идея",warning:"Важно",disclaimer:"Образовательный материал. Сетевой маркетинг не гарантирует доход. Результат зависит от реального продукта или услуги, рынка, продаж, отношений, лидерства, исполнения, расходов и правил бизнеса. Не берите долг ради участия.", lessons: [
-        ["Возьмите ответственность за финансовое будущее","Финансовая грамотность начинается с понимания источников дохода, расходов и того, что вы создаёте на будущее.","Цель не в том, чтобы немедленно увольняться, а в снижении зависимости от одного источника.","Перечислите доходы и отметьте те, что полностью зависят от ваших часов."],
-        ["Четыре способа получения дохода","Сравните работу по найму, самозанятость, бизнес-системы и инвестирование.","Высокий доход не всегда означает независимую систему.","Определите, что продолжит приносить доход после 30 дней без работы."],
-        ["Предпринимательское мышление","Предпринимательство — это поиск проблем, создание ценности и ответственность за исполнение.","Смелость без анализа опасна, анализ без действия бесполезен.","Выберите реальную проблему и сформулируйте решение одним предложением."],
-        ["Доход и актив — не одно и то же","Трудовой доход связан со временем, а продуктивный актив или система может продолжать создавать ценность.","Отличайте популярное понятие актива по денежному потоку от бухгалтерского определения.","Разделите доход от личной работы и системы, создающие ценность."],
-        ["Актив 1 — Реальное бизнес-образование","Коммуникация, продажи, презентация, переговоры и сопровождение развиваются практикой.","Практика — лаборатория бизнеса.","Тренируйте один коммерческий навык семь дней."],
-        ["Актив 2 — Личностное развитие","Бизнес выявляет страхи, привычки, дисциплину и реакцию на отказ.","Личностный рост усиливает стратегию, но не заменяет её.","Сделайте маленький шаг в ситуации, которую обычно избегаете."],
-        ["Актив 3 — Окружение и отношения","Развивающее окружение повышает стандарты, качество обратной связи и ответственность.","Поддержка не означает постоянное согласие.","Выберите трёх людей для обмена бизнес-знаниями."],
-        ["Актив 4 — Сила сети","Сеть расширяет дистрибуцию, но её ценность зависит от клиентов, активности, обучения и доверия.","Список контактов сам по себе не является активом.","Разделите сеть на клиентов, потенциальных партнёров и источники рекомендаций."],
-        ["Актив 5 — Дублирование и масштаб","Простые процессы легче повторять, чем талант одного выдающегося продавца.","Масштаб — это обучаемый и измеримый процесс.","Запишите четыре шага: приглашение, презентация, сопровождение, обучение."],
-        ["Актив 6 — Лидерство","Лидер создаёт ясность, пример, доверие и развивает новых лидеров.","Устойчивая сеть не должна зависеть от одного человека.","Помогите одному человеку освоить конкретный навык."],
-        ["Актив 7 — Системы создания ценности","Привлечение клиентов, обслуживание, сопровождение и обучение должны становиться системами.","Автоматизация помогает, но не заменяет доверие.","Опишите один повторяющийся процесс."],
-        ["Актив 8 — Цель и видение","Финансовые цели устойчивее, когда связаны со смыслом и измеримыми действиями.","Мечта без плана остаётся желанием.","Определите цель на 12 месяцев и первый шаг."],
-        ["Выбирайте осознанно","Проверяйте продукт, спрос, цену, репутацию, договор, расходы, возвраты, поддержку и систему вознаграждения.","Не выбирайте компанию только по историям о больших доходах.","Создайте чек-лист из десяти критериев."],
-        ["Не нужно быть прирождённым продавцом","Коммуникация, обучение, сопровождение и развитие команды можно освоить и повторить.","Развивайте самостоятельных людей.","Сделайте двухминутную презентацию без обещаний дохода."],
-        ["Приглашать, презентовать, сопровождать и обучать","Четыре этапа помогают выстроить рост через отношения.","Инструменты помогают, но доверие и слушание остаются человеческими.","Создайте этичный сценарий для каждого этапа."],
-        ["План на 30 дней — учиться, применять, обучать и дублировать","Измеряйте несколько действий и улучшайте процесс каждую неделю.","Учиться, применять, измерять, корректировать, обучать и дублировать.","30 дней отслеживайте качественные контакты, презентации, сопровождение, клиентов и обученных людей."],
-      ],
-    },
+  const PT = {
+    title: "Educar para Multiplicar",
+    subtitle: "Ativos, negócios, redes e crescimento sustentável",
+    intro: [
+      "Este curso foi criado pelo EduCashPro para desenvolver uma compreensão prática sobre educação financeira, construção de ativos, empreendedorismo e marketing de rede. A proposta não é ensinar fórmulas de enriquecimento, mas mostrar como conhecimento, relacionamento, sistemas e liderança podem ser organizados para produzir valor ao longo do tempo.",
+      "A ideia central é simples: antes de multiplicar resultados, é necessário multiplicar capacidade. Isso significa aprender a administrar dinheiro, desenvolver habilidades, criar processos, atender pessoas, formar relacionamentos e construir estruturas que não dependam exclusivamente de uma única hora de trabalho.",
+      "Ao longo das aulas, você será convidado a observar sua própria realidade. Em vez de perguntar apenas quanto deseja ganhar, aprenderá a perguntar o que está construindo, quais competências possui, onde está sua dependência e quais sistemas podem ser desenvolvidos para ampliar sua capacidade de gerar valor.",
+      "O marketing de rede aparece aqui como uma das formas possíveis de organização comercial baseada em produtos ou serviços reais, clientes, indicação, relacionamento, treinamento e desenvolvimento de equipe. Não é apresentado como garantia de renda nem como substituto de planejamento financeiro." 
+    ],
+    back: "Voltar para a Academy", next: "Próxima aula", prev: "Aula anterior", lesson: "Aula", of: "de", apply: "Aplicação prática", key: "Princípio EduCashPro", reflection: "Para refletir", warning: "Importante",
+    disclaimer: "Conteúdo educacional. Nenhuma atividade empresarial ou de marketing de rede garante renda. Resultados dependem de produto ou serviço real, demanda, vendas, relacionamento, custos, liderança, execução e regras do negócio. Evite decisões baseadas em promessa de ganho e não contraia dívidas apenas para participar de uma oportunidade.",
+    lessons: [
+      {
+        title: "A segurança financeira começa pela consciência",
+        body: [
+          "Muitas pessoas associam segurança financeira a ter um emprego, receber um salário ou possuir determinada quantidade de dinheiro. Esses elementos podem contribuir para estabilidade, mas não substituem consciência financeira. Se a pessoa não entende de onde vem sua renda, como gasta, quanto custa seu estilo de vida e quanto consegue reservar para construir patrimônio, ela permanece vulnerável mesmo quando ganha bem.",
+          "Educação financeira começa quando o dinheiro deixa de ser apenas algo que entra e sai da conta e passa a ser observado como um fluxo. Você precisa saber quanto entra, quanto sai, o que é essencial, o que é desperdício, quais compromissos são recorrentes e quais decisões estão aumentando ou reduzindo sua capacidade futura.",
+          "O primeiro nível de crescimento não é ganhar mais. É compreender melhor. Uma pessoa que aumenta a renda sem modificar comportamento pode apenas aumentar despesas. Por outro lado, quem aprende a administrar recursos cria espaço para investir em conhecimento, ferramentas, negócios ou ativos.",
+          "Assumir responsabilidade financeira não significa controlar todos os acontecimentos externos. Significa desenvolver capacidade para responder melhor a eles."],
+        key: "Controle financeiro não é controlar a economia; é conhecer seus números e aumentar sua capacidade de decisão.",
+        apply: "Registre sua renda líquida mensal, despesas fixas, despesas variáveis, dívidas, reservas e valor disponível para construção de patrimônio. Não estime: use números reais.",
+        reflection: "Se sua principal fonte de renda fosse interrompida por três meses, quais partes da sua vida financeira continuariam funcionando?"
+      },
+      {
+        title: "A qualidade da renda importa tanto quanto a quantidade",
+        body: [
+          "Duas pessoas podem ganhar o mesmo valor e possuir realidades completamente diferentes. Uma pode depender de trabalhar todos os dias para receber; outra pode combinar trabalho, comissões, negócios e investimentos. O valor mensal é igual, mas a estrutura que produz esse dinheiro é diferente.",
+          "Renda baseada exclusivamente em horas trabalhadas possui um limite natural: o tempo disponível. Ela pode ser excelente e necessária, mas é importante reconhecer sua dependência. Quando a renda depende da presença física ou mental constante, qualquer interrupção pode afetar diretamente o fluxo financeiro.",
+          "A evolução financeira acontece quando a pessoa começa a construir mais de uma capacidade de geração de valor. Isso não exige abandonar o trabalho atual. Pode começar com uma habilidade comercial, um pequeno serviço, uma atividade digital, uma carteira de investimentos ou uma organização de vendas construída gradualmente.",
+          "Diversificar renda não significa fazer dez coisas ao mesmo tempo. Significa reduzir dependência de uma única estrutura de geração de dinheiro."],
+        key: "Não observe apenas quanto você ganha. Observe como esse dinheiro é produzido e o quanto essa fonte depende exclusivamente de você.",
+        apply: "Classifique cada fonte de renda como: depende totalmente do meu tempo; depende parcialmente do meu tempo; ou pode continuar gerando valor sem minha presença constante.",
+        reflection: "Qual fonte de renda você poderia começar a desenvolver sem abandonar a que já possui?"
+      },
+      {
+        title: "Quatro estruturas de geração de renda",
+        body: [
+          "Para compreender crescimento financeiro, é útil observar quatro estruturas: emprego, trabalho autônomo, negócio organizado em sistemas e investimento. Nenhuma delas é automaticamente melhor. Cada uma possui vantagens, riscos, responsabilidades e exigências diferentes.",
+          "No emprego, a pessoa troca conhecimento e tempo por remuneração dentro de uma organização. No trabalho autônomo, ela possui mais controle, mas frequentemente continua dependente da própria execução. No negócio estruturado, o desafio é criar processos, equipe, distribuição e gestão capazes de funcionar além de uma única pessoa. No investimento, o capital é alocado com expectativa de retorno, sempre acompanhado de risco.",
+          "O erro é imaginar que mudar de atividade significa necessariamente mudar de estrutura. Um profissional pode abrir uma empresa e continuar completamente preso ao próprio trabalho. Pode ter CNPJ, funcionários e faturamento, mas se tudo parar quando ele se ausenta, ainda existe forte dependência pessoal.",
+          "A pergunta relevante é: o que você está construindo além do seu esforço imediato?"],
+        key: "Crescimento financeiro envolve migrar gradualmente de dependência exclusiva do esforço pessoal para estruturas mais organizadas de geração de valor.",
+        apply: "Desenhe quatro quadrantes em uma folha e coloque suas fontes atuais de renda em emprego, autônomo, negócio/sistema e investimento.",
+        reflection: "Em qual estrutura você está mais concentrado e qual gostaria de desenvolver nos próximos cinco anos?"
+      },
+      {
+        title: "Ativo é aquilo que você constrói para produzir valor",
+        body: [
+          "No uso cotidiano da educação financeira, costuma-se chamar de ativo aquilo que possui potencial de gerar valor ou fluxo de caixa. Na contabilidade, o termo tem definição técnica própria. Para este curso, o mais importante é compreender a lógica econômica: você está acumulando apenas despesas ou também construindo coisas capazes de produzir valor no futuro?",
+          "Um ativo financeiro pode produzir juros, dividendos ou valorização. Um imóvel pode produzir aluguel. Um negócio pode produzir resultado por meio de clientes, processos e equipe. Propriedade intelectual pode gerar receita por licenciamento. Uma rede comercial pode produzir valor quando existe atividade real, clientes, vendas, treinamento e retenção.",
+          "Nem todo projeto é automaticamente um ativo. Um perfil em rede social sem audiência relevante, um grupo sem participação ou um negócio que só consome recursos não devem ser tratados como ativos simplesmente porque foram criados. O valor aparece quando existe capacidade real de gerar benefício econômico ou estratégico.",
+          "A construção de ativos normalmente exige uma fase em que você trabalha mais do que recebe. A diferença é que parte desse esforço está sendo convertida em estrutura, conhecimento, reputação, base de clientes ou capital."],
+        key: "A pergunta não é apenas 'quanto isto vale hoje?', mas 'que capacidade de produzir valor estou construindo aqui?'.",
+        apply: "Liste cinco coisas que você possui ou está construindo e escreva ao lado como cada uma poderia produzir valor de maneira legítima.",
+        reflection: "Seu tempo atual está sendo usado apenas para pagar o presente ou também para construir o futuro?"
+      },
+      {
+        title: "O primeiro ativo é conhecimento aplicável",
+        body: [
+          "Conhecimento só se transforma em ativo pessoal quando altera sua capacidade de agir. Ler sobre vendas, comunicação ou finanças pode ampliar visão, mas o verdadeiro desenvolvimento ocorre quando você testa o conhecimento em situações reais, observa resultados e melhora sua execução.",
+          "Negócios exigem habilidades que raramente são dominadas apenas pela teoria: conversar com pessoas, identificar necessidades, explicar valor, lidar com objeções, organizar contatos, acompanhar clientes, negociar, treinar e tomar decisões com informação incompleta.",
+          "Por isso, a educação empresarial precisa combinar estudo e prática. Pequenas experiências, realizadas de maneira responsável, ensinam muito sobre mercado. Uma conversa com um cliente pode revelar mais sobre uma oferta do que horas tentando aperfeiçoá-la sozinho.",
+          "O profissional que aprende continuamente aumenta sua capacidade de adaptação. Em ambientes econômicos e tecnológicos que mudam rápido, essa capacidade pode ser mais valiosa do que dominar uma única ferramenta."],
+        key: "Conhecimento gera valor quando se transforma em habilidade observável.",
+        apply: "Escolha uma habilidade entre vendas, comunicação, organização financeira, liderança ou marketing. Defina uma prática diária de 20 minutos durante sete dias.",
+        reflection: "Qual conhecimento você já possui, mas ainda não transformou em comportamento?"
+      },
+      {
+        title: "Desenvolvimento pessoal é infraestrutura do negócio",
+        body: [
+          "Empreender e construir uma rede expõem características pessoais que podem permanecer escondidas em outros contextos. Medo de rejeição, dificuldade de manter disciplina, necessidade de aprovação, ansiedade por resultado imediato e resistência a receber feedback começam a interferir diretamente na execução.",
+          "Desenvolvimento pessoal não é repetir frases positivas. É aprender a reconhecer padrões de comportamento e criar respostas melhores. Significa conseguir ouvir um 'não' sem transformar a resposta em rejeição pessoal, manter consistência quando o entusiasmo diminui e aceitar correções sem abandonar o processo.",
+          "Autoconfiança saudável nasce principalmente da competência. Quanto mais você pratica uma habilidade e percebe evolução, menos depende de motivação momentânea. Por isso, disciplina e aprendizagem são mais importantes do que entusiasmo constante.",
+          "Uma organização cresce até o limite da capacidade de seus líderes de aprender, comunicar e desenvolver outras pessoas."],
+        key: "Crescimento externo sustentável exige crescimento interno compatível.",
+        apply: "Identifique um comportamento que hoje limita sua execução. Defina um gatilho, uma nova resposta e uma forma de acompanhar sua evolução por 30 dias.",
+        reflection: "Qual dificuldade pessoal aparece repetidamente quando você tenta crescer?"
+      },
+      {
+        title: "Relacionamentos são capital social",
+        body: [
+          "Nenhum negócio cresce isolado. Clientes, parceiros, fornecedores, mentores, colaboradores e pessoas que indicam oportunidades formam um conjunto de relações que pode ampliar acesso a conhecimento, confiança e mercado.",
+          "Capital social não significa conhecer muita gente. Significa cultivar relações baseadas em respeito, reciprocidade e credibilidade. Uma pessoa que só procura os outros quando precisa vender alguma coisa enfraquece sua própria rede.",
+          "Relacionamentos fortes são construídos antes da necessidade. Eles nascem de conversas, entregas consistentes, ajuda real e reputação. No marketing de rede, isso é especialmente importante porque confiança precede indicação.",
+          "A qualidade da rede também influencia comportamento. Ambientes que valorizam estudo, ética e execução tendem a elevar o padrão de seus participantes."],
+        key: "Rede forte é consequência de confiança acumulada, não de uma lista grande de contatos.",
+        apply: "Escolha dez contatos importantes e registre quando foi sua última interação de valor com cada um. Retome duas relações sem tentar vender nada.",
+        reflection: "As pessoas lembram de você apenas quando recebem uma oferta ou também quando recebem valor?"
+      },
+      {
+        title: "Marketing de rede: produto, cliente e distribuição",
+        body: [
+          "Marketing de rede é um modelo de distribuição em que participantes independentes comercializam produtos ou serviços e podem desenvolver equipes de distribuição conforme as regras da empresa. A existência de rede não elimina a necessidade de produto, cliente e venda real.",
+          "Um modelo sustentável precisa possuir algo que pessoas comprariam pelo valor recebido, e não apenas pelo direito de participar. Quando o foco deixa de ser produto ou serviço e passa a depender principalmente de entrada de novos participantes, o risco de distorção aumenta.",
+          "Para o profissional, o marketing de rede pode funcionar como laboratório de habilidades comerciais: comunicação, indicação, atendimento, apresentação, acompanhamento, treinamento e liderança. Essas competências também são úteis em negócios tradicionais.",
+          "A rede pode adquirir valor econômico quando existe base de clientes, atividade recorrente, pessoas treinadas, processos simples e capacidade de retenção. Apenas cadastrar nomes não constrói esse valor."],
+        key: "Marketing de rede legítimo começa por valor real para clientes e só depois por expansão da distribuição.",
+        apply: "Escolha qualquer empresa de venda direta que você conheça e responda: qual problema o produto resolve, quem compra sem participar da rede e por que o cliente recompra?",
+        reflection: "Se a oportunidade de comissão desaparecesse, o produto ou serviço ainda teria compradores?"
+      },
+      {
+        title: "A rede como sistema de distribuição",
+        body: [
+          "Uma pessoa possui limite de tempo e alcance. Uma rede organizada amplia distribuição porque várias pessoas aprendem a apresentar uma solução, atender clientes e ensinar outras a executar o processo.",
+          "Esse crescimento não acontece pela multiplicação de discursos. A verdadeira expansão ocorre quando conhecimento e comportamento conseguem ser reproduzidos com qualidade. Se um processo só funciona nas mãos de uma pessoa extremamente talentosa, ele dificilmente será escalável.",
+          "Por isso, simplicidade é estratégica. Scripts curtos, materiais claros, treinamento organizado e padrões de atendimento facilitam aprendizagem. A tecnologia pode ajudar a padronizar conteúdo e acompanhamento, mas deve servir às relações humanas.",
+          "Quanto mais simples, ético e mensurável for o processo, maior a chance de outra pessoa aprender e repetir sem depender permanentemente de quem a convidou."],
+        key: "Escala é a capacidade de repetir qualidade, não apenas aumentar quantidade.",
+        apply: "Descreva em uma página o processo que uma nova pessoa deveria aprender na primeira semana. Retire tudo que não for essencial.",
+        reflection: "Seu processo é ensinável ou depende da sua personalidade?"
+      },
+      {
+        title: "Duplicação: aprender, aplicar, ensinar",
+        body: [
+          "Duplicação é frequentemente mal compreendida como simples cópia. No contexto de desenvolvimento de rede, ela é a capacidade de transformar uma prática funcional em algo que outras pessoas consigam compreender, executar e ensinar novamente.",
+          "A sequência mais saudável é aprender, aplicar, medir e só depois ensinar. Quando alguém transmite um processo que nunca executou, tende a reproduzir teoria sem experiência. Quando executa, registra resultados e corrige, consegue ensinar com mais clareza.",
+          "Duplicar também exige tolerar diferenças. Pessoas não terão a mesma personalidade, ritmo ou estilo. O objetivo é preservar princípios e processos essenciais, não fabricar cópias do líder.",
+          "Uma boa duplicação reduz dependência. O sucesso do treinamento aparece quando o novo participante consegue caminhar sem precisar de autorização para cada passo."],
+        key: "Duplicação é autonomia reproduzível.",
+        apply: "Escolha uma tarefa que você domina e ensine a outra pessoa em três etapas: demonstre, acompanhe a execução e observe-a ensinar de volta.",
+        reflection: "Você está formando pessoas independentes ou criando pessoas que sempre precisam de você?"
+      },
+      {
+        title: "Liderança é desenvolver capacidade nos outros",
+        body: [
+          "Liderança não é ser o centro da rede. É aumentar a capacidade das pessoas que fazem parte dela. Um líder cria clareza, estabelece exemplo, oferece feedback e ajuda outros a assumir responsabilidade.",
+          "Equipes frágeis dependem da energia de uma única pessoa. Quando esse líder se afasta, tudo diminui. Equipes maduras distribuem conhecimento, funções e liderança. Novas pessoas são treinadas para resolver problemas, não apenas para encaminhá-los ao topo.",
+          "A liderança também exige coerência ética. Pressionar pessoas a comprar, ocultar riscos ou exagerar resultados pode gerar crescimento rápido no curto prazo e destruir confiança no longo prazo.",
+          "O líder profissional mede sua influência pela evolução das pessoas, não apenas pelo tamanho da equipe."],
+        key: "Liderar é tornar outras pessoas mais capazes.",
+        apply: "Escolha uma pessoa e pergunte qual habilidade ela precisa dominar para depender menos de você. Crie um pequeno plano de desenvolvimento.",
+        reflection: "Se você se ausentasse por um mês, sua equipe saberia o que fazer?"
+      },
+      {
+        title: "Sistemas transformam esforço em organização",
+        body: [
+          "Sem sistema, cada venda, convite ou atendimento começa do zero. Isso consome energia e torna resultado difícil de repetir. Sistemas são sequências definidas de ações que ajudam a manter qualidade e reduzir improviso.",
+          "Um sistema comercial pode incluir captação, qualificação, apresentação, acompanhamento, atendimento, pós-venda, treinamento e métricas. Não precisa ser sofisticado. Uma planilha bem organizada pode ser mais útil do que uma ferramenta cara mal utilizada.",
+          "O sistema também protege memória. Quando o processo está documentado, a organização não depende de alguém lembrar de tudo. Isso facilita treinamento de novos participantes e permite identificar onde os resultados estão se perdendo.",
+          "Com o tempo, automação pode assumir tarefas repetitivas, como lembretes, distribuição de conteúdo e organização de informações. O relacionamento, entretanto, continua exigindo atenção humana."],
+        key: "O que é repetido deve ser documentado; o que é documentado pode ser melhorado; o que é estável pode ser automatizado.",
+        apply: "Mapeie seu processo atual do primeiro contato ao pós-venda. Identifique uma etapa para documentar e uma etapa que poderia ser automatizada.",
+        reflection: "Quais tarefas você repete toda semana sem possuir um processo definido?"
+      },
+      {
+        title: "Produto real e cliente real vêm antes da rede",
+        body: [
+          "Uma oportunidade comercial só é sustentável se existe valor real sendo entregue. O primeiro teste é simples: alguém compraria o produto ou serviço mesmo que não pudesse receber comissão por indicá-lo?",
+          "Produtos bons resolvem problemas, atendem desejos legítimos ou oferecem conveniência percebida pelo cliente. Preço, qualidade, recompra, atendimento e reputação precisam fazer sentido fora da narrativa de oportunidade.",
+          "Isso protege o profissional de construir uma organização baseada apenas em entusiasmo. Redes sustentáveis possuem clientes reais, não apenas participantes consumindo para manter posição ou expectativa de ganho.",
+          "Antes de aprender a recrutar, aprenda a compreender o cliente. Pergunte, escute, identifique necessidade e apresente solução sem pressão."],
+        key: "O negócio começa no cliente, não no plano de remuneração.",
+        apply: "Converse com três clientes ou potenciais clientes e faça perguntas sobre necessidade, experiência e percepção de valor. Não tente fechar a venda durante a pesquisa.",
+        reflection: "Você consegue explicar por que alguém deveria comprar o produto sem mencionar a oportunidade de renda?"
+      },
+      {
+        title: "Convidar sem pressionar",
+        body: [
+          "O convite é apenas a abertura de uma conversa. Seu objetivo não é convencer alguém em poucos segundos, mas verificar se existe interesse suficiente para uma apresentação mais completa.",
+          "Convites eficientes são claros, breves e respeitam a autonomia da pessoa. Exageros, urgência artificial e promessas de ganhos podem aumentar curiosidade momentânea, mas comprometem confiança.",
+          "A qualidade da prospecção melhora quando você para de tratar todos como candidatos. Pessoas possuem objetivos, momentos e necessidades diferentes. O papel do profissional é identificar compatibilidade, não forçar encaixe.",
+          "Um 'não' pode significar não agora, não para esse produto, não para esse modelo ou simplesmente não. Respeitar a resposta preserva relacionamento."],
+        key: "Convite profissional cria interesse e liberdade de escolha.",
+        apply: "Escreva três convites: um para conhecer um produto, outro para conhecer uma oportunidade e outro para participar de uma apresentação. Limite cada um a duas frases.",
+        reflection: "Seu convite desperta curiosidade ou cria pressão?"
+      },
+      {
+        title: "Apresentar valor antes de falar de ganhos",
+        body: [
+          "Uma apresentação profissional explica o que é oferecido, para quem serve, qual problema resolve, como funciona e quais são os próximos passos. O plano de remuneração é apenas uma parte do modelo, não o centro de toda comunicação.",
+          "Quando o discurso começa por grandes ganhos, a pessoa tende a avaliar a oportunidade como promessa financeira. Isso aumenta expectativas e pode atrair participantes que não possuem interesse real no produto, no cliente ou no trabalho necessário.",
+          "Apresentações mais sustentáveis mostram primeiro produto, mercado, cliente, atividade necessária e custos. Depois explicam como a remuneração funciona, deixando claro que comissão depende de vendas e regras específicas.",
+          "Clareza reduz frustração. Quem entra entendendo o processo tende a tomar decisões mais conscientes."],
+        key: "Venda possibilidade com clareza, não fantasia com emoção.",
+        apply: "Revise sua apresentação e retire qualquer frase que possa ser interpretada como garantia de renda. Acrescente produto, cliente, custos e trabalho necessário.",
+        reflection: "Se uma pessoa assistir à sua apresentação, ela saberá exatamente o que terá de fazer?"
+      },
+      {
+        title: "Acompanhamento é relacionamento, não perseguição",
+        body: [
+          "Poucas decisões importantes acontecem no primeiro contato. O acompanhamento existe para responder dúvidas, fornecer informação e permitir que a pessoa amadureça sua escolha.",
+          "O problema surge quando follow-up se transforma em insistência. Mensagens diárias, pressão emocional ou culpa podem produzir uma adesão e destruir um relacionamento. O profissional precisa aprender a diferenciar interesse de evasão.",
+          "Um bom acompanhamento possui contexto. Você registra o que a pessoa perguntou, o que valorizou e qual próximo passo combinou. Assim, cada conversa continua de onde a anterior terminou.",
+          "Ferramentas podem lembrar você de acompanhar, mas a mensagem precisa respeitar a conversa real."],
+        key: "Follow-up eficiente ajuda a decidir; não tenta cansar a pessoa até ela aceitar.",
+        apply: "Crie uma rotina de acompanhamento com três momentos: confirmação após apresentação, resposta a dúvidas e contato final respeitoso.",
+        reflection: "Você acompanha com propósito ou apenas pergunta repetidamente 'e aí, decidiu?'"
+      },
+      {
+        title: "Treinamento simples produz mais que excesso de informação",
+        body: [
+          "Novos participantes costumam receber informação demais. Produtos, regras, ferramentas, técnicas, scripts e metas chegam ao mesmo tempo. O excesso pode gerar paralisia.",
+          "Um bom treinamento organiza prioridades. Primeiro, a pessoa precisa compreender produto, cliente, ética e processo básico. Depois aprende prospecção, apresentação e acompanhamento. Liderança e automação entram à medida que existe atividade real para organizar.",
+          "Treinamento também deve ser aplicável. Cada aula precisa terminar com uma ação observável. Isso permite medir aprendizagem pela execução, e não apenas pela quantidade de vídeos assistidos.",
+          "A cultura de uma rede é construída pelo que é repetidamente ensinado e praticado."],
+        key: "Treinar é reduzir complexidade até que a pessoa consiga agir com segurança.",
+        apply: "Monte um roteiro de primeiros sete dias para um novo participante contendo no máximo uma habilidade principal por dia.",
+        reflection: "Seu treinamento ajuda a agir ou apenas transfere informação?"
+      },
+      {
+        title: "Automação deve ampliar eficiência sem destruir confiança",
+        body: [
+          "Automação é valiosa quando elimina tarefas repetitivas e reduz esquecimentos. Programar conteúdo, organizar contatos, enviar lembretes e distribuir materiais pode liberar tempo para atividades de maior valor.",
+          "O risco aparece quando automação vira spam. Mensagens genéricas enviadas em massa podem aumentar volume e reduzir credibilidade. Pessoas percebem quando estão sendo tratadas apenas como números.",
+          "A melhor automação ocorre nos bastidores: organização, segmentação, agendamento, métricas e preparação de materiais. Quanto mais sensível for a conversa, maior deve ser a presença humana.",
+          "No EduCashPro, o princípio é: automatize o processo, não automatize a confiança."],
+        key: "Tecnologia deve aumentar sua capacidade de servir, não aumentar sua capacidade de incomodar.",
+        apply: "Liste suas tarefas semanais e marque quais são repetitivas, quais exigem julgamento e quais exigem relacionamento. Automatize apenas a primeira categoria inicialmente.",
+        reflection: "Sua automação melhora a experiência da outra pessoa ou apenas economiza seu tempo?"
+      },
+      {
+        title: "Como avaliar uma oportunidade com responsabilidade",
+        body: [
+          "Antes de participar de um negócio, investigue. Entusiasmo não substitui diligência. Avalie empresa, produto, demanda, preço, reputação, suporte, contrato, política de devolução, custos obrigatórios, exigências de compra e forma de remuneração.",
+          "Observe especialmente de onde vem a receita. Modelos sustentáveis dependem de venda de produtos ou serviços para clientes. Estruturas focadas predominantemente em entrada de pessoas, taxas de adesão ou promessas de retorno exigem cautela redobrada.",
+          "Também avalie compatibilidade pessoal. Um bom negócio para alguém pode não ser adequado para você. Produto, mercado, rotina, valores e tipo de relacionamento precisam fazer sentido.",
+          "Decisão responsável inclui a possibilidade de dizer não, mesmo quando amigos ou líderes estão animados."],
+        key: "Escolher bem é parte da construção do ativo.",
+        apply: "Crie um checklist com pelo menos 15 itens e pesquise qualquer oportunidade antes de comprometer dinheiro ou reputação.",
+        reflection: "Você escolheria essa empresa se não conhecesse ninguém nela?"
+      },
+      {
+        title: "Métricas: o que não é medido vira opinião",
+        body: [
+          "Crescimento de rede pode parecer subjetivo quando tudo é avaliado por sensação. Métricas simples transformam percepção em informação. Quantos contatos qualificados foram feitos? Quantas apresentações? Quantos acompanhamentos? Quantos clientes? Qual taxa de recompra? Quantas pessoas treinadas continuam ativas?",
+          "Métrica não serve para pressionar pessoas. Serve para entender processo. Se muitos aceitam apresentação e poucos compram, a oferta ou comunicação pode estar fraca. Se muitas pessoas entram e poucas permanecem, o problema pode estar no treinamento, expectativa ou valor entregue.",
+          "Acompanhar poucos indicadores relevantes é melhor do que criar dezenas de números que ninguém usa. O objetivo é descobrir onde melhorar.",
+          "Resultados financeiros são consequência tardia. Atividades e qualidade de processo são indicadores que você consegue ajustar mais cedo."],
+        key: "Meça comportamento antes de cobrar resultado.",
+        apply: "Escolha cinco indicadores semanais: contatos qualificados, apresentações, follow-ups, novos clientes e pessoas treinadas. Registre por quatro semanas.",
+        reflection: "Você sabe exatamente qual etapa do seu processo precisa melhorar?"
+      },
+      {
+        title: "Plano de 30 dias: construir antes de multiplicar",
+        body: [
+          "Os próximos 30 dias não devem ser usados para perseguir um número de renda. O objetivo é construir base: conhecimento, rotina, processo, atendimento e relacionamento. Quando a base melhora, a capacidade de resultado também melhora.",
+          "Na primeira semana, organize produto, público, mensagem e lista de contatos. Na segunda, pratique convites e apresentações. Na terceira, melhore acompanhamento e atendimento. Na quarta, documente o que funcionou e comece a ensinar processos simples a outra pessoa.",
+          "Reserve um momento semanal para revisar números e comportamento. Pergunte o que funcionou, o que não funcionou, o que precisa ser simplificado e qual habilidade mais limita seu avanço.",
+          "Ao final do mês, você não deve apenas contar quantas pessoas entraram. Deve conseguir mostrar quais competências desenvolveu e quais sistemas começou a construir."],
+        key: "Primeiro construa capacidade. Depois multiplique capacidade.",
+        apply: "Defina metas de atividade para quatro semanas. Priorize ações que você controla: estudar, convidar, apresentar, acompanhar, atender, treinar e registrar.",
+        reflection: "Qual ativo pessoal ou empresarial você conseguirá mostrar depois de 30 dias, mesmo que a renda ainda não tenha mudado?"
+      },
+      {
+        title: "Multiplicação sustentável: pessoas, sistemas e propósito",
+        body: [
+          "Multiplicar não é apenas aumentar volume. É ampliar conhecimento, capacidade, clientes, processos, liderança e geração de valor sem perder qualidade. Crescimento que destrói confiança não é multiplicação sustentável.",
+          "Uma organização madura possui pessoas que sabem aprender e ensinar, processos que podem ser repetidos, clientes que percebem valor e líderes que desenvolvem novos líderes. Essa combinação reduz dependência de uma única pessoa.",
+          "O propósito também importa. Quem constrói apenas por expectativa de ganho tende a abandonar quando a recompensa demora. Quem compreende o valor que entrega, as habilidades que desenvolve e o futuro que está construindo possui uma motivação mais consistente.",
+          "Educar para Multiplicar significa exatamente isso: transformar conhecimento em capacidade, capacidade em estrutura e estrutura em valor compartilhado."],
+        key: "A melhor multiplicação é aquela em que mais pessoas se tornam capazes de gerar valor com autonomia e ética.",
+        apply: "Escreva seu plano de 12 meses em quatro dimensões: educação financeira, habilidades, sistema comercial e liderança. Defina um indicador para cada uma.",
+        reflection: "Você quer apenas aumentar sua renda ou está construindo algo que continua produzindo valor enquanto outras pessoas também crescem?"
+      }
+    ]
   };
 
-  let current = 0;
+  function translated(language) {
+    if (language === "pt") return PT;
+    const maps = {
+      en: {title:"Educate to Multiply",subtitle:"Assets, business, networks and sustainable growth",back:"Back to Academy",next:"Next lesson",prev:"Previous lesson",lesson:"Lesson",of:"of",apply:"Practical application",key:"EduCashPro principle",reflection:"Reflect",warning:"Important",disclaimer:"Educational content. No business or network-marketing activity guarantees income. Results depend on a real product or service, demand, sales, relationships, costs, leadership, execution and business rules. Avoid decisions based on income promises and do not borrow money merely to join an opportunity."},
+      es: {title:"Educar para Multiplicar",subtitle:"Activos, negocios, redes y crecimiento sostenible",back:"Volver a Academy",next:"Siguiente lección",prev:"Lección anterior",lesson:"Lección",of:"de",apply:"Aplicación práctica",key:"Principio EduCashPro",reflection:"Para reflexionar",warning:"Importante",disclaimer:"Contenido educativo. Ninguna actividad empresarial o de marketing de red garantiza ingresos. Los resultados dependen de producto o servicio real, demanda, ventas, relaciones, costos, liderazgo, ejecución y reglas del negocio. Evita decisiones basadas en promesas de ganancias y no te endeudes solo para participar."},
+      ru: {title:"Обучайся, чтобы умножать",subtitle:"Активы, бизнес, сети и устойчивый рост",back:"Назад в Academy",next:"Следующий урок",prev:"Предыдущий урок",lesson:"Урок",of:"из",apply:"Практика",key:"Принцип EduCashPro",reflection:"Для размышления",warning:"Важно",disclaimer:"Образовательный материал. Бизнес и сетевой маркетинг не гарантируют доход. Результаты зависят от реального продукта или услуги, спроса, продаж, отношений, затрат, лидерства, исполнения и правил бизнеса. Не принимайте решения на основе обещаний дохода и не берите долг только ради участия."}
+    };
+    const m = maps[language] || maps.en;
+    return {
+      ...PT,
+      ...m,
+      intro: language === "en" ? ["This EduCashPro course develops a practical understanding of financial education, asset building, entrepreneurship and network marketing. It does not teach quick-rich formulas; it focuses on building knowledge, relationships, systems and leadership that can create value over time.","Before multiplying results, multiply capability: manage money, develop skills, create processes, serve customers, build relationships and form structures that do not depend on a single hour of work."] : language === "es" ? ["Este curso EduCashPro desarrolla una comprensión práctica de educación financiera, construcción de activos, emprendimiento y marketing de red. No enseña fórmulas de enriquecimiento rápido; se concentra en conocimiento, relaciones, sistemas y liderazgo.","Antes de multiplicar resultados, multiplica capacidad: administra dinero, desarrolla habilidades, crea procesos, atiende clientes y construye relaciones y estructuras."] : ["Этот курс EduCashPro посвящён финансовой грамотности, созданию активов, предпринимательству и сетевому маркетингу. Здесь нет формул быстрого обогащения: акцент сделан на знаниях, отношениях, системах и лидерстве.","Прежде чем умножать результаты, нужно умножить возможности: управлять деньгами, развивать навыки, создавать процессы, обслуживать клиентов и строить устойчивые структуры."],
+      lessons: PT.lessons.map((item, i) => ({
+        title: language === "en" ? ["Financial security starts with awareness","Income quality matters","Four income structures","Build assets that create value","Applied knowledge is the first asset","Personal development is business infrastructure","Relationships are social capital","Network marketing: product, customer and distribution","The network as a distribution system","Duplication: learn, apply, teach","Leadership develops capability in others","Systems turn effort into organization","Real product and real customers come first","Invite without pressure","Present value before earnings","Follow-up is relationship, not pursuit","Simple training beats information overload","Automation must preserve trust","Evaluate opportunities responsibly","Metrics turn opinions into information","30-day plan: build before multiplying","Sustainable multiplication: people, systems and purpose"][i] : language === "es" ? ["La seguridad financiera comienza con conciencia","La calidad del ingreso importa","Cuatro estructuras de ingresos","Construye activos que generen valor","El conocimiento aplicado es el primer activo","El desarrollo personal es infraestructura","Las relaciones son capital social","Marketing de red: producto, cliente y distribución","La red como sistema de distribución","Duplicación: aprender, aplicar, enseñar","Liderazgo es desarrollar capacidad","Los sistemas convierten esfuerzo en organización","Producto real y cliente real primero","Invitar sin presionar","Presenta valor antes que ganancias","Seguimiento es relación, no persecución","Entrenamiento simple vence al exceso","Automatiza sin destruir confianza","Evalúa oportunidades con responsabilidad","Métricas convierten opinión en información","Plan de 30 días: construir antes de multiplicar","Multiplicación sostenible: personas, sistemas y propósito"][i] : ["Финансовая безопасность начинается с осознанности","Важна не только сумма, но и качество дохода","Четыре структуры дохода","Создавайте активы, производящие ценность","Первый актив — применимые знания","Личностный рост — инфраструктура бизнеса","Отношения — социальный капитал","Сетевой маркетинг: продукт, клиент и дистрибуция","Сеть как система дистрибуции","Дублирование: учиться, применять, обучать","Лидерство развивает способности других","Системы превращают усилие в организацию","Сначала реальный продукт и реальный клиент","Приглашайте без давления","Сначала ценность, потом доход","Сопровождение — это отношения","Простое обучение лучше перегруза","Автоматизация должна сохранять доверие","Оценивайте возможности ответственно","Метрики превращают мнение в информацию","План на 30 дней: сначала строить","Устойчивое умножение: люди, системы и смысл"][i],
+        body: language === "en" ? [item.body[0], item.body[2]] : language === "es" ? [item.body[0], item.body[2]] : [item.body[0], item.body[2]],
+        key: item.key,
+        apply: item.apply,
+        reflection: item.reflection
+      }))
+    };
+  }
 
-  function getCopy() { return COPY[lang()] || COPY.pt; }
+  let current = 0;
+  function getCopy() { return translated(lang()); }
 
   function goBack() {
     const learn = document.querySelector('#bottomNav button[data-view="learn"]');
@@ -118,20 +307,23 @@
     const c = getCopy();
     current = Math.max(0, Math.min(c.lessons.length - 1, Number(index || 0)));
     const item = c.lessons[current];
+    const intro = current === 0 ? `<article class="lessonCard">${c.intro.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</article>` : "";
+    const body = item.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("");
     content.innerHTML = `
       <button id="business21Back" class="textButton">← ${escapeHtml(c.back)}</button>
       <section class="courseHero">
-        <span class="eyebrow">EXCLUSIVO PARA ASSINANTES</span>
+        <span class="eyebrow">EDUCASHPRO • EXCLUSIVO PARA ASSINANTES</span>
         <h2>${escapeHtml(c.title)}</h2>
         <p>${escapeHtml(c.subtitle)}</p>
       </section>
-      ${current === 0 ? `<article class="lessonCard"><p>${escapeHtml(c.intro)}</p><p><small>${escapeHtml(c.source)}</small></p></article>` : ""}
-      <div class="sectionHead"><div><h2>${escapeHtml(c.lesson)} ${current + 1} ${escapeHtml(c.of)} ${c.lessons.length}</h2><p>${escapeHtml(item[0])}</p></div></div>
+      ${intro}
+      <div class="sectionHead"><div><h2>${escapeHtml(c.lesson)} ${current + 1} ${escapeHtml(c.of)} ${c.lessons.length}</h2><p>${escapeHtml(item.title)}</p></div></div>
       <article class="lessonCard">
-        <h3>${escapeHtml(item[0])}</h3>
-        <p>${escapeHtml(item[1])}</p>
-        <div class="lessonCallout"><strong>${escapeHtml(c.key)}</strong><p>${escapeHtml(item[2])}</p></div>
-        <div class="lessonCallout"><strong>${escapeHtml(c.apply)}</strong><p>${escapeHtml(item[3])}</p></div>
+        <h3>${escapeHtml(item.title)}</h3>
+        ${body}
+        <div class="lessonCallout"><strong>${escapeHtml(c.key)}</strong><p>${escapeHtml(item.key)}</p></div>
+        <div class="lessonCallout"><strong>${escapeHtml(c.apply)}</strong><p>${escapeHtml(item.apply)}</p></div>
+        <div class="lessonCallout"><strong>${escapeHtml(c.reflection)}</strong><p>${escapeHtml(item.reflection)}</p></div>
       </article>
       <div class="cardActions" style="margin-top:16px">
         <button id="business21Prev" class="secondaryButton" ${current === 0 ? "disabled" : ""}>← ${escapeHtml(c.prev)}</button>
