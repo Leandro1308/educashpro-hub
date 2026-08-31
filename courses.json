@@ -54,12 +54,12 @@
       "icon": "📈",
       "image": "./assets/technical-analysis-exness.svg",
       "category": "technical_analysis",
-      "access": "subscriber",
+      "access": "free",
       "link": "",
       "order": 5,
-      "title": { "pt": "Análise Técnica Completa", "en": "Complete Technical Analysis", "es": "Análisis Técnico Completo", "ru": "Полный курс технического анализа" },
-      "description": { "pt": "Do gráfico ao plano operacional: Price Action, indicadores, XAUUSD, risco, estratégias e treinamento em Demo.", "en": "From charts to an operating plan: Price Action, indicators, XAUUSD, risk, strategies and Demo practice.", "es": "Del gráfico al plan operativo: Price Action, indicadores, XAUUSD, riesgo, estrategias y práctica en Demo.", "ru": "От графика до торгового плана: Price Action, индикаторы, XAUUSD, риск, стратегии и практика на демо-счёте." },
-      "preview": { "pt": ["Estrutura, candles e Price Action", "EMA 9/20, RSI, MACD e ATR", "XAUUSD, sessões e notícias", "Risco, estratégias, backtest e Demo"], "en": ["Structure, candles and Price Action", "EMA 9/20, RSI, MACD and ATR", "XAUUSD, sessions and news", "Risk, strategies, backtesting and Demo"], "es": ["Estructura, velas y Price Action", "EMA 9/20, RSI, MACD y ATR", "XAUUSD, sesiones y noticias", "Riesgo, estrategias, backtest y Demo"], "ru": ["Структура, свечи и Price Action", "EMA 9/20, RSI, MACD и ATR", "XAUUSD, сессии и новости", "Риск, стратегии, бэктест и демо"] }
+      "title": { "pt": "Análise Técnica e Price Action", "en": "Technical Analysis and Price Action", "es": "Análisis Técnico y Price Action", "ru": "Технический анализ и Price Action" },
+      "description": { "pt": "Curso visual gratuito: contexto, tendências, suportes, resistências, padrões, XAUUSD, risco e treino em Demo.", "en": "Free visual course: context, trends, support, resistance, patterns, XAUUSD, risk and Demo practice.", "es": "Curso visual gratuito: contexto, tendencias, soportes, resistencias, patrones, XAUUSD, riesgo y práctica en Demo.", "ru": "Бесплатный визуальный курс: контекст, тренды, поддержка, сопротивление, модели, XAUUSD, риск и демо-практика." },
+      "preview": { "pt": ["Cada padrão explicado separadamente", "Tendências, canais, suportes e resistências", "Continuação, reversão, H1/H2 e L1/L2", "XAUUSD, risco, backtest e Demo"], "en": ["Each pattern explained separately", "Trends, channels, support and resistance", "Continuation, reversal, H1/H2 and L1/L2", "XAUUSD, risk, backtesting and Demo"], "es": ["Cada patrón explicado por separado", "Tendencias, canales, soportes y resistencias", "Continuación, reversión, H1/H2 y L1/L2", "XAUUSD, riesgo, backtest y Demo"], "ru": ["Каждая модель объясняется отдельно", "Тренды, каналы, поддержка и сопротивление", "Продолжение, разворот, H1/H2 и L1/L2", "XAUUSD, риск, бэктест и демо"] }
     },
     {
       "id": "liberdade_financeira_assinantes",
