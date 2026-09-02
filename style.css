@@ -461,6 +461,54 @@ body::before {
 .benefitOffer span { font-size: 27px; }
 .benefitOffer h2 { margin: 7px 0 5px; font-size: 17px; }
 .benefitOffer p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.solarienTeaser { position: relative; overflow: hidden; margin-top: 18px; padding: 24px 20px; border: 1px solid rgba(39,213,136,.38); border-radius: 22px; background: linear-gradient(140deg, #071d27 0%, #073327 58%, #0c5a3d 100%); box-shadow: 0 18px 45px rgba(0,0,0,.22); }
+.solarienTeaserGlow { position: absolute; width: 190px; height: 190px; right: -70px; top: -90px; border-radius: 50%; background: rgba(45,234,142,.2); filter: blur(6px); }
+.solarienMiniLogo, .solarienLogo { position: relative; color: #f6fbf9; font-weight: 950; letter-spacing: -.04em; }
+.solarienMiniLogo { font-size: 25px; }
+.solarienMiniLogo span, .solarienLogo span { display: inline-grid; place-items: center; color: #071c23; border-radius: 50%; background: repeating-conic-gradient(#39e18e 0 8deg, #06a962 8deg 13deg); }
+.solarienMiniLogo span { width: 27px; height: 27px; margin: 0 1px; }
+.solarienTeaserBadge { position: relative; display: inline-block; margin-top: 17px; color: #a9ffd1; font-size: 10px; font-weight: 900; letter-spacing: .09em; }
+.solarienTeaser h2 { position: relative; max-width: 500px; margin: 10px 0 7px; color: #fff; font-size: 23px; line-height: 1.15; }
+.solarienTeaser p { position: relative; max-width: 520px; margin: 0; color: #c7e5d8; font-size: 13px; line-height: 1.55; }
+.solarienTeaserButton { position: relative; width: 100%; margin-top: 18px; padding: 14px 17px; border: 0; border-radius: 14px; color: #062016; background: #41e78f; font-weight: 950; box-shadow: 0 8px 24px rgba(42,224,132,.22); }
+.solarienPage { margin: -16px -16px 0; color: #12352b; background: #fff; }
+.solarienBack { position: sticky; z-index: 8; top: 0; width: 100%; padding: 13px 18px; border: 0; border-bottom: 1px solid #dcebe5; color: #315d50; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); text-align: left; font-weight: 800; }
+.solarienHero { position: relative; overflow: hidden; min-height: 680px; padding: 50px 22px 44px; color: #fff; background: linear-gradient(145deg, #062d24, #075a3d 64%, #08a55e); }
+.solarienOrb { position: absolute; width: 360px; height: 360px; top: -170px; right: -170px; border: 70px solid rgba(116,255,177,.12); border-radius: 50%; }
+.solarienLogo { display: inline-flex; align-items: center; font-size: 39px; }
+.solarienLogo span { width: 43px; height: 43px; }
+.solarienLogo small { margin-left: 7px; color: #9cebbb; font-size: 9px; letter-spacing: .16em; }
+.solarienBadge, .solarienKicker { display: block; margin-top: 48px; color: #88ffc0; font-size: 10px; font-weight: 950; letter-spacing: .14em; }
+.solarienHero h1 { position: relative; max-width: 680px; margin: 13px 0 16px; font-size: clamp(36px, 8vw, 62px); line-height: 1.02; letter-spacing: -.045em; }
+.solarienHero > p { position: relative; max-width: 610px; color: #d5f2e5; font-size: 16px; line-height: 1.65; }
+.solarienActions { position: relative; display: grid; gap: 10px; margin-top: 27px; }
+.solarienPrimary, .solarienSecondary { min-height: 51px; padding: 14px 20px; border-radius: 14px; font-weight: 950; }
+.solarienPrimary { border: 0; color: #07301f; background: #49eb95; box-shadow: 0 12px 30px rgba(16,95,58,.28); }
+.solarienSecondary { border: 1px solid rgba(255,255,255,.34); color: #fff; background: rgba(255,255,255,.08); }
+.solarienProof { position: relative; display: grid; gap: 8px; margin-top: 32px; color: #dff8eb; font-size: 12px; font-weight: 800; }
+.solarienSection { padding: 58px 22px; }
+.solarienSection .solarienKicker, .solarienIncome .solarienKicker { margin: 0 0 10px; color: #079755; }
+.solarienSection h2, .solarienIncome h2, .solarienFinal h2 { margin: 0; color: #113d31; font-size: 30px; line-height: 1.12; letter-spacing: -.035em; }
+.solarienLead, .solarienIncome p, .solarienFinal p { color: #54746a; font-size: 15px; line-height: 1.68; }
+.solarienBenefitGrid { display: grid; gap: 12px; margin-top: 28px; }
+.solarienBenefitGrid article { padding: 20px; border: 1px solid #dcece6; border-radius: 18px; background: #f7fbf9; }
+.solarienBenefitGrid span { font-size: 29px; }
+.solarienBenefitGrid h3 { margin: 11px 0 5px; color: #164c3c; font-size: 17px; }
+.solarienBenefitGrid p { margin: 0; color: #637d75; font-size: 13px; line-height: 1.5; }
+.solarienIncome { padding: 58px 22px; background: linear-gradient(145deg, #effbf4, #dff7ea); }
+.solarienSteps { display: grid; gap: 22px; margin-top: 28px; }
+.solarienSteps article { display: flex; gap: 15px; }
+.solarienSteps b { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; color: #fff; background: #0ca864; }
+.solarienSteps h3 { margin: 0 0 5px; color: #164c3c; }
+.solarienSteps p { margin: 0; color: #637d75; font-size: 13px; line-height: 1.55; }
+.solarienFinal { padding: 60px 22px; color: #fff; background: #072e25; text-align: center; }
+.solarienFinal .solarienLogo { color: #fff; font-size: 28px; }
+.solarienFinal .solarienLogo span { width: 31px; height: 31px; }
+.solarienFinal h2 { margin-top: 26px; color: #fff; }
+.solarienFinal p { color: #c6e2d7; }
+.solarienFinal .solarienPrimary { width: 100%; margin-top: 12px; }
+.solarienFinal > small { display: block; margin-top: 20px; color: #85a99b; font-size: 10px; line-height: 1.5; }
+.solarienFooter { padding: 19px 22px 28px; color: #91aaa1; background: #06271f; font-size: 10px; text-align: center; }
 .providerLine { display: grid; gap: 7px; margin-top: 13px; padding: 11px; border-radius: 12px; background: rgba(74,140,255,.08); color: #c7d8ea; font-size: 11px; line-height: 1.4; }
 .freeChip { color: #bff9e5; background: rgba(48,230,166,.11); }
 .marginTool > p { color: var(--muted); font-size: 12px; line-height: 1.5; }
@@ -475,6 +523,11 @@ body::before {
 @media (min-width: 620px) {
   .quickGrid { grid-template-columns: repeat(3, 1fr); }
   .toolGrid { grid-template-columns: repeat(2, 1fr); }
+  .solarienPage { margin-left: -28px; margin-right: -28px; }
+  .solarienHero, .solarienSection, .solarienIncome, .solarienFinal { padding-left: 9%; padding-right: 9%; }
+  .solarienActions { grid-template-columns: 1fr 1fr; max-width: 560px; }
+  .solarienProof { grid-template-columns: repeat(3, auto); justify-content: start; gap: 22px; }
+  .solarienBenefitGrid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 420px) {
