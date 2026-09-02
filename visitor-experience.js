@@ -13,11 +13,11 @@
   const COPY = {
     pt: {
       lockTitle: "ÁREA EXCLUSIVA PARA ASSINANTES",
-      lockText: "Ative sua assinatura para acessar cursos, ferramentas, grupos, bots, canais, benefícios e os detalhes completos das empresas parceiras.",
+      lockText: "Ative sua assinatura para acessar cursos exclusivos, grupos, bots, canais, benefícios e os detalhes completos das empresas parceiras.",
       subscribe: "ATIVAR ASSINATURA",
       close: "Agora não",
       tools: "Ferramentas",
-      toolsSub: "Calculadoras, simuladores e recursos exclusivos",
+      toolsSub: "Sorteadores locais com acesso livre",
       partnersTitle: "Empresas parceiras",
       partnersText: "Conheça empresas que já fazem parte do EduCashPro. Descontos, condições, endereços e contatos são exclusivos para assinantes ativos.",
       noPartners: "Novas empresas parceiras aparecerão aqui.",
@@ -34,11 +34,11 @@
     },
     en: {
       lockTitle: "SUBSCRIBERS-ONLY AREA",
-      lockText: "Activate your subscription to access courses, tools, groups, bots, channels, benefits and full partner company details.",
+      lockText: "Activate your subscription to access exclusive courses, groups, bots, channels, benefits and full partner company details.",
       subscribe: "ACTIVATE SUBSCRIPTION",
       close: "Not now",
       tools: "Tools",
-      toolsSub: "Calculators, simulators and exclusive resources",
+      toolsSub: "Free local randomizers",
       partnersTitle: "Partner companies",
       partnersText: "See companies already in EduCashPro. Discounts, conditions, addresses and contacts are exclusive to active subscribers.",
       noPartners: "New partner companies will appear here.",
@@ -55,11 +55,11 @@
     },
     es: {
       lockTitle: "ÁREA EXCLUSIVA PARA SUSCRIPTORES",
-      lockText: "Activa tu suscripción para acceder a cursos, herramientas, grupos, bots, canales, beneficios y los datos completos de las empresas asociadas.",
+      lockText: "Activa tu suscripción para acceder a cursos exclusivos, grupos, bots, canales, beneficios y los datos completos de las empresas asociadas.",
       subscribe: "ACTIVAR SUSCRIPCIÓN",
       close: "Ahora no",
       tools: "Herramientas",
-      toolsSub: "Calculadoras, simuladores y recursos exclusivos",
+      toolsSub: "Sorteadores locales de acceso libre",
       partnersTitle: "Empresas asociadas",
       partnersText: "Conoce empresas que ya forman parte de EduCashPro. Descuentos, condiciones, direcciones y contactos son exclusivos para suscriptores activos.",
       noPartners: "Las nuevas empresas asociadas aparecerán aquí.",
@@ -76,11 +76,11 @@
     },
     ru: {
       lockTitle: "РАЗДЕЛ ТОЛЬКО ДЛЯ ПОДПИСЧИКОВ",
-      lockText: "Активируйте подписку, чтобы получить доступ к курсам, инструментам, группам, ботам, каналам, преимуществам и полной информации о партнёрах.",
+      lockText: "Активируйте подписку, чтобы получить доступ к эксклюзивным курсам, группам, ботам, каналам, преимуществам и полной информации о партнёрах.",
       subscribe: "АКТИВИРОВАТЬ ПОДПИСКУ",
       close: "Не сейчас",
       tools: "Инструменты",
-      toolsSub: "Калькуляторы, симуляторы и эксклюзивные ресурсы",
+      toolsSub: "Бесплатная локальная жеребьёвка",
       partnersTitle: "Компании-партнёры",
       partnersText: "Посмотрите компании, уже участвующие в EduCashPro. Скидки, условия, адреса и контакты доступны только активным подписчикам.",
       noPartners: "Новые компании-партнёры появятся здесь.",
@@ -181,10 +181,10 @@
 
     if (!grid.querySelector('[data-visitor-tools="1"]')) {
       const tools = document.createElement("button");
-      tools.className = "quickCard lockedExperience";
+      tools.className = "quickCard";
       tools.dataset.visitorTools = "1";
       tools.innerHTML = `<span class="emoji">🧮</span><strong>${escapeHtml(tr("tools"))}</strong><small>${escapeHtml(tr("toolsSub"))}</small>`;
-      tools.onclick = () => showLock();
+      tools.onclick = () => window.EduCashProLocal?.renderToolsHub?.();
       grid.appendChild(tools);
     }
 
