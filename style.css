@@ -525,6 +525,23 @@ body::before {
 .qrCanvas { width: 264px; min-height: 264px; margin: 18px auto; padding: 12px; border-radius: 20px; background: #fff; display: grid; place-items: center; }
 .qrCanvas img, .qrCanvas canvas { max-width: 240px !important; width: 100% !important; height: auto !important; }
 .qrCard > p { overflow-wrap: anywhere; }
+.qrActions { display:grid; gap:9px; margin-top:14px; }
+.drawTabs { display:flex; gap:8px; overflow-x:auto; margin-bottom:14px; }
+.drawClear { width:100%; margin-top:9px; }
+.drawNumber { display:block; padding:12px; text-align:center; font-size:40px; }
+.drawTeam { padding:10px 0; border-bottom:1px solid var(--line); }
+.drawTeam:last-child { border-bottom:0; }
+.drawTeam p { margin:5px 0 0; color:var(--text); font-weight:600; }
+.freeAccessBadge { display:inline-block; margin-top:8px; color:var(--green); font-size:10px; font-weight:900; letter-spacing:.06em; }
+.gameGrid { display:grid; gap:12px; margin-top:14px; }
+.gameCard { overflow:hidden; border:1px solid var(--line); border-radius:19px; background:var(--surface); }
+.gameCard > img, .gamePlaceholder { width:100%; aspect-ratio:16/9; object-fit:cover; background:linear-gradient(135deg, rgba(74,140,255,.22), rgba(48,230,166,.16)); }
+.gamePlaceholder { display:grid; place-items:center; font-size:48px; }
+.gameCard > div:last-child { padding:15px; }
+.gameCard h3 { margin:10px 0 6px; }
+.gameCard p { margin:0 0 9px; color:var(--muted); font-size:12px; line-height:1.5; }
+.gameCard small { display:block; margin-bottom:12px; color:var(--muted); }
+.gameCard .primaryButton { width:100%; }
 .verificationCard { max-width: 520px; margin: 48px auto; text-align: center; }
 .verificationIcon { margin-bottom: 14px; font-size: 64px; }
 .verificationCard h1 { margin: 8px 0 18px; }
@@ -532,6 +549,7 @@ body::before {
 @media (min-width: 620px) {
   .quickGrid { grid-template-columns: repeat(3, 1fr); }
   .toolGrid { grid-template-columns: repeat(2, 1fr); }
+  .gameGrid { grid-template-columns: repeat(2, 1fr); }
   .solarienPage { margin-left: -28px; margin-right: -28px; }
   .solarienHero, .solarienSection, .solarienIncome, .solarienFinal { padding-left: 9%; padding-right: 9%; }
   .solarienActions { grid-template-columns: 1fr 1fr; max-width: 560px; }
