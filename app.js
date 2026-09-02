@@ -8,6 +8,7 @@
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "";
   const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
+  const SOLARIEN_AFFILIATE_URL = "https://painel.solarien.com.br/remunerando";
   const MEMBERSHIP_PUBLIC_KEY_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeIVIbmPd6xtE6PECnwl9SdqUThN0MGYDulK88/0vzgDJIRFiU53leJ9hLflBm4fSwvbEGUIniofTmHgWylwAPA==";
 
   const state = {
@@ -64,6 +65,66 @@
     },
     ru: {
       subtitle: "Ваша вселенная в одном месте", loading: "Организуем ваш опыт…", navHome: "Главная", navLearn: "Учиться", navExplore: "Обзор", navBenefits: "Бонусы", navArea: "Мой раздел", welcome: "Добро пожаловать", active: "Подписка активна", inactive: "Подписка неактивна", validUntil: "Действует до", heroActive: "Учитесь, находите возможности и развивайте цифровое присутствие.", heroInactive: "Изучите EduCashPro и возобновите подписку, чтобы открыть курсы и преимущества.", yourSpace: "Ваше пространство", yourSpaceSub: "Всё организовано для вас", courses: "Academy", coursesSub: "Курсы и материалы", explore: "Обзор", exploreSub: "Группы, каналы, боты и страницы", benefits: "Преимущества", benefitsSub: "Эксклюзивные возможности", tools: "Инструменты", toolsSub: "Калькуляторы и задания", projects: "Мои проекты", projectsSub: "Следите за публикациями", network: "Пригласить", networkSub: "Поделиться ссылкой", learnTitle: "EduCashPro Academy", learnDesc: "Организованное обучение без множества сообщений в чате.", presentation: "Начните здесь", presentationDesc: "Цифровые активы, Web3 и EduCashPro.", academy: "EduCashPro Academy", academyDesc: "Финансовая грамотность, Telegram, Web3, сетевой маркетинг и новая экономика.", openCourse: "Открыть курс", locked: "Нужна активная подписка", toolsTitle: "Образовательные инструменты", interest: "Калькулятор сложного процента", initial: "Начальная сумма", monthly: "Ежемесячный взнос", rate: "Процент в месяц (%)", months: "Месяцы", calculate: "Рассчитать", futureValue: "Прогноз", quiz: "Финансовое задание", quizQuestion: "Что лучше всего описывает актив?", quizA: "Регулярный расход", quizB: "То, что может приносить ценность или доход", quizC: "Импульсивная покупка", correct: "Отлично! Вы определили понятие.", wrong: "Почти. Актив способен приносить ценность или доход.", exploreTitle: "Отобранные проекты", exploreDesc: "Выберите категорию и просматривайте удобный список.", all: "Все", groups: "Группы", channels: "Каналы", bots: "Боты", pages: "Сайты и страницы", access: "Открыть", rateAction: "Оценить", noItems: "Нет доступных элементов.", previous: "Назад", next: "Далее", page: "Страница", sample: "Вы видите образец. Возобновите подписку для полного каталога.", benefitsTitle: "Клуб преимуществ", benefitsDesc: "Отобранные преимущества для подписчиков EduCashPro.", unlock: "Возобновить", openBenefit: "Открыть преимущество", areaTitle: "Мой раздел", member: "Участник EduCashPro", affiliate: "Моя реферальная ссылка", copy: "Копировать", copied: "Ссылка скопирована", myProjects: "Мои проекты", noProjects: "У вас пока нет проектов.", openBot: "Открыть бот для управления", officialCommunity: "Официальное сообщество", officialCommunitySub: "Следите за новостями и участвуйте в сообществе EduCashPro.", officialChannel: "Официальный канал EduCashPro", officialChannelSub: "Официальные объявления, новости и материалы.", officialGroup: "Официальная группа EduCashPro", officialGroupSub: "Общайтесь и участвуйте в сообществе.", openTelegram: "Открыть в Telegram", expires: "Сессия истекла. Закройте и откройте снова через бот.", telegramOnly: "Откройте страницу кнопкой EduCashPro внутри Telegram.", error: "Не удалось загрузить. Попробуйте снова.", back: "Назад", chapters: "Главы", lesson: "Урок", continue: "Продолжить", books: "Рекомендуемые книги", reactivate: "Возобновить в боте", ratingPrompt: "Какую оценку вы поставите?", ratingSaved: "Оценка сохранена!",
+    },
+  };
+
+  const SOLARIEN_COPY = {
+    pt: {
+      cardTitle: "Energia solar que pode gerar economia e renda",
+      cardText: "Conheça a energia por assinatura e a oportunidade de atuar no mercado de energia limpa.",
+      cardButton: "Conhecer benefício",
+      lockedTitle: "Uma nova oportunidade já está disponível",
+      lockedText: "Assinantes ativos podem conhecer uma solução de energia solar por assinatura e uma oportunidade de aumentar a renda indicando novos clientes.",
+      lockedAction: "Ativar assinatura",
+      badge: "BENEFÍCIO PARA ASSINANTES",
+      title: "Economize com energia limpa. Cresça com um mercado em expansão.",
+      lead: "O EduCashPro seleciona produtos, propostas e soluções que podem gerar valor real para seus usuários. Agora, assinantes ativos podem conhecer a Solarien Energy e participar do mercado de energia por assinatura.",
+      primary: "Quero fazer meu cadastro",
+      secondary: "Entender como funciona",
+      noCost: "Sem custo inicial",
+      noWork: "Sem obras",
+      noPanels: "Sem instalar placas",
+      aboutEyebrow: "ENERGIA POR ASSINATURA",
+      aboutTitle: "Economia de energia sem mudar a rotina",
+      aboutText: "A proposta conecta consumidores a energia renovável produzida por usinas parceiras. A distribuição continua pela rede convencional, sem troca de fiação, obras ou instalação de painéis no imóvel.",
+      benefitsTitle: "Uma solução pensada para pessoas e empresas",
+      benefits: [
+        ["☀️", "Energia renovável", "Consumo associado a fontes limpas e sustentáveis."],
+        ["💡", "Economia na conta", "Condições comerciais apresentadas durante a contratação."],
+        ["📱", "Processo digital", "Cadastro e acompanhamento realizados pela plataforma Solarien."],
+        ["🏠", "Sem instalação", "Não é necessário instalar placas solares no imóvel."],
+      ],
+      incomeEyebrow: "OPORTUNIDADE DE NEGÓCIO",
+      incomeTitle: "Também é possível atuar indicando novos clientes",
+      incomeText: "Além de conhecer a solução de energia por assinatura, o assinante pode se cadastrar para apresentar os serviços da Solarien a pessoas e empresas, conforme as regras e condições comerciais da própria plataforma.",
+      stepsTitle: "Comece em três passos",
+      steps: [
+        ["1", "Faça seu cadastro", "Acesse o formulário pelo botão desta página. O patrocinador será identificado automaticamente."],
+        ["2", "Conheça a plataforma", "Consulte treinamentos, condições, áreas atendidas e regras vigentes diretamente na Solarien."],
+        ["3", "Apresente a solução", "Compartilhe a proposta com responsabilidade, sem prometer economia ou ganhos garantidos."],
+      ],
+      finalTitle: "Pronto para conhecer esta oportunidade?",
+      finalText: "O cadastro é concluído no ambiente oficial da Solarien, usando o vínculo de indicação disponibilizado pelo EduCashPro.",
+      disclaimer: "Resultados, descontos, disponibilidade regional e remunerações dependem das regras, análises e condições vigentes da Solarien. O EduCashPro não garante economia nem renda.",
+      affiliate: "Esta página foi gerada por um afiliado da Solarien Energy.",
+      back: "Voltar aos benefícios",
+    },
+    en: {
+      cardTitle: "Solar energy that can create savings and income",
+      cardText: "Discover subscription solar energy and the opportunity to work in the clean energy market.", cardButton: "View benefit",
+      lockedTitle: "A new opportunity is available", lockedText: "Active subscribers can discover subscription solar energy and an opportunity to increase income by referring new customers.", lockedAction: "Activate subscription",
+      badge: "SUBSCRIBER BENEFIT", title: "Save with clean energy. Grow with an expanding market.", lead: "EduCashPro selects products, proposals and solutions that may create real value for its users. Active subscribers can now discover Solarien Energy and the subscription energy market.", primary: "Create my account", secondary: "How it works", noCost: "No upfront cost", noWork: "No construction", noPanels: "No solar panels",
+      aboutEyebrow: "SUBSCRIPTION ENERGY", aboutTitle: "Energy savings without changing your routine", aboutText: "The proposal connects consumers with renewable energy generated by partner plants. Distribution continues through the conventional grid, with no rewiring, construction or panels installed at the property.", benefitsTitle: "A solution for people and businesses",
+      benefits: [["☀️","Renewable energy","Consumption connected to clean, sustainable sources."],["💡","Bill savings","Commercial terms are presented during contracting."],["📱","Digital process","Registration and tracking through Solarien's platform."],["🏠","No installation","No solar panels need to be installed at the property."]],
+      incomeEyebrow: "BUSINESS OPPORTUNITY", incomeTitle: "You can also refer new customers", incomeText: "Subscribers may register to introduce Solarien services to people and businesses, subject to Solarien's own commercial rules and conditions.", stepsTitle: "Start in three steps", steps: [["1","Create your account","Use this page's button. Your sponsor is identified automatically."],["2","Explore the platform","Check training, terms, coverage and current rules directly with Solarien."],["3","Present the solution","Share responsibly, without promising guaranteed savings or income."]], finalTitle: "Ready to discover this opportunity?", finalText: "Registration is completed in Solarien's official environment using the referral connection provided through EduCashPro.", disclaimer: "Results, discounts, regional availability and compensation depend on Solarien's current rules, reviews and conditions. EduCashPro does not guarantee savings or income.", affiliate: "This page was generated by a Solarien Energy affiliate.", back: "Back to benefits",
+    },
+    es: {
+      cardTitle: "Energía solar que puede generar ahorro e ingresos", cardText: "Conoce la energía por suscripción y la oportunidad de participar en el mercado de energía limpia.", cardButton: "Conocer beneficio", lockedTitle: "Una nueva oportunidad ya está disponible", lockedText: "Los suscriptores activos pueden conocer una solución de energía solar por suscripción y una oportunidad de aumentar sus ingresos indicando nuevos clientes.", lockedAction: "Activar suscripción",
+      badge: "BENEFICIO PARA SUSCRIPTORES", title: "Ahorra con energía limpia. Crece con un mercado en expansión.", lead: "EduCashPro selecciona productos, propuestas y soluciones que pueden generar valor real. Los suscriptores activos ahora pueden conocer Solarien Energy y el mercado de energía por suscripción.", primary: "Quiero registrarme", secondary: "Cómo funciona", noCost: "Sin costo inicial", noWork: "Sin obras", noPanels: "Sin instalar paneles", aboutEyebrow: "ENERGÍA POR SUSCRIPCIÓN", aboutTitle: "Ahorro de energía sin cambiar tu rutina", aboutText: "La propuesta conecta consumidores con energía renovable producida por plantas asociadas. La distribución continúa por la red convencional, sin obras ni paneles en el inmueble.", benefitsTitle: "Una solución para personas y empresas", benefits: [["☀️","Energía renovable","Consumo asociado a fuentes limpias y sostenibles."],["💡","Ahorro en la factura","Las condiciones se presentan durante la contratación."],["📱","Proceso digital","Registro y seguimiento en la plataforma Solarien."],["🏠","Sin instalación","No es necesario instalar paneles solares."]], incomeEyebrow: "OPORTUNIDAD DE NEGOCIO", incomeTitle: "También puedes indicar nuevos clientes", incomeText: "El suscriptor puede registrarse para presentar los servicios de Solarien a personas y empresas, según las reglas comerciales de la plataforma.", stepsTitle: "Comienza en tres pasos", steps: [["1","Regístrate","Usa el botón de esta página. El patrocinador se identifica automáticamente."],["2","Conoce la plataforma","Consulta capacitaciones, condiciones, cobertura y reglas vigentes."],["3","Presenta la solución","Comparte con responsabilidad, sin prometer ahorro o ingresos garantizados."]], finalTitle: "¿Listo para conocer esta oportunidad?", finalText: "El registro se completa en el entorno oficial de Solarien con el vínculo de indicación de EduCashPro.", disclaimer: "Resultados, descuentos, disponibilidad regional y remuneraciones dependen de las reglas y condiciones vigentes de Solarien. EduCashPro no garantiza ahorro ni ingresos.", affiliate: "Esta página fue generada por un afiliado de Solarien Energy.", back: "Volver a beneficios",
+    },
+    ru: {
+      cardTitle: "Солнечная энергия для экономии и дополнительного дохода", cardText: "Узнайте об энергии по подписке и возможностях рынка чистой энергии.", cardButton: "Открыть преимущество", lockedTitle: "Доступна новая возможность", lockedText: "Активные подписчики могут узнать об энергии по подписке и возможности увеличить доход, привлекая новых клиентов.", lockedAction: "Активировать подписку",
+      badge: "ПРЕИМУЩЕСТВО ДЛЯ ПОДПИСЧИКОВ", title: "Экономьте с чистой энергией. Развивайтесь на растущем рынке.", lead: "EduCashPro отбирает продукты, предложения и решения, способные приносить реальную пользу. Активные подписчики могут познакомиться с Solarien Energy и рынком энергии по подписке.", primary: "Зарегистрироваться", secondary: "Как это работает", noCost: "Без начальных затрат", noWork: "Без строительных работ", noPanels: "Без установки панелей", aboutEyebrow: "ЭНЕРГИЯ ПО ПОДПИСКЕ", aboutTitle: "Экономия без изменения привычного потребления", aboutText: "Потребители подключаются к возобновляемой энергии партнерских электростанций, продолжая пользоваться обычной сетью — без работ и установки панелей.", benefitsTitle: "Решение для людей и компаний", benefits: [["☀️","Возобновляемая энергия","Потребление из чистых и устойчивых источников."],["💡","Экономия на счете","Условия сообщаются при оформлении."],["📱","Цифровой процесс","Регистрация и сопровождение на платформе Solarien."],["🏠","Без установки","Солнечные панели на объекте не требуются."]], incomeEyebrow: "ДЕЛОВАЯ ВОЗМОЖНОСТЬ", incomeTitle: "Можно также привлекать новых клиентов", incomeText: "Подписчик может зарегистрироваться и знакомить людей и компании с услугами Solarien согласно действующим правилам платформы.", stepsTitle: "Три шага для начала", steps: [["1","Зарегистрируйтесь","Используйте кнопку на этой странице — спонсор определяется автоматически."],["2","Изучите платформу","Ознакомьтесь с обучением, условиями, регионами и правилами Solarien."],["3","Представляйте решение","Делитесь ответственно, не обещая гарантированной экономии или дохода."]], finalTitle: "Готовы узнать больше?", finalText: "Регистрация проходит на официальной платформе Solarien по партнерской ссылке EduCashPro.", disclaimer: "Результаты, скидки, доступность и вознаграждение зависят от действующих правил и условий Solarien. EduCashPro не гарантирует экономию или доход.", affiliate: "Эта страница создана партнером Solarien Energy.", back: "Назад к преимуществам",
     },
   };
 
@@ -313,6 +374,7 @@
   };
 
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
+  function solarienCopy(key) { return SOLARIEN_COPY[state.language]?.[key] ?? SOLARIEN_COPY.pt[key] ?? key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function benefitNavigationCopy(key) {
@@ -350,6 +412,19 @@
     }
 
     openUrl(url);
+  }
+
+  function showSolarienLock() {
+    const modal = document.getElementById("accessModal");
+    document.getElementById("modalIcon").textContent = "☀️";
+    document.getElementById("modalTitle").textContent = solarienCopy("lockedTitle");
+    document.getElementById("modalDescription").textContent = solarienCopy("lockedText");
+    document.getElementById("modalLearning").innerHTML = "";
+    const subscribe = document.getElementById("modalSubscribe");
+    subscribe.textContent = `⚡ ${solarienCopy("lockedAction")}`;
+    subscribe.onclick = openSubscription;
+    modal.querySelector(".modalCancel").textContent = t("back");
+    modal.classList.remove("hidden");
   }
   function localized(value) { return value?.[state.language] || value?.pt || ""; }
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
@@ -447,8 +522,8 @@
   }
 
   function setView(view) {
-    if (!state.profile?.active && ["explore", "benefits"].includes(view)) {
-      const lockedId = view === "explore" ? "communities" : view === "benefits" ? "benefits" : "courses";
+    if (!state.profile?.active && ["explore"].includes(view)) {
+      const lockedId = view === "explore" ? "communities" : "courses";
       showLockedInfo(lockedExperience(lockedId));
       return;
     }
@@ -879,9 +954,23 @@
   }
 
   async function renderBenefits() {
-    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
-    content.querySelector('[data-target="exclusive-benefits"]').onclick = renderExclusiveBenefits;
-    content.querySelector('[data-target="partner-stores"]').onclick = renderPartnerStores;
+    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">S<span>O</span>LARIEN</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(solarienCopy("badge"))}</span><h2>${escapeHtml(solarienCopy("cardTitle"))}</h2><p>${escapeHtml(solarienCopy("cardText"))}</p><button id="openSolarien" class="solarienTeaserButton">${escapeHtml(solarienCopy("cardButton"))} →</button></article><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
+    document.getElementById("openSolarien").onclick = () => state.profile?.active ? renderSolarienPage() : showSolarienLock();
+    content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : showSolarienLock();
+    content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : showSolarienLock();
+  }
+
+  function renderSolarienPage() {
+    if (!state.profile?.active) return showSolarienLock();
+    state.view = "benefits";
+    updateNav();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    const benefitCards = solarienCopy("benefits").map(([icon, title, text]) => `<article><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></article>`).join("");
+    const steps = solarienCopy("steps").map(([number, title, text]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></div></article>`).join("");
+    content.innerHTML = `<div class="solarienPage"><button id="solarienBack" class="solarienBack">← ${escapeHtml(solarienCopy("back"))}</button><section class="solarienHero"><div class="solarienOrb"></div><div class="solarienLogo">S<span>O</span>LARIEN<small>ENERGY</small></div><span class="solarienBadge">${escapeHtml(solarienCopy("badge"))}</span><h1>${escapeHtml(solarienCopy("title"))}</h1><p>${escapeHtml(solarienCopy("lead"))}</p><div class="solarienActions"><button class="solarienPrimary" data-solarien-register>${escapeHtml(solarienCopy("primary"))}</button><button class="solarienSecondary" id="solarienLearn">${escapeHtml(solarienCopy("secondary"))}</button></div><div class="solarienProof"><span>✓ ${escapeHtml(solarienCopy("noCost"))}</span><span>✓ ${escapeHtml(solarienCopy("noWork"))}</span><span>✓ ${escapeHtml(solarienCopy("noPanels"))}</span></div></section><section class="solarienSection" id="solarienAbout"><span class="solarienKicker">${escapeHtml(solarienCopy("aboutEyebrow"))}</span><h2>${escapeHtml(solarienCopy("aboutTitle"))}</h2><p class="solarienLead">${escapeHtml(solarienCopy("aboutText"))}</p><div class="solarienBenefitGrid">${benefitCards}</div></section><section class="solarienIncome"><span class="solarienKicker">${escapeHtml(solarienCopy("incomeEyebrow"))}</span><h2>${escapeHtml(solarienCopy("incomeTitle"))}</h2><p>${escapeHtml(solarienCopy("incomeText"))}</p></section><section class="solarienSection"><h2>${escapeHtml(solarienCopy("stepsTitle"))}</h2><div class="solarienSteps">${steps}</div></section><section class="solarienFinal"><div class="solarienLogo small">S<span>O</span>LARIEN</div><h2>${escapeHtml(solarienCopy("finalTitle"))}</h2><p>${escapeHtml(solarienCopy("finalText"))}</p><button class="solarienPrimary" data-solarien-register>${escapeHtml(solarienCopy("primary"))}</button><small>${escapeHtml(solarienCopy("disclaimer"))}</small></section><footer class="solarienFooter">${escapeHtml(solarienCopy("affiliate"))}</footer></div>`;
+    document.getElementById("solarienBack").onclick = renderBenefits;
+    document.getElementById("solarienLearn").onclick = () => document.getElementById("solarienAbout")?.scrollIntoView({ behavior: "smooth" });
+    content.querySelectorAll("[data-solarien-register]").forEach((button) => button.onclick = () => openUrl(SOLARIEN_AFFILIATE_URL));
   }
 
   async function renderExclusiveBenefits() {
