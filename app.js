@@ -966,8 +966,7 @@
   }
 
   async function renderBenefits() {
-    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">SUNARA</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(sunaraCopy("badge"))}</span><h2>${escapeHtml(sunaraCopy("cardTitle"))}</h2><p>${escapeHtml(sunaraCopy("cardText"))}</p><button id="openSunara" class="solarienTeaserButton">${escapeHtml(sunaraCopy("cardButton"))} →</button></article><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
-    document.getElementById("openSunara").onclick = () => state.profile?.active ? renderSunaraPage() : showSunaraLock();
+    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
     content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : showSunaraLock();
     content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : showSunaraLock();
   }
@@ -990,8 +989,9 @@
     state.view = "benefits";
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">SUNARA</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(sunaraCopy("badge"))}</span><h2>${escapeHtml(sunaraCopy("cardTitle"))}</h2><p>${escapeHtml(sunaraCopy("cardText"))}</p><button id="openSunara" class="solarienTeaserButton">${escapeHtml(sunaraCopy("cardButton"))} →</button></article><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
     document.getElementById("benefitsBack").onclick = renderBenefits;
+    document.getElementById("openSunara").onclick = renderSunaraPage;
     document.getElementById("offerBenefit").onclick = () => renderSubmissionForm("benefit");
     const container = document.getElementById("benefitList");
     try {
