@@ -8,7 +8,12 @@
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "";
   const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
-  const SOLARIEN_AFFILIATE_URL = "https://painel.solarien.com.br/remunerando";
+  const SUNARA_URLS = Object.freeze({
+    partner: "https://sunarapartners.com/?ref=leandronascimentopsi",
+    quiz: "https://sunara.solar/quiz?ref=leandronascimentopsi",
+    discount: "https://sunara.solar/?ref=leandronascimentopsi",
+    panels: "https://sunara.solar/placas?ref=leandronascimentopsi",
+  });
   const MEMBERSHIP_PUBLIC_KEY_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeIVIbmPd6xtE6PECnwl9SdqUThN0MGYDulK88/0vzgDJIRFiU53leJ9hLflBm4fSwvbEGUIniofTmHgWylwAPA==";
 
   const state = {
@@ -68,63 +73,70 @@
     },
   };
 
-  const SOLARIEN_COPY = {
+  const SUNARA_COPY = {
     pt: {
-      cardTitle: "Energia solar que pode gerar economia e renda",
-      cardText: "Conheça a energia por assinatura e a oportunidade de atuar no mercado de energia limpa.",
+      cardTitle: "Economize na conta de luz e descubra novas oportunidades",
+      cardText: "Conheça as soluções da Sunara para economia de energia, indicação de clientes e instalação de placas solares.",
       cardButton: "Conhecer benefício",
       lockedTitle: "Uma nova oportunidade já está disponível",
-      lockedText: "Assinantes ativos podem conhecer uma solução de energia solar por assinatura e uma oportunidade de aumentar a renda indicando novos clientes.",
+      lockedText: "Assinantes ativos podem simular economia na conta de luz, solicitar desconto, instalar placas solares ou atuar como Agente Sunara indicando novos clientes.",
       lockedAction: "Ativar assinatura",
       badge: "BENEFÍCIO PARA ASSINANTES",
-      title: "Economize com energia limpa. Cresça com um mercado em expansão.",
-      lead: "O EduCashPro seleciona produtos, propostas e soluções que podem gerar valor real para seus usuários. Agora, assinantes ativos podem conhecer a Solarien Energy e participar do mercado de energia por assinatura.",
-      primary: "Quero fazer meu cadastro",
+      title: "Sua conta de luz pode valer menos. Sua indicação pode valer mais.",
+      lead: "O EduCashPro seleciona produtos, propostas e soluções que podem gerar valor real. Agora, assinantes ativos encontram quatro caminhos da Sunara organizados em um só lugar.",
+      primary: "Ver meu desconto",
       secondary: "Entender como funciona",
       noCost: "Sem custo inicial",
       noWork: "Sem obras",
       noPanels: "Sem instalar placas",
       aboutEyebrow: "ENERGIA POR ASSINATURA",
       aboutTitle: "Economia de energia sem mudar a rotina",
-      aboutText: "A proposta conecta consumidores a energia renovável produzida por usinas parceiras. A distribuição continua pela rede convencional, sem troca de fiação, obras ou instalação de painéis no imóvel.",
+      aboutText: "A Sunara conecta clientes elegíveis a soluções de energia sustentável. Na energia por assinatura, a distribuição continua pela rede convencional, sem obra e sem instalação de painéis no imóvel.",
+      choicesTitle: "Escolha o que você quer fazer",
+      choices: [
+        ["partner", "🤝", "Quero ser Agente Sunara", "Cadastre-se gratuitamente para indicar pessoas e empresas. A comissão é liberada conforme as regras e a ativação do cliente.", "Cadastrar como agente"],
+        ["quiz", "🧮", "Quiz de Economia", "Responda algumas perguntas e descubra uma estimativa de quanto poderá economizar na conta de energia.", "Fazer o quiz"],
+        ["discount", "💡", "Quero desconto na conta", "Inicie a análise da sua fatura e veja as condições de desconto disponíveis para o seu perfil e sua região.", "Ver meu desconto"],
+        ["panels", "☀️", "Quero instalar placas solares", "Acesse a solução indicada para quem deseja gerar energia com placas solares instaladas no imóvel.", "Conhecer placas solares"],
+      ],
       benefitsTitle: "Uma solução pensada para pessoas e empresas",
       benefits: [
         ["☀️", "Energia renovável", "Consumo associado a fontes limpas e sustentáveis."],
         ["💡", "Economia na conta", "Condições comerciais apresentadas durante a contratação."],
-        ["📱", "Processo digital", "Cadastro e acompanhamento realizados pela plataforma Solarien."],
+        ["📱", "Processo digital", "Cadastro e acompanhamento realizados pela plataforma Sunara."],
         ["🏠", "Sem instalação", "Não é necessário instalar placas solares no imóvel."],
       ],
       incomeEyebrow: "OPORTUNIDADE DE NEGÓCIO",
-      incomeTitle: "Também é possível atuar indicando novos clientes",
-      incomeText: "Além de conhecer a solução de energia por assinatura, o assinante pode se cadastrar para apresentar os serviços da Solarien a pessoas e empresas, conforme as regras e condições comerciais da própria plataforma.",
+      incomeTitle: "Seja um Agente Sunara e indique quem já paga conta de luz",
+      incomeText: "O cadastro de agente é gratuito e online. Você pode indicar residências e empresas, acompanhar as etapas pelo painel e receber comissão quando clientes elegíveis forem ativados, conforme as regras vigentes da Sunara.",
       stepsTitle: "Comece em três passos",
       steps: [
-        ["1", "Faça seu cadastro", "Acesse o formulário pelo botão desta página. O patrocinador será identificado automaticamente."],
-        ["2", "Conheça a plataforma", "Consulte treinamentos, condições, áreas atendidas e regras vigentes diretamente na Solarien."],
-        ["3", "Apresente a solução", "Compartilhe a proposta com responsabilidade, sem prometer economia ou ganhos garantidos."],
+        ["1", "Escolha seu objetivo", "Simule economia, solicite desconto, conheça placas solares ou cadastre-se como agente."],
+        ["2", "Acesse a página correta", "Cada botão leva diretamente à jornada correspondente, preservando o vínculo de indicação."],
+        ["3", "Confira as condições", "Verifique elegibilidade, cobertura, desconto e regras vigentes diretamente na Sunara."],
       ],
       finalTitle: "Pronto para conhecer esta oportunidade?",
-      finalText: "O cadastro é concluído no ambiente oficial da Solarien, usando o vínculo de indicação disponibilizado pelo EduCashPro.",
-      disclaimer: "Resultados, descontos, disponibilidade regional e remunerações dependem das regras, análises e condições vigentes da Solarien. O EduCashPro não garante economia nem renda.",
-      affiliate: "Esta página foi gerada por um afiliado da Solarien Energy.",
+      finalText: "Escolha abaixo a opção que corresponde ao seu objetivo. O processo continuará no ambiente oficial da Sunara.",
+      disclaimer: "Estimativas, descontos, elegibilidade, cobertura e remunerações dependem da análise e das regras vigentes da Sunara. O EduCashPro não garante economia nem renda.",
+      affiliate: "Esta página foi gerada por um afiliado da Sunara.",
       back: "Voltar aos benefícios",
     },
     en: {
-      cardTitle: "Solar energy that can create savings and income",
-      cardText: "Discover subscription solar energy and the opportunity to work in the clean energy market.", cardButton: "View benefit",
-      lockedTitle: "A new opportunity is available", lockedText: "Active subscribers can discover subscription solar energy and an opportunity to increase income by referring new customers.", lockedAction: "Activate subscription",
-      badge: "SUBSCRIBER BENEFIT", title: "Save with clean energy. Grow with an expanding market.", lead: "EduCashPro selects products, proposals and solutions that may create real value for its users. Active subscribers can now discover Solarien Energy and the subscription energy market.", primary: "Create my account", secondary: "How it works", noCost: "No upfront cost", noWork: "No construction", noPanels: "No solar panels",
+      cardTitle: "Save on electricity and discover new opportunities", cardText: "Explore Sunara solutions for energy savings, referrals and solar panels.", cardButton: "View benefit",
+      lockedTitle: "A new opportunity is available", lockedText: "Active subscribers can estimate savings, request a discount, explore solar panels or become a Sunara Agent.", lockedAction: "Activate subscription",
+      badge: "SUBSCRIBER BENEFIT", title: "Your electricity bill can cost less. Your referrals can be worth more.", lead: "EduCashPro selects useful products, proposals and solutions. Active subscribers now have four Sunara paths organized in one place.", primary: "View my discount", secondary: "How it works", noCost: "No upfront cost", noWork: "No construction", noPanels: "No solar panels",
+      choicesTitle: "Choose what you want to do", choices: [["partner","🤝","Become a Sunara Agent","Register free to refer people and businesses, subject to activation and current rules.","Register as an agent"],["quiz","🧮","Savings Quiz","Answer a few questions and see an estimate of potential electricity savings.","Take the quiz"],["discount","💡","Get an electricity discount","Start your bill review and see conditions available for your profile and region.","View my discount"],["panels","☀️","Install solar panels","Explore the option for generating energy with panels installed at your property.","Explore solar panels"]],
       aboutEyebrow: "SUBSCRIPTION ENERGY", aboutTitle: "Energy savings without changing your routine", aboutText: "The proposal connects consumers with renewable energy generated by partner plants. Distribution continues through the conventional grid, with no rewiring, construction or panels installed at the property.", benefitsTitle: "A solution for people and businesses",
-      benefits: [["☀️","Renewable energy","Consumption connected to clean, sustainable sources."],["💡","Bill savings","Commercial terms are presented during contracting."],["📱","Digital process","Registration and tracking through Solarien's platform."],["🏠","No installation","No solar panels need to be installed at the property."]],
-      incomeEyebrow: "BUSINESS OPPORTUNITY", incomeTitle: "You can also refer new customers", incomeText: "Subscribers may register to introduce Solarien services to people and businesses, subject to Solarien's own commercial rules and conditions.", stepsTitle: "Start in three steps", steps: [["1","Create your account","Use this page's button. Your sponsor is identified automatically."],["2","Explore the platform","Check training, terms, coverage and current rules directly with Solarien."],["3","Present the solution","Share responsibly, without promising guaranteed savings or income."]], finalTitle: "Ready to discover this opportunity?", finalText: "Registration is completed in Solarien's official environment using the referral connection provided through EduCashPro.", disclaimer: "Results, discounts, regional availability and compensation depend on Solarien's current rules, reviews and conditions. EduCashPro does not guarantee savings or income.", affiliate: "This page was generated by a Solarien Energy affiliate.", back: "Back to benefits",
+      benefits: [["☀️","Renewable energy","Consumption connected to clean, sustainable sources."],["💡","Bill savings","Commercial terms are presented during contracting."],["📱","Digital process","Registration and tracking through Sunara's platform."],["🏠","No installation","Subscription energy does not require solar panels at the property."]],
+      incomeEyebrow: "BUSINESS OPPORTUNITY", incomeTitle: "Become a Sunara Agent", incomeText: "Registration is free and online. Refer eligible homes and businesses and receive commission after activation, subject to Sunara's current rules.", stepsTitle: "Start in three steps", steps: [["1","Choose your goal","Estimate savings, request a discount, explore panels or become an agent."],["2","Open the right page","Each button preserves the referral connection and opens the matching journey."],["3","Check current terms","Confirm eligibility, coverage, discounts and rules directly with Sunara."]], finalTitle: "Ready to continue?", finalText: "Choose the option that matches your goal. The process continues in Sunara's official environment.", disclaimer: "Estimates, discounts, eligibility, coverage and compensation depend on Sunara's current review and rules. EduCashPro does not guarantee savings or income.", affiliate: "This page was generated by a Sunara affiliate.", back: "Back to benefits",
     },
     es: {
-      cardTitle: "Energía solar que puede generar ahorro e ingresos", cardText: "Conoce la energía por suscripción y la oportunidad de participar en el mercado de energía limpia.", cardButton: "Conocer beneficio", lockedTitle: "Una nueva oportunidad ya está disponible", lockedText: "Los suscriptores activos pueden conocer una solución de energía solar por suscripción y una oportunidad de aumentar sus ingresos indicando nuevos clientes.", lockedAction: "Activar suscripción",
-      badge: "BENEFICIO PARA SUSCRIPTORES", title: "Ahorra con energía limpia. Crece con un mercado en expansión.", lead: "EduCashPro selecciona productos, propuestas y soluciones que pueden generar valor real. Los suscriptores activos ahora pueden conocer Solarien Energy y el mercado de energía por suscripción.", primary: "Quiero registrarme", secondary: "Cómo funciona", noCost: "Sin costo inicial", noWork: "Sin obras", noPanels: "Sin instalar paneles", aboutEyebrow: "ENERGÍA POR SUSCRIPCIÓN", aboutTitle: "Ahorro de energía sin cambiar tu rutina", aboutText: "La propuesta conecta consumidores con energía renovable producida por plantas asociadas. La distribución continúa por la red convencional, sin obras ni paneles en el inmueble.", benefitsTitle: "Una solución para personas y empresas", benefits: [["☀️","Energía renovable","Consumo asociado a fuentes limpias y sostenibles."],["💡","Ahorro en la factura","Las condiciones se presentan durante la contratación."],["📱","Proceso digital","Registro y seguimiento en la plataforma Solarien."],["🏠","Sin instalación","No es necesario instalar paneles solares."]], incomeEyebrow: "OPORTUNIDAD DE NEGOCIO", incomeTitle: "También puedes indicar nuevos clientes", incomeText: "El suscriptor puede registrarse para presentar los servicios de Solarien a personas y empresas, según las reglas comerciales de la plataforma.", stepsTitle: "Comienza en tres pasos", steps: [["1","Regístrate","Usa el botón de esta página. El patrocinador se identifica automáticamente."],["2","Conoce la plataforma","Consulta capacitaciones, condiciones, cobertura y reglas vigentes."],["3","Presenta la solución","Comparte con responsabilidad, sin prometer ahorro o ingresos garantizados."]], finalTitle: "¿Listo para conocer esta oportunidad?", finalText: "El registro se completa en el entorno oficial de Solarien con el vínculo de indicación de EduCashPro.", disclaimer: "Resultados, descuentos, disponibilidad regional y remuneraciones dependen de las reglas y condiciones vigentes de Solarien. EduCashPro no garantiza ahorro ni ingresos.", affiliate: "Esta página fue generada por un afiliado de Solarien Energy.", back: "Volver a beneficios",
+      cardTitle: "Ahorra en electricidad y descubre oportunidades", cardText: "Conoce las soluciones Sunara para ahorro, indicaciones y paneles solares.", cardButton: "Conocer beneficio", lockedTitle: "Una nueva oportunidad ya está disponible", lockedText: "Los suscriptores activos pueden estimar ahorro, solicitar descuento, conocer paneles o ser Agente Sunara.", lockedAction: "Activar suscripción",
+      badge: "BENEFICIO PARA SUSCRIPTORES", title: "Tu factura puede costar menos. Tus indicaciones pueden valer más.", lead: "EduCashPro selecciona soluciones útiles. Los suscriptores activos encuentran cuatro caminos Sunara en un solo lugar.", primary: "Ver mi descuento", secondary: "Cómo funciona", noCost: "Sin costo inicial", noWork: "Sin obras", noPanels: "Sin instalar paneles", aboutEyebrow: "ENERGÍA POR SUSCRIPCIÓN", aboutTitle: "Ahorro sin cambiar tu rutina", aboutText: "Sunara conecta clientes elegibles con soluciones sostenibles. La energía por suscripción utiliza la red convencional, sin obras ni paneles.", benefitsTitle: "Una solución para personas y empresas", benefits: [["☀️","Energía renovable","Consumo asociado a fuentes limpias."],["💡","Ahorro en la factura","Condiciones presentadas durante la contratación."],["📱","Proceso digital","Registro y seguimiento en la plataforma Sunara."],["🏠","Sin instalación","La energía por suscripción no requiere paneles."]], choicesTitle: "Elige lo que quieres hacer", choices: [["partner","🤝","Ser Agente Sunara","Regístrate gratis para indicar personas y empresas.","Registrarme como agente"],["quiz","🧮","Quiz de Ahorro","Responde algunas preguntas y recibe una estimación.","Hacer el quiz"],["discount","💡","Descuento en electricidad","Inicia el análisis de tu factura.","Ver mi descuento"],["panels","☀️","Instalar paneles solares","Conoce la solución de paneles para tu inmueble.","Conocer paneles"]], incomeEyebrow: "OPORTUNIDAD DE NEGOCIO", incomeTitle: "Conviértete en Agente Sunara", incomeText: "El registro es gratuito y en línea. Indica clientes elegibles y recibe comisión tras la activación, según las reglas vigentes.", stepsTitle: "Comienza en tres pasos", steps: [["1","Elige tu objetivo","Estima ahorro, solicita descuento, conoce paneles o sé agente."],["2","Abre la página correcta","Cada botón conserva el vínculo de indicación."],["3","Consulta las condiciones","Confirma elegibilidad, cobertura y reglas con Sunara."]], finalTitle: "¿Listo para continuar?", finalText: "Elige la opción que corresponde a tu objetivo. El proceso continúa en Sunara.", disclaimer: "Estimaciones, descuentos, elegibilidad y remuneraciones dependen de las reglas de Sunara. EduCashPro no garantiza ahorro ni ingresos.", affiliate: "Esta página fue generada por un afiliado de Sunara.", back: "Volver a beneficios",
     },
     ru: {
-      cardTitle: "Солнечная энергия для экономии и дополнительного дохода", cardText: "Узнайте об энергии по подписке и возможностях рынка чистой энергии.", cardButton: "Открыть преимущество", lockedTitle: "Доступна новая возможность", lockedText: "Активные подписчики могут узнать об энергии по подписке и возможности увеличить доход, привлекая новых клиентов.", lockedAction: "Активировать подписку",
-      badge: "ПРЕИМУЩЕСТВО ДЛЯ ПОДПИСЧИКОВ", title: "Экономьте с чистой энергией. Развивайтесь на растущем рынке.", lead: "EduCashPro отбирает продукты, предложения и решения, способные приносить реальную пользу. Активные подписчики могут познакомиться с Solarien Energy и рынком энергии по подписке.", primary: "Зарегистрироваться", secondary: "Как это работает", noCost: "Без начальных затрат", noWork: "Без строительных работ", noPanels: "Без установки панелей", aboutEyebrow: "ЭНЕРГИЯ ПО ПОДПИСКЕ", aboutTitle: "Экономия без изменения привычного потребления", aboutText: "Потребители подключаются к возобновляемой энергии партнерских электростанций, продолжая пользоваться обычной сетью — без работ и установки панелей.", benefitsTitle: "Решение для людей и компаний", benefits: [["☀️","Возобновляемая энергия","Потребление из чистых и устойчивых источников."],["💡","Экономия на счете","Условия сообщаются при оформлении."],["📱","Цифровой процесс","Регистрация и сопровождение на платформе Solarien."],["🏠","Без установки","Солнечные панели на объекте не требуются."]], incomeEyebrow: "ДЕЛОВАЯ ВОЗМОЖНОСТЬ", incomeTitle: "Можно также привлекать новых клиентов", incomeText: "Подписчик может зарегистрироваться и знакомить людей и компании с услугами Solarien согласно действующим правилам платформы.", stepsTitle: "Три шага для начала", steps: [["1","Зарегистрируйтесь","Используйте кнопку на этой странице — спонсор определяется автоматически."],["2","Изучите платформу","Ознакомьтесь с обучением, условиями, регионами и правилами Solarien."],["3","Представляйте решение","Делитесь ответственно, не обещая гарантированной экономии или дохода."]], finalTitle: "Готовы узнать больше?", finalText: "Регистрация проходит на официальной платформе Solarien по партнерской ссылке EduCashPro.", disclaimer: "Результаты, скидки, доступность и вознаграждение зависят от действующих правил и условий Solarien. EduCashPro не гарантирует экономию или доход.", affiliate: "Эта страница создана партнером Solarien Energy.", back: "Назад к преимуществам",
+      cardTitle: "Экономьте на электричестве и находите новые возможности", cardText: "Решения Sunara для экономии, рекомендаций и солнечных панелей.", cardButton: "Открыть преимущество", lockedTitle: "Доступна новая возможность", lockedText: "Активные подписчики могут оценить экономию, запросить скидку, узнать о панелях или стать агентом Sunara.", lockedAction: "Активировать подписку",
+      badge: "ПРЕИМУЩЕСТВО ДЛЯ ПОДПИСЧИКОВ", title: "Ваш счет может стать меньше. Ваши рекомендации — ценнее.", lead: "EduCashPro отбирает полезные решения. Четыре направления Sunara собраны в одном месте для активных подписчиков.", primary: "Узнать скидку", secondary: "Как это работает", noCost: "Без начальных затрат", noWork: "Без строительных работ", noPanels: "Без установки панелей", aboutEyebrow: "ЭНЕРГИЯ ПО ПОДПИСКЕ", aboutTitle: "Экономия без изменения привычек", aboutText: "Sunara подключает подходящих клиентов к устойчивым энергетическим решениям через обычную сеть.", benefitsTitle: "Решение для людей и компаний", benefits: [["☀️","Возобновляемая энергия","Чистые и устойчивые источники."],["💡","Экономия на счете","Условия сообщаются при оформлении."],["📱","Цифровой процесс","Регистрация на платформе Sunara."],["🏠","Без установки","Подписка не требует панелей."]], choicesTitle: "Выберите цель", choices: [["partner","🤝","Стать агентом Sunara","Бесплатная регистрация для рекомендаций.","Стать агентом"],["quiz","🧮","Тест экономии","Ответьте на вопросы и получите оценку.","Пройти тест"],["discount","💡","Скидка на электричество","Начните анализ счета.","Узнать скидку"],["panels","☀️","Установить панели","Познакомьтесь с решением для объекта.","Узнать о панелях"]], incomeEyebrow: "ДЕЛОВАЯ ВОЗМОЖНОСТЬ", incomeTitle: "Станьте агентом Sunara", incomeText: "Регистрация бесплатна. Комиссия выплачивается за активированных подходящих клиентов по правилам Sunara.", stepsTitle: "Три шага", steps: [["1","Выберите цель","Экономия, скидка, панели или работа агентом."],["2","Откройте нужную страницу","Каждая кнопка сохраняет партнерскую привязку."],["3","Проверьте условия","Уточните доступность и правила у Sunara."]], finalTitle: "Готовы продолжить?", finalText: "Выберите подходящий вариант. Процесс продолжится на официальной платформе Sunara.", disclaimer: "Оценки, скидки, доступность и вознаграждения зависят от правил Sunara. EduCashPro не гарантирует экономию или доход.", affiliate: "Эта страница создана партнером Sunara.", back: "Назад к преимуществам",
     },
   };
 
@@ -374,7 +386,7 @@
   };
 
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
-  function solarienCopy(key) { return SOLARIEN_COPY[state.language]?.[key] ?? SOLARIEN_COPY.pt[key] ?? key; }
+  function sunaraCopy(key) { return SUNARA_COPY[state.language]?.[key] ?? SUNARA_COPY.pt[key] ?? key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function benefitNavigationCopy(key) {
@@ -414,14 +426,14 @@
     openUrl(url);
   }
 
-  function showSolarienLock() {
+  function showSunaraLock() {
     const modal = document.getElementById("accessModal");
     document.getElementById("modalIcon").textContent = "☀️";
-    document.getElementById("modalTitle").textContent = solarienCopy("lockedTitle");
-    document.getElementById("modalDescription").textContent = solarienCopy("lockedText");
+    document.getElementById("modalTitle").textContent = sunaraCopy("lockedTitle");
+    document.getElementById("modalDescription").textContent = sunaraCopy("lockedText");
     document.getElementById("modalLearning").innerHTML = "";
     const subscribe = document.getElementById("modalSubscribe");
-    subscribe.textContent = `⚡ ${solarienCopy("lockedAction")}`;
+    subscribe.textContent = `⚡ ${sunaraCopy("lockedAction")}`;
     subscribe.onclick = openSubscription;
     modal.querySelector(".modalCancel").textContent = t("back");
     modal.classList.remove("hidden");
@@ -954,23 +966,24 @@
   }
 
   async function renderBenefits() {
-    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">S<span>O</span>LARIEN</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(solarienCopy("badge"))}</span><h2>${escapeHtml(solarienCopy("cardTitle"))}</h2><p>${escapeHtml(solarienCopy("cardText"))}</p><button id="openSolarien" class="solarienTeaserButton">${escapeHtml(solarienCopy("cardButton"))} →</button></article><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
-    document.getElementById("openSolarien").onclick = () => state.profile?.active ? renderSolarienPage() : showSolarienLock();
-    content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : showSolarienLock();
-    content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : showSolarienLock();
+    content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">SUNARA</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(sunaraCopy("badge"))}</span><h2>${escapeHtml(sunaraCopy("cardTitle"))}</h2><p>${escapeHtml(sunaraCopy("cardText"))}</p><button id="openSunara" class="solarienTeaserButton">${escapeHtml(sunaraCopy("cardButton"))} →</button></article><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
+    document.getElementById("openSunara").onclick = () => state.profile?.active ? renderSunaraPage() : showSunaraLock();
+    content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : showSunaraLock();
+    content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : showSunaraLock();
   }
 
-  function renderSolarienPage() {
-    if (!state.profile?.active) return showSolarienLock();
+  function renderSunaraPage() {
+    if (!state.profile?.active) return showSunaraLock();
     state.view = "benefits";
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const benefitCards = solarienCopy("benefits").map(([icon, title, text]) => `<article><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></article>`).join("");
-    const steps = solarienCopy("steps").map(([number, title, text]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></div></article>`).join("");
-    content.innerHTML = `<div class="solarienPage"><button id="solarienBack" class="solarienBack">← ${escapeHtml(solarienCopy("back"))}</button><section class="solarienHero"><div class="solarienOrb"></div><div class="solarienLogo">S<span>O</span>LARIEN<small>ENERGY</small></div><span class="solarienBadge">${escapeHtml(solarienCopy("badge"))}</span><h1>${escapeHtml(solarienCopy("title"))}</h1><p>${escapeHtml(solarienCopy("lead"))}</p><div class="solarienActions"><button class="solarienPrimary" data-solarien-register>${escapeHtml(solarienCopy("primary"))}</button><button class="solarienSecondary" id="solarienLearn">${escapeHtml(solarienCopy("secondary"))}</button></div><div class="solarienProof"><span>✓ ${escapeHtml(solarienCopy("noCost"))}</span><span>✓ ${escapeHtml(solarienCopy("noWork"))}</span><span>✓ ${escapeHtml(solarienCopy("noPanels"))}</span></div></section><section class="solarienSection" id="solarienAbout"><span class="solarienKicker">${escapeHtml(solarienCopy("aboutEyebrow"))}</span><h2>${escapeHtml(solarienCopy("aboutTitle"))}</h2><p class="solarienLead">${escapeHtml(solarienCopy("aboutText"))}</p><div class="solarienBenefitGrid">${benefitCards}</div></section><section class="solarienIncome"><span class="solarienKicker">${escapeHtml(solarienCopy("incomeEyebrow"))}</span><h2>${escapeHtml(solarienCopy("incomeTitle"))}</h2><p>${escapeHtml(solarienCopy("incomeText"))}</p></section><section class="solarienSection"><h2>${escapeHtml(solarienCopy("stepsTitle"))}</h2><div class="solarienSteps">${steps}</div></section><section class="solarienFinal"><div class="solarienLogo small">S<span>O</span>LARIEN</div><h2>${escapeHtml(solarienCopy("finalTitle"))}</h2><p>${escapeHtml(solarienCopy("finalText"))}</p><button class="solarienPrimary" data-solarien-register>${escapeHtml(solarienCopy("primary"))}</button><small>${escapeHtml(solarienCopy("disclaimer"))}</small></section><footer class="solarienFooter">${escapeHtml(solarienCopy("affiliate"))}</footer></div>`;
-    document.getElementById("solarienBack").onclick = renderBenefits;
-    document.getElementById("solarienLearn").onclick = () => document.getElementById("solarienAbout")?.scrollIntoView({ behavior: "smooth" });
-    content.querySelectorAll("[data-solarien-register]").forEach((button) => button.onclick = () => openUrl(SOLARIEN_AFFILIATE_URL));
+    const benefitCards = sunaraCopy("benefits").map(([icon, title, text]) => `<article><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></article>`).join("");
+    const choices = sunaraCopy("choices").map(([key, icon, title, text, action]) => `<article class="sunaraChoice"><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p><button class="solarienPrimary" data-sunara-url="${escapeHtml(key)}">${escapeHtml(action)} →</button></article>`).join("");
+    const steps = sunaraCopy("steps").map(([number, title, text]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></div></article>`).join("");
+    content.innerHTML = `<div class="solarienPage"><button id="sunaraBack" class="solarienBack">← ${escapeHtml(sunaraCopy("back"))}</button><section class="solarienHero"><div class="solarienOrb"></div><div class="solarienLogo">SUNARA<small>ENERGIA INTELIGENTE</small></div><span class="solarienBadge">${escapeHtml(sunaraCopy("badge"))}</span><h1>${escapeHtml(sunaraCopy("title"))}</h1><p>${escapeHtml(sunaraCopy("lead"))}</p><div class="solarienActions"><button class="solarienPrimary" data-sunara-url="discount">${escapeHtml(sunaraCopy("primary"))}</button><button class="solarienSecondary" id="sunaraLearn">${escapeHtml(sunaraCopy("secondary"))}</button></div><div class="solarienProof"><span>✓ ${escapeHtml(sunaraCopy("noCost"))}</span><span>✓ ${escapeHtml(sunaraCopy("noWork"))}</span><span>✓ ${escapeHtml(sunaraCopy("noPanels"))}</span></div></section><section class="solarienSection sunaraChoices" id="sunaraChoices"><span class="solarienKicker">SUNARA</span><h2>${escapeHtml(sunaraCopy("choicesTitle"))}</h2><div class="sunaraChoiceGrid">${choices}</div></section><section class="solarienSection" id="sunaraAbout"><span class="solarienKicker">${escapeHtml(sunaraCopy("aboutEyebrow"))}</span><h2>${escapeHtml(sunaraCopy("aboutTitle"))}</h2><p class="solarienLead">${escapeHtml(sunaraCopy("aboutText"))}</p><div class="solarienBenefitGrid">${benefitCards}</div></section><section class="solarienIncome"><span class="solarienKicker">${escapeHtml(sunaraCopy("incomeEyebrow"))}</span><h2>${escapeHtml(sunaraCopy("incomeTitle"))}</h2><p>${escapeHtml(sunaraCopy("incomeText"))}</p><button class="solarienPrimary sunaraIncomeButton" data-sunara-url="partner">${escapeHtml(sunaraCopy("choices")[0][4])} →</button></section><section class="solarienSection"><h2>${escapeHtml(sunaraCopy("stepsTitle"))}</h2><div class="solarienSteps">${steps}</div></section><section class="solarienFinal"><div class="solarienLogo small">SUNARA</div><h2>${escapeHtml(sunaraCopy("finalTitle"))}</h2><p>${escapeHtml(sunaraCopy("finalText"))}</p><div class="sunaraFinalActions">${sunaraCopy("choices").map(([key, icon, title]) => `<button data-sunara-url="${escapeHtml(key)}">${icon} ${escapeHtml(title)}</button>`).join("")}</div><small>${escapeHtml(sunaraCopy("disclaimer"))}</small></section><footer class="solarienFooter">${escapeHtml(sunaraCopy("affiliate"))}</footer></div>`;
+    document.getElementById("sunaraBack").onclick = renderBenefits;
+    document.getElementById("sunaraLearn").onclick = () => document.getElementById("sunaraChoices")?.scrollIntoView({ behavior: "smooth" });
+    content.querySelectorAll("[data-sunara-url]").forEach((button) => button.onclick = () => openUrl(SUNARA_URLS[button.dataset.sunaraUrl]));
   }
 
   async function renderExclusiveBenefits() {
