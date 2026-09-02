@@ -1051,13 +1051,8 @@
   }
 
   function renderTools() {
-    const savedMargin = (() => { try { return JSON.parse(localStorage.getItem("educashpro:profit-margin") || "{}"); } catch { return {}; } })();
-    const selectedCurrency = ["BRL", "USD", "USDT", "EUR"].includes(savedMargin.currency) ? savedMargin.currency : "BRL";
-    content.innerHTML = `<button id="toolsBack" class="textButton">← ${escapeHtml(t("back"))}</button><div class="sectionHead"><div><h2>${escapeHtml(t("toolsTitle"))}</h2></div></div><section class="toolGrid"><article class="toolCard marginTool"><h3>📊 ${escapeHtml(featureCopy("profitTitle"))}</h3><p>${escapeHtml(featureCopy("profitDesc"))}</p><div class="fieldGrid"><div class="field"><label>${escapeHtml(featureCopy("cost"))}</label><input id="costValue" inputmode="decimal" value="${escapeHtml(savedMargin.cost ?? "0.89")}"></div><div class="field"><label>${escapeHtml(featureCopy("sale"))}</label><input id="saleValue" inputmode="decimal" value="${escapeHtml(savedMargin.sale ?? "2.00")}"></div><div class="field fullField"><label>${escapeHtml(featureCopy("currency"))}</label><select id="marginCurrency">${["BRL", "USD", "USDT", "EUR"].map((currency) => `<option value="${currency}" ${currency === selectedCurrency ? "selected" : ""}>${currency}</option>`).join("")}</select></div></div><button id="calculateMargin" class="wideButton" style="margin-top:12px">${escapeHtml(featureCopy("calculateMargin"))}</button><div id="marginResult" class="resultBox hidden"></div></article><article class="toolCard"><h3>📈 ${escapeHtml(t("interest"))}</h3><div class="fieldGrid"><div class="field"><label>${escapeHtml(t("initial"))}</label><input id="initialValue" inputmode="decimal" value="1000"></div><div class="field"><label>${escapeHtml(t("monthly"))}</label><input id="monthlyValue" inputmode="decimal" value="100"></div><div class="field"><label>${escapeHtml(t("rate"))}</label><input id="rateValue" inputmode="decimal" value="1"></div><div class="field"><label>${escapeHtml(t("months"))}</label><input id="monthsValue" inputmode="numeric" value="24"></div></div><button id="calculateButton" class="wideButton" style="margin-top:12px">${escapeHtml(t("calculate"))}</button><div id="interestResult" class="resultBox hidden"></div></article><article class="toolCard"><h3>🧠 ${escapeHtml(t("quiz"))}</h3><p>${escapeHtml(t("quizQuestion"))}</p><button class="quizOption" data-answer="wrong">A. ${escapeHtml(t("quizA"))}</button><button class="quizOption" data-answer="correct">B. ${escapeHtml(t("quizB"))}</button><button class="quizOption" data-answer="wrong">C. ${escapeHtml(t("quizC"))}</button><div id="quizResult" class="resultBox hidden"></div></article></section>`;
-    document.getElementById("toolsBack").onclick = () => setView("learn");
-    document.getElementById("calculateMargin").onclick = calculateProfitMargin;
-    document.getElementById("calculateButton").onclick = calculateInterest;
-    content.querySelectorAll("[data-answer]").forEach((button) => button.onclick = () => { const result = document.getElementById("quizResult"); result.textContent = t(button.dataset.answer); result.classList.remove("hidden"); });
+    if (window.EduCashProLocal?.renderToolsHub) return window.EduCashProLocal.renderToolsHub();
+    renderNetworkProjection();
   }
 
   function calculateProfitMargin() {
@@ -1133,17 +1128,45 @@
     document.getElementById("downloadQr").onclick = () => downloadQr(container, "educashpro-qrcode.png");
   }
 
+  function scanMembershipQr() {
+    const scannerText = {
+      pt: "Aponte a câmera para o QR Code do assinante",
+      en: "Point the camera at the subscriber's QR Code",
+      es: "Apunta la cámara al código QR del suscriptor",
+      ru: "Наведите камеру на QR-код подписчика",
+    }[state.language] || "Aponte a câmera para o QR Code do assinante";
+    if (!tg?.showScanQrPopup) {
+      showToast({ pt: "Leitor disponível dentro do Telegram.", en: "Scanner available inside Telegram.", es: "Lector disponible dentro de Telegram.", ru: "Сканер доступен внутри Telegram." }[state.language]);
+      return;
+    }
+    tg.showScanQrPopup({ text: scannerText }, (value) => {
+      try {
+        const scanned = new URL(String(value || ""));
+        const credential = scanned.searchParams.get("credential");
+        if (!credential) return false;
+        tg.closeScanQrPopup?.();
+        verifyMembershipCredential(credential, scanned.searchParams.get("lang") || state.language, true);
+        return true;
+      } catch {
+        showToast(featureCopy("invalidCredential"));
+        return false;
+      }
+    });
+  }
+
   function renderMembershipProof() {
     const credential = state.membershipCredential;
     const payload = decodeCredential(credential);
     if (!credential || !payload) return;
     const verificationUrl = `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(state.language)}`;
-    content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
+    const scanLabel = { pt: "Ler QR Code", en: "Scan QR Code", es: "Leer código QR", ru: "Сканировать QR-код" }[state.language];
+    content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><div class="qrActions"><button id="scanMembershipQr" class="wideButton">📷 ${escapeHtml(scanLabel)}</button></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
     createQr(document.getElementById("proofQr"), verificationUrl);
     document.getElementById("proofBack").onclick = renderArea;
+    document.getElementById("scanMembershipQr").onclick = scanMembershipQr;
   }
 
-  async function verifyMembershipCredential(credential, language) {
+  async function verifyMembershipCredential(credential, language, embedded = false) {
     state.language = ["pt", "en", "es", "ru"].includes(language) ? language : "pt";
     applyLanguage();
     const parts = String(credential || "").split(".");
@@ -1154,9 +1177,13 @@
       authentic = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, base64UrlBytes(parts[1]), new TextEncoder().encode(parts[0]));
     } catch { authentic = false; }
     const active = authentic && Number(payload?.validUntil || 0) > Date.now() / 1000;
-    document.getElementById("closeButton").classList.add("hidden");
-    bottomNav.classList.add("hidden");
-    content.innerHTML = `<section class="profileCard verificationCard"><div class="verificationIcon">${authentic ? active ? "✅" : "❌" : "⚠️"}</div><h1>${escapeHtml(authentic ? active ? featureCopy("credentialActive") : featureCopy("credentialExpired") : featureCopy("invalidCredential"))}</h1>${authentic ? `<h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div class="providerLine"><span>🛡️ ${escapeHtml(featureCopy("authentic"))}</span></div>` : ""}</section>`;
+    if (!embedded) {
+      document.getElementById("closeButton").classList.add("hidden");
+      bottomNav.classList.add("hidden");
+    }
+    const back = embedded ? `<button id="verificationBack" class="textButton">← ${escapeHtml(t("back"))}</button>` : "";
+    content.innerHTML = `${back}<section class="profileCard verificationCard"><div class="verificationIcon">${authentic ? active ? "✅" : "❌" : "⚠️"}</div><h1>${escapeHtml(authentic ? active ? featureCopy("credentialActive") : featureCopy("credentialExpired") : featureCopy("invalidCredential"))}</h1>${authentic ? `<h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div class="providerLine"><span>🛡️ ${escapeHtml(featureCopy("authentic"))}</span></div>` : ""}</section>`;
+    if (embedded) document.getElementById("verificationBack").onclick = renderArea;
   }
 
   function loadingCard() { return `<div class="empty"><div class="loader" style="margin:auto"><span></span></div></div>`; }
@@ -1214,4 +1241,5 @@
   });
   window.addEventListener("focus", checkForUpdates);
   document.addEventListener("DOMContentLoaded", init);
+  window.EduCashProApp = { renderNetworkProjection, scanMembershipQr };
 })();
