@@ -147,7 +147,7 @@
 
   function bindVisitorNavigation() {
     if (!isVisitor()) return;
-    document.querySelectorAll('#bottomNav button[data-view="learn"], #bottomNav button[data-view="explore"], #bottomNav button[data-view="benefits"]').forEach((button) => {
+    document.querySelectorAll('#bottomNav button[data-view="learn"], #bottomNav button[data-view="explore"]').forEach((button) => {
       if (button.dataset.visitorLocked === "1") return;
       button.dataset.visitorLocked = "1";
       button.addEventListener("click", (event) => {
