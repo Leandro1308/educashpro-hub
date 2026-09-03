@@ -4,7 +4,8 @@
   const tg = window.Telegram?.WebApp;
   const params = new URL(window.location.href).searchParams;
   const apiParam = String(params.get("api") || "").replace(/\/+$/, "");
-  const API_BASE = /^https:\/\//i.test(apiParam) ? apiParam : "";
+  const DEFAULT_API_BASE = "https://educashpro-all.onrender.com";
+  const API_BASE = /^https:\/\//i.test(apiParam) ? apiParam : DEFAULT_API_BASE;
   const originalFetch = window.fetch.bind(window);
   let session = null;
 
@@ -59,6 +60,7 @@
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
   function validUrl(value) { try { const url = new URL(String(value)); return url.protocol === "https:"; } catch { return false; } }
   function slugify(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
+  function pageSlug(value, pageName) { const raw = String(value || "").trim(); return /^(?:https?|www)[-.:/]|(?:^|-)t-me(?:-|$)/i.test(raw) ? slugify(pageName) : slugify(raw || pageName); }
   function requestMessage(error) {
     const reason = String(error?.message || "");
     const map = { invalid_slug: "invalidSlug", slug_in_use: "slugInUse", name_required: "nameRequired", link_required: "linkRequired", invalid_link: "invalidUrl", responsibility_required: "accept", rate_limited: "rateLimited" };
@@ -69,7 +71,7 @@
   async function api(path, body, publicRequest = false) { const response = await originalFetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), cache: publicRequest ? "default" : "no-store" }); const data = await response.json().catch(() => ({})); if (!response.ok || data?.ok === false) throw new Error(data?.reason || "REQUEST"); return data; }
   function field(label, id, value = "", extra = "") { return `<div class="field"><label for="${id}">${esc(label)}</label><input id="${id}" value="${esc(value)}" ${extra}></div>`; }
   function responsibility() { return `<label class="linkResponsibility"><input id="linkResponsibility" type="checkbox"> <span>${esc(text("responsibility"))}</span></label>`; }
-  function publicUrl(kind, code) { const url = new URL(window.location.href); ["page", "go", "credential"].forEach((key) => url.searchParams.delete(key)); url.searchParams.set(kind, code); url.searchParams.set("lang", language()); return url.toString(); }
+  function publicUrl(kind, code) { const url = new URL(window.location.href); ["page", "go", "credential", "api", "lang"].forEach((key) => url.searchParams.delete(key)); url.searchParams.set(kind, code); return url.toString(); }
 
   function showUpgrade() {
     const modal = document.getElementById("accessModal");
@@ -111,7 +113,7 @@
       if (edited.some((link) => !link.title || !validUrl(link.url))) return toast(text("invalidUrl"));
       const links = active() ? edited : [...edited.slice(0, 3), ...storedLinks.slice(3)];
       try {
-        const normalizedSlug = slugify(document.getElementById("linkSlug").value || pageName);
+        const normalizedSlug = pageSlug(document.getElementById("linkSlug").value, pageName);
         document.getElementById("linkSlug").value = normalizedSlug;
         const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: pageName, bio: document.getElementById("linkBio").value.trim(), slug: normalizedSlug, links }, acceptedResponsibility: true });
         const slug = data.page?.slug || data.slug; const url = data.publicUrl || publicUrl("page", slug);
