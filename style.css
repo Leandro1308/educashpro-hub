@@ -536,6 +536,7 @@ body::before {
 .drawHelpCard article + article { margin-top:9px; }
 .drawHelpCard article strong { color:#e8f1ff; font-size:14px; }
 .drawHelpCard article p { margin:6px 0 0; color:var(--muted); font-size:12px; line-height:1.5; }
+.drawPresentationCta { display:block; width:max-content; max-width:100%; margin:14px auto 0; padding:9px 13px; border:1px solid rgba(48,230,166,.48); border-radius:999px; color:#061b15; background:linear-gradient(135deg, var(--green), #7bf0c7); font-size:11px; font-weight:950; box-shadow:0 7px 18px rgba(48,230,166,.18); }
 .drawClear { width:100%; margin-top:9px; }
 .drawNumber { display:block; padding:12px; text-align:center; font-size:40px; }
 .drawTeam { padding:10px 0; border-bottom:1px solid var(--line); }
