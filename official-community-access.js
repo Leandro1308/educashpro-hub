@@ -6,7 +6,7 @@
   const OFFICIAL_CHANNEL_ACCESS_URL = "https://t.me/+1mP5ad7vJH5lOGNh";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
   const apiBaseFromUrl = String(new URL(window.location.href).searchParams.get("api") || "").replace(/\/+$/, "");
-  const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "";
+  const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "https://educashpro-all.onrender.com";
   const originalFetch = window.fetch.bind(window);
   let session = null;
   let enhancing = false;
