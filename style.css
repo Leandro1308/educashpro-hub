@@ -556,6 +556,28 @@ body::before {
 .verificationIcon { margin-bottom: 14px; font-size: 64px; }
 .verificationCard h1 { margin: 8px 0 18px; }
 
+.linkEditor { display:grid; gap:13px; }
+.linkRows { display:grid; gap:12px; }
+.linkRow { position:relative; display:grid; grid-template-columns:1fr 1.5fr; gap:9px; padding:13px 46px 13px 13px; border:1px solid var(--line); border-radius:15px; background:rgba(74,140,255,.055); }
+.linkRemove { position:absolute; top:12px; right:10px; width:31px; height:31px; border:1px solid var(--line); border-radius:10px; color:#ffb0b8; background:var(--surface2); }
+.linkAdd { width:100%; }
+.linkResponsibility { display:flex; gap:10px; align-items:flex-start; padding:13px; border:1px solid rgba(255,200,92,.24); border-radius:14px; color:#ffe2a1; background:rgba(255,200,92,.08); font-size:12px; line-height:1.5; }
+.linkResponsibility input { flex:0 0 auto; width:18px; height:18px; margin-top:1px; accent-color:var(--green); }
+.publishedLink { display:grid; gap:8px; padding:14px; border-radius:14px; background:rgba(48,230,166,.09); }
+.publishedLink strong { color:var(--green); }
+.publishedLink span { overflow-wrap:anywhere; color:var(--muted); font-size:12px; }
+.publicLinkShell { width:min(100%,560px); margin:28px auto; padding:28px 20px; text-align:center; }
+.publicAvatar,.publicBrand { display:grid; place-items:center; width:82px; height:82px; margin:0 auto 16px; border-radius:27px; color:#06151c; background:linear-gradient(135deg,var(--green),var(--blue)); font-size:34px; font-weight:950; box-shadow:var(--shadow); }
+.publicBrand { width:62px; height:62px; border-radius:20px; font-size:26px; }
+.publicLinkShell h1 { margin:8px 0; font-size:clamp(27px,8vw,42px); line-height:1.12; }
+.publicLinkShell > p { margin:8px auto 22px; max-width:480px; color:var(--muted); line-height:1.55; }
+.publicButtons { display:grid; gap:11px; }
+.publicButtons button,.publicDestination { width:100%; min-height:52px; padding:13px 16px; border:1px solid rgba(255,255,255,.12); border-radius:15px; color:var(--text); background:var(--surface); font-weight:850; box-shadow:0 8px 24px rgba(0,0,0,.14); }
+.publicAffiliate { width:100%; min-height:46px; margin-top:18px; padding:11px 15px; border:1px solid rgba(48,230,166,.4); border-radius:14px; color:#061b15; background:linear-gradient(135deg,var(--green),#7bf0c7); font-weight:950; }
+.publicLinkShell > small { display:block; margin-top:18px; color:var(--muted); }
+.publicShort { margin-top:55px; padding:27px 20px; border:1px solid var(--line); border-radius:24px; background:var(--surface); box-shadow:var(--shadow); }
+.publicShort .publicDestination { color:#06151c; background:#fff; }
+
 @media (min-width: 620px) {
   .quickGrid { grid-template-columns: repeat(3, 1fr); }
   .toolGrid { grid-template-columns: repeat(2, 1fr); }
@@ -571,4 +593,5 @@ body::before {
 
 @media (max-width: 420px) {
   .presentationPair { grid-template-columns: 1fr; }
+  .linkRow { grid-template-columns:1fr; }
 }
