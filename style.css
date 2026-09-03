@@ -565,7 +565,7 @@ body::before {
 .linkResponsibility input { flex:0 0 auto; width:18px; height:18px; margin-top:1px; accent-color:var(--green); }
 .publishedLink { display:grid; gap:8px; padding:14px; border-radius:14px; background:rgba(48,230,166,.09); }
 .publishedLink strong { color:var(--green); }
-.publishedLink span { overflow-wrap:anywhere; color:var(--muted); font-size:12px; }
+.publishedLink span,.publishedLink .publishedUrl { overflow-wrap:anywhere; color:var(--muted); font-size:12px; text-decoration:underline; text-underline-offset:3px; }
 .publicLinkShell { width:min(100%,560px); margin:28px auto; padding:28px 20px; text-align:center; }
 .publicAvatar,.publicBrand { display:grid; place-items:center; width:82px; height:82px; margin:0 auto 16px; border-radius:27px; color:#06151c; background:linear-gradient(135deg,var(--green),var(--blue)); font-size:34px; font-weight:950; box-shadow:var(--shadow); }
 .publicBrand { width:62px; height:62px; border-radius:20px; font-size:26px; }
