@@ -16,6 +16,7 @@
       helpNumbers: "Sortear número: informe o menor e o maior número permitidos. O resultado será escolhido aleatoriamente dentro desse intervalo.",
       helpTeams: "Formar equipes: escreva um nome por linha, informe quantas equipes deseja e toque em Sortear. Os participantes serão embaralhados e distribuídos entre as equipes.",
       closeHelp: "Fechar explicação",
+      presentationCta: "✨ Descubra o EduCashPro",
       affiliateCalc: "Simulador do programa de afiliados", affiliateCalcSub: "Simule os cinco níveis e os critérios de desbloqueio.",
     },
     en: {
@@ -32,6 +33,7 @@
       helpNumbers: "Draw number: enter the lowest and highest allowed numbers. One result will be randomly selected within that range.",
       helpTeams: "Create teams: enter one name per line, choose the number of teams and tap Draw. Participants are shuffled and distributed among the teams.",
       closeHelp: "Close instructions",
+      presentationCta: "✨ Discover EduCashPro",
       affiliateCalc: "Affiliate program simulator", affiliateCalcSub: "Simulate five levels and unlock requirements.",
     },
     es: {
@@ -48,6 +50,7 @@
       helpNumbers: "Sortear número: indica el número menor y el mayor permitidos. El resultado se elegirá aleatoriamente dentro de ese intervalo.",
       helpTeams: "Formar equipos: escribe un nombre por línea, indica cuántos equipos deseas y toca Sortear. Los participantes se mezclarán y distribuirán entre los equipos.",
       closeHelp: "Cerrar explicación",
+      presentationCta: "✨ Descubre EduCashPro",
       affiliateCalc: "Simulador del programa de afiliados", affiliateCalcSub: "Simula cinco niveles y los requisitos de desbloqueo.",
     },
     ru: {
@@ -64,6 +67,7 @@
       helpNumbers: "Случайное число: укажите минимальное и максимальное значения. Результат будет случайно выбран в этом диапазоне.",
       helpTeams: "Создание команд: введите по одному имени в строке, укажите количество команд и нажмите кнопку выбора. Участники будут перемешаны и распределены по командам.",
       closeHelp: "Закрыть инструкцию",
+      presentationCta: "✨ Откройте EduCashPro",
       affiliateCalc: "Симулятор партнёрской программы", affiliateCalcSub: "Пять уровней и условия их открытия.",
     },
   };
@@ -143,9 +147,10 @@
   }
 
   function renderRandomizers() {
-    content().innerHTML = `<button id="drawBack" class="textButton">←</button><section class="hero"><span class="eyebrow">${esc(tr("free"))}</span><h1>🎲 ${esc(tr("drawTitle"))}</h1><p>${esc(tr("drawDesc"))}</p></section><div id="drawHelpOverlay" class="drawHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="drawHelpTitle"><section class="drawHelpCard"><button id="closeDrawHelp" class="drawHelpClose" type="button" aria-label="${esc(tr("closeHelp"))}">✕</button><span class="drawHelpIcon">🎲</span><h2 id="drawHelpTitle">${esc(tr("helpTitle"))}</h2><article><strong>👥 ${esc(tr("names"))}</strong><p>${esc(tr("helpNames"))}</p></article><article><strong>🔢 ${esc(tr("numbers"))}</strong><p>${esc(tr("helpNumbers"))}</p></article><article><strong>🤝 ${esc(tr("teams"))}</strong><p>${esc(tr("helpTeams"))}</p></article></section></div><article class="toolCard"><div class="drawTabs"><button class="filter active" data-draw-tab="names">${esc(tr("names"))}</button><button class="filter" data-draw-tab="numbers">${esc(tr("numbers"))}</button><button class="filter" data-draw-tab="teams">${esc(tr("teams"))}</button></div><div id="drawFields"></div><button id="runDraw" class="wideButton">${esc(tr("draw"))}</button><button id="clearDraw" class="secondaryButton drawClear">${esc(tr("clear"))}</button><div id="localDrawResult" class="resultBox hidden"></div></article>`;
+    content().innerHTML = `<button id="drawBack" class="textButton">←</button><section class="hero"><span class="eyebrow">${esc(tr("free"))}</span><h1>🎲 ${esc(tr("drawTitle"))}</h1><p>${esc(tr("drawDesc"))}</p></section><div id="drawHelpOverlay" class="drawHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="drawHelpTitle"><section class="drawHelpCard"><button id="closeDrawHelp" class="drawHelpClose" type="button" aria-label="${esc(tr("closeHelp"))}">✕</button><span class="drawHelpIcon">🎲</span><h2 id="drawHelpTitle">${esc(tr("helpTitle"))}</h2><article><strong>👥 ${esc(tr("names"))}</strong><p>${esc(tr("helpNames"))}</p></article><article><strong>🔢 ${esc(tr("numbers"))}</strong><p>${esc(tr("helpNumbers"))}</p></article><article><strong>🤝 ${esc(tr("teams"))}</strong><p>${esc(tr("helpTeams"))}</p></article><button id="drawPresentationCta" class="drawPresentationCta" type="button">${esc(tr("presentationCta"))}</button></section></div><article class="toolCard"><div class="drawTabs"><button class="filter active" data-draw-tab="names">${esc(tr("names"))}</button><button class="filter" data-draw-tab="numbers">${esc(tr("numbers"))}</button><button class="filter" data-draw-tab="teams">${esc(tr("teams"))}</button></div><div id="drawFields"></div><button id="runDraw" class="wideButton">${esc(tr("draw"))}</button><button id="clearDraw" class="secondaryButton drawClear">${esc(tr("clear"))}</button><div id="localDrawResult" class="resultBox hidden"></div></article>`;
     document.getElementById("drawBack").onclick = home;
     document.getElementById("closeDrawHelp").onclick = () => document.getElementById("drawHelpOverlay")?.remove();
+    document.getElementById("drawPresentationCta").onclick = () => window.EduCashProApp?.renderPresentation?.();
     let mode = "names";
     const fields = () => {
       const node = document.getElementById("drawFields");
