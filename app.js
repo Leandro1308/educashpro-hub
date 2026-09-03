@@ -1241,5 +1241,5 @@
   });
   window.addEventListener("focus", checkForUpdates);
   document.addEventListener("DOMContentLoaded", init);
-  window.EduCashProApp = { renderNetworkProjection, scanMembershipQr };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, scanMembershipQr };
 })();
