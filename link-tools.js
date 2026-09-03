@@ -15,7 +15,7 @@
       back: "Voltar", free: "ACESSO LIVRE", loading: "Carregando…", error: "Não foi possível concluir. Tente novamente.",
       pageLead: "Crie uma página pública para reunir seus principais links e divulgar seu trabalho.", name: "Nome ou título",
       bio: "Descrição curta", slug: "Endereço personalizado", linkTitle: "Título do botão", destination: "Endereço completo",
-      add: "Adicionar mais um link", save: "Salvar e publicar", saved: "Página publicada com sucesso.", copy: "Copiar endereço",
+      add: "Adicionar mais um link", save: "Salvar e publicar", saved: "Página publicada com sucesso.", copy: "Copiar endereço", share: "Compartilhar página",
       copied: "Endereço copiado.", freeLimit: "A página gratuita permite até 3 links.", proLimit: "Sua assinatura libera até 20 links.",
       hidden: "{count} links estão guardados e temporariamente ocultos. Renove para reativá-los.", unlockTitle: "Libere até 20 links",
       unlockText: "Ative sua assinatura EduCashPro para adicionar mais links e ampliar sua presença digital.", subscribe: "Ativar assinatura",
@@ -25,10 +25,10 @@
       create: "Criar Link Inteligente", myLinks: "Meus links", noLinks: "Você ainda não criou links inteligentes.", remove: "Excluir",
       continueTo: "Continuar para", officialCta: "Conheça o Marketing de Rede do EduCashPro no Telegram",
       officialButton: "Conhecer o EduCashPro", externalNotice: "O destino abaixo foi informado pelo criador deste link. O EduCashPro não controla nem endossa o conteúdo externo.",
-      unavailable: "Este endereço não está disponível.", open: "Abrir", ownerCta: "Crie também sua página no EduCashPro",
+      unavailable: "Este endereço não está disponível.", open: "Abrir", ownerCta: "Crie também sua página no EduCashPro", invalidSlug: "O endereço personalizado precisa ter pelo menos 3 caracteres.", slugInUse: "Esse endereço já está sendo usado. Escolha outro.", nameRequired: "Informe o nome ou título da página.", linkRequired: "Adicione pelo menos um link completo.", rateLimited: "Muitas tentativas em pouco tempo. Aguarde um minuto.", shareText: "Veja minha página de links no EduCashPro",
     },
     en: {
-      pageTitle: "My link page", pageCardSub: "Keep your links on one personalized page", shortTitle: "Smart Link", shortCardSub: "Create a short address with your call to action", back: "Back", free: "FREE ACCESS", loading: "Loading…", error: "Unable to complete. Try again.", pageLead: "Create a public page for your main links and work.", name: "Name or title", bio: "Short description", slug: "Custom address", linkTitle: "Button title", destination: "Full address", add: "Add another link", save: "Save and publish", saved: "Page published successfully.", copy: "Copy address", copied: "Address copied.", freeLimit: "The free page allows up to 3 links.", proLimit: "Your subscription unlocks up to 20 links.", hidden: "{count} links are saved and temporarily hidden. Renew to restore them.", unlockTitle: "Unlock up to 20 links", unlockText: "Activate EduCashPro to add more links and expand your digital presence.", subscribe: "Activate subscription", presentation: "Discover EduCashPro", later: "Not now", responsibility: "I am responsible for the submitted addresses and will not use this tool for fraud, illegal content, malicious pages or rights violations.", accept: "You must accept the responsibility statement.", invalidUrl: "Only complete https:// addresses are accepted.", shortLead: "Turn a long address into a short link with a transparent page before the destination.", buttonLabel: "Button title", create: "Create Smart Link", myLinks: "My links", noLinks: "You have not created smart links yet.", remove: "Delete", continueTo: "Continue to", officialCta: "Discover EduCashPro Network Marketing on Telegram", officialButton: "Discover EduCashPro", externalNotice: "The destination below was submitted by this link's creator. EduCashPro does not control or endorse external content.", unavailable: "This address is unavailable.", open: "Open", ownerCta: "Create your EduCashPro page too",
+      pageTitle: "My link page", pageCardSub: "Keep your links on one personalized page", shortTitle: "Smart Link", shortCardSub: "Create a short address with your call to action", back: "Back", free: "FREE ACCESS", loading: "Loading…", error: "Unable to complete. Try again.", pageLead: "Create a public page for your main links and work.", name: "Name or title", bio: "Short description", slug: "Custom address", linkTitle: "Button title", destination: "Full address", add: "Add another link", save: "Save and publish", saved: "Page published successfully.", copy: "Copy address", share: "Share page", copied: "Address copied.", freeLimit: "The free page allows up to 3 links.", proLimit: "Your subscription unlocks up to 20 links.", hidden: "{count} links are saved and temporarily hidden. Renew to restore them.", unlockTitle: "Unlock up to 20 links", unlockText: "Activate EduCashPro to add more links and expand your digital presence.", subscribe: "Activate subscription", presentation: "Discover EduCashPro", later: "Not now", responsibility: "I am responsible for the submitted addresses and will not use this tool for fraud, illegal content, malicious pages or rights violations.", accept: "You must accept the responsibility statement.", invalidUrl: "Only complete https:// addresses are accepted.", shortLead: "Turn a long address into a short link with a transparent page before the destination.", buttonLabel: "Button title", create: "Create Smart Link", myLinks: "My links", noLinks: "You have not created smart links yet.", remove: "Delete", continueTo: "Continue to", officialCta: "Discover EduCashPro Network Marketing on Telegram", officialButton: "Discover EduCashPro", externalNotice: "The destination below was submitted by this link's creator. EduCashPro does not control or endorse external content.", unavailable: "This address is unavailable.", open: "Open", ownerCta: "Create your EduCashPro page too", invalidSlug: "The custom address must contain at least 3 characters.", slugInUse: "This address is already in use. Choose another.", nameRequired: "Enter the page name or title.", linkRequired: "Add at least one complete link.", rateLimited: "Too many attempts. Wait one minute.", shareText: "View my EduCashPro link page",
     },
     es: {
       pageTitle: "Mi página de enlaces", pageCardSub: "Reúne tus enlaces en una página personalizada", shortTitle: "Enlace Inteligente", shortCardSub: "Crea una dirección corta con tu llamada", back: "Volver", free: "ACCESO LIBRE", loading: "Cargando…", error: "No fue posible completar. Inténtalo de nuevo.", pageLead: "Crea una página pública para reunir tus enlaces y divulgar tu trabajo.", name: "Nombre o título", bio: "Descripción breve", slug: "Dirección personalizada", linkTitle: "Título del botón", destination: "Dirección completa", add: "Añadir otro enlace", save: "Guardar y publicar", saved: "Página publicada correctamente.", copy: "Copiar dirección", copied: "Dirección copiada.", freeLimit: "La página gratuita permite hasta 3 enlaces.", proLimit: "Tu suscripción libera hasta 20 enlaces.", hidden: "{count} enlaces están guardados y ocultos temporalmente. Renueva para reactivarlos.", unlockTitle: "Libera hasta 20 enlaces", unlockText: "Activa tu suscripción EduCashPro para añadir más enlaces y ampliar tu presencia digital.", subscribe: "Activar suscripción", presentation: "Conocer EduCashPro", later: "Ahora no", responsibility: "Declaro que soy responsable de las direcciones añadidas y que no usaré esta herramienta para fraude, contenido ilegal, páginas maliciosas o violación de derechos.", accept: "Debes aceptar la declaración de responsabilidad.", invalidUrl: "Usa solamente direcciones completas que comiencen con https://.", shortLead: "Convierte una dirección larga en un enlace corto con una página transparente antes del destino.", buttonLabel: "Título del botón", create: "Crear Enlace Inteligente", myLinks: "Mis enlaces", noLinks: "Aún no has creado enlaces inteligentes.", remove: "Eliminar", continueTo: "Continuar a", officialCta: "Conoce el Marketing de Red de EduCashPro en Telegram", officialButton: "Conocer EduCashPro", externalNotice: "El destino fue informado por el creador. EduCashPro no controla ni respalda el contenido externo.", unavailable: "Esta dirección no está disponible.", open: "Abrir", ownerCta: "Crea también tu página en EduCashPro",
@@ -38,6 +38,19 @@
     },
   };
 
+  Object.assign(COPY.es, {
+    share: "Compartir página", invalidSlug: "La dirección personalizada debe tener al menos 3 caracteres.",
+    slugInUse: "Esta dirección ya está en uso. Elige otra.", nameRequired: "Indica el nombre o título de la página.",
+    linkRequired: "Añade al menos un enlace completo.", rateLimited: "Demasiados intentos. Espera un minuto.",
+    shareText: "Mira mi página de enlaces en EduCashPro",
+  });
+  Object.assign(COPY.ru, {
+    share: "Поделиться страницей", invalidSlug: "Персональный адрес должен содержать не менее 3 символов.",
+    slugInUse: "Этот адрес уже используется. Выберите другой.", nameRequired: "Укажите имя или заголовок страницы.",
+    linkRequired: "Добавьте хотя бы одну полную ссылку.", rateLimited: "Слишком много попыток. Подождите минуту.",
+    shareText: "Посмотрите мою страницу ссылок EduCashPro",
+  });
+
   function language() { const value = String(session?.profile?.language || params.get("lang") || "pt").toLowerCase(); return COPY[value] ? value : "pt"; }
   function text(key, values = {}) { return Object.entries(values).reduce((value, [name, item]) => value.replace(`{${name}}`, item), COPY[language()][key] || COPY.pt[key] || key); }
   function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
@@ -45,6 +58,12 @@
   function active() { return session?.profile?.active === true; }
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
   function validUrl(value) { try { const url = new URL(String(value)); return url.protocol === "https:"; } catch { return false; } }
+  function slugify(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
+  function requestMessage(error) {
+    const reason = String(error?.message || "");
+    const map = { invalid_slug: "invalidSlug", slug_in_use: "slugInUse", name_required: "nameRequired", link_required: "linkRequired", invalid_link: "invalidUrl", responsibility_required: "accept", rate_limited: "rateLimited" };
+    return text(map[reason] || "error");
+  }
   function openUrl(url) { if (!url) return; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url); if (tg?.openLink) return tg.openLink(url); window.location.assign(url); }
   function toast(message) { const node = document.getElementById("toast"); if (!node) return; node.textContent = message; node.classList.add("show"); setTimeout(() => node.classList.remove("show"), 2300); }
   async function api(path, body, publicRequest = false) { const response = await originalFetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), cache: publicRequest ? "default" : "no-store" }); const data = await response.json().catch(() => ({})); if (!response.ok || data?.ok === false) throw new Error(data?.reason || "REQUEST"); return data; }
@@ -79,19 +98,27 @@
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="40" inputmode="url" pattern="[a-z0-9-]+"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="hidden"></div></article>`;
     document.getElementById("linkBack").onclick = home;
+    const slugInput = document.getElementById("linkSlug");
+    slugInput.addEventListener("input", () => { slugInput.value = slugify(slugInput.value); });
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); };
     bindRowButtons();
     document.getElementById("saveLinkPage").onclick = async () => {
       if (!document.getElementById("linkResponsibility").checked) return toast(text("accept"));
       const edited = [...document.querySelectorAll(".linkRow")].map((row) => ({ title: row.querySelector("[data-link-title]").value.trim(), url: row.querySelector("[data-link-url]").value.trim() })).filter((link) => link.title || link.url);
+      const pageName = document.getElementById("linkName").value.trim();
+      if (!pageName) return toast(text("nameRequired"));
+      if (!edited.length) return toast(text("linkRequired"));
       if (edited.some((link) => !link.title || !validUrl(link.url))) return toast(text("invalidUrl"));
       const links = active() ? edited : [...edited.slice(0, 3), ...storedLinks.slice(3)];
       try {
-        const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: document.getElementById("linkName").value.trim(), bio: document.getElementById("linkBio").value.trim(), slug: document.getElementById("linkSlug").value.trim().toLowerCase(), links }, acceptedResponsibility: true });
+        const normalizedSlug = slugify(document.getElementById("linkSlug").value || pageName);
+        document.getElementById("linkSlug").value = normalizedSlug;
+        const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: pageName, bio: document.getElementById("linkBio").value.trim(), slug: normalizedSlug, links }, acceptedResponsibility: true });
         const slug = data.page?.slug || data.slug; const url = data.publicUrl || publicUrl("page", slug);
-        document.getElementById("publishedLink").className = "publishedLink"; document.getElementById("publishedLink").innerHTML = `<strong>${esc(text("saved"))}</strong><span>${esc(url)}</span><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button>`;
+        document.getElementById("publishedLink").className = "publishedLink"; document.getElementById("publishedLink").innerHTML = `<strong>${esc(text("saved"))}</strong><span>${esc(url)}</span><div class="cardActions"><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button><button id="sharePublished" class="primaryButton">${esc(text("share"))}</button></div>`;
         document.getElementById("copyPublished").onclick = () => navigator.clipboard.writeText(url).then(() => toast(text("copied")));
-      } catch { toast(text("error")); }
+        document.getElementById("sharePublished").onclick = async () => { if (navigator.share) { try { await navigator.share({ title: pageName, text: text("shareText"), url }); return; } catch {} } await navigator.clipboard.writeText(url); toast(text("copied")); };
+      } catch (error) { toast(requestMessage(error)); }
     };
   }
 
