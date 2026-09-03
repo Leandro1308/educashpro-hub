@@ -9,8 +9,32 @@
   <meta http-equiv="Expires" content="0" />
   <title>EduCashPro</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="./style.css?v=20260903.11" />
-  <link rel="stylesheet" href="./visitor-experience.css?v=20260903.11" />
+  <script>
+    window.__EDUCASHPRO_BOOT__ = {
+      startedAt: Date.now(),
+      telegramReady: false,
+      scriptErrors: []
+    };
+
+    window.addEventListener("error", function (event) {
+      var source = event && event.target && event.target.src;
+      if (!source) return;
+      window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);
+      console.error("[EduCashPro] Falha ao carregar recurso:", source);
+    }, true);
+
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        window.__EDUCASHPRO_BOOT__.telegramReady = true;
+      }
+    } catch (error) {
+      console.error("[EduCashPro] Falha ao sinalizar inicialização ao Telegram:", error);
+    }
+  </script>
+  <link rel="stylesheet" href="./style.css?v=20260903.12" />
+  <link rel="stylesheet" href="./visitor-experience.css?v=20260903.12" />
 </head>
 <body>
   <div id="app">
@@ -54,17 +78,30 @@
       <button class="secondaryButton modalCancel" data-close-modal></button>
     </section>
   </div>
-  <script src="./technical-analysis-course.js?v=20260903.11"></script>
-  <script src="./official-community-access.js?v=20260903.11"></script>
-  <script src="./local-tools-and-games.js?v=20260903.11"></script>
-  <script src="./link-tools.js?v=20260903.11"></script>
-  <script src="./app.js?v=20260903.11"></script>
-  <script src="./business-21st-century-course.js?v=20260903.11"></script>
-  <script src="./course-final-notice.js?v=20260903.11"></script>
-  <script src="./video-course-access.js?v=20260903.11"></script>
-  <script src="./visitor-experience.js?v=20260903.11"></script>
-  <script src="./academy-navigation-fix.js?v=20260903.11"></script>
-  <script src="./subscription-redirect-fix.js?v=20260903.11"></script>
+  <script defer src="./technical-analysis-course.js?v=20260903.12"></script>
+  <script defer src="./official-community-access.js?v=20260903.12"></script>
+  <script defer src="./local-tools-and-games.js?v=20260903.12"></script>
+  <script defer src="./link-tools.js?v=20260903.12"></script>
+  <script defer src="./app.js?v=20260903.12"></script>
+  <script defer src="./business-21st-century-course.js?v=20260903.12"></script>
+  <script defer src="./course-final-notice.js?v=20260903.12"></script>
+  <script defer src="./video-course-access.js?v=20260903.12"></script>
+  <script defer src="./visitor-experience.js?v=20260903.12"></script>
+  <script defer src="./academy-navigation-fix.js?v=20260903.12"></script>
+  <script defer src="./subscription-redirect-fix.js?v=20260903.12"></script>
   <script async src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script>
+    window.setTimeout(function () {
+      if (window.__EDUCASHPRO_APP_STARTED__) return;
+      var loadingText = document.getElementById("loadingText");
+      var loader = document.querySelector(".splash .loader");
+      if (loader) loader.hidden = true;
+      if (loadingText) {
+        loadingText.classList.add("error");
+        loadingText.textContent = "Não foi possível iniciar. Feche e abra novamente pelo botão do EduCashPro.";
+      }
+      console.error("[EduCashPro] Tempo limite de inicialização excedido.", window.__EDUCASHPRO_BOOT__);
+    }, 15000);
+  </script>
 </body>
 </html>

@@ -1194,12 +1194,18 @@
   }
 
   async function init() {
+    window.__EDUCASHPRO_APP_STARTED__ = true;
+    try {
+      tg?.ready?.();
+      tg?.expand?.();
+      if (window.__EDUCASHPRO_BOOT__) window.__EDUCASHPRO_BOOT__.telegramReady = Boolean(tg);
+    } catch (error) {
+      console.error("[EduCashPro] Falha ao confirmar inicialização do aplicativo:", error);
+    }
     const publicParams = new URL(window.location.href).searchParams;
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
-    tg?.ready?.();
-    tg?.expand?.();
     document.getElementById("closeButton").onclick = () => tg?.close?.();
     document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
     bottomNav.onclick = (event) => {
