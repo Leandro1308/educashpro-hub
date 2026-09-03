@@ -60,7 +60,10 @@
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
   function validUrl(value) { try { const url = new URL(String(value)); return url.protocol === "https:"; } catch { return false; } }
   function slugify(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
-  function pageSlug(value, pageName) { const raw = String(value || "").trim(); return /^(?:https?|www)[-.:/]|(?:^|-)t-me(?:-|$)/i.test(raw) ? slugify(pageName) : slugify(raw || pageName); }
+  function pageSlug(value, pageName) {
+    const raw = String(value || "").trim().replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 160);
+    return (raw || slugify(pageName)).normalize("NFC");
+  }
   function requestMessage(error) {
     const reason = String(error?.message || "");
     const map = { invalid_slug: "invalidSlug", slug_in_use: "slugInUse", name_required: "nameRequired", link_required: "linkRequired", invalid_link: "invalidUrl", responsibility_required: "accept", rate_limited: "rateLimited" };
@@ -153,10 +156,8 @@
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
-    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="40" inputmode="url" pattern="[a-z0-9-]+"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
+    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="160" inputmode="url" autocomplete="off" spellcheck="false"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
     document.getElementById("linkBack").onclick = home;
-    const slugInput = document.getElementById("linkSlug");
-    slugInput.addEventListener("input", () => { slugInput.value = slugify(slugInput.value); });
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); };
     bindRowButtons();
     if (savedUrl) bindPublishedActions(savedUrl, page.name || session?.profile?.firstName || text("pageTitle"));
