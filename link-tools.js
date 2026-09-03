@@ -68,10 +68,64 @@
   }
   function openUrl(url) { if (!url) return; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url); if (tg?.openLink) return tg.openLink(url); window.location.assign(url); }
   function toast(message) { const node = document.getElementById("toast"); if (!node) return; node.textContent = message; node.classList.add("show"); setTimeout(() => node.classList.remove("show"), 2300); }
+
+  async function copyText(value) {
+    const textValue = String(value || "");
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("clipboard_unavailable");
+      await navigator.clipboard.writeText(textValue);
+    } catch {
+      const field = document.createElement("textarea");
+      field.value = textValue;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+    toast(text("copied"));
+  }
+
+  async function sharePage(url, title) {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text: text("shareText"), url });
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+    const telegramShare = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text("shareText"))}`;
+    if (tg?.openTelegramLink) {
+      tg.openTelegramLink(telegramShare);
+      return;
+    }
+    await copyText(url);
+  }
+
+  function publishedMarkup(url) {
+    return `<strong>${esc(text("saved"))}</strong><a class="publishedUrl" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a><div class="cardActions"><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button><button id="sharePublished" class="primaryButton">${esc(text("share"))}</button></div>`;
+  }
+
+  function bindPublishedActions(url, title) {
+    document.getElementById("copyPublished")?.addEventListener("click", () => copyText(url));
+    document.getElementById("sharePublished")?.addEventListener("click", () => sharePage(url, title));
+  }
+
+  function showPublishedLink(url, title) {
+    const target = document.getElementById("publishedLink");
+    if (!target) return;
+    target.className = "publishedLink";
+    target.innerHTML = publishedMarkup(url);
+    bindPublishedActions(url, title);
+  }
+
   async function api(path, body, publicRequest = false) { const response = await originalFetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), cache: publicRequest ? "default" : "no-store" }); const data = await response.json().catch(() => ({})); if (!response.ok || data?.ok === false) throw new Error(data?.reason || "REQUEST"); return data; }
   function field(label, id, value = "", extra = "") { return `<div class="field"><label for="${id}">${esc(label)}</label><input id="${id}" value="${esc(value)}" ${extra}></div>`; }
   function responsibility() { return `<label class="linkResponsibility"><input id="linkResponsibility" type="checkbox"> <span>${esc(text("responsibility"))}</span></label>`; }
-  function publicUrl(kind, code) { const url = new URL(window.location.href); ["page", "go", "credential", "api", "lang"].forEach((key) => url.searchParams.delete(key)); url.searchParams.set(kind, code); return url.toString(); }
+  function publicUrl(kind, code) { const url = new URL("https://go.educashpro.vip/"); url.searchParams.set(kind, String(code || "")); return url.toString(); }
 
   function showUpgrade() {
     const modal = document.getElementById("accessModal");
@@ -98,12 +152,14 @@
     const storedLinks = Array.isArray(page.links) ? page.links.slice(0, 20) : [];
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
-    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="40" inputmode="url" pattern="[a-z0-9-]+"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="hidden"></div></article>`;
+    const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
+    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="40" inputmode="url" pattern="[a-z0-9-]+"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
     document.getElementById("linkBack").onclick = home;
     const slugInput = document.getElementById("linkSlug");
     slugInput.addEventListener("input", () => { slugInput.value = slugify(slugInput.value); });
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); };
     bindRowButtons();
+    if (savedUrl) bindPublishedActions(savedUrl, page.name || session?.profile?.firstName || text("pageTitle"));
     document.getElementById("saveLinkPage").onclick = async () => {
       if (!document.getElementById("linkResponsibility").checked) return toast(text("accept"));
       const edited = [...document.querySelectorAll(".linkRow")].map((row) => ({ title: row.querySelector("[data-link-title]").value.trim(), url: row.querySelector("[data-link-url]").value.trim() })).filter((link) => link.title || link.url);
@@ -117,9 +173,7 @@
         document.getElementById("linkSlug").value = normalizedSlug;
         const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: pageName, bio: document.getElementById("linkBio").value.trim(), slug: normalizedSlug, links }, acceptedResponsibility: true });
         const slug = data.page?.slug || data.slug; const url = data.publicUrl || publicUrl("page", slug);
-        document.getElementById("publishedLink").className = "publishedLink"; document.getElementById("publishedLink").innerHTML = `<strong>${esc(text("saved"))}</strong><span>${esc(url)}</span><div class="cardActions"><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button><button id="sharePublished" class="primaryButton">${esc(text("share"))}</button></div>`;
-        document.getElementById("copyPublished").onclick = () => navigator.clipboard.writeText(url).then(() => toast(text("copied")));
-        document.getElementById("sharePublished").onclick = async () => { if (navigator.share) { try { await navigator.share({ title: pageName, text: text("shareText"), url }); return; } catch {} } await navigator.clipboard.writeText(url); toast(text("copied")); };
+        showPublishedLink(url, pageName);
       } catch (error) { toast(requestMessage(error)); }
     };
   }
@@ -142,7 +196,7 @@
   }
   async function loadShorts() {
     const target = document.getElementById("shortList");
-    try { const data = await api("/api/hub/short-links", { token: session?.token }); const items = Array.isArray(data.items) ? data.items : []; target.innerHTML = items.length ? items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">✂️</div><div><h3>${esc(item.label)}</h3><p>${esc(item.publicUrl || publicUrl("go", item.code))}</p></div></div><div class="cardActions"><button class="secondaryButton" data-copy-short="${esc(item.publicUrl || publicUrl("go", item.code))}">${esc(text("copy"))}</button><button class="secondaryButton" data-remove-short="${esc(item.id || item.code)}">🗑️ ${esc(text("remove"))}</button></div></article>`).join("") : `<div class="empty">${esc(text("noLinks"))}</div>`; target.querySelectorAll("[data-copy-short]").forEach((button) => button.onclick = () => navigator.clipboard.writeText(button.dataset.copyShort).then(() => toast(text("copied")))); target.querySelectorAll("[data-remove-short]").forEach((button) => button.onclick = async () => { await api("/api/hub/short-links/delete", { token: session?.token, id: button.dataset.removeShort }); loadShorts(); }); } catch { target.innerHTML = `<div class="empty error">${esc(text("error"))}</div>`; }
+    try { const data = await api("/api/hub/short-links", { token: session?.token }); const items = Array.isArray(data.items) ? data.items : []; target.innerHTML = items.length ? items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">✂️</div><div><h3>${esc(item.label)}</h3><p>${esc(item.publicUrl || publicUrl("go", item.code))}</p></div></div><div class="cardActions"><button class="secondaryButton" data-copy-short="${esc(item.publicUrl || publicUrl("go", item.code))}">${esc(text("copy"))}</button><button class="secondaryButton" data-remove-short="${esc(item.id || item.code)}">🗑️ ${esc(text("remove"))}</button></div></article>`).join("") : `<div class="empty">${esc(text("noLinks"))}</div>`; target.querySelectorAll("[data-copy-short]").forEach((button) => button.onclick = () => copyText(button.dataset.copyShort)); target.querySelectorAll("[data-remove-short]").forEach((button) => button.onclick = async () => { await api("/api/hub/short-links/delete", { token: session?.token, id: button.dataset.removeShort }); loadShorts(); }); } catch { target.innerHTML = `<div class="empty error">${esc(text("error"))}</div>`; }
   }
 
   async function bootPublic(searchParams) {
