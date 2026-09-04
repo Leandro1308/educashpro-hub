@@ -180,31 +180,48 @@
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
-    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="160" inputmode="url" autocomplete="off" spellcheck="false"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
+    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="160" inputmode="url" autocomplete="off" spellcheck="false"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
     document.getElementById("linkBack").onclick = home;
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); };
     bindRowButtons();
+    bindImagePickers();
     if (savedUrl) bindPublishedActions(savedUrl, page.name || session?.profile?.firstName || text("pageTitle"));
     document.getElementById("saveLinkPage").onclick = async () => {
       if (!document.getElementById("linkResponsibility").checked) return toast(text("accept"));
-      const edited = [...document.querySelectorAll(".linkRow")].map((row) => ({ title: row.querySelector("[data-link-title]").value.trim(), url: row.querySelector("[data-link-url]").value.trim() })).filter((link) => link.title || link.url);
+      const rows = [...document.querySelectorAll(".linkRow")];
+      const edited = rows.map((row) => ({ title: row.querySelector("[data-link-title]").value.trim(), url: row.querySelector("[data-link-url]").value.trim(), row })).filter((link) => link.title || link.url);
       const pageName = document.getElementById("linkName").value.trim();
       if (!pageName) return toast(text("nameRequired"));
       if (!edited.length) return toast(text("linkRequired"));
       if (edited.some((link) => !link.title || !validUrl(link.url))) return toast(text("invalidUrl"));
-      const links = active() ? edited : [...edited.slice(0, 3), ...storedLinks.slice(3)];
       try {
+        const saveButton = document.getElementById("saveLinkPage"); saveButton.disabled = true; saveButton.textContent = text("imageUploading");
+        const profilePicker = document.querySelector('[data-image-kind="profile"]');
+        let profileImage = profilePicker?.dataset.imageUrl ? { url: profilePicker.dataset.imageUrl, publicId: profilePicker.dataset.imagePublicId } : null;
+        const profileFile = profilePicker?.querySelector("[data-image-input]")?.selectedFile;
+        if (profileFile) profileImage = await uploadPageImage(profileFile, 640);
+        const prepared = [];
+        for (const item of edited) {
+          const picker = item.row.querySelector('[data-image-kind="link"]');
+          let thumbnail = picker?.dataset.imageUrl ? { url: picker.dataset.imageUrl, publicId: picker.dataset.imagePublicId } : null;
+          const file = picker?.querySelector("[data-image-input]")?.selectedFile;
+          if (file) thumbnail = await uploadPageImage(file, 192);
+          prepared.push({ title: item.title, url: item.url, thumbnail });
+        }
+        const links = active() ? prepared : [...prepared.slice(0, 3), ...storedLinks.slice(3)];
         const normalizedSlug = pageSlug(document.getElementById("linkSlug").value, pageName);
         document.getElementById("linkSlug").value = normalizedSlug;
-        const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: pageName, bio: document.getElementById("linkBio").value.trim(), slug: normalizedSlug, links }, acceptedResponsibility: true });
+        const data = await api("/api/hub/link-page/save", { token: session?.token, page: { name: pageName, bio: document.getElementById("linkBio").value.trim(), slug: normalizedSlug, profileImage, links }, acceptedResponsibility: true });
         const slug = data.page?.slug || data.slug; const url = data.publicUrl || publicUrl("page", slug);
         showPublishedLink(url, pageName);
-      } catch (error) { toast(requestMessage(error)); }
+      } catch (error) { toast(error?.message === "IMAGE" ? text("imageError") : requestMessage(error)); }
+      finally { const button = document.getElementById("saveLinkPage"); if (button) { button.disabled = false; button.textContent = text("save"); } }
     };
   }
 
-  function linkRow(link) { return `<div class="linkRow">${field(text("linkTitle"), "", link.title || "", 'data-link-title maxlength="60"')}${field(text("destination"), "", link.url || "", 'data-link-url type="url" inputmode="url" placeholder="https://"')}<button class="linkRemove" type="button" aria-label="${esc(text("remove"))}">✕</button></div>`; }
-  function bindRowButtons() { document.querySelectorAll(".linkRemove").forEach((button) => button.onclick = () => button.closest(".linkRow")?.remove()); }
+  function linkRow(link) { return `<div class="linkRow">${imagePicker(text("linkPhoto"), "link", link.thumbnail)}${field(text("linkTitle"), "", link.title || "", 'data-link-title maxlength="60"')}${field(text("destination"), "", link.url || "", 'data-link-url type="url" inputmode="url" placeholder="https://"')}<button class="linkRemove" type="button" aria-label="${esc(text("remove"))}">✕</button></div>`; }
+  function bindImagePickers(root = document) { root.querySelectorAll(".imagePicker").forEach((picker) => { if (picker.dataset.bound) return; picker.dataset.bound = "1"; const input = picker.querySelector("[data-image-input]"), preview = picker.querySelector(".imagePreview"); input.onchange = () => { const file = input.files?.[0]; if (!file) return; if (!/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) { input.value = ""; return toast(text("imageError")); } input.selectedFile = file; preview.innerHTML = `<img src="${esc(URL.createObjectURL(file))}" alt="">`; }; picker.querySelector(".imageRemove").onclick = () => { input.value = ""; input.selectedFile = null; picker.dataset.imageUrl = ""; picker.dataset.imagePublicId = ""; preview.innerHTML = "<div>📷</div>"; }; }); }
+  function bindRowButtons() { document.querySelectorAll(".linkRemove").forEach((button) => button.onclick = () => button.closest(".linkRow")?.remove()); bindImagePickers(document.getElementById("linkRows")); }
 
   async function renderShortener() {
     content().innerHTML = `<button id="shortBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>✂️ ${esc(text("shortTitle"))}</h1><p>${esc(text("shortLead"))}</p></section><article class="toolCard linkEditor">${field(text("destination"), "shortDestination", "", 'type="url" inputmode="url" placeholder="https://"')}${field(text("buttonLabel"), "shortLabel", "", 'maxlength="60"')}${responsibility()}<button id="createShort" class="wideButton">${esc(text("create"))}</button></article><section class="sectionHead"><div><h2>${esc(text("myLinks"))}</h2></div></section><div id="shortList" class="cardList"><div class="empty">${esc(text("loading"))}</div></div>`;
@@ -238,7 +255,7 @@
   function renderPublicPage(page) {
     if (!page) throw new Error("NOT_FOUND");
     const links = Array.isArray(page.links) ? page.links : [];
-    content().innerHTML = `<section class="publicLinkShell"><div class="publicAvatar">${esc(String(page.name || "E").slice(0, 1).toUpperCase())}</div><h1>${esc(page.name)}</h1><p>${esc(page.bio || "")}</p><div class="publicButtons">${links.map((link) => `<button data-public-url="${esc(link.url)}">${esc(link.title)}</button>`).join("")}</div><button id="publicAffiliate" class="publicAffiliate">✨ ${esc(page.affiliateCtaLabel || text("ownerCta"))}</button><small>EduCashPro</small></section>`;
+    content().innerHTML = `<section class="publicLinkShell"><div class="publicAvatar">${page.profileImage?.url ? `<img src="${esc(page.profileImage.url)}" alt="${esc(page.name)}">` : esc(String(page.name || "E").slice(0, 1).toUpperCase())}</div><h1>${esc(page.name)}</h1><p>${esc(page.bio || "")}</p><div class="publicButtons">${links.map((link) => `<button data-public-url="${esc(link.url)}">${link.thumbnail?.url ? `<img src="${esc(link.thumbnail.url)}" alt="">` : ""}<span>${esc(link.title)}</span></button>`).join("")}</div><button id="publicAffiliate" class="publicAffiliate">✨ ${esc(page.affiliateCtaLabel || text("ownerCta"))}</button><small>EduCashPro</small></section>`;
     content().querySelectorAll("[data-public-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.publicUrl)); document.getElementById("publicAffiliate").onclick = () => openUrl(page.affiliateUrl || page.officialUrl);
   }
   function renderPublicShort(link) {
