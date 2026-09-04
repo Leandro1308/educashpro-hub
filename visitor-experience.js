@@ -317,7 +317,12 @@
     const uploadResponse = await originalFetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signatureData.cloudName)}/image/upload`, { method: "POST", body: form });
     const uploaded = await uploadResponse.json().catch(() => ({}));
     if (!uploadResponse.ok || !uploaded.secure_url) throw new Error("upload");
+    const previousPublicId = ui.publicId?.value || "";
     ui.logoUrl.value = uploaded.secure_url;
+    if (ui.publicId) ui.publicId.value = uploaded.public_id || "";
+    if (previousPublicId && previousPublicId !== uploaded.public_id) {
+      originalFetch(`${API_BASE}/api/hub/media/delete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token: visitorState.session?.token || "", publicId: previousPublicId }), cache: "no-store" }).catch(() => {});
+    }
     ui.preview.innerHTML = `<img src="${escapeHtml(uploaded.secure_url)}" alt="">`;
     ui.preview.classList.add("ready");
     ui.status.textContent = tr("logoReady");
@@ -338,11 +343,12 @@
 
     const field = document.createElement("div");
     field.className = "field fullField partnerLogoField";
-    field.innerHTML = `<label>${escapeHtml(tr("logo"))}</label><div class="partnerLogoUpload"><div class="partnerLogoPreview"><span>🏪</span></div><div class="partnerLogoControls"><label class="secondaryButton partnerLogoButton">${escapeHtml(tr("logoChoose"))}<input id="partnerLogoFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><small>${escapeHtml(tr("logoHelp"))}</small><span class="partnerLogoStatus"></span></div></div><input id="logoUrl" type="hidden" value="">`;
+    field.innerHTML = `<label>${escapeHtml(tr("logo"))}</label><div class="partnerLogoUpload"><div class="partnerLogoPreview"><span>🏪</span></div><div class="partnerLogoControls"><label class="secondaryButton partnerLogoButton">${escapeHtml(tr("logoChoose"))}<input id="partnerLogoFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><small>${escapeHtml(tr("logoHelp"))}</small><span class="partnerLogoStatus"></span></div></div><input id="logoUrl" type="hidden" value=""><input id="logoPublicId" type="hidden" value="">`;
     companyName.closest(".field")?.insertAdjacentElement("beforebegin", field);
 
     const fileInput = field.querySelector("#partnerLogoFile");
     const logoUrl = field.querySelector("#logoUrl");
+    const publicId = field.querySelector("#logoPublicId");
     const preview = field.querySelector(".partnerLogoPreview");
     const status = field.querySelector(".partnerLogoStatus");
     const submit = document.getElementById("submitForm");
@@ -350,7 +356,7 @@
       const file = fileInput.files?.[0];
       if (!file) return;
       try {
-        await uploadPartnerLogo(file, { logoUrl, preview, status, submit });
+        await uploadPartnerLogo(file, { logoUrl, publicId, preview, status, submit });
       } catch (error) {
         logoUrl.value = "";
         status.textContent = error?.message === "not_configured" ? tr("logoConfig") : tr("logoError");
