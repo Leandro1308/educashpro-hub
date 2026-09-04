@@ -495,14 +495,7 @@ body::before {
 .solarienBenefitGrid span { font-size: 29px; }
 .solarienBenefitGrid h3 { margin: 11px 0 5px; color: #164c3c; font-size: 17px; }
 .solarienBenefitGrid p { margin: 0; color: #637d75; font-size: 13px; line-height: 1.5; }
-.sunaraChoiceGrid { display: grid; gap: 14px; margin-top: 28px; }
-.sunaraChoice { display: flex; flex-direction: column; padding: 22px; border: 1px solid #d8ebe3; border-radius: 20px; background: #f7fbf9; box-shadow: 0 10px 30px rgba(21,89,64,.07); }
-.sunaraChoice > span { font-size: 32px; }
-.sunaraChoice h3 { margin: 12px 0 6px; color: #164c3c; font-size: 18px; }
-.sunaraChoice p { flex: 1; margin: 0 0 17px; color: #637d75; font-size: 13px; line-height: 1.55; }
-.sunaraChoice .solarienPrimary { width: 100%; }
 .solarienIncome { padding: 58px 22px; background: linear-gradient(145deg, #effbf4, #dff7ea); }
-.sunaraIncomeButton { width: 100%; margin-top: 18px; }
 .solarienSteps { display: grid; gap: 22px; margin-top: 28px; }
 .solarienSteps article { display: flex; gap: 15px; }
 .solarienSteps b { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 50%; color: #fff; background: #0ca864; }
@@ -515,8 +508,6 @@ body::before {
 .solarienFinal p { color: #c6e2d7; }
 .solarienFinal .solarienPrimary { width: 100%; margin-top: 12px; }
 .solarienFinal > small { display: block; margin-top: 20px; color: #85a99b; font-size: 10px; line-height: 1.5; }
-.sunaraFinalActions { display: grid; gap: 9px; margin-top: 20px; }
-.sunaraFinalActions button { min-height: 48px; padding: 12px 14px; border: 1px solid rgba(111,246,175,.3); border-radius: 13px; color: #dff8eb; background: rgba(45,205,121,.1); font-weight: 850; }
 .solarienFooter { padding: 19px 22px 28px; color: #91aaa1; background: #06271f; font-size: 10px; text-align: center; }
 .providerLine { display: grid; gap: 7px; margin-top: 13px; padding: 11px; border-radius: 12px; background: rgba(74,140,255,.08); color: #c7d8ea; font-size: 11px; line-height: 1.4; }
 .freeChip { color: #bff9e5; background: rgba(48,230,166,.11); }
@@ -587,8 +578,6 @@ body::before {
   .solarienActions { grid-template-columns: 1fr 1fr; max-width: 560px; }
   .solarienProof { grid-template-columns: repeat(3, auto); justify-content: start; gap: 22px; }
   .solarienBenefitGrid { grid-template-columns: 1fr 1fr; }
-  .sunaraChoiceGrid { grid-template-columns: 1fr 1fr; }
-  .sunaraFinalActions { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 420px) {
