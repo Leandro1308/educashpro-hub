@@ -495,18 +495,27 @@
 
   function renderHome() {
     const p = state.profile;
+    const supportLabels = {
+      pt: ["Fale com o administrador", "Relate problemas, falhas ou envie sugestões"],
+      en: ["Contact the administrator", "Report problems, failures or send suggestions"],
+      es: ["Hablar con el administrador", "Informa problemas, fallas o envía sugerencias"],
+      ru: ["Связаться с администратором", "Сообщите о проблеме, ошибке или предложении"],
+    };
+    const supportLabel = supportLabels[state.language] || supportLabels.pt;
     const activeCards = `
       ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
       ${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}
       ${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
+      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}
       ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
       ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
       ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
     const inactiveCards = `
       ${quickCard("course:fundamentos_marketing_rede", "🌱", t("freeCourse"), localized(state.courseCatalog.find((item) => item.id === "fundamentos_marketing_rede")?.title))}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
+      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}
       ${lockedExperienceCard("communities", "👥", t("lockedGroups"), t("lockedGroupsDesc"))}
       ${lockedExperienceCard("bots", "🤖", t("lockedBots"), t("lockedBotsDesc"))}
       ${lockedExperienceCard("channels", "📣", t("lockedChannels"), t("lockedChannelsDesc"))}
@@ -528,7 +537,7 @@
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
+      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign(`./support.html?api=${encodeURIComponent(API_BASE)}`); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
