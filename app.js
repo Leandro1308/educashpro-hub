@@ -446,12 +446,31 @@
 
   function closeModal() { document.getElementById("accessModal").classList.add("hidden"); }
 
+  const pendingApiRequests = new Map();
   async function api(path, payload = {}) {
-    const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store" });
-    const data = await response.json().catch(() => ({}));
-    if (response.status === 401) throw new Error("SESSION");
-    if (!response.ok) throw new Error(data.reason || "REQUEST");
-    return data;
+    const requestKey = path + JSON.stringify(payload);
+    if (pendingApiRequests.has(requestKey)) return pendingApiRequests.get(requestKey);
+    const request = (async () => {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 12000);
+      document.body.classList.add("api-busy");
+      try {
+        const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store", signal: controller.signal });
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) throw new Error("SESSION");
+        if (!response.ok) throw new Error(data.reason || "REQUEST");
+        return data;
+      } catch (error) {
+        if (error?.name === "AbortError") throw new Error("TIMEOUT");
+        throw error;
+      } finally {
+        window.clearTimeout(timeout);
+        pendingApiRequests.delete(requestKey);
+        if (!pendingApiRequests.size) document.body.classList.remove("api-busy");
+      }
+    })();
+    pendingApiRequests.set(requestKey, request);
+    return request;
   }
 
   function updateNav() {
