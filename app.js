@@ -312,7 +312,14 @@
     },
   };
 
-  function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
+  const AGENDA_COPY = {
+    pt: { agenda: "Agenda profissional", agendaSub: "Organize serviços, clientes e horários" },
+    en: { agenda: "Professional schedule", agendaSub: "Organize services, clients and appointments" },
+    es: { agenda: "Agenda profesional", agendaSub: "Organiza servicios, clientes y horarios" },
+    ru: { agenda: "Профессиональная запись", agendaSub: "Услуги, клиенты и расписание" },
+  };
+
+  function t(key) { return AGENDA_COPY[state.language]?.[key] || EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || AGENDA_COPY.pt[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function benefitNavigationCopy(key) {
@@ -419,6 +426,10 @@
   }
 
   function subscribeNow() { openSubscription(); }
+  function openAgenda(publicId = "") {
+    const query = publicId ? `?agenda=${encodeURIComponent(publicId)}` : "";
+    window.location.assign(`./agenda.html${query}`);
+  }
 
   function showLockedInfo(item) {
     const modal = document.getElementById("accessModal");
@@ -470,11 +481,13 @@
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
       ${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}
       ${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}
+      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
       ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
       ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
       ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
     const inactiveCards = `
       ${quickCard("course:fundamentos_marketing_rede", "🌱", t("freeCourse"), localized(state.courseCatalog.find((item) => item.id === "fundamentos_marketing_rede")?.title))}
+      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
       ${lockedExperienceCard("communities", "👥", t("lockedGroups"), t("lockedGroupsDesc"))}
       ${lockedExperienceCard("bots", "🤖", t("lockedBots"), t("lockedBotsDesc"))}
       ${lockedExperienceCard("channels", "📣", t("lockedChannels"), t("lockedChannelsDesc"))}
@@ -496,7 +509,7 @@
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "tools") renderTools(); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
+      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
@@ -1134,6 +1147,11 @@
       if (receivedCredential && Number(receivedPayload?.validUntil || 0) !== Number(cachedPayload?.validUntil || 0)) localStorage.setItem("educashpro:membership-credential", receivedCredential);
       state.membershipCredential = Number(cachedPayload?.validUntil || 0) === Number(receivedPayload?.validUntil || 0) && cachedCredential ? cachedCredential : receivedCredential;
       state.language = session.profile.language || "pt";
+      const startParam = String(tg?.initDataUnsafe?.start_param || publicParams.get("tgWebAppStartParam") || "");
+      if (startParam.startsWith("agenda_")) {
+        openAgenda(startParam.slice(7));
+        return;
+      }
       await loadCourseCatalog();
       applyLanguage();
       bottomNav.classList.remove("hidden");
