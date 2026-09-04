@@ -584,3 +584,5 @@ body::before {
   .presentationPair { grid-template-columns: 1fr; }
   .linkRow { grid-template-columns:1fr; }
 }
+
+body.api-busy{cursor:progress}body.api-busy button{pointer-events:none}
