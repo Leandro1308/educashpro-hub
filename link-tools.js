@@ -52,6 +52,11 @@
     shareText: "Посмотрите мою страницу ссылок EduCashPro",
   });
 
+  Object.assign(COPY.pt,{profilePhoto:"Foto do perfil da página",linkPhoto:"Miniatura do link",choosePhoto:"Escolher foto",removePhoto:"Remover foto",imageError:"Não foi possível enviar a imagem. Use JPG, PNG ou WebP.",imageUploading:"Enviando imagens…"});
+  Object.assign(COPY.en,{profilePhoto:"Page profile photo",linkPhoto:"Link thumbnail",choosePhoto:"Choose photo",removePhoto:"Remove photo",imageError:"Could not upload the image. Use JPG, PNG or WebP.",imageUploading:"Uploading images…"});
+  Object.assign(COPY.es,{profilePhoto:"Foto de perfil de la página",linkPhoto:"Miniatura del enlace",choosePhoto:"Elegir foto",removePhoto:"Eliminar foto",imageError:"No fue posible enviar la imagen. Usa JPG, PNG o WebP.",imageUploading:"Subiendo imágenes…"});
+  Object.assign(COPY.ru,{profilePhoto:"Фото профиля страницы",linkPhoto:"Миниатюра ссылки",choosePhoto:"Выбрать фото",removePhoto:"Удалить фото",imageError:"Не удалось загрузить изображение. Используйте JPG, PNG или WebP.",imageUploading:"Загрузка изображений…"});
+
   function language() { const value = String(session?.profile?.language || params.get("lang") || "pt").toLowerCase(); return COPY[value] ? value : "pt"; }
   function text(key, values = {}) { return Object.entries(values).reduce((value, [name, item]) => value.replace(`{${name}}`, item), COPY[language()][key] || COPY.pt[key] || key); }
   function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
@@ -126,6 +131,25 @@
   }
 
   async function api(path, body, publicRequest = false) { const response = await originalFetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), cache: publicRequest ? "default" : "no-store" }); const data = await response.json().catch(() => ({})); if (!response.ok || data?.ok === false) throw new Error(data?.reason || "REQUEST"); return data; }
+  async function compressImage(file, maxSize) {
+    if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) throw new Error("IMAGE");
+    const bitmap = await createImageBitmap(file), scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(bitmap.width * scale)); canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close?.();
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("IMAGE")), "image/webp", .82));
+  }
+  async function uploadPageImage(file, maxSize) {
+    const sign = await api("/api/hub/link-page/media-signature", { token: session?.token }), blob = await compressImage(file, maxSize), form = new FormData();
+    form.append("file", blob, "image.webp"); form.append("api_key", sign.apiKey); form.append("timestamp", String(sign.timestamp)); form.append("folder", sign.folder); form.append("signature", sign.signature);
+    const response = await originalFetch(`https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`, { method: "POST", body: form }), data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.secure_url || !data.public_id) throw new Error("IMAGE");
+    return { url: data.secure_url, publicId: data.public_id };
+  }
+  function imagePicker(label, kind, media) {
+    const value = media?.url || "", publicId = media?.publicId || "";
+    return `<div class="imagePicker" data-image-kind="${kind}" data-image-url="${esc(value)}" data-image-public-id="${esc(publicId)}"><span>${esc(label)}</span><div class="imagePreview">${value ? `<img src="${esc(value)}" alt="">` : `<div>📷</div>`}</div><label class="secondaryButton imageChoose">${esc(text("choosePhoto"))}<input type="file" accept="image/jpeg,image/png,image/webp" hidden data-image-input></label><button type="button" class="textButton imageRemove">${esc(text("removePhoto"))}</button></div>`;
+  }
+
   function field(label, id, value = "", extra = "") { return `<div class="field"><label for="${id}">${esc(label)}</label><input id="${id}" value="${esc(value)}" ${extra}></div>`; }
   function responsibility() { return `<label class="linkResponsibility"><input id="linkResponsibility" type="checkbox"> <span>${esc(text("responsibility"))}</span></label>`; }
   function publicUrl(kind, code) { const url = new URL("https://go.educashpro.vip/"); url.searchParams.set(kind, String(code || "")); return url.toString(); }
