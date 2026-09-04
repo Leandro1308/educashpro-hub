@@ -8,12 +8,6 @@
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "https://educashpro-all.onrender.com";
   const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
-  const SUNARA_URLS = Object.freeze({
-    partner: "https://sunarapartners.com/?ref=leandronascimentopsi",
-    quiz: "https://sunara.solar/quiz?ref=leandronascimentopsi",
-    discount: "https://sunara.solar/?ref=leandronascimentopsi",
-    panels: "https://sunara.solar/placas?ref=leandronascimentopsi",
-  });
   const MEMBERSHIP_PUBLIC_KEY_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeIVIbmPd6xtE6PECnwl9SdqUThN0MGYDulK88/0vzgDJIRFiU53leJ9hLflBm4fSwvbEGUIniofTmHgWylwAPA==";
 
   const state = {
@@ -70,73 +64,6 @@
     },
     ru: {
       subtitle: "Ваша вселенная в одном месте", loading: "Организуем ваш опыт…", navHome: "Главная", navLearn: "Учиться", navExplore: "Обзор", navBenefits: "Бонусы", navArea: "Мой раздел", welcome: "Добро пожаловать", active: "Подписка активна", inactive: "Подписка неактивна", validUntil: "Действует до", heroActive: "Учитесь, находите возможности и развивайте цифровое присутствие.", heroInactive: "Изучите EduCashPro и возобновите подписку, чтобы открыть курсы и преимущества.", yourSpace: "Ваше пространство", yourSpaceSub: "Всё организовано для вас", courses: "Academy", coursesSub: "Курсы и материалы", explore: "Обзор", exploreSub: "Группы, каналы, боты и страницы", benefits: "Преимущества", benefitsSub: "Эксклюзивные возможности", tools: "Инструменты", toolsSub: "Калькуляторы и задания", projects: "Мои проекты", projectsSub: "Следите за публикациями", network: "Пригласить", networkSub: "Поделиться ссылкой", learnTitle: "EduCashPro Academy", learnDesc: "Организованное обучение без множества сообщений в чате.", presentation: "Начните здесь", presentationDesc: "Цифровые активы, Web3 и EduCashPro.", academy: "EduCashPro Academy", academyDesc: "Финансовая грамотность, Telegram, Web3, сетевой маркетинг и новая экономика.", openCourse: "Открыть курс", locked: "Нужна активная подписка", toolsTitle: "Образовательные инструменты", interest: "Калькулятор сложного процента", initial: "Начальная сумма", monthly: "Ежемесячный взнос", rate: "Процент в месяц (%)", months: "Месяцы", calculate: "Рассчитать", futureValue: "Прогноз", quiz: "Финансовое задание", quizQuestion: "Что лучше всего описывает актив?", quizA: "Регулярный расход", quizB: "То, что может приносить ценность или доход", quizC: "Импульсивная покупка", correct: "Отлично! Вы определили понятие.", wrong: "Почти. Актив способен приносить ценность или доход.", exploreTitle: "Отобранные проекты", exploreDesc: "Выберите категорию и просматривайте удобный список.", all: "Все", groups: "Группы", channels: "Каналы", bots: "Боты", pages: "Сайты и страницы", access: "Открыть", noItems: "Нет доступных элементов.", previous: "Назад", next: "Далее", page: "Страница", sample: "Вы видите образец. Возобновите подписку для полного каталога.", benefitsTitle: "Клуб преимуществ", benefitsDesc: "Отобранные преимущества для подписчиков EduCashPro.", unlock: "Возобновить", openBenefit: "Открыть преимущество", areaTitle: "Мой раздел", member: "Участник EduCashPro", affiliate: "Моя реферальная ссылка", copy: "Копировать", copied: "Ссылка скопирована", myProjects: "Мои проекты", noProjects: "У вас пока нет проектов.", openBot: "Открыть бот для управления", officialCommunity: "Официальное сообщество", officialCommunitySub: "Следите за новостями и участвуйте в сообществе EduCashPro.", officialChannel: "Официальный канал EduCashPro", officialChannelSub: "Официальные объявления, новости и материалы.", officialGroup: "Официальная группа EduCashPro", officialGroupSub: "Общайтесь и участвуйте в сообществе.", openTelegram: "Открыть в Telegram", expires: "Сессия истекла. Закройте и откройте снова через бот.", telegramOnly: "Откройте страницу кнопкой EduCashPro внутри Telegram.", error: "Не удалось загрузить. Попробуйте снова.", back: "Назад", chapters: "Главы", lesson: "Урок", continue: "Продолжить", books: "Рекомендуемые книги", reactivate: "Возобновить в боте",
-    },
-  };
-
-  const SUNARA_COPY = {
-    pt: {
-      cardTitle: "Economize na conta de luz e descubra novas oportunidades",
-      cardText: "Conheça as soluções da Sunara para economia de energia, indicação de clientes e instalação de placas solares.",
-      cardButton: "Conhecer benefício",
-      lockedTitle: "Uma nova oportunidade já está disponível",
-      lockedText: "Assinantes ativos podem simular economia na conta de luz, solicitar desconto, instalar placas solares ou atuar como Agente Sunara indicando novos clientes.",
-      lockedAction: "Ativar assinatura",
-      badge: "BENEFÍCIO PARA ASSINANTES",
-      title: "Sua conta de luz pode valer menos. Sua indicação pode valer mais.",
-      lead: "O EduCashPro seleciona produtos, propostas e soluções que podem gerar valor real. Agora, assinantes ativos encontram quatro caminhos da Sunara organizados em um só lugar.",
-      primary: "Ver meu desconto",
-      secondary: "Entender como funciona",
-      noCost: "Sem custo inicial",
-      noWork: "Sem obras",
-      noPanels: "Sem instalar placas",
-      aboutEyebrow: "ENERGIA POR ASSINATURA",
-      aboutTitle: "Economia de energia sem mudar a rotina",
-      aboutText: "A Sunara conecta clientes elegíveis a soluções de energia sustentável. Na energia por assinatura, a distribuição continua pela rede convencional, sem obra e sem instalação de painéis no imóvel.",
-      choicesTitle: "Escolha o que você quer fazer",
-      choices: [
-        ["partner", "🤝", "Quero ser Agente Sunara", "Cadastre-se gratuitamente para indicar pessoas e empresas. A comissão é liberada conforme as regras e a ativação do cliente.", "Cadastrar como agente"],
-        ["quiz", "🧮", "Quiz de Economia", "Responda algumas perguntas e descubra uma estimativa de quanto poderá economizar na conta de energia.", "Fazer o quiz"],
-        ["discount", "💡", "Quero desconto na conta", "Inicie a análise da sua fatura e veja as condições de desconto disponíveis para o seu perfil e sua região.", "Ver meu desconto"],
-        ["panels", "☀️", "Quero instalar placas solares", "Acesse a solução indicada para quem deseja gerar energia com placas solares instaladas no imóvel.", "Conhecer placas solares"],
-      ],
-      benefitsTitle: "Uma solução pensada para pessoas e empresas",
-      benefits: [
-        ["☀️", "Energia renovável", "Consumo associado a fontes limpas e sustentáveis."],
-        ["💡", "Economia na conta", "Condições comerciais apresentadas durante a contratação."],
-        ["📱", "Processo digital", "Cadastro e acompanhamento realizados pela plataforma Sunara."],
-        ["🏠", "Sem instalação", "Não é necessário instalar placas solares no imóvel."],
-      ],
-      incomeEyebrow: "OPORTUNIDADE DE NEGÓCIO",
-      incomeTitle: "Seja um Agente Sunara e indique quem já paga conta de luz",
-      incomeText: "O cadastro de agente é gratuito e online. Você pode indicar residências e empresas, acompanhar as etapas pelo painel e receber comissão quando clientes elegíveis forem ativados, conforme as regras vigentes da Sunara.",
-      stepsTitle: "Comece em três passos",
-      steps: [
-        ["1", "Escolha seu objetivo", "Simule economia, solicite desconto, conheça placas solares ou cadastre-se como agente."],
-        ["2", "Acesse a página correta", "Cada botão leva diretamente à jornada correspondente, preservando o vínculo de indicação."],
-        ["3", "Confira as condições", "Verifique elegibilidade, cobertura, desconto e regras vigentes diretamente na Sunara."],
-      ],
-      finalTitle: "Pronto para conhecer esta oportunidade?",
-      finalText: "Escolha abaixo a opção que corresponde ao seu objetivo. O processo continuará no ambiente oficial da Sunara.",
-      disclaimer: "Estimativas, descontos, elegibilidade, cobertura e remunerações dependem da análise e das regras vigentes da Sunara. O EduCashPro não garante economia nem renda.",
-      affiliate: "Esta página foi gerada por um afiliado da Sunara.",
-      back: "Voltar aos benefícios",
-    },
-    en: {
-      cardTitle: "Save on electricity and discover new opportunities", cardText: "Explore Sunara solutions for energy savings, referrals and solar panels.", cardButton: "View benefit",
-      lockedTitle: "A new opportunity is available", lockedText: "Active subscribers can estimate savings, request a discount, explore solar panels or become a Sunara Agent.", lockedAction: "Activate subscription",
-      badge: "SUBSCRIBER BENEFIT", title: "Your electricity bill can cost less. Your referrals can be worth more.", lead: "EduCashPro selects useful products, proposals and solutions. Active subscribers now have four Sunara paths organized in one place.", primary: "View my discount", secondary: "How it works", noCost: "No upfront cost", noWork: "No construction", noPanels: "No solar panels",
-      choicesTitle: "Choose what you want to do", choices: [["partner","🤝","Become a Sunara Agent","Register free to refer people and businesses, subject to activation and current rules.","Register as an agent"],["quiz","🧮","Savings Quiz","Answer a few questions and see an estimate of potential electricity savings.","Take the quiz"],["discount","💡","Get an electricity discount","Start your bill review and see conditions available for your profile and region.","View my discount"],["panels","☀️","Install solar panels","Explore the option for generating energy with panels installed at your property.","Explore solar panels"]],
-      aboutEyebrow: "SUBSCRIPTION ENERGY", aboutTitle: "Energy savings without changing your routine", aboutText: "The proposal connects consumers with renewable energy generated by partner plants. Distribution continues through the conventional grid, with no rewiring, construction or panels installed at the property.", benefitsTitle: "A solution for people and businesses",
-      benefits: [["☀️","Renewable energy","Consumption connected to clean, sustainable sources."],["💡","Bill savings","Commercial terms are presented during contracting."],["📱","Digital process","Registration and tracking through Sunara's platform."],["🏠","No installation","Subscription energy does not require solar panels at the property."]],
-      incomeEyebrow: "BUSINESS OPPORTUNITY", incomeTitle: "Become a Sunara Agent", incomeText: "Registration is free and online. Refer eligible homes and businesses and receive commission after activation, subject to Sunara's current rules.", stepsTitle: "Start in three steps", steps: [["1","Choose your goal","Estimate savings, request a discount, explore panels or become an agent."],["2","Open the right page","Each button preserves the referral connection and opens the matching journey."],["3","Check current terms","Confirm eligibility, coverage, discounts and rules directly with Sunara."]], finalTitle: "Ready to continue?", finalText: "Choose the option that matches your goal. The process continues in Sunara's official environment.", disclaimer: "Estimates, discounts, eligibility, coverage and compensation depend on Sunara's current review and rules. EduCashPro does not guarantee savings or income.", affiliate: "This page was generated by a Sunara affiliate.", back: "Back to benefits",
-    },
-    es: {
-      cardTitle: "Ahorra en electricidad y descubre oportunidades", cardText: "Conoce las soluciones Sunara para ahorro, indicaciones y paneles solares.", cardButton: "Conocer beneficio", lockedTitle: "Una nueva oportunidad ya está disponible", lockedText: "Los suscriptores activos pueden estimar ahorro, solicitar descuento, conocer paneles o ser Agente Sunara.", lockedAction: "Activar suscripción",
-      badge: "BENEFICIO PARA SUSCRIPTORES", title: "Tu factura puede costar menos. Tus indicaciones pueden valer más.", lead: "EduCashPro selecciona soluciones útiles. Los suscriptores activos encuentran cuatro caminos Sunara en un solo lugar.", primary: "Ver mi descuento", secondary: "Cómo funciona", noCost: "Sin costo inicial", noWork: "Sin obras", noPanels: "Sin instalar paneles", aboutEyebrow: "ENERGÍA POR SUSCRIPCIÓN", aboutTitle: "Ahorro sin cambiar tu rutina", aboutText: "Sunara conecta clientes elegibles con soluciones sostenibles. La energía por suscripción utiliza la red convencional, sin obras ni paneles.", benefitsTitle: "Una solución para personas y empresas", benefits: [["☀️","Energía renovable","Consumo asociado a fuentes limpias."],["💡","Ahorro en la factura","Condiciones presentadas durante la contratación."],["📱","Proceso digital","Registro y seguimiento en la plataforma Sunara."],["🏠","Sin instalación","La energía por suscripción no requiere paneles."]], choicesTitle: "Elige lo que quieres hacer", choices: [["partner","🤝","Ser Agente Sunara","Regístrate gratis para indicar personas y empresas.","Registrarme como agente"],["quiz","🧮","Quiz de Ahorro","Responde algunas preguntas y recibe una estimación.","Hacer el quiz"],["discount","💡","Descuento en electricidad","Inicia el análisis de tu factura.","Ver mi descuento"],["panels","☀️","Instalar paneles solares","Conoce la solución de paneles para tu inmueble.","Conocer paneles"]], incomeEyebrow: "OPORTUNIDAD DE NEGOCIO", incomeTitle: "Conviértete en Agente Sunara", incomeText: "El registro es gratuito y en línea. Indica clientes elegibles y recibe comisión tras la activación, según las reglas vigentes.", stepsTitle: "Comienza en tres pasos", steps: [["1","Elige tu objetivo","Estima ahorro, solicita descuento, conoce paneles o sé agente."],["2","Abre la página correcta","Cada botón conserva el vínculo de indicación."],["3","Consulta las condiciones","Confirma elegibilidad, cobertura y reglas con Sunara."]], finalTitle: "¿Listo para continuar?", finalText: "Elige la opción que corresponde a tu objetivo. El proceso continúa en Sunara.", disclaimer: "Estimaciones, descuentos, elegibilidad y remuneraciones dependen de las reglas de Sunara. EduCashPro no garantiza ahorro ni ingresos.", affiliate: "Esta página fue generada por un afiliado de Sunara.", back: "Volver a beneficios",
-    },
-    ru: {
-      cardTitle: "Экономьте на электричестве и находите новые возможности", cardText: "Решения Sunara для экономии, рекомендаций и солнечных панелей.", cardButton: "Открыть преимущество", lockedTitle: "Доступна новая возможность", lockedText: "Активные подписчики могут оценить экономию, запросить скидку, узнать о панелях или стать агентом Sunara.", lockedAction: "Активировать подписку",
-      badge: "ПРЕИМУЩЕСТВО ДЛЯ ПОДПИСЧИКОВ", title: "Ваш счет может стать меньше. Ваши рекомендации — ценнее.", lead: "EduCashPro отбирает полезные решения. Четыре направления Sunara собраны в одном месте для активных подписчиков.", primary: "Узнать скидку", secondary: "Как это работает", noCost: "Без начальных затрат", noWork: "Без строительных работ", noPanels: "Без установки панелей", aboutEyebrow: "ЭНЕРГИЯ ПО ПОДПИСКЕ", aboutTitle: "Экономия без изменения привычек", aboutText: "Sunara подключает подходящих клиентов к устойчивым энергетическим решениям через обычную сеть.", benefitsTitle: "Решение для людей и компаний", benefits: [["☀️","Возобновляемая энергия","Чистые и устойчивые источники."],["💡","Экономия на счете","Условия сообщаются при оформлении."],["📱","Цифровой процесс","Регистрация на платформе Sunara."],["🏠","Без установки","Подписка не требует панелей."]], choicesTitle: "Выберите цель", choices: [["partner","🤝","Стать агентом Sunara","Бесплатная регистрация для рекомендаций.","Стать агентом"],["quiz","🧮","Тест экономии","Ответьте на вопросы и получите оценку.","Пройти тест"],["discount","💡","Скидка на электричество","Начните анализ счета.","Узнать скидку"],["panels","☀️","Установить панели","Познакомьтесь с решением для объекта.","Узнать о панелях"]], incomeEyebrow: "ДЕЛОВАЯ ВОЗМОЖНОСТЬ", incomeTitle: "Станьте агентом Sunara", incomeText: "Регистрация бесплатна. Комиссия выплачивается за активированных подходящих клиентов по правилам Sunara.", stepsTitle: "Три шага", steps: [["1","Выберите цель","Экономия, скидка, панели или работа агентом."],["2","Откройте нужную страницу","Каждая кнопка сохраняет партнерскую привязку."],["3","Проверьте условия","Уточните доступность и правила у Sunara."]], finalTitle: "Готовы продолжить?", finalText: "Выберите подходящий вариант. Процесс продолжится на официальной платформе Sunara.", disclaimer: "Оценки, скидки, доступность и вознаграждения зависят от правил Sunara. EduCashPro не гарантирует экономию или доход.", affiliate: "Эта страница создана партнером Sunara.", back: "Назад к преимуществам",
     },
   };
 
@@ -386,7 +313,6 @@
   };
 
   function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
-  function sunaraCopy(key) { return SUNARA_COPY[state.language]?.[key] ?? SUNARA_COPY.pt[key] ?? key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function benefitNavigationCopy(key) {
@@ -426,18 +352,6 @@
     openUrl(url);
   }
 
-  function showSunaraLock() {
-    const modal = document.getElementById("accessModal");
-    document.getElementById("modalIcon").textContent = "☀️";
-    document.getElementById("modalTitle").textContent = sunaraCopy("lockedTitle");
-    document.getElementById("modalDescription").textContent = sunaraCopy("lockedText");
-    document.getElementById("modalLearning").innerHTML = "";
-    const subscribe = document.getElementById("modalSubscribe");
-    subscribe.textContent = `⚡ ${sunaraCopy("lockedAction")}`;
-    subscribe.onclick = openSubscription;
-    modal.querySelector(".modalCancel").textContent = t("back");
-    modal.classList.remove("hidden");
-  }
   function localized(value) { return value?.[state.language] || value?.pt || ""; }
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
@@ -959,31 +873,16 @@
 
   async function renderBenefits() {
     content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
-    content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : showSunaraLock();
-    content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : showSunaraLock();
-  }
-
-  function renderSunaraPage() {
-    if (!state.profile?.active) return showSunaraLock();
-    state.view = "benefits";
-    updateNav();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    const benefitCards = sunaraCopy("benefits").map(([icon, title, text]) => `<article><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></article>`).join("");
-    const choices = sunaraCopy("choices").map(([key, icon, title, text, action]) => `<article class="sunaraChoice"><span>${icon}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p><button class="solarienPrimary" data-sunara-url="${escapeHtml(key)}">${escapeHtml(action)} →</button></article>`).join("");
-    const steps = sunaraCopy("steps").map(([number, title, text]) => `<article><b>${escapeHtml(number)}</b><div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p></div></article>`).join("");
-    content.innerHTML = `<div class="solarienPage"><button id="sunaraBack" class="solarienBack">← ${escapeHtml(sunaraCopy("back"))}</button><section class="solarienHero"><div class="solarienOrb"></div><div class="solarienLogo">SUNARA<small>ENERGIA INTELIGENTE</small></div><span class="solarienBadge">${escapeHtml(sunaraCopy("badge"))}</span><h1>${escapeHtml(sunaraCopy("title"))}</h1><p>${escapeHtml(sunaraCopy("lead"))}</p><div class="solarienActions"><button class="solarienPrimary" data-sunara-url="discount">${escapeHtml(sunaraCopy("primary"))}</button><button class="solarienSecondary" id="sunaraLearn">${escapeHtml(sunaraCopy("secondary"))}</button></div><div class="solarienProof"><span>✓ ${escapeHtml(sunaraCopy("noCost"))}</span><span>✓ ${escapeHtml(sunaraCopy("noWork"))}</span><span>✓ ${escapeHtml(sunaraCopy("noPanels"))}</span></div></section><section class="solarienSection sunaraChoices" id="sunaraChoices"><span class="solarienKicker">SUNARA</span><h2>${escapeHtml(sunaraCopy("choicesTitle"))}</h2><div class="sunaraChoiceGrid">${choices}</div></section><section class="solarienSection" id="sunaraAbout"><span class="solarienKicker">${escapeHtml(sunaraCopy("aboutEyebrow"))}</span><h2>${escapeHtml(sunaraCopy("aboutTitle"))}</h2><p class="solarienLead">${escapeHtml(sunaraCopy("aboutText"))}</p><div class="solarienBenefitGrid">${benefitCards}</div></section><section class="solarienIncome"><span class="solarienKicker">${escapeHtml(sunaraCopy("incomeEyebrow"))}</span><h2>${escapeHtml(sunaraCopy("incomeTitle"))}</h2><p>${escapeHtml(sunaraCopy("incomeText"))}</p><button class="solarienPrimary sunaraIncomeButton" data-sunara-url="partner">${escapeHtml(sunaraCopy("choices")[0][4])} →</button></section><section class="solarienSection"><h2>${escapeHtml(sunaraCopy("stepsTitle"))}</h2><div class="solarienSteps">${steps}</div></section><section class="solarienFinal"><div class="solarienLogo small">SUNARA</div><h2>${escapeHtml(sunaraCopy("finalTitle"))}</h2><p>${escapeHtml(sunaraCopy("finalText"))}</p><div class="sunaraFinalActions">${sunaraCopy("choices").map(([key, icon, title]) => `<button data-sunara-url="${escapeHtml(key)}">${icon} ${escapeHtml(title)}</button>`).join("")}</div><small>${escapeHtml(sunaraCopy("disclaimer"))}</small></section><footer class="solarienFooter">${escapeHtml(sunaraCopy("affiliate"))}</footer></div>`;
-    document.getElementById("sunaraBack").onclick = renderBenefits;
-    document.getElementById("sunaraLearn").onclick = () => document.getElementById("sunaraChoices")?.scrollIntoView({ behavior: "smooth" });
-    content.querySelectorAll("[data-sunara-url]").forEach((button) => button.onclick = () => openUrl(SUNARA_URLS[button.dataset.sunaraUrl]));
+    content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : openSubscription();
+    content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : openSubscription();
   }
 
   async function renderExclusiveBenefits() {
     state.view = "benefits";
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="solarienTeaser"><div class="solarienTeaserGlow"></div><div class="solarienMiniLogo">SUNARA</div><span class="solarienTeaserBadge">☀️ ${escapeHtml(sunaraCopy("badge"))}</span><h2>${escapeHtml(sunaraCopy("cardTitle"))}</h2><p>${escapeHtml(sunaraCopy("cardText"))}</p><button id="openSunara" class="solarienTeaserButton">${escapeHtml(sunaraCopy("cardButton"))} →</button></article><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
+    content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
     document.getElementById("benefitsBack").onclick = renderBenefits;
-    document.getElementById("openSunara").onclick = renderSunaraPage;
     document.getElementById("offerBenefit").onclick = () => renderSubmissionForm("benefit");
     const container = document.getElementById("benefitList");
     try {
