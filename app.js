@@ -313,10 +313,10 @@
   };
 
   const AGENDA_COPY = {
-    pt: { agenda: "Agenda profissional", agendaSub: "Organize serviços, clientes e horários" },
-    en: { agenda: "Professional schedule", agendaSub: "Organize services, clients and appointments" },
-    es: { agenda: "Agenda profesional", agendaSub: "Organiza servicios, clientes y horarios" },
-    ru: { agenda: "Профессиональная запись", agendaSub: "Услуги, клиенты и расписание" },
+    pt: { agenda: "Agenda Profissional", agendaSub: "Atendimentos, serviços, reuniões, aulas, visitas e compromissos" },
+    en: { agenda: "Professional Schedule", agendaSub: "Appointments, services, meetings, classes, visits and commitments" },
+    es: { agenda: "Agenda Profesional", agendaSub: "Atenciones, servicios, reuniones, clases, visitas y compromisos" },
+    ru: { agenda: "Профессиональное расписание", agendaSub: "Приёмы, услуги, встречи, занятия, визиты и личные дела" },
   };
 
   function t(key) { return AGENDA_COPY[state.language]?.[key] || EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || AGENDA_COPY.pt[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
