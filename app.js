@@ -503,24 +503,15 @@
     };
     const supportLabel = supportLabels[state.language] || supportLabels.pt;
     const activeCards = `
-      ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
+      ${quickCard("learn", "🎓", t("continueLearning"), t("coursesSub"))}
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
-      ${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}
-      ${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}
-      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
-      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}
-      ${quickCard("tools", "🧮", t("tools"), t("toolsSub"))}
-      ${quickCard("area", "🚀", t("projects"), t("projectsSub"))}
-      ${quickCard("share", "💰", t("network"), t("networkSub"))}`;
+      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
+      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}`;
     const inactiveCards = `
-      ${quickCard("course:fundamentos_marketing_rede", "🌱", t("freeCourse"), localized(state.courseCatalog.find((item) => item.id === "fundamentos_marketing_rede")?.title))}
+      ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
+      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
-      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}
-      ${lockedExperienceCard("communities", "👥", t("lockedGroups"), t("lockedGroupsDesc"))}
-      ${lockedExperienceCard("bots", "🤖", t("lockedBots"), t("lockedBotsDesc"))}
-      ${lockedExperienceCard("channels", "📣", t("lockedChannels"), t("lockedChannelsDesc"))}
-      ${lockedExperienceCard("courses", "🎓", t("courses"), t("learnDesc"))}
-      ${lockedExperienceCard("benefits", "🎁", t("lockedBenefits"), t("lockedBenefitsDesc"))}`;
+      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}`;
     content.innerHTML = `
       <section class="hero">
         <span class="eyebrow">${escapeHtml(t("welcome"))}</span>
@@ -532,14 +523,27 @@
       <div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2><p>${escapeHtml(t("yourSpaceSub"))}</p></div></div>
       <section class="quickGrid">
         ${p.active ? activeCards : inactiveCards}
-      </section>`;
+      </section>
+      ${p.active ? "" : renderMembershipUpsell()}`;
     document.getElementById("openPresentation")?.addEventListener("click", renderPresentation);
+    document.getElementById("homeSubscribe")?.addEventListener("click", renderPresentation);
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign(`./support.html?api=${encodeURIComponent(API_BASE)}`); else if (target === "share") copyAffiliate(); else if (target === "exclusive-benefits") renderExclusiveBenefits(); else if (target === "partner-stores") renderPartnerStores(); else setView(target);
+      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign(`./support.html?api=${encodeURIComponent(API_BASE)}`); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
+  }
+
+  function renderMembershipUpsell() {
+    const copies = {
+      pt: ["Experiência completa", "Cursos exclusivos, diretório, benefícios, parceiros e programa de indicação reunidos em uma única assinatura.", "Ver tudo que a assinatura libera"],
+      en: ["Full experience", "Exclusive courses, directory, benefits, partners and the referral program included in one subscription.", "See everything the subscription unlocks"],
+      es: ["Experiencia completa", "Cursos exclusivos, directorio, beneficios, socios y programa de recomendación reunidos en una sola suscripción.", "Ver todo lo que libera la suscripción"],
+      ru: ["Полная версия", "Эксклюзивные курсы, каталог, преимущества, партнёры и реферальная программа в одной подписке.", "Посмотреть возможности подписки"],
+    };
+    const value = copies[state.language] || copies.pt;
+    return `<section class="membershipUpsell"><span class="membershipUpsellIcon">✨</span><div><span class="eyebrow">EDUCASHPRO</span><h2>${escapeHtml(value[0])}</h2><p>${escapeHtml(value[1])}</p></div><button id="homeSubscribe" class="wideButton">⚡ ${escapeHtml(value[2])}</button></section>`;
   }
 
   function presentationPriceText() {
@@ -964,11 +968,30 @@
 
   async function renderArea() {
     const p = state.profile;
+    const areaLabels = ({
+      pt: ["Minha assinatura", "Status, validade e divulgação", "Minhas ferramentas", "Recursos gratuitos para sua presença digital", "Comunidade e suporte", "Meus cadastros", "Projetos enviados para avaliação"],
+      en: ["My subscription", "Status, validity and promotion", "My tools", "Free resources for your digital presence", "Community and support", "My submissions", "Projects submitted for review"],
+      es: ["Mi suscripción", "Estado, vigencia y divulgación", "Mis herramientas", "Recursos gratuitos para tu presencia digital", "Comunidad y soporte", "Mis registros", "Proyectos enviados para evaluación"],
+      ru: ["Моя подписка", "Статус, срок и продвижение", "Мои инструменты", "Бесплатные ресурсы для цифрового присутствия", "Сообщество и поддержка", "Мои заявки", "Проекты, отправленные на проверку"],
+    })[state.language] || ["Minha assinatura", "Status, validade e divulgação", "Minhas ferramentas", "Recursos gratuitos para sua presença digital", "Comunidade e suporte", "Meus cadastros", "Projetos enviados para avaliação"];
     const linkPageTitle = window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links";
     const linkPageSubtitle = window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página personalizada";
     const smartLinkTitle = window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente";
     const smartLinkSubtitle = window.EduCashProLinks?.text?.("shortCardSub") || "Crie um endereço curto com sua chamada";
     content.innerHTML = `<section class="profileCard"><div class="avatar">${escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase())}</div><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${p.active && state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div>` : ""}${state.membershipCredential ? `<button id="membershipProof" class="wideButton" style="margin-top:10px">✅ ${escapeHtml(featureCopy("activeProof"))}</button>` : ""}</section><div class="sectionHead"><div><h2>${escapeHtml(t("tools"))}</h2><p>${escapeHtml(t("toolsSub"))}</p></div></div><section class="quickGrid"><button id="areaLinkPage" class="quickCard"><span class="emoji">🔗</span><strong>${escapeHtml(linkPageTitle)}</strong><small>${escapeHtml(linkPageSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button><button id="areaSmartLink" class="quickCard"><span class="emoji">✂️</span><strong>${escapeHtml(smartLinkTitle)}</strong><small>${escapeHtml(smartLinkSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button></section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
+    const profileHeading = document.createElement("div");
+    profileHeading.className = "sectionHead areaFirstHead";
+    profileHeading.innerHTML = `<div><h2>${escapeHtml(areaLabels[0])}</h2><p>${escapeHtml(areaLabels[1])}</p></div>`;
+    content.prepend(profileHeading);
+    const sectionHeads = content.querySelectorAll(".sectionHead");
+    if (sectionHeads[1]) sectionHeads[1].innerHTML = `<div><h2>${escapeHtml(areaLabels[2])}</h2><p>${escapeHtml(areaLabels[3])}</p></div>`;
+    if (sectionHeads[2]) sectionHeads[2].querySelector("h2").textContent = areaLabels[4];
+    if (sectionHeads[3]) {
+      sectionHeads[3].querySelector("h2").textContent = areaLabels[5];
+      const detail = document.createElement("p");
+      detail.textContent = areaLabels[6];
+      sectionHeads[3].querySelector("div")?.appendChild(detail);
+    }
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
     document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
     document.getElementById("membershipProof")?.addEventListener("click", renderMembershipProof);
@@ -1133,6 +1156,32 @@
     document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   }
 
+  function renderPublicLanding() {
+    const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
+    const copies = {
+      pt: ["Conhecimento e oportunidades organizados dentro do Telegram.", "Cursos, ferramentas digitais, benefícios, projetos e uma comunidade para aprender e desenvolver sua presença online.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Para acessar sua conta e todos os recursos, abra o Mini App pelo botão do EduCashPro no Telegram."],
+      en: ["Knowledge and opportunities organized inside Telegram.", "Courses, digital tools, benefits, projects and a community to learn and grow your online presence.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "To access your account and all features, open the Mini App from the EduCashPro button in Telegram."],
+      es: ["Conocimiento y oportunidades organizados dentro de Telegram.", "Cursos, herramientas digitales, beneficios, proyectos y una comunidad para aprender y desarrollar tu presencia en línea.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Para acceder a tu cuenta y todos los recursos, abre la Mini App desde el botón de EduCashPro en Telegram."],
+      ru: ["Знания и возможности в удобном пространстве Telegram.", "Курсы, цифровые инструменты, преимущества, проекты и сообщество для обучения и развития в интернете.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Чтобы открыть аккаунт и все функции, запустите Mini App кнопкой EduCashPro в Telegram."],
+    };
+    const value = copies[browserLanguage] || copies.pt;
+    document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
+    content.innerHTML = `<section class="publicWelcome">
+      <div class="publicWelcomeMark"><span>E</span></div>
+      <span class="eyebrow">EDUCASHPRO</span>
+      <h1>${escapeHtml(value[0])}</h1>
+      <p>${escapeHtml(value[1])}</p>
+      <div class="publicWelcomeGrid">
+        <article><span>🎓</span><strong>${escapeHtml(value[2])}</strong><small>${escapeHtml(value[3])}</small></article>
+        <article><span>🧰</span><strong>${escapeHtml(value[4])}</strong><small>${escapeHtml(value[5])}</small></article>
+        <article><span>🎁</span><strong>${escapeHtml(value[6])}</strong><small>${escapeHtml(value[7])}</small></article>
+      </div>
+      <a class="publicTelegramButton" href="https://t.me/+1mP5ad7vJH5lOGNh">📚 ${escapeHtml(value[8])}</a>
+      <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
+    </section>`;
+    bottomNav.classList.add("hidden");
+  }
+
   async function init() {
     window.__EDUCASHPRO_APP_STARTED__ = true;
     try {
@@ -1155,7 +1204,7 @@
     };
 
     if (!tg?.initData) {
-      content.innerHTML = `<section class="splash"><div class="splashLogo">E</div><h1>EduCashPro</h1><p class="error">${escapeHtml(COPY.pt.telegramOnly)}</p></section>`;
+      renderPublicLanding();
       return;
     }
 

@@ -166,7 +166,6 @@
     if (enhancing) return;
     enhancing = true;
     try {
-      addFreeChannelToHome();
       decorateOfficialArea();
     } finally {
       enhancing = false;

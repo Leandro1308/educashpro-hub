@@ -147,7 +147,7 @@
 
   function bindVisitorNavigation() {
     if (!isVisitor()) return;
-    document.querySelectorAll('#bottomNav button[data-view="learn"], #bottomNav button[data-view="explore"]').forEach((button) => {
+    document.querySelectorAll('#bottomNav button[data-view="explore"]').forEach((button) => {
       if (button.dataset.visitorLocked === "1") return;
       button.dataset.visitorLocked = "1";
       button.addEventListener("click", (event) => {
@@ -166,8 +166,6 @@
     const grid = intro?.parentElement?.querySelector(".quickGrid");
     if (!grid) return;
 
-    grid.querySelector('[data-target="course:fundamentos_marketing_rede"]')?.remove();
-
     grid.querySelectorAll("[data-locked-experience]").forEach((button) => {
       if (button.dataset.visitorModal === "1") return;
       button.dataset.visitorModal = "1";
@@ -179,24 +177,6 @@
       }, true);
     });
 
-    if (!grid.querySelector('[data-visitor-tools="1"]')) {
-      const tools = document.createElement("button");
-      tools.className = "quickCard";
-      tools.dataset.visitorTools = "1";
-      tools.innerHTML = `<span class="emoji">🧮</span><strong>${escapeHtml(tr("tools"))}</strong><small>${escapeHtml(tr("toolsSub"))}</small>`;
-      tools.onclick = () => window.EduCashProLocal?.renderToolsHub?.();
-      grid.appendChild(tools);
-    }
-
-    if (!document.getElementById("visitorPartnerShowcase")) {
-      const showcase = document.createElement("section");
-      showcase.id = "visitorPartnerShowcase";
-      showcase.className = "visitorPartnerShowcase";
-      showcase.innerHTML = `<div class="sectionHead"><div><h2>${escapeHtml(tr("partnersTitle"))}</h2><p>${escapeHtml(tr("partnersText"))}</p></div></div><div id="visitorPartnerGrid" class="visitorPartnerGrid"><div class="visitorPartnerLoading">•••</div></div><button type="button" class="wideButton visitorPartnerCta">🔒 ${escapeHtml(tr("subscribe"))}</button>`;
-      showcase.querySelector(".visitorPartnerCta").onclick = openSubscription;
-      grid.insertAdjacentElement("afterend", showcase);
-      loadVisitorPartners();
-    }
   }
 
   async function loadVisitorPartners() {

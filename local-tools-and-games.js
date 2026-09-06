@@ -208,14 +208,6 @@
       button.dataset.localToolsReady = "1";
       button.onclick = renderToolsHub;
     });
-    if (!grid.querySelector("[data-games-card]")) {
-      const button = document.createElement("button");
-      button.className = "quickCard";
-      button.dataset.gamesCard = "1";
-      button.innerHTML = `<span class="emoji">🎮</span><strong>${esc(tr("games"))}</strong><small>${esc(tr("gamesSub"))}</small></button>`;
-      button.onclick = () => renderGames();
-      grid.appendChild(button);
-    }
   }
 
   const observer = new MutationObserver(() => queueMicrotask(enhanceHome));
