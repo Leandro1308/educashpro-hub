@@ -374,6 +374,8 @@ body::before {
 }
 
 .bottomNav button { border: 0; background: none; color: #7f93aa; padding: 5px 2px; }
+.bottomNav button { min-height:58px; border-radius:12px; touch-action:manipulation; }
+.bottomNav button:active { background:rgba(48,230,166,.09); transform:scale(.97); }
 .bottomNav button span { display: block; font-size: 20px; filter: grayscale(1); }
 .bottomNav button small { display: block; font-size: 10px; margin-top: 2px; }
 .bottomNav button.active { color: var(--green); }
@@ -399,6 +401,12 @@ body::before {
 }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+.globalLoading { position:fixed; z-index:120; inset:0; display:grid; place-items:center; padding:24px; background:rgba(4,11,20,.72); backdrop-filter:blur(7px); }
+.globalLoadingCard { display:grid; justify-items:center; gap:8px; width:min(82%,280px); padding:25px 20px; border:1px solid rgba(48,230,166,.28); border-radius:22px; background:#0d1b2d; box-shadow:0 24px 70px rgba(0,0,0,.5); text-align:center; }
+.globalLoadingCard strong { margin-top:4px; font-size:16px; }
+.globalLoadingCard small { color:#afc0d3; font-size:12px; }
+.globalSpinner { width:42px; height:42px; border:4px solid rgba(255,255,255,.12); border-top-color:var(--green); border-radius:50%; animation:global-spin .75s linear infinite; }
+@keyframes global-spin { to { transform:rotate(360deg); } }
 .modal { position: fixed; z-index: 100; inset: 0; display: grid; align-items: end; }
 .modalBackdrop { position: absolute; inset: 0; background: rgba(0,0,0,.72); backdrop-filter: blur(5px); }
 
@@ -617,7 +625,7 @@ body::before {
   *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
 }
 
-body.api-busy{cursor:progress}body.api-busy button{pointer-events:none}
+html[aria-busy="true"]{cursor:progress}
 
 .imagePicker{display:grid;grid-template-columns:72px 1fr auto;gap:9px;align-items:center;grid-column:1/-1;padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
 .imagePicker>span{grid-column:1/-1;color:var(--muted);font-size:12px;font-weight:750}

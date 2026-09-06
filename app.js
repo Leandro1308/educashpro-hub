@@ -3,6 +3,9 @@
   const content = document.getElementById("content");
   const bottomNav = document.getElementById("bottomNav");
   const toast = document.getElementById("toast");
+  const globalLoading = document.getElementById("globalLoading");
+  const globalLoadingText = document.getElementById("globalLoadingText");
+  const globalLoadingHint = document.getElementById("globalLoadingHint");
   const headerSubtitle = document.getElementById("headerSubtitle");
   const apiBaseFromUrl = String(new URL(window.location.href).searchParams.get("api") || "").replace(/\/+$/, "");
   const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "https://educashpro-all.onrender.com";
@@ -335,6 +338,22 @@
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
   function typeIcon(type) { return ({ group: "👥", channel: "📣", bot: "🤖", page: "🌐" })[type] || "✨"; }
   function showToast(message) { toast.textContent = message; toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2300); }
+  let loadingFailsafe = 0;
+  function showGlobalLoading(message = t("loading")) {
+    if (!globalLoading) return;
+    globalLoadingText.textContent = message || t("loading");
+    globalLoadingHint.textContent = ({ pt: "Aguarde um instante", en: "Please wait a moment", es: "Espera un momento", ru: "Пожалуйста, подождите" })[state.language] || "Aguarde um instante";
+    globalLoading.classList.remove("hidden");
+    document.documentElement.setAttribute("aria-busy", "true");
+    window.clearTimeout(loadingFailsafe);
+    loadingFailsafe = window.setTimeout(() => hideGlobalLoading(true), 15000);
+  }
+  function hideGlobalLoading(force = false) {
+    if (!globalLoading || (!force && pendingApiRequests.size)) return;
+    window.clearTimeout(loadingFailsafe);
+    globalLoading.classList.add("hidden");
+    document.documentElement.removeAttribute("aria-busy");
+  }
   function freshAssetUrl(url) {
     const value = String(url || "");
     if (!value || /^(?:https?:|data:|blob:)/i.test(value)) return value;
@@ -453,7 +472,7 @@
     const request = (async () => {
       const controller = new AbortController();
       const timeout = window.setTimeout(() => controller.abort(), 12000);
-      document.body.classList.add("api-busy");
+      showGlobalLoading();
       try {
         const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store", signal: controller.signal });
         const data = await response.json().catch(() => ({}));
@@ -466,7 +485,7 @@
       } finally {
         window.clearTimeout(timeout);
         pendingApiRequests.delete(requestKey);
-        if (!pendingApiRequests.size) document.body.classList.remove("api-busy");
+        if (!pendingApiRequests.size) hideGlobalLoading();
       }
     })();
     pendingApiRequests.set(requestKey, request);
@@ -486,11 +505,26 @@
     state.view = view;
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (view === "home") renderHome();
-    if (view === "learn") renderLearn();
-    if (view === "explore") renderExplore();
-    if (view === "benefits") renderBenefits();
-    if (view === "area") renderArea();
+    if (view === "home") return renderHome();
+    if (view === "learn") return renderLearn();
+    if (view === "explore") return renderExplore();
+    if (view === "benefits") return renderBenefits();
+    if (view === "area") return renderArea();
+  }
+
+  let navigationBusy = false;
+  async function navigateFromFooter(button) {
+    if (!button || navigationBusy) return;
+    navigationBusy = true;
+    showGlobalLoading();
+    try {
+      await Promise.resolve(setView(button.dataset.view));
+    } catch (error) {
+      handleError(error);
+    } finally {
+      navigationBusy = false;
+      hideGlobalLoading();
+    }
   }
 
   function renderHome() {
@@ -1197,11 +1231,9 @@
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
     document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
-    bottomNav.onclick = (event) => {
-      const button = event.target?.closest?.("button[data-view]");
-      if (!button || !bottomNav.contains(button)) return;
-      setView(button.dataset.view);
-    };
+    bottomNav.querySelectorAll("button[data-view]").forEach((button) => {
+      button.addEventListener("click", () => navigateFromFooter(button));
+    });
 
     if (!tg?.initData) {
       renderPublicLanding();
