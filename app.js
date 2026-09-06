@@ -118,8 +118,10 @@
       included: [
         ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
         ["🔎", "Descoberta organizada", "Grupos, canais, bots, páginas e projetos selecionados."],
+        ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras, sorteadores e jogos no celular."],
+        ["📅", "Organização profissional", "Agenda para atendimentos, reuniões, aulas, serviços e outros compromissos."],
         ["🎁", "Benefícios exclusivos", "Vantagens e parcerias disponibilizadas aos assinantes ativos."],
-        ["🚀", "Espaço para crescer", "Divulgue seus projetos e desenvolva sua presença dentro do Telegram."],
+        ["❤️", "Minha Área", "Assinatura, credencial, suporte, comunidade, links e projetos reunidos no mesmo espaço."],
       ],
       worksTitle: "Como funciona",
       works: [
@@ -138,6 +140,8 @@
       subscribe: "Assinar por {price} USDT",
       reactivate: "Reativar por {price} USDT",
       details: "Pagamento e ativação são concluídos com segurança pelo bot do EduCashPro.",
+      accessTitle: "Recursos públicos e recursos da assinatura",
+      accessText: "A apresentação, o canal educacional e algumas ferramentas podem ser acessados gratuitamente. Cursos completos, diretório, benefícios, parceiros e participação no programa de indicação dependem das regras de acesso e de assinatura ativa.",
     },
     en: {
       homeTitle: "EDUCASHPRO PRESENTATION",
@@ -154,8 +158,10 @@
       included: [
         ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
         ["🔎", "Organized discovery", "Selected groups, channels, bots, pages and projects."],
+        ["🧰", "Digital tools", "Link page, Smart Link, calculators, randomizers and mobile games."],
+        ["📅", "Professional organization", "A schedule for appointments, meetings, classes, services and other commitments."],
         ["🎁", "Exclusive benefits", "Advantages and partnerships available to active subscribers."],
-        ["🚀", "Room to grow", "Promote projects and develop your presence inside Telegram."],
+        ["❤️", "My Area", "Subscription, credential, support, community, links and projects in one place."],
       ],
       worksTitle: "How it works",
       works: [
@@ -174,6 +180,8 @@
       subscribe: "Subscribe for {price} USDT",
       reactivate: "Reactivate for {price} USDT",
       details: "Payment and activation are securely completed through the EduCashPro bot.",
+      accessTitle: "Public and subscription resources",
+      accessText: "The presentation, educational channel and some tools are available for free. Full courses, directory, benefits, partners and referral-program participation follow access rules and require an active subscription.",
     },
     es: {
       homeTitle: "PRESENTACIÓN EDUCASHPRO",
@@ -190,8 +198,10 @@
       included: [
         ["🎓", "Aprendizaje práctico", "Educación financiera, Telegram, marketing de red y habilidades digitales."],
         ["🔎", "Descubrimiento organizado", "Grupos, canales, bots, páginas y proyectos seleccionados."],
+        ["🧰", "Herramientas digitales", "Página de enlaces, Enlace Inteligente, calculadoras, sorteos y juegos en el celular."],
+        ["📅", "Organización profesional", "Agenda para citas, reuniones, clases, servicios y otros compromisos."],
         ["🎁", "Beneficios exclusivos", "Ventajas y alianzas disponibles para suscriptores activos."],
-        ["🚀", "Espacio para crecer", "Promociona proyectos y desarrolla tu presencia dentro de Telegram."],
+        ["❤️", "Mi Área", "Suscripción, credencial, soporte, comunidad, enlaces y proyectos en un solo espacio."],
       ],
       worksTitle: "Cómo funciona",
       works: [
@@ -210,6 +220,8 @@
       subscribe: "Suscribirme por {price} USDT",
       reactivate: "Reactivar por {price} USDT",
       details: "El pago y la activación se completan de forma segura mediante el bot de EduCashPro.",
+      accessTitle: "Recursos públicos y recursos de la suscripción",
+      accessText: "La presentación, el canal educativo y algunas herramientas tienen acceso gratuito. Los cursos completos, el directorio, los beneficios, los socios y la participación en el programa de recomendación dependen de las reglas de acceso y de una suscripción activa.",
     },
     ru: {
       homeTitle: "ПРЕЗЕНТАЦИЯ EDUCASHPRO",
@@ -226,8 +238,10 @@
       included: [
         ["🎓", "Практическое обучение", "Финансовая грамотность, Telegram, сетевой маркетинг и цифровые навыки."],
         ["🔎", "Удобный каталог", "Отобранные группы, каналы, боты, страницы и проекты."],
+        ["🧰", "Цифровые инструменты", "Страница ссылок, умная ссылка, калькуляторы, жеребьёвки и игры в телефоне."],
+        ["📅", "Рабочая организация", "Расписание приёмов, встреч, занятий, услуг и других дел."],
         ["🎁", "Эксклюзивные преимущества", "Преимущества и партнёрства для активных подписчиков."],
-        ["🚀", "Пространство для роста", "Продвигайте проекты и развивайте своё присутствие в Telegram."],
+        ["❤️", "Мой раздел", "Подписка, подтверждение, поддержка, сообщество, ссылки и проекты в одном месте."],
       ],
       worksTitle: "Как это работает",
       works: [
@@ -246,6 +260,8 @@
       subscribe: "Подписаться за {price} USDT",
       reactivate: "Возобновить за {price} USDT",
       details: "Оплата и активация безопасно выполняются через бот EduCashPro.",
+      accessTitle: "Открытые возможности и ресурсы подписки",
+      accessText: "Презентация, образовательный канал и некоторые инструменты доступны бесплатно. Полные курсы, каталог, преимущества, партнёры и участие в реферальной программе требуют активной подписки и соблюдения правил доступа.",
     },
   };
 
@@ -272,6 +288,8 @@
       cost: "Custo de compra", sale: "Preço de venda", currency: "Moeda", gross: "Lucro bruto", margin: "Margem de lucro", markup: "Markup sobre o custo", calculateMargin: "Calcular margem", invalidMargin: "Informe custo e preço de venda maiores que zero.",
       offerBenefit: "Oferecer benefício gratuito",
       offerBenefitDesc: "Cadastre uma vantagem que o usuário receba sem pagar nada a você. A publicação depende de avaliação do EduCashPro.",
+      creatorReferralTitle: "Sua divulgação também apresenta o EduCashPro",
+      creatorReferralText: "Nas páginas públicas criadas ou compartilhadas pelo EduCashPro, um convite discreto para assinar acompanha o conteúdo e preserva sua identificação de origem. Para receber comissões, sua assinatura precisa estar ativa no momento da adesão ou renovação, conforme as regras do programa.",
       freeBenefit: "Benefício gratuito", offeredBy: "Oferecido por", reviewed: "Avaliado e autorizado pelo EduCashPro", accessBenefit: "Acessar benefício", partnersTitle: "Parceiros com desconto", partnersDesc: "Empresas avaliadas que oferecem descontos aos assinantes ativos.", registerPartner: "Cadastrar parceiro", discount: "Desconto", rules: "Regras", location: "Abrir localização ou site", activeProof: "Comprovar assinatura", affiliateQr: "QR Code do meu link", createQr: "Criar QR Code", downloadQr: "Baixar QR Code", credentialUpdated: "Assinatura renovada em", credentialUntil: "Válida até", credentialActive: "ASSINATURA ATIVA", credentialExpired: "ASSINATURA VENCIDA", authentic: "Credencial autêntica do EduCashPro", invalidCredential: "Credencial inválida ou alterada", proofHelp: "Mostre este QR Code ao parceiro. A validação não consulta Render nem MongoDB.",
     },
     en: {
@@ -285,7 +303,7 @@
       automatic: "Eligible commissions are distributed in USDT directly to connected wallets, with no withdrawal request.",
       inactiveTitle: "If the subscription becomes inactive", inactiveRules: ["No new commissions are received during inactivity.", "The existing network remains linked.", "People joining during inactivity are not added to the network, either then or later.", "Amounts from the inactive period do not accumulate or receive retroactive payment.", "After reactivation, future participation from the preserved network resumes."],
       profitTitle: "Margin and markup calculator", profitDesc: "Calculate gross profit, sales margin and markup over cost.", cost: "Purchase cost", sale: "Sale price", currency: "Currency", gross: "Gross profit", margin: "Profit margin", markup: "Markup over cost", calculateMargin: "Calculate margin", invalidMargin: "Enter cost and sale price greater than zero.",
-      offerBenefit: "Offer a free benefit", offerBenefitDesc: "Submit an advantage users receive without paying you. Publication requires EduCashPro review.", freeBenefit: "Free benefit", offeredBy: "Offered by", reviewed: "Reviewed and authorized by EduCashPro", accessBenefit: "Access benefit", partnersTitle: "Discount partners", partnersDesc: "Reviewed companies offering discounts to active subscribers.", registerPartner: "Register partner", discount: "Discount", rules: "Rules", location: "Open location or website", activeProof: "Prove subscription", affiliateQr: "My referral QR Code", createQr: "Create QR Code", downloadQr: "Download QR Code", credentialUpdated: "Subscription renewed on", credentialUntil: "Valid until", credentialActive: "ACTIVE SUBSCRIPTION", credentialExpired: "EXPIRED SUBSCRIPTION", authentic: "Authentic EduCashPro credential", invalidCredential: "Invalid or altered credential", proofHelp: "Show this QR Code to the partner. Validation does not query Render or MongoDB.",
+      offerBenefit: "Offer a free benefit", offerBenefitDesc: "Submit an advantage users receive without paying you. Publication requires EduCashPro review.", creatorReferralTitle: "Your promotion also introduces EduCashPro", creatorReferralText: "On public pages created or shared through EduCashPro, a discreet subscription invitation follows the content and preserves your source identification. To receive commissions, your subscription must be active when the subscription or renewal occurs, under program rules.", freeBenefit: "Free benefit", offeredBy: "Offered by", reviewed: "Reviewed and authorized by EduCashPro", accessBenefit: "Access benefit", partnersTitle: "Discount partners", partnersDesc: "Reviewed companies offering discounts to active subscribers.", registerPartner: "Register partner", discount: "Discount", rules: "Rules", location: "Open location or website", activeProof: "Prove subscription", affiliateQr: "My referral QR Code", createQr: "Create QR Code", downloadQr: "Download QR Code", credentialUpdated: "Subscription renewed on", credentialUntil: "Valid until", credentialActive: "ACTIVE SUBSCRIPTION", credentialExpired: "EXPIRED SUBSCRIPTION", authentic: "Authentic EduCashPro credential", invalidCredential: "Invalid or altered credential", proofHelp: "Show this QR Code to the partner. Validation does not query Render or MongoDB.",
     },
     es: {
       topicsTitle: "Contenido para aprender y aplicar",
@@ -298,7 +316,7 @@
       automatic: "Las comisiones elegibles se distribuyen en USDT directamente a las billeteras conectadas, sin solicitud de retiro.",
       inactiveTitle: "Si la suscripción queda inactiva", inactiveRules: ["No recibe nuevas comisiones durante la inactividad.", "La red ya construida permanece vinculada.", "Quienes ingresen durante la inactividad no se agregan a la red, ni entonces ni posteriormente.", "Los valores del período inactivo no se acumulan ni se pagan retroactivamente.", "Después de reactivar, vuelve a participar en resultados futuros de la red preservada."],
       profitTitle: "Calculadora de margen y markup", profitDesc: "Calcula el beneficio bruto, el margen sobre la venta y el markup sobre el costo.", cost: "Costo de compra", sale: "Precio de venta", currency: "Moneda", gross: "Beneficio bruto", margin: "Margen de beneficio", markup: "Markup sobre el costo", calculateMargin: "Calcular margen", invalidMargin: "Introduce costo y precio de venta mayores que cero.",
-      offerBenefit: "Ofrecer beneficio gratuito", offerBenefitDesc: "Registra una ventaja que el usuario reciba sin pagarte. La publicación requiere evaluación de EduCashPro.", freeBenefit: "Beneficio gratuito", offeredBy: "Ofrecido por", reviewed: "Evaluado y autorizado por EduCashPro", accessBenefit: "Acceder al beneficio", partnersTitle: "Socios con descuento", partnersDesc: "Empresas evaluadas que ofrecen descuentos a suscriptores activos.", registerPartner: "Registrar socio", discount: "Descuento", rules: "Reglas", location: "Abrir ubicación o sitio", activeProof: "Comprobar suscripción", affiliateQr: "QR de mi enlace", createQr: "Crear QR", downloadQr: "Descargar QR", credentialUpdated: "Suscripción renovada el", credentialUntil: "Válida hasta", credentialActive: "SUSCRIPCIÓN ACTIVA", credentialExpired: "SUSCRIPCIÓN VENCIDA", authentic: "Credencial auténtica de EduCashPro", invalidCredential: "Credencial inválida o alterada", proofHelp: "Muestra este QR al socio. La validación no consulta Render ni MongoDB.",
+      offerBenefit: "Ofrecer beneficio gratuito", offerBenefitDesc: "Registra una ventaja que el usuario reciba sin pagarte. La publicación requiere evaluación de EduCashPro.", creatorReferralTitle: "Tu divulgación también presenta EduCashPro", creatorReferralText: "En las páginas públicas creadas o compartidas mediante EduCashPro, una invitación discreta para suscribirse acompaña el contenido y conserva tu identificación de origen. Para recibir comisiones, tu suscripción debe estar activa cuando ocurra la suscripción o renovación, conforme a las reglas del programa.", freeBenefit: "Beneficio gratuito", offeredBy: "Ofrecido por", reviewed: "Evaluado y autorizado por EduCashPro", accessBenefit: "Acceder al beneficio", partnersTitle: "Socios con descuento", partnersDesc: "Empresas evaluadas que ofrecen descuentos a suscriptores activos.", registerPartner: "Registrar socio", discount: "Descuento", rules: "Reglas", location: "Abrir ubicación o sitio", activeProof: "Comprobar suscripción", affiliateQr: "QR de mi enlace", createQr: "Crear QR", downloadQr: "Descargar QR", credentialUpdated: "Suscripción renovada el", credentialUntil: "Válida hasta", credentialActive: "SUSCRIPCIÓN ACTIVA", credentialExpired: "SUSCRIPCIÓN VENCIDA", authentic: "Credencial auténtica de EduCashPro", invalidCredential: "Credencial inválida o alterada", proofHelp: "Muestra este QR al socio. La validación no consulta Render ni MongoDB.",
     },
     ru: {
       topicsTitle: "Материалы для обучения и применения",
@@ -311,7 +329,7 @@
       automatic: "Доступные комиссионные распределяются в USDT прямо на подключённые кошельки без запроса на вывод.",
       inactiveTitle: "Если подписка неактивна", inactiveRules: ["Во время неактивности новые комиссионные не начисляются.", "Ранее созданная сеть остаётся привязанной.", "Новые пользователи периода неактивности не добавляются в сеть ни тогда, ни позднее.", "Суммы этого периода не накапливаются и не выплачиваются задним числом.", "После повторной активации возобновляется участие в будущих результатах сохранённой сети."],
       profitTitle: "Калькулятор маржи и наценки", profitDesc: "Рассчитайте валовую прибыль, маржу продаж и наценку к себестоимости.", cost: "Закупочная стоимость", sale: "Цена продажи", currency: "Валюта", gross: "Валовая прибыль", margin: "Маржа прибыли", markup: "Наценка к себестоимости", calculateMargin: "Рассчитать", invalidMargin: "Введите стоимость и цену продажи больше нуля.",
-      offerBenefit: "Предложить бесплатное преимущество", offerBenefitDesc: "Добавьте преимущество, которое пользователь получает без оплаты вам. Публикация требует проверки EduCashPro.", freeBenefit: "Бесплатное преимущество", offeredBy: "Предлагает", reviewed: "Проверено и разрешено EduCashPro", accessBenefit: "Открыть преимущество", partnersTitle: "Партнёры со скидками", partnersDesc: "Проверенные компании со скидками для активных подписчиков.", registerPartner: "Добавить партнёра", discount: "Скидка", rules: "Правила", location: "Открыть адрес или сайт", activeProof: "Подтвердить подписку", affiliateQr: "QR моей ссылки", createQr: "Создать QR", downloadQr: "Скачать QR", credentialUpdated: "Подписка продлена", credentialUntil: "Действует до", credentialActive: "ПОДПИСКА АКТИВНА", credentialExpired: "ПОДПИСКА ИСТЕКЛА", authentic: "Подлинная учётная запись EduCashPro", invalidCredential: "Недействительная или изменённая учётная запись", proofHelp: "Покажите QR партнёру. Проверка не обращается к Render или MongoDB.",
+      offerBenefit: "Предложить бесплатное преимущество", offerBenefitDesc: "Добавьте преимущество, которое пользователь получает без оплаты вам. Публикация требует проверки EduCashPro.", creatorReferralTitle: "Ваша публикация также знакомит с EduCashPro", creatorReferralText: "На открытых страницах, созданных или опубликованных через EduCashPro, вместе с материалом показывается ненавязчивое приглашение оформить подписку и сохраняется идентификатор источника. Для получения комиссионных подписка должна быть активна в момент оформления или продления согласно правилам программы.", freeBenefit: "Бесплатное преимущество", offeredBy: "Предлагает", reviewed: "Проверено и разрешено EduCashPro", accessBenefit: "Открыть преимущество", partnersTitle: "Партнёры со скидками", partnersDesc: "Проверенные компании со скидками для активных подписчиков.", registerPartner: "Добавить партнёра", discount: "Скидка", rules: "Правила", location: "Открыть адрес или сайт", activeProof: "Подтвердить подписку", affiliateQr: "QR моей ссылки", createQr: "Создать QR", downloadQr: "Скачать QR", credentialUpdated: "Подписка продлена", credentialUntil: "Действует до", credentialActive: "ПОДПИСКА АКТИВНА", credentialExpired: "ПОДПИСКА ИСТЕКЛА", authentic: "Подлинная учётная запись EduCashPro", invalidCredential: "Недействительная или изменённая учётная запись", proofHelp: "Покажите QR партнёру. Проверка не обращается к Render или MongoDB.",
     },
   };
 
@@ -615,6 +633,13 @@
       <section class="presentationPair">
         <article><span>👨‍💻</span><h2>${escapeHtml(featureCopy("creatorTitle"))}</h2><p>${escapeHtml(featureCopy("creatorText"))}</p></article>
         <article><span>🔎</span><h2>${escapeHtml(featureCopy("directoryTitle"))}</h2><p>${escapeHtml(featureCopy("directoryText"))}</p></article>
+      </section>
+      <section class="presentationSection accessExplanation">
+        <h2>${escapeHtml(presentationCopy("accessTitle"))}</h2>
+        <p>${escapeHtml(presentationCopy("accessText"))}</p>
+      </section>
+      <section class="creatorReferralNotice">
+        <span>🔗</span><div><h2>${escapeHtml(featureCopy("creatorReferralTitle"))}</h2><p>${escapeHtml(featureCopy("creatorReferralText"))}</p></div>
       </section>
       <section class="presentationSection">
         <h2>${escapeHtml(presentationCopy("worksTitle"))}</h2>
@@ -932,7 +957,7 @@
       : kind === "benefit"
         ? field("name", fc("name")) + common
         : field("companyName", fc("company")) + field("segment", fc("segment"), "select", true, partnerSegmentOptions()) + common + field("discountRange", fc("discount")) + field("discountRules", fc("rules"), "textarea") + field("storeType", fc("storeType"), "select", true, [["physical", "Físico / Physical"], ["online", "Online"], ["both", "Ambos / Both"]]) + field("city", fc("city"), "input", false) + field("region", fc("region"), "input", false) + field("contact", fc("contact"), "input", false) + field("affiliateLink", fc("affiliate"), "input", false);
-    content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
+    content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${escapeHtml(featureCopy("creatorReferralTitle"))}</h2><p>${escapeHtml(featureCopy("creatorReferralText"))}</p></div></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
     document.getElementById("language").value = state.language;
     document.getElementById("formBack").onclick = kind === "project" ? renderArea : kind === "partner" ? renderPartnerStores : renderExclusiveBenefits;
     document.getElementById("submissionForm").onsubmit = async (event) => {
