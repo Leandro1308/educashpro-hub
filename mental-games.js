@@ -92,7 +92,6 @@
     if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url);
     else if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener");
   }
-  function referralUrl() { return String(session?.affiliateLink || session?.subscribeUrl || session?.botUrl || ""); }
   function gameUrl(game, lang) {
     const url = new URL(location.href); url.search = ""; url.searchParams.set("game", game); url.searchParams.set("lang", language(lang)); return url.toString();
   }
@@ -102,10 +101,13 @@
     catch { openUrl(`https://t.me/share/url?url=${encodeURIComponent(url)}`); }
   }
   function footer(lang) {
-    const url = referralUrl();
-    return `<aside class="gameBrand"><span class="gameBrandMark">E</span><span><strong>EduCashPro</strong><small>${esc(text("edu", lang))}</small></span>${url ? `<button type="button" data-game-cta>${esc(text("subscribe", lang))}</button>` : ""}</aside>`;
+    return `<aside class="gameBrand"><span class="gameBrandMark">E</span><span><strong>EduCashPro</strong><small>${esc(text("edu", lang))}</small></span><button type="button" data-game-cta>${esc(text("subscribe", lang))}</button></aside>`;
   }
-  function bindFooter() { $("[data-game-cta]")?.addEventListener("click", () => openUrl(referralUrl())); }
+  function bindFooter() {
+    $("[data-game-cta]")?.addEventListener("click", () => {
+      window.EduCashProApp?.renderPresentation?.(() => renderCatalog(context));
+    });
+  }
   function goBack() {
     stopTimer();
     if (typeof context.back === "function") return context.back();

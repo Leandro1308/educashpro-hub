@@ -605,7 +605,7 @@
     return String(presentationCopy(key)).replace("{price}", formattedPrice);
   }
 
-  function renderPresentation() {
+  function renderPresentation(returnTo) {
     const isActive = Boolean(state.profile?.active);
     const included = presentationCopy("included");
     const works = presentationCopy("works");
@@ -669,7 +669,7 @@
         <p>${escapeHtml(presentationCopy(isActive ? "finalTextActive" : "finalText"))}</p>
         ${isActive ? "" : `<button class="wideButton presentationSubscribe">⚡ ${escapeHtml(presentationPriceText())}</button><small>${escapeHtml(presentationCopy("details"))}</small>`}
       </section>`;
-    document.getElementById("presentationBack").onclick = () => setView("home");
+    document.getElementById("presentationBack").onclick = typeof returnTo === "function" ? returnTo : () => setView("home");
     content.querySelectorAll(".presentationSubscribe").forEach((button) => button.onclick = subscribeNow);
   }
 
