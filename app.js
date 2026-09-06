@@ -1218,10 +1218,10 @@
   function renderPublicLanding() {
     const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
     const copies = {
-      pt: ["Conhecimento e oportunidades organizados dentro do Telegram.", "Cursos, ferramentas digitais, benefícios, projetos e uma comunidade para aprender e desenvolver sua presença online.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Para acessar sua conta e todos os recursos, abra o Mini App pelo botão do EduCashPro no Telegram."],
-      en: ["Knowledge and opportunities organized inside Telegram.", "Courses, digital tools, benefits, projects and a community to learn and grow your online presence.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "To access your account and all features, open the Mini App from the EduCashPro button in Telegram."],
-      es: ["Conocimiento y oportunidades organizados dentro de Telegram.", "Cursos, herramientas digitales, beneficios, proyectos y una comunidad para aprender y desarrollar tu presencia en línea.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Para acceder a tu cuenta y todos los recursos, abre la Mini App desde el botón de EduCashPro en Telegram."],
-      ru: ["Знания и возможности в удобном пространстве Telegram.", "Курсы, цифровые инструменты, преимущества, проекты и сообщество для обучения и развития в интернете.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Чтобы открыть аккаунт и все функции, запустите Mini App кнопкой EduCashPro в Telegram."],
+      pt: ["Conhecimento e oportunidades organizados dentro do Telegram.", "Cursos, ferramentas digitais, benefícios, projetos e uma comunidade para aprender e desenvolver sua presença online.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Para acessar sua conta e todos os recursos, abra o Mini App pelo botão do EduCashPro no Telegram.", "Jogos gratuitos", "Treine atenção e raciocínio lógico."],
+      en: ["Knowledge and opportunities organized inside Telegram.", "Courses, digital tools, benefits, projects and a community to learn and grow your online presence.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "To access your account and all features, open the Mini App from the EduCashPro button in Telegram.", "Free games", "Train attention and logical thinking."],
+      es: ["Conocimiento y oportunidades organizados dentro de Telegram.", "Cursos, herramientas digitales, beneficios, proyectos y una comunidad para aprender y desarrollar tu presencia en línea.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Para acceder a tu cuenta y todos los recursos, abre la Mini App desde el botón de EduCashPro en Telegram.", "Juegos gratuitos", "Entrena atención y pensamiento lógico."],
+      ru: ["Знания и возможности в удобном пространстве Telegram.", "Курсы, цифровые инструменты, преимущества, проекты и сообщество для обучения и развития в интернете.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Чтобы открыть аккаунт и все функции, запустите Mini App кнопкой EduCashPro в Telegram.", "Бесплатные игры", "Развивайте внимание и логику."],
     };
     const value = copies[browserLanguage] || copies.pt;
     document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
@@ -1236,8 +1236,10 @@
         <article><span>🎁</span><strong>${escapeHtml(value[6])}</strong><small>${escapeHtml(value[7])}</small></article>
       </div>
       <a class="publicTelegramButton" href="https://t.me/+1mP5ad7vJH5lOGNh">📚 ${escapeHtml(value[8])}</a>
+      <button id="publicGames" class="publicGamesButton" type="button">🎮 <span><strong>${escapeHtml(value[10])}</strong><small>${escapeHtml(value[11])}</small></span></button>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
     </section>`;
+    document.getElementById("publicGames")?.addEventListener("click", () => window.EduCashProMentalGames?.renderCatalog?.({ public: true, lang: browserLanguage, back: renderPublicLanding }));
     bottomNav.classList.add("hidden");
   }
 
@@ -1252,6 +1254,7 @@
     }
     const publicParams = new URL(window.location.href).searchParams;
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
+    if (!tg?.initData && await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
@@ -1274,6 +1277,8 @@
       state.referrerId = String(session.referrerId || "");
       state.planPriceUsdt = Number(session.planPriceUsdt || 12);
       state.botUrl = session.botUrl;
+      window.EduCashProMentalGames?.setSession?.(session);
+      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
       const receivedCredential = String(session.membershipCredential || "");
       const cachedCredential = String(localStorage.getItem("educashpro:membership-credential") || "");
       const receivedPayload = decodeCredential(receivedCredential);
@@ -1301,5 +1306,5 @@
   });
   window.addEventListener("focus", checkForUpdates);
   document.addEventListener("DOMContentLoaded", init);
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, scanMembershipQr };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr };
 })();

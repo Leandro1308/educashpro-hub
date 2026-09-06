@@ -98,7 +98,7 @@
       const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
       if (/\/api\/hub\/session$/.test(url)) {
         const data = await response.clone().json();
-        if (data?.ok) { session = data; queueMicrotask(enhanceHome); }
+        if (data?.ok) { session = data; window.EduCashProMentalGames?.setSession?.(data); queueMicrotask(enhanceHome); }
       }
     } catch {}
     return response;
@@ -117,6 +117,9 @@
   function gameText(value) { return value?.[language()] || value?.pt || value || ""; }
 
   async function renderGames(category = "") {
+    if (window.EduCashProMentalGames?.renderCatalog) {
+      return window.EduCashProMentalGames.renderCatalog({ back: renderToolsHub, lang: language() });
+    }
     const target = content();
     if (!target) return;
     target.innerHTML = `<button id="gamesBack" class="textButton">←</button><section class="hero"><span class="eyebrow">DISCOVERY</span><h1>🎮 ${esc(tr("gamesTitle"))}</h1><p>${esc(tr("gamesDesc"))}</p></section><div id="gameCatalog"><div class="empty">•••</div></div>`;
