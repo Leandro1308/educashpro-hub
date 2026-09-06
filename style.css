@@ -637,4 +637,9 @@ html[aria-busy="true"]{cursor:progress}
 .publicButtons button{display:flex;align-items:center;justify-content:flex-start;gap:12px;text-align:left}
 .publicButtons button img{flex:0 0 38px;width:38px;height:38px;border-radius:10px;object-fit:cover}
 .publicButtons button span{flex:1;text-align:center}
+.creatorReferralNotice{display:flex;align-items:flex-start;gap:14px;margin:18px 0;padding:18px;border:1px solid rgba(48,230,166,.32);border-radius:18px;background:linear-gradient(135deg,rgba(48,230,166,.11),rgba(74,140,255,.08))}
+.creatorReferralNotice>span{flex:0 0 auto;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:rgba(48,230,166,.15);font-size:23px}
+.creatorReferralNotice h2{margin:0 0 6px;font-size:17px;line-height:1.25}.creatorReferralNotice p,.accessExplanation p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.creatorReferralNotice.compact{padding:14px}.creatorReferralNotice.compact>span{width:38px;height:38px;font-size:20px}.creatorReferralNotice.compact h2{font-size:15px}.creatorReferralNotice.compact p{font-size:12px}
+.accessExplanation{border-color:rgba(74,140,255,.28);background:rgba(74,140,255,.07)}
 @media(max-width:520px){.imagePicker{grid-template-columns:64px 1fr}.imagePreview{width:64px;height:64px}.imageRemove{grid-column:2}.partnerLogoUpload{align-items:flex-start}.partnerLogoPreview{flex-basis:64px;width:64px;height:64px}}
