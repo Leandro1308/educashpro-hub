@@ -23,5 +23,8 @@ assert(!index.includes('<script defer src="./technical-analysis-course.js'),"Cou
 assert(loader.includes("loadGames")&&loader.includes("loadCourses"),"Resource loader is incomplete");
 assert(app.includes('quickCard("professional"'),"Professional Profile is missing from active home");
 assert(links.includes("integratedAgendaLink"),"Agenda and public page are not integrated");
+assert(professional.includes('id="recommendedProfessionalAction"'),"Recommended action must have a contextual button");
+assert(professional.includes('step("configureServices"')&&professional.includes('step("configureAppearance"'),"Professional setup steps are incomplete");
+assert(app.includes('query.set("view", view)')&&agenda.includes('p.get("view")'),"Professional setup cannot open the requested agenda section");
 for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(language),`Missing professional translation: ${language}`);
 console.log("EduCashPro static audit: OK");

@@ -463,9 +463,11 @@
   }
 
   function subscribeNow() { openSubscription(); }
-  function openAgenda(publicId = "") {
-    const query = publicId ? `?agenda=${encodeURIComponent(publicId)}` : "";
-    window.location.assign(`./agenda.html${query}`);
+  function openAgenda(publicId = "", view = "") {
+    const query = new URLSearchParams();
+    if (publicId) query.set("agenda", publicId);
+    if (["appointments", "services", "clients", "staff", "settings"].includes(view)) query.set("view", view);
+    window.location.assign(`./agenda.html${query.size ? `?${query}` : ""}`);
   }
 
   function showLockedInfo(item) {
