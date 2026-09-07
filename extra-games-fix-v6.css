@@ -1,0 +1,41 @@
+.blockGamePage .blockBoard{
+  width:min(calc(100vw - 40px),620px)!important;
+  max-width:620px!important;
+  box-sizing:border-box;
+  margin:12px auto 4px!important;
+  gap:5px!important;
+  padding:12px!important;
+}
+.blockGamePage .blockCell{
+  border-radius:9px!important;
+  min-width:0!important;
+}
+.blockGamePage .blockTray{
+  width:min(calc(100vw - 40px),620px)!important;
+  max-width:620px!important;
+  box-sizing:border-box;
+  margin:16px auto 0!important;
+}
+.blockGamePage .blockPieceSlot{
+  min-height:112px!important;
+}
+.blockGamePage .blockPiecePreview{
+  grid-template-columns:repeat(var(--pc),20px)!important;
+  grid-template-rows:repeat(var(--pr),20px)!important;
+  gap:4px!important;
+}
+.nutGamePage .nutBoard{
+  width:min(calc(100vw - 32px),660px)!important;
+  max-width:660px!important;
+  box-sizing:border-box;
+  margin:10px auto 0!important;
+}
+.gameCatalogV2 .extraGameCard{display:none!important}
+@media(max-width:430px){
+  .blockGamePage .blockBoard,
+  .blockGamePage .blockTray{width:calc(100vw - 28px)!important}
+  .blockGamePage .blockBoard{padding:9px!important;gap:4px!important}
+  .blockGamePage .blockPieceSlot{min-height:96px!important;padding:8px!important}
+  .blockGamePage .blockPiecePreview{grid-template-columns:repeat(var(--pc),18px)!important;grid-template-rows:repeat(var(--pr),18px)!important}
+  .nutGamePage .nutBoard{width:calc(100vw - 24px)!important}
+}
