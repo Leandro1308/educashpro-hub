@@ -39,10 +39,10 @@
 
   const COPY = {
     pt: {
-      subtitle: "Seu universo em um só lugar", loading: "Organizando sua experiência…",
+      subtitle: "Ferramentas para seu negócio no Telegram", loading: "Organizando sua experiência…",
       navHome: "Início", navLearn: "Aprender", navExplore: "Explorar", navBenefits: "Benefícios", navArea: "Minha área",
       welcome: "Bem-vindo", active: "Assinatura ativa", inactive: "Assinatura inativa", validUntil: "Válida até",
-      heroActive: "Aprenda, descubra oportunidades e desenvolva sua presença digital.",
+      heroActive: "Divulgue seu trabalho, organize atendimentos e desenvolva sua presença digital.",
       heroInactive: "Explore o EduCashPro e reative para liberar cursos, benefícios e participação completa.",
       yourSpace: "Seu espaço", yourSpaceSub: "Tudo organizado para você",
       courses: "Academy", coursesSub: "Cursos e conteúdos", explore: "Explorar", exploreSub: "Grupos, canais, bots e páginas",
