@@ -1,6 +1,6 @@
 (function(){
   const tg=window.Telegram?.WebApp, params=new URL(location.href).searchParams;
-  const API_BASE=/^https:\/\//i.test(params.get("api")||"")?params.get("api").replace(/\/+$/,""):"https://educashpro-all.onrender.com";
+  const API_BASE="https://educashpro-all.onrender.com";
   const content=document.getElementById("content"),toast=document.getElementById("toast");
   let token="",lang="pt",isAdmin=false,items=[];
   const C={

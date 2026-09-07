@@ -117,6 +117,7 @@
   function gameText(value) { return value?.[language()] || value?.pt || value || ""; }
 
   async function renderGames(category = "") {
+    await window.EduCashProResources?.loadGames?.();
     if (window.EduCashProMentalGames?.renderCatalog) {
       return window.EduCashProMentalGames.renderCatalog({ back: renderToolsHub, lang: language() });
     }

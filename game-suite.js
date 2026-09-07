@@ -71,8 +71,7 @@
   function stopMotion() { if (raf) cancelAnimationFrame(raf); raf = 0; }
   function top() { window.scrollTo({top:0,behavior:"smooth"}); }
   function apiBase() {
-    const supplied = String(new URL(location.href).searchParams.get("api") || "").replace(/\/+$/, "");
-    return /^https:\/\//i.test(supplied) ? supplied : "https://educashpro-all.onrender.com";
+    return "https://educashpro-all.onrender.com";
   }
   function openUrl(url) {
     if (!url) return;
@@ -160,12 +159,11 @@
     bridge.currentGame = null;
     const requested = language(options.lang);
     document.getElementById("bottomNav")?.classList.add("hidden");
-    content().innerHTML = `<main class="gameSuite"><div class="gameSuiteHeader"><div><span class="eyebrow">EDUCASHPRO PLAY</span><h1>🎮 ${esc(text("title",requested))}</h1><p>${esc(text("sub",requested))}</p></div>${bridge.catalogContext.back?`<button class="textButton gameCatalogBack">← ${esc(text("back",requested))}</button>`:""}</div><section class="gameCatalogV2">${Object.keys(GAME_META).map(id=>gameCard(id,requested)).join("")}</section><section class="socialActions"><button id="gameHistory" class="secondaryButton">☁️ ${esc(text("history",requested))}</button><button id="gameRaffle" class="secondaryButton">🎟️ ${esc(text("raffle",requested))}</button></section><p class="notice">📱 ${esc(text("local",requested))}. ${esc(text("syncNote",requested))}</p></main>`;
+    content().innerHTML = `<main class="gameSuite"><div class="gameSuiteHeader"><div><span class="eyebrow">EDUCASHPRO PLAY</span><h1>🎮 ${esc(text("title",requested))}</h1><p>${esc(text("sub",requested))}</p></div>${bridge.catalogContext.back?`<button class="textButton gameCatalogBack">← ${esc(text("back",requested))}</button>`:""}</div><section class="gameCatalogV2">${Object.keys(GAME_META).map(id=>gameCard(id,requested)).join("")}</section><section class="socialActions"><button id="gameHistory" class="secondaryButton">☁️ ${esc(text("history",requested))}</button></section><p class="notice">📱 ${esc(text("local",requested))}. ${esc(text("syncNote",requested))}</p></main>`;
     $(".gameCatalogBack")?.addEventListener("click",()=>bridge.catalogContext.back?.());
     document.querySelectorAll("[data-play]").forEach(button=>button.addEventListener("click",()=>launchGame(button.dataset.play,{lang:requested})));
     document.querySelectorAll("[data-tournament]").forEach(button=>button.addEventListener("click",()=>window.EduCashProSocial?.openTournament?.(button.dataset.tournament,{lang:requested})));
     $("#gameHistory")?.addEventListener("click",()=>active()?renderHistory(requested):paywall("advanced",requested));
-    $("#gameRaffle")?.addEventListener("click",()=>window.EduCashProSocial?.openRaffle?.({lang:requested}));
     top();
   }
 

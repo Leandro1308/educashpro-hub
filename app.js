@@ -7,8 +7,8 @@
   const globalLoadingText = document.getElementById("globalLoadingText");
   const globalLoadingHint = document.getElementById("globalLoadingHint");
   const headerSubtitle = document.getElementById("headerSubtitle");
-  const apiBaseFromUrl = String(new URL(window.location.href).searchParams.get("api") || "").replace(/\/+$/, "");
-  const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "https://educashpro-all.onrender.com";
+  // Never forward Telegram initData to an API selected through a public URL.
+  const API_BASE = "https://educashpro-all.onrender.com";
   const OFFICIAL_CHANNEL_URL = "https://t.me/boost?c=3942997522";
   const OFFICIAL_GROUP_URL = "https://t.me/boost?c=3980981498";
   const MEMBERSHIP_PUBLIC_KEY_B64 = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEeIVIbmPd6xtE6PECnwl9SdqUThN0MGYDulK88/0vzgDJIRFiU53leJ9hLflBm4fSwvbEGUIniofTmHgWylwAPA==";
@@ -554,7 +554,14 @@
       ru: ["Связаться с администратором", "Сообщите о проблеме, ошибке или предложении"],
     };
     const supportLabel = supportLabels[state.language] || supportLabels.pt;
+    const professionalLabels = {
+      pt: ["Perfil Profissional", "Página, serviços, agenda e cartão digital"],
+      en: ["Professional Profile", "Page, services, schedule and digital card"],
+      es: ["Perfil Profesional", "Página, servicios, agenda y tarjeta digital"],
+      ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
+    }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
     const activeCards = `
+      ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1])}
       ${quickCard("learn", "🎓", t("continueLearning"), t("coursesSub"))}
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
       ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
@@ -582,7 +589,8 @@
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign(`./support.html?api=${encodeURIComponent(API_BASE)}`); else setView(target);
+      else if (target === "professional") window.EduCashProProfessional?.render?.();
+      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign("./support.html"); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
@@ -785,6 +793,7 @@
   }
 
   async function openCourse(courseId) {
+    await window.EduCashProResources?.loadCourses?.();
     content.innerHTML = loadingCard();
     try {
       const localTechnicalCourse = window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
@@ -1239,7 +1248,10 @@
       <button id="publicGames" class="publicGamesButton" type="button">🎮 <span><strong>${escapeHtml(value[10])}</strong><small>${escapeHtml(value[11])}</small></span></button>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
     </section>`;
-    document.getElementById("publicGames")?.addEventListener("click", () => window.EduCashProMentalGames?.renderCatalog?.({ public: true, lang: browserLanguage, back: renderPublicLanding }));
+    document.getElementById("publicGames")?.addEventListener("click", async () => {
+      await window.EduCashProResources?.loadGames?.();
+      window.EduCashProMentalGames?.renderCatalog?.({ public: true, lang: browserLanguage, back: renderPublicLanding });
+    });
     bottomNav.classList.add("hidden");
   }
 
@@ -1254,7 +1266,10 @@
     }
     const publicParams = new URL(window.location.href).searchParams;
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
-    if (!tg?.initData && await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+    if (!tg?.initData && publicParams.get("game")) {
+      await window.EduCashProResources?.loadGames?.();
+      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+    }
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
@@ -1277,8 +1292,13 @@
       state.referrerId = String(session.referrerId || "");
       state.planPriceUsdt = Number(session.planPriceUsdt || 12);
       state.botUrl = session.botUrl;
-      window.EduCashProMentalGames?.setSession?.(session);
-      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+      window.__EDUCASHPRO_SESSION__ = session;
+      window.EduCashProProfessional?.setSession?.(session);
+      if (publicParams.get("game") || publicParams.get("tournament")) {
+        await window.EduCashProResources?.loadGames?.();
+        window.EduCashProMentalGames?.setSession?.(session);
+        if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+      }
       const receivedCredential = String(session.membershipCredential || "");
       const cachedCredential = String(localStorage.getItem("educashpro:membership-credential") || "");
       const receivedPayload = decodeCredential(receivedCredential);
@@ -1295,6 +1315,7 @@
       applyLanguage();
       bottomNav.classList.remove("hidden");
       renderHome();
+      window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();
     } catch (error) {
       content.innerHTML = `<section class="splash"><div class="splashLogo">E</div><h1>EduCashPro</h1><p class="error">${escapeHtml(error?.message === "SESSION" ? COPY.pt.telegramOnly : COPY.pt.error)}</p></section>`;
@@ -1306,5 +1327,5 @@
   });
   window.addEventListener("focus", checkForUpdates);
   document.addEventListener("DOMContentLoaded", init);
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, openAgenda };
 })();
