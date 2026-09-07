@@ -1,0 +1,14 @@
+/* EduCashPro Play v4 — estratégia, legibilidade de jogadas e cronômetros */
+.ecpStrategyPage{gap:12px}.ecpStrategyHero{padding:18px!important}.ecpStrategyCard{background:linear-gradient(145deg,#0d1b2d,#10243a)!important;border-color:rgba(48,230,166,.2)!important}.ecpStrategyCard h3{font-size:18px;line-height:1.42;color:#f4fbff}.ecpStrategyCard p{color:#bfd0e2!important}.ecpStrategyLearn{padding:11px 12px;border-radius:14px;background:rgba(48,230,166,.07);border:1px solid rgba(48,230,166,.16);color:#d7f9ee!important}
+
+/* Resta Um: deixa evidentes todas as peças que podem iniciar uma jogada. */
+.pegHole.peg.ecpMovableChoice:not(.selected){outline:2px solid rgba(121,239,208,.72)!important;outline-offset:2px;filter:brightness(1.08);box-shadow:inset 0 -5px 8px rgba(0,0,0,.18),0 0 0 1px rgba(121,239,208,.2),0 0 14px rgba(48,230,166,.15)!important}
+.pegHole.peg.ecpSelectedPeg,.pegHole.peg.selected{outline:3px solid #f6fbff!important;outline-offset:3px!important;transform:scale(1.08);filter:brightness(1.12)}
+.pegHole.ecpMoveTarget,.pegHole.target{background:rgba(121,239,208,.14)!important;box-shadow:inset 0 0 0 3px #79efd0,0 0 14px rgba(121,239,208,.16)!important;transform:scale(1.08)}
+
+/* Cronômetros locais para jogos em que tempo ajuda a acompanhar desempenho. */
+.ecpGameClock{min-width:72px;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.02em}.ecpCrossClockHost{justify-content:flex-end;margin-top:-3px;margin-bottom:2px}
+
+@media(max-width:430px){
+  .ecpStrategyCard h3{font-size:16px}.ecpStrategyCard p{font-size:12px!important;line-height:1.55!important}.ecpGameClock{min-width:66px}
+}
