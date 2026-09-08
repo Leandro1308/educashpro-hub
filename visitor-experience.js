@@ -1,8 +1,7 @@
 (function () {
   const tg = window.Telegram?.WebApp;
   const originalFetch = window.fetch.bind(window);
-  const apiBaseFromUrl = String(new URL(window.location.href).searchParams.get("api") || "").replace(/\/+$/, "");
-  const API_BASE = /^https:\/\//i.test(apiBaseFromUrl) ? apiBaseFromUrl : "https://educashpro-all.onrender.com";
+  const API_BASE = "https://educashpro-all.onrender.com";
 
   const visitorState = {
     session: null,

@@ -1,0 +1,86 @@
+(function(){
+  "use strict";
+  let session=null;
+  const content=()=>document.getElementById("content");
+  const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const language=()=>["pt","en","es","ru"].includes(session?.profile?.language)?session.profile.language:"pt";
+  const UI={
+    pt:{back:"Voltar",title:"Como usar o EduCashPro",lead:"Orientações rápidas para configurar, publicar e utilizar cada recurso.",open:"Abrir orientação",steps:"Passo a passo",action:"Fazer agora",help:"Ainda preciso de ajuda",free:"ACESSO GRATUITO",tip:"Importante"},
+    en:{back:"Back",title:"How to use EduCashPro",lead:"Quick guidance to set up, publish and use each feature.",open:"Open guide",steps:"Step by step",action:"Do it now",help:"I still need help",free:"FREE ACCESS",tip:"Important"},
+    es:{back:"Volver",title:"Cómo usar EduCashPro",lead:"Orientaciones rápidas para configurar, publicar y utilizar cada recurso.",open:"Abrir orientación",steps:"Paso a paso",action:"Hacerlo ahora",help:"Todavía necesito ayuda",free:"ACCESO GRATUITO",tip:"Importante"},
+    ru:{back:"Назад",title:"Как пользоваться EduCashPro",lead:"Краткие инструкции по настройке, публикации и использованию функций.",open:"Открыть инструкцию",steps:"Пошагово",action:"Перейти к действию",help:"Мне нужна помощь",free:"БЕСПЛАТНЫЙ ДОСТУП",tip:"Важно"}
+  };
+  const GUIDES={
+    pt:[
+      ["start","✨","Primeiros passos","Entenda a sequência principal para começar.",["Abra seu Perfil Profissional.","Complete informações, foto e contatos.","Cadastre serviços e configure sua agenda.","Revise e compartilhe sua página pública."],"profile","Sua página pode ser melhorada a qualquer momento sem alterar o endereço público."],
+      ["profile","👤","Perfil e página pública","Organize sua identidade profissional em um só lugar.",["Informe nome profissional e uma apresentação objetiva.","Escolha uma foto nítida e um endereço público fácil de lembrar.","Adicione apenas contatos e links que você realmente utiliza.","Salve, abra a página pública e confira o resultado."],"page","O convite do EduCashPro preserva a identificação do assinante que criou a página."],
+      ["services","🧰","Serviços","Apresente claramente o que você oferece.",["Abra o Perfil Profissional e escolha Serviços.","Informe nome, duração e valores.","Use nomes que o cliente compreenda sem explicação adicional.","Revise os serviços antes de divulgar a agenda."],"services","Um serviço bem descrito facilita a decisão e reduz dúvidas antes do atendimento."],
+      ["agenda","📅","Agenda e horários","Organize solicitações e compromissos.",["Crie sua única agenda profissional.","Preencha apresentação e contato direto.","Cadastre os serviços antes de receber solicitações.","Compartilhe a agenda ou integre-a à sua página."],"agenda","A agenda reúne serviços, clientes e compromissos no mesmo espaço."],
+      ["card","💳","Cartão digital e QR Code","Compartilhe sua presença profissional com rapidez.",["Conclua página, contatos, serviços e agenda.","Abra Ver cartão digital.","Escolha a aparência e confira os dados.","Compartilhe o link, o QR Code ou salve o contato."],"card","O QR Code leva à sua presença digital sem exigir material impresso novo a cada atualização."],
+      ["telegram","✈️","Grupos, canais e bots","Escolha a estrutura correta para seu objetivo.",["Use grupo para conversa entre participantes.","Use canal para publicações de uma administração para muitos seguidores.","Use bot para automatizar comandos, respostas ou serviços.","Depois de criar no Telegram, cadastre o projeto no EduCashPro."],"project","O EduCashPro divulga e organiza projetos; a criação do grupo, canal ou bot acontece no Telegram."],
+      ["affiliate","🤝","Programa de Afiliados","Entenda como desenvolver a indicação como atividade complementar.",["Conheça e utilize o produto antes de apresentá-lo.","Defina quem pode se beneficiar da plataforma.","Compartilhe páginas e conteúdos úteis com sua identificação integrada.","Organize contatos, acompanhamento e atendimento aos novos assinantes."],"affiliate","A participação é opcional. O assinante ativo pode organizá-la como atividade secundária e possível segunda fonte de renda."],
+      ["lead","🧲","Iscas digitais","Ofereça valor antes de apresentar um produto ou serviço.",["Escolha uma dúvida real do seu público.","Crie um material gratuito e útil: guia, checklist, aula, modelo ou calculadora.","Entregue o conteúdo com clareza, sem título enganoso.","Depois do valor entregue, convide a pessoa para conhecer a solução completa."],"page","Isca digital não é armadilha nem promessa exagerada. É um conteúdo gratuito que atrai pessoas interessadas e inicia um relacionamento no marketing digital."],
+      ["subscription","⚡","Assinatura e acesso","Compreenda ativação, renovação e recursos exclusivos.",["Abra Minha área para conferir a situação da assinatura.","Use o botão de ativação ou renovação quando necessário.","Conclua o pagamento pelo fluxo indicado no bot.","Reabra o Mini App para atualizar o acesso."],"area","Cursos e recursos exclusivos dependem da situação atual da assinatura."],
+      ["support","🛟","Solução de problemas","Encontre ajuda quando algo não funcionar.",["Feche e reabra o Mini App pelo botão do bot.","Confira sua conexão e tente novamente.","Registre o que ocorreu e, se possível, faça uma captura da tela.","Envie o relato ao suporte escolhendo problema, falha ou sugestão."],"support","Nunca envie senha, chave privada, código de acesso ou frase de recuperação ao suporte."]
+    ],
+    en:[
+      ["start","✨","First steps","Follow the main path to get started.",["Open your Professional Profile.","Complete information, photo and contacts.","Add services and set up your schedule.","Review and share your public page."],"profile","You can update the page without changing its public address."],
+      ["profile","👤","Profile and public page","Keep your professional identity in one place.",["Enter your professional name and a clear introduction.","Choose a clear photo and memorable public address.","Add contacts and links you actually use.","Save and review the public result."],"page","The EduCashPro invitation preserves the subscriber identification attached to the page."],
+      ["services","🧰","Services","Clearly present what you offer.",["Open Professional Profile and choose Services.","Enter name, duration and prices.","Use names clients understand immediately.","Review services before sharing your schedule."],"services","Clear services reduce questions before booking."],
+      ["agenda","📅","Schedule and availability","Organize requests and appointments.",["Create your professional schedule.","Complete its introduction and direct contact.","Add services before accepting requests.","Share it or connect it to your page."],"agenda","Your schedule keeps services, clients and appointments together."],
+      ["card","💳","Digital card and QR Code","Share your professional presence quickly.",["Complete your page, services and schedule.","Open the digital card.","Choose its appearance and review the data.","Share the link or QR Code."],"card","The QR Code always points to your updated digital presence."],
+      ["telegram","✈️","Groups, channels and bots","Choose the right Telegram structure.",["Use groups for participant conversations.","Use channels for one-to-many publishing.","Use bots for commands and automation.","Then submit the project to EduCashPro."],"project","Creation happens in Telegram; EduCashPro organizes and promotes the project."],
+      ["affiliate","🤝","Affiliate Program","Develop referrals as a complementary activity.",["Know and use the product.","Define who can benefit from it.","Share useful pages with your identification attached.","Organize contacts and follow-up."],"affiliate","Participation is optional and may be organized as a secondary activity and possible second income source."],
+      ["lead","🧲","Lead magnets","Deliver value before presenting an offer.",["Choose a real audience question.","Create a useful free guide, checklist, class, template or calculator.","Use a clear and honest title.","After delivering value, introduce the complete solution."],"page","A lead magnet is not a trap. It is useful free content that attracts interested people and starts a relationship."],
+      ["subscription","⚡","Subscription and access","Understand activation and renewal.",["Check status in My area.","Use activation or renewal when needed.","Complete payment through the bot flow.","Reopen the Mini App to refresh access."],"area","Exclusive resources follow the current subscription status."],
+      ["support","🛟","Troubleshooting","Get help when something fails.",["Close and reopen from the bot.","Check your connection and retry.","Record what happened with a screenshot.","Send the report to support."],"support","Never send passwords, private keys or recovery phrases."]
+    ],
+    es:[
+      ["start","✨","Primeros pasos","Sigue la secuencia principal para comenzar.",["Abre tu Perfil Profesional.","Completa información, foto y contactos.","Registra servicios y configura la agenda.","Revisa y comparte la página pública."],"profile","Puedes actualizar la página sin cambiar su dirección pública."],
+      ["profile","👤","Perfil y página pública","Organiza tu identidad profesional.",["Escribe nombre y presentación.","Elige foto y dirección pública.","Añade contactos y enlaces útiles.","Guarda y revisa el resultado."],"page","La invitación conserva la identificación del suscriptor creador."],
+      ["services","🧰","Servicios","Presenta con claridad lo que ofreces.",["Abre Perfil Profesional y Servicios.","Informa nombre, duración y valores.","Usa nombres fáciles de comprender.","Revisa antes de divulgar."],"services","Una descripción clara reduce dudas antes de reservar."],
+      ["agenda","📅","Agenda y horarios","Organiza solicitudes y citas.",["Crea tu agenda profesional.","Completa presentación y contacto.","Registra los servicios.","Comparte o integra la agenda."],"agenda","La agenda reúne servicios, clientes y citas."],
+      ["card","💳","Tarjeta digital y QR","Comparte rápidamente tu presencia.",["Completa página, servicios y agenda.","Abre la tarjeta digital.","Elige la apariencia.","Comparte enlace o QR."],"card","El QR dirige siempre a tu presencia actualizada."],
+      ["telegram","✈️","Grupos, canales y bots","Elige la estructura adecuada.",["Usa grupos para conversar.","Usa canales para publicar.","Usa bots para automatizar.","Registra después el proyecto."],"project","La creación ocurre en Telegram; EduCashPro organiza y divulga."],
+      ["affiliate","🤝","Programa de Afiliados","Desarrolla la indicación como actividad complementaria.",["Conoce y utiliza el producto.","Define quién puede beneficiarse.","Comparte contenido útil con tu identificación.","Organiza contactos y seguimiento."],"affiliate","Es opcional y puede organizarse como actividad secundaria y posible segunda fuente de ingresos."],
+      ["lead","🧲","Imanes de clientes","Entrega valor antes de presentar una oferta.",["Elige una duda real.","Crea una guía, lista, clase, modelo o calculadora gratuita.","Usa un título honesto.","Después presenta la solución completa."],"page","No es una trampa: es contenido gratuito útil que inicia una relación de marketing."],
+      ["subscription","⚡","Suscripción y acceso","Comprende activación y renovación.",["Consulta el estado en Mi área.","Activa o renueva cuando sea necesario.","Completa el pago en el bot.","Reabre el Mini App."],"area","Los recursos exclusivos dependen del estado actual."],
+      ["support","🛟","Solución de problemas","Obtén ayuda cuando algo falle.",["Cierra y reabre desde el bot.","Revisa la conexión.","Registra lo ocurrido.","Envía el informe al soporte."],"support","Nunca envíes contraseñas, claves privadas o frases de recuperación."]
+    ],
+    ru:[
+      ["start","✨","Первые шаги","Основная последовательность действий.",["Откройте профессиональный профиль.","Заполните данные, фото и контакты.","Добавьте услуги и расписание.","Проверьте и поделитесь страницей."],"profile","Страницу можно обновлять без смены публичного адреса."],
+      ["profile","👤","Профиль и страница","Соберите профессиональные данные.",["Укажите имя и описание.","Выберите фото и адрес.","Добавьте нужные контакты.","Сохраните и проверьте страницу."],"page","Приглашение сохраняет идентификатор создавшего страницу подписчика."],
+      ["services","🧰","Услуги","Понятно опишите своё предложение.",["Откройте Профиль и Услуги.","Укажите название, длительность и цену.","Используйте понятные названия.","Проверьте перед публикацией."],"services","Чёткое описание уменьшает количество вопросов."],
+      ["agenda","📅","Расписание","Организуйте заявки и встречи.",["Создайте расписание.","Заполните описание и контакт.","Добавьте услуги.","Поделитесь ссылкой."],"agenda","Расписание объединяет услуги, клиентов и записи."],
+      ["card","💳","Визитка и QR-код","Быстро делитесь профилем.",["Заполните страницу и расписание.","Откройте визитку.","Выберите оформление.","Поделитесь ссылкой или QR."],"card","QR-код ведёт к актуальной цифровой странице."],
+      ["telegram","✈️","Группы, каналы и боты","Выберите подходящий формат.",["Группа — для общения.","Канал — для публикаций.","Бот — для автоматизации.","Затем добавьте проект в EduCashPro."],"project","Создание происходит в Telegram; EduCashPro организует и продвигает."],
+      ["affiliate","🤝","Партнёрская программа","Развивайте рекомендации как дополнительную деятельность.",["Изучите продукт.","Определите целевую аудиторию.","Делитесь полезными страницами со своим идентификатором.","Организуйте контакты и сопровождение."],"affiliate","Участие необязательно и может стать дополнительной деятельностью и возможным вторым источником дохода."],
+      ["lead","🧲","Лид-магниты","Сначала дайте пользу.",["Выберите реальный вопрос аудитории.","Создайте бесплатный гайд, список, урок, шаблон или калькулятор.","Используйте честный заголовок.","После пользы представьте полное решение."],"page","Лид-магнит — не ловушка, а полезный бесплатный материал для начала отношений."],
+      ["subscription","⚡","Подписка и доступ","Активация и продление.",["Проверьте статус в профиле.","Активируйте или продлите доступ.","Завершите оплату через бота.","Снова откройте Mini App."],"area","Доступ зависит от текущего статуса подписки."],
+      ["support","🛟","Решение проблем","Получите помощь.",["Закройте и откройте через бота.","Проверьте интернет.","Сделайте снимок ошибки.","Отправьте сообщение в поддержку."],"support","Никому не отправляйте пароли, приватные ключи и фразы восстановления."]
+    ]
+  };
+  const ui=key=>UI[language()]?.[key]||UI.pt[key];
+  const guides=()=>GUIDES[language()]||GUIDES.pt;
+  function backToLearn(){window.EduCashProApp?.renderLearn?.()||window.EduCashProApp?.renderHome?.()}
+  function runAction(action){
+    if(action==="profile")return window.EduCashProProfessional?.render?.();
+    if(action==="page")return window.EduCashProLinks?.renderPageEditor?.();
+    if(action==="services"||action==="agenda")return window.EduCashProApp?.openAgenda?.("",action==="services"?"services":"settings");
+    if(action==="card")return window.EduCashProProfessional?.render?.();
+    if(action==="project")return window.EduCashProApp?.renderSubmissionForm?.("project");
+    if(action==="affiliate"||action==="area")return window.EduCashProApp?.renderArea?.();
+    if(action==="support")return location.assign("./support.html");
+  }
+  function render(){
+    content().innerHTML=`<button id="helpBack" class="textButton">← ${esc(ui("back"))}</button><section class="helpHero"><span class="eyebrow">${esc(ui("free"))}</span><h1>🧭 ${esc(ui("title"))}</h1><p>${esc(ui("lead"))}</p></section><section class="helpGuideList">${guides().map(g=>`<button class="helpGuideCard" data-help="${esc(g[0])}"><span>${g[1]}</span><div><strong>${esc(g[2])}</strong><small>${esc(g[3])}</small></div><b>›</b></button>`).join("")}</section>`;
+    document.getElementById("helpBack").onclick=backToLearn;
+    document.querySelectorAll("[data-help]").forEach(button=>button.onclick=()=>renderGuide(button.dataset.help));
+  }
+  function renderGuide(id){
+    const guide=guides().find(g=>g[0]===id);if(!guide)return render();
+    content().innerHTML=`<button id="guideBack" class="textButton">← ${esc(ui("back"))}</button><section class="helpHero compact"><span class="helpGuideIcon">${guide[1]}</span><h1>${esc(guide[2])}</h1><p>${esc(guide[3])}</p></section><article class="helpSteps"><h2>${esc(ui("steps"))}</h2><ol>${guide[4].map(step=>`<li>${esc(step)}</li>`).join("")}</ol><aside><strong>${esc(ui("tip"))}</strong><p>${esc(guide[6])}</p></aside><button id="guideAction" class="wideButton">${esc(ui("action"))} →</button><button id="guideSupport" class="secondaryButton helpSupport">${esc(ui("help"))}</button></article>`;
+    document.getElementById("guideBack").onclick=render;document.getElementById("guideAction").onclick=()=>runAction(guide[5]);document.getElementById("guideSupport").onclick=()=>runAction("support");scrollTo({top:0,behavior:"smooth"});
+  }
+  window.EduCashProHelp={setSession(value){session=value},render,renderGuide};
+})();

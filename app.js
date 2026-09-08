@@ -36,6 +36,8 @@
     currentLesson: 0,
     courseCatalog: [],
   };
+  let activeBookScrollHandler = null;
+  function stopBookTracking(){if(activeBookScrollHandler){removeEventListener("scroll",activeBookScrollHandler);activeBookScrollHandler=null}}
 
   const COPY = {
     pt: {
@@ -517,6 +519,7 @@
   }
 
   function setView(view) {
+    stopBookTracking();
     if (!state.profile?.active && ["explore"].includes(view)) {
       const lockedId = view === "explore" ? "communities" : "courses";
       showLockedInfo(lockedExperience(lockedId));
@@ -708,10 +711,9 @@
         choose: "Escolha uma área",
         chooseSub: "Conteúdos separados por assunto para você encontrar o que precisa.",
         categories: [
-          ["introduction", "✨", "Comece por aqui", "Conheça o EduCashPro e os fundamentos da plataforma."],
-          ["network_marketing", "🤝", "Afiliados e Marketing de Rede", "Produto, indicação, relacionamento, liderança e desenvolvimento de rede."],
-          ["technical_analysis", "📈", "Análise Técnica", "Gráficos, Price Action, indicadores, XAUUSD, estratégias e risco."],
-          ["financial_education", "💰", "Renda Extra, Finanças e Web3", "Educação financeira, nova economia e desenvolvimento de ativos digitais."],
+          ["network_marketing", "🤝", "Marketing, Relacionamento e Afiliados", "Produto, comunicação, indicação, profissão afiliado e desenvolvimento de rede."],
+          ["technical_analysis", "📈", "Mercados e Gestão de Risco", "Gráficos, Price Action, XAUUSD, estratégias, treino e controle de risco."],
+          ["financial_education", "💰", "Educação Financeira e Negócios", "Renda, organização financeira, negócios digitais e construção de novas fontes de renda."],
           ["telegram", "✈️", "Telegram Profissional", "Grupos, canais, bots, segurança, crescimento e monetização responsável."],
           ["tools", "🧮", "Ferramentas", "Calculadoras, simuladores e recursos educativos."],
         ],
@@ -720,10 +722,9 @@
         choose: "Choose an area",
         chooseSub: "Content separated by topic so you can quickly find what you need.",
         categories: [
-          ["introduction", "✨", "Start here", "Discover EduCashPro and the platform fundamentals."],
-          ["network_marketing", "🤝", "Affiliates and Network Marketing", "Product, referrals, relationships, leadership and network development."],
-          ["technical_analysis", "📈", "Technical Analysis", "Charts, Price Action, indicators, XAUUSD, strategies and risk."],
-          ["financial_education", "💰", "Extra Income, Finance and Web3", "Financial education, the new economy and digital asset development."],
+          ["network_marketing", "🤝", "Marketing, Relationships and Affiliates", "Product, communication, referrals, affiliate work and network development."],
+          ["technical_analysis", "📈", "Markets and Risk Management", "Charts, Price Action, XAUUSD, strategies, practice and risk control."],
+          ["financial_education", "💰", "Financial Education and Business", "Income, financial organization, digital business and new income sources."],
           ["telegram", "✈️", "Professional Telegram", "Groups, channels, bots, safety, growth and responsible monetization."],
           ["tools", "🧮", "Tools", "Calculators, simulators and educational resources."],
         ],
@@ -732,10 +733,9 @@
         choose: "Elige un área",
         chooseSub: "Contenidos separados por tema para encontrar rápidamente lo que necesitas.",
         categories: [
-          ["introduction", "✨", "Empieza aquí", "Conoce EduCashPro y los fundamentos de la plataforma."],
-          ["network_marketing", "🤝", "Afiliados y Marketing de Red", "Producto, referidos, relaciones, liderazgo y desarrollo de red."],
-          ["technical_analysis", "📈", "Análisis Técnico", "Gráficos, Price Action, indicadores, XAUUSD, estrategias y riesgo."],
-          ["financial_education", "💰", "Ingresos Extra, Finanzas y Web3", "Educación financiera, nueva economía y activos digitales."],
+          ["network_marketing", "🤝", "Marketing, Relaciones y Afiliados", "Producto, comunicación, indicación, profesión afiliado y desarrollo de red."],
+          ["technical_analysis", "📈", "Mercados y Gestión de Riesgo", "Gráficos, Price Action, XAUUSD, estrategias, práctica y control de riesgo."],
+          ["financial_education", "💰", "Educación Financiera y Negocios", "Ingresos, organización financiera, negocios digitales y nuevas fuentes de ingresos."],
           ["telegram", "✈️", "Telegram Profesional", "Grupos, canales, bots, seguridad, crecimiento y monetización responsable."],
           ["tools", "🧮", "Herramientas", "Calculadoras, simuladores y recursos educativos."],
         ],
@@ -744,10 +744,9 @@
         choose: "Выберите направление",
         chooseSub: "Материалы разделены по темам, чтобы быстро найти нужное.",
         categories: [
-          ["introduction", "✨", "Начните здесь", "Познакомьтесь с EduCashPro и основами платформы."],
-          ["network_marketing", "🤝", "Партнёрство и сетевой маркетинг", "Продукт, рекомендации, отношения, лидерство и развитие сети."],
-          ["technical_analysis", "📈", "Технический анализ", "Графики, Price Action, индикаторы, XAUUSD, стратегии и риск."],
-          ["financial_education", "💰", "Дополнительный доход, финансы и Web3", "Финансовая грамотность, новая экономика и цифровые активы."],
+          ["network_marketing", "🤝", "Маркетинг, отношения и партнёрство", "Продукт, коммуникация, рекомендации, работа партнёра и развитие сети."],
+          ["technical_analysis", "📈", "Рынки и управление риском", "Графики, Price Action, XAUUSD, стратегии, практика и контроль риска."],
+          ["financial_education", "💰", "Финансовая грамотность и бизнес", "Доход, финансовая организация, цифровой бизнес и новые источники дохода."],
           ["telegram", "✈️", "Профессиональный Telegram", "Группы, каналы, боты, безопасность, рост и ответственная монетизация."],
           ["tools", "🧮", "Инструменты", "Калькуляторы, симуляторы и образовательные ресурсы."],
         ],
@@ -757,13 +756,22 @@
   }
 
   function renderLearn() {
+    stopBookTracking();
     const menu = academyMenuCopy();
+    const helpCopy = {
+      pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, serviços, agenda, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
+      en:["How to use EduCashPro","Quick guides for profile, page, services, schedule, card, projects and subscription.","Open Help Center","Learning paths"],
+      es:["Cómo usar EduCashPro","Guías rápidas para perfil, página, servicios, agenda, tarjeta, proyectos y suscripción.","Abrir Central de Ayuda","Rutas de aprendizaje"],
+      ru:["Как пользоваться EduCashPro","Краткие инструкции по профилю, странице, услугам, расписанию, проектам и подписке.","Открыть Центр помощи","Учебные направления"]
+    }[state.language] || ["Como usar o EduCashPro","Guias rápidos para configurar e utilizar os recursos.","Abrir Central de Ajuda","Trilhas de aprendizagem"];
     content.innerHTML = `
-      <section class="courseHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
-      <div class="sectionHead"><div><h2>${escapeHtml(menu.choose)}</h2><p>${escapeHtml(menu.chooseSub)}</p></div></div>
-      <section class="quickGrid academyGrid">
+      <section class="courseHero academyMainHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
+      <button id="openHelpCenter" class="academyHelpCard"><span>🧭</span><div><b>${escapeHtml(helpCopy[0])}</b><small>${escapeHtml(helpCopy[1])}</small><em>${escapeHtml(helpCopy[2])} →</em></div></button>
+      <div class="sectionHead"><div><h2>${escapeHtml(helpCopy[3])}</h2><p>${escapeHtml(menu.chooseSub)}</p></div></div>
+      <section class="quickGrid academyGrid academyPathGrid">
         ${menu.categories.map(([id, icon, title, description]) => `<button class="quickCard academyCategoryCard" data-academy-category="${escapeHtml(id)}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></button>`).join("")}
       </section>`;
+    document.getElementById("openHelpCenter").onclick = () => window.EduCashProHelp?.render?.();
     content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
       if (button.dataset.academyCategory === "tools") return renderTools();
       renderCourseCategory(button.dataset.academyCategory);
@@ -790,8 +798,9 @@
   }
 
   function courseCard(item, locked) {
-    const progress = getProgress(item.id);
-    return `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${item.icon || "🎓"}</div><div><h3>${escapeHtml(localized(item.title))}</h3><p>${escapeHtml(localized(item.description))}</p><div class="meta"><span class="chip">${escapeHtml(item.access === "free" ? t("freeCourse") : t("subscriberExperiences"))}</span></div></div></div><div class="progressTrack"><span style="width:${Math.min(100, progress * 6.67)}%"></span></div><div class="cardActions"><button class="${locked ? "secondaryButton lockedButton" : "primaryButton"}" data-course="${item.id}" data-locked="${locked}">${escapeHtml(locked ? t("locked") : t("openCourse"))}</button><button class="secondaryButton" data-course="${item.id}" data-locked="${locked}">${escapeHtml(t("chapters"))}</button></div></article>`;
+    const percent=Math.max(0,Math.min(100,Number(localStorage.getItem(`educashpro:course-percent:${item.id}`)||0)));
+    const label=percent>0?t("continueLearning"):t("openCourse");
+    return `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${item.icon || "🎓"}</div><div><h3>${escapeHtml(localized(item.title))}</h3><p>${escapeHtml(localized(item.description))}</p><div class="meta"><span class="chip">${escapeHtml(item.access === "free" ? t("freeCourse") : t("subscriberExperiences"))}</span><span class="chip">${percent}%</span></div></div></div><div class="progressTrack"><span style="width:${percent}%"></span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${locked ? "secondaryButton lockedButton" : "primaryButton"}" data-course="${item.id}" data-locked="${locked}">${escapeHtml(locked ? t("locked") : label)}</button></div></article>`;
   }
 
   async function openCourse(courseId) {
@@ -828,23 +837,37 @@
   }
 
   function renderCourseIndex() {
+    stopBookTracking();
     const course = state.currentCourse;
     const courseMeta = state.courseCatalog.find((item) => item.id === course.id);
-    const completed = getProgress(course.id);
-    const percent = course.lessons.length ? Math.round((Math.min(completed + 1, course.lessons.length) / course.lessons.length) * 100) : 0;
+    const completed = getProgress(course.id), storedPercent = Math.max(0,Math.min(100,Number(localStorage.getItem(`educashpro:course-percent:${course.id}`)||0)));
+    const percent = storedPercent;
     const visual = `<div class="courseVisual"><span>📚 ${escapeHtml(t("continueLearning"))}</span><span>✅ ${percent}%</span><span>💾 ${escapeHtml(t("catalogOffline"))}</span></div>`;
     const calculatorButton = course.id === "marketing_rede_educashpro" ? `<button id="openProjection" class="wideButton" style="margin-top:14px">📊 ${escapeHtml(t("projection"))}</button>` : "";
     const cover = courseMeta?.image ? `<img class="courseCover" src="${escapeHtml(freshAssetUrl(courseMeta.image))}" alt="${escapeHtml(course.title)}">` : "";
     const themeClass = course.theme === "exness" ? " technicalCourse" : "";
-    content.innerHTML = `<div class="${themeClass.trim()}"><button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(t("chapters"))}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span></div>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}${renderCoursePartnerCta(course)}</div>`;
+    const readerCopy={pt:["Leitura contínua","Começar leitura","Continuar leitura"],en:["Continuous reading","Start reading","Continue reading"],es:["Lectura continua","Comenzar lectura","Continuar lectura"],ru:["Непрерывное чтение","Начать чтение","Продолжить чтение"]}[state.language]||["Leitura contínua","Começar leitura","Continuar leitura"];
+    content.innerHTML = `<div class="${themeClass.trim()}"><button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(readerCopy[0])}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span><button id="openBookReader" class="wideButton bookStart">${escapeHtml(percent?readerCopy[2]:readerCopy[1])} →</button>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-reader-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}${renderCoursePartnerCta(course)}</div>`;
     document.getElementById("courseBack").onclick = renderLearn;
-    content.querySelectorAll("[data-chapter]").forEach((button) => button.onclick = () => {
-      const index = course.lessons.findIndex((lesson) => Number(lesson.ch) === Number(button.dataset.chapter));
-      if (index >= 0) renderLesson(index);
-    });
+    document.getElementById("openBookReader").onclick=()=>renderBookReader(completed);
+    content.querySelectorAll("[data-reader-chapter]").forEach((button) => button.onclick = () => renderBookReader(Math.max(0,course.lessons.findIndex(lesson=>Number(lesson.ch)===Number(button.dataset.readerChapter)))));
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
     document.getElementById("openProjection")?.addEventListener("click", renderNetworkProjection);
     bindCoursePartnerAction();
+  }
+
+  function renderBookReader(startIndex=0){
+    const course=state.currentCourse;if(!course)return renderLearn();
+    const copy={pt:{contents:"Sumário",back:"Sobre o curso",smaller:"Diminuir texto",larger:"Aumentar texto",finished:"Fim da formação",next:"Voltar às trilhas"},en:{contents:"Contents",back:"About the course",smaller:"Smaller text",larger:"Larger text",finished:"End of course",next:"Back to paths"},es:{contents:"Contenido",back:"Sobre el curso",smaller:"Reducir texto",larger:"Aumentar texto",finished:"Fin de la formación",next:"Volver a las rutas"},ru:{contents:"Содержание",back:"О курсе",smaller:"Уменьшить текст",larger:"Увеличить текст",finished:"Конец курса",next:"К направлениям"}}[state.language];
+    const grouped=course.chapters.map(ch=>({chapter:ch,lessons:course.lessons.map((lesson,index)=>({...lesson,index})).filter(lesson=>Number(lesson.ch)===Number(ch.id))})).filter(group=>group.lessons.length);
+    const fontSize=Math.max(15,Math.min(23,Number(localStorage.getItem("educashpro:reader-font")||18)));
+    const sections=grouped.map(group=>`<section class="bookChapter" id="book-chapter-${group.chapter.id}" data-book-index="${group.lessons[0].index}"><span class="bookChapterLabel">${escapeHtml(t("chapters"))} ${escapeHtml(group.chapter.id)}</span><h2>${escapeHtml(String(group.chapter.title).replace(/^\s*\d+[.)-]?\s*/,""))}</h2>${group.lessons.map(lesson=>`<div class="lessonBody">${cleanLessonBody(lesson.body,group.chapter.title)}</div>`).join("")}</section>`).join("");
+    content.innerHTML=`<div class="bookReader" style="--reader-font:${fontSize}px"><header class="bookReaderBar"><button id="bookBack" aria-label="${escapeHtml(copy.back)}">←</button><strong>${escapeHtml(course.title)}</strong><span id="bookProgress">0%</span></header><details class="bookContents"><summary>☰ ${escapeHtml(copy.contents)}</summary><nav>${grouped.map(group=>`<button data-book-target="book-chapter-${group.chapter.id}">${escapeHtml(group.chapter.title)}</button>`).join("")}</nav></details><div class="bookFontControls"><button id="readerSmaller" class="secondaryButton" aria-label="${escapeHtml(copy.smaller)}">A−</button><button id="readerLarger" class="secondaryButton" aria-label="${escapeHtml(copy.larger)}">A+</button></div><article class="bookPage">${sections}<footer class="bookEnd"><b>✓ ${escapeHtml(copy.finished)}</b><button id="bookFinish" class="wideButton">${escapeHtml(copy.next)}</button></footer></article></div>`;
+    const setFont=value=>{const next=Math.max(15,Math.min(23,value));localStorage.setItem("educashpro:reader-font",String(next));document.querySelector(".bookReader")?.style.setProperty("--reader-font",`${next}px`)};
+    document.getElementById("bookBack").onclick=renderCourseIndex;document.getElementById("readerSmaller").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)-1);document.getElementById("readerLarger").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)+1);document.getElementById("bookFinish").onclick=renderLearn;
+    document.querySelectorAll("[data-book-target]").forEach(button=>button.onclick=()=>{document.getElementById(button.dataset.bookTarget)?.scrollIntoView({behavior:"smooth"});document.querySelector(".bookContents")?.removeAttribute("open")});
+    const chapters=[...document.querySelectorAll(".bookChapter")],update=()=>{const root=document.documentElement,max=Math.max(1,root.scrollHeight-innerHeight),percent=Math.max(0,Math.min(100,Math.round(scrollY/max*100)));localStorage.setItem(`educashpro:course-percent:${course.id}`,String(percent));document.getElementById("bookProgress").textContent=`${percent}%`;let current=0;chapters.forEach(section=>{if(section.getBoundingClientRect().top<innerHeight*.45)current=Number(section.dataset.bookIndex||0)});saveProgress(course.id,current)};
+    activeBookScrollHandler=update;addEventListener("scroll",activeBookScrollHandler,{passive:true});requestAnimationFrame(()=>{const lesson=course.lessons[Math.max(0,Math.min(course.lessons.length-1,Number(startIndex)||0))];document.getElementById(`book-chapter-${lesson?.ch}`)?.scrollIntoView();update()});
   }
 
   function bindCoursePartnerAction() {
@@ -1296,6 +1319,7 @@
       state.botUrl = session.botUrl;
       window.__EDUCASHPRO_SESSION__ = session;
       window.EduCashProProfessional?.setSession?.(session);
+      window.EduCashProHelp?.setSession?.(session);
       if (publicParams.get("game") || publicParams.get("tournament")) {
         await window.EduCashProResources?.loadGames?.();
         window.EduCashProMentalGames?.setSession?.(session);
@@ -1329,5 +1353,5 @@
   });
   window.addEventListener("focus", checkForUpdates);
   document.addEventListener("DOMContentLoaded", init);
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, openAgenda };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda };
 })();
