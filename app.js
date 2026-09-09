@@ -1355,6 +1355,7 @@
     if (document.visibilityState === "visible") checkForUpdates();
   });
   window.addEventListener("focus", checkForUpdates);
-  document.addEventListener("DOMContentLoaded", init);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+  else init();
   window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda };
 })();

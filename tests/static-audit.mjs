@@ -35,6 +35,7 @@ assert(app.includes("readerThemeDot")&&app.includes("educashpro:reader-theme"),"
 assert(technicalCourse.includes("campaign=43340")&&!technicalCourse.includes("campaign=43335"),"Exness affiliate campaign is incorrect");
 assert(technicalCourse.includes('button: "CURSO EM VÍDEO"')&&technicalCourse.includes("url: VIDEO_COURSE_URL, videoUrl: EXNESS_URL"),"Free video and Exness actions are not separated correctly");
 assert(index.includes("market-learning-center.js")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
+assert(index.includes('<script async src="./market-learning-center.js')&&app.includes("else init();"),"Complementary modules must not block startup");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=43340"),"Partner attribution is missing from the markets center");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js"),"TradingView widgets are incomplete");
