@@ -1,6 +1,6 @@
 (function(){
   "use strict";
-  const loaded=new Map(),version="20260908.1";
+  const loaded=new Map(),version="20260909.1";
   function script(src){
     if(loaded.has(src))return loaded.get(src);
     const promise=new Promise((resolve,reject)=>{
