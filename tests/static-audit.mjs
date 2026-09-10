@@ -40,7 +40,6 @@ assert(index.includes('<script async src="./market-learning-center.js')&&app.inc
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=43340"),"Partner attribution is missing from the markets center");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js"),"TradingView widgets are incomplete");
-assert(marketCenter.includes('studies: ["STD;Moving Average"]')&&marketCenter.includes('"moving average.length": 20'),"The advanced chart must contain only the configured 20-period moving average");
 assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("active:state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
 assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
 assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");

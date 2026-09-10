@@ -15,6 +15,10 @@
   };
 
   const LOCALE = { pt: "br", en: "en", es: "es", ru: "ru" };
+  COPY.pt.lockedText = "Ative sua assinatura para utilizar o gráfico avançado e o resumo técnico.";
+  COPY.en.lockedText = "Activate your subscription to use the advanced chart and the technical summary.";
+  COPY.es.lockedText = "Activa tu suscripción para utilizar el gráfico avanzado y el resumen técnico.";
+  COPY.ru.lockedText = "Активируйте подписку, чтобы использовать расширенный график и техническую сводку.";
   const COURSES = [{ icon: "₿", name: "Binance Academy", key: "binance", url: "https://academy.binance.com/" }];
   const WIDGETS = {
     chart: { src: "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js", height: 720, config: { autosize: true, symbol: "OANDA:XAUUSD", interval: "60", timezone: "Etc/UTC", theme: "dark", style: "1", allow_symbol_change: true, calendar: false, studies: ["STD;Moving Average"], studies_overrides: { "moving average.length": 20, "moving average.plot.color": "#ffcc33", "moving average.plot.linewidth": 2 }, support_host: "https://www.tradingview.com" } },
@@ -40,7 +44,7 @@
     host.innerHTML = `<div class="marketLocked"><span>🔒</span><h3>${esc(copy.locked)}</h3><p>${esc(copy.lockedText)}</p><button id="marketSubscribe">${esc(copy.subscribe)}</button></div>`;
     document.getElementById("marketSubscribe").onclick = () => options.subscribe?.();
     document.getElementById("marketExpand").hidden = true;
-    if (kind === "chart") document.getElementById("marketStudyNote").textContent = copy.ma20;
+    document.getElementById("marketStudyNote").textContent = "";
   }
 
   function loadWidget(kind) {
@@ -49,7 +53,7 @@
     currentWidget = kind;
     const copy = COPY[options.language] || COPY.pt;
     document.querySelectorAll("[data-market-widget]").forEach((button) => button.classList.toggle("active", button.dataset.marketWidget === kind));
-    document.getElementById("marketStudyNote").textContent = kind === "chart" ? copy.ma20 : "";
+    document.getElementById("marketStudyNote").textContent = "";
     if (RESTRICTED.has(kind) && !options.active) return lockedView(kind);
     const item = WIDGETS[kind] || WIDGETS.heatmap;
     document.getElementById("marketExpand").hidden = false;
