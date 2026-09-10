@@ -774,7 +774,7 @@
     document.getElementById("openHelpCenter").onclick = () => window.EduCashProHelp?.render?.();
     content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
       if (button.dataset.academyCategory === "tools") return renderTools();
-      if (button.dataset.academyCategory === "technical_analysis") return window.EduCashProMarkets?.render?.({language:state.language,back:renderLearn,openCourse,openUrl});
+      if (button.dataset.academyCategory === "technical_analysis") return window.EduCashProMarkets?.render?.({language:state.language,active:state.profile?.active === true,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
       renderCourseCategory(button.dataset.academyCategory);
     });
   }

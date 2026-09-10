@@ -1,6 +1,6 @@
 (function(){
   "use strict";
-  const loaded=new Map(),version="20260909.2";
+  const loaded=new Map(),version="20260910.1";
   function script(src){
     if(loaded.has(src))return loaded.get(src);
     const promise=new Promise((resolve,reject)=>{
@@ -12,8 +12,9 @@
     loaded.set(src,promise);return promise;
   }
   async function series(files){for(const file of files)await script(file)}
-  let gamesPromise=null,coursesPromise=null;
+  let gamesPromise=null,coursesPromise=null,financePromise=null;
   function loadGames(){return gamesPromise||(gamesPromise=series(["./mental-games.js","./game-suite.js","./social-play.js","./game-polish-v3.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js"]).then(()=>{const value=window.__EDUCASHPRO_SESSION__;if(value){window.EduCashProMentalGames?.setSession?.(value);window.EduCashProGameSuite?.setSession?.(value)}}).catch(error=>{gamesPromise=null;throw error}))}
   function loadCourses(){return coursesPromise||(coursesPromise=series(["./technical-analysis-course.js"]).catch(error=>{coursesPromise=null;throw error}))}
-  window.EduCashProResources={loadGames,loadCourses};
+  function loadFinance(){return financePromise||(financePromise=series(["./monthly-finance-control.js"]).catch(error=>{financePromise=null;throw error}))}
+  window.EduCashProResources={loadGames,loadCourses,loadFinance};
 })();

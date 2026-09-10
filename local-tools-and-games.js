@@ -18,6 +18,7 @@
       closeHelp: "Fechar explicação",
       presentationCta: "✨ Descubra o EduCashPro",
       affiliateCalc: "Simulador do programa de afiliados", affiliateCalcSub: "Simule os cinco níveis e os critérios de desbloqueio.",
+      finance: "Controle Financeiro Mensal", financeSub: "Registre renda e gastos e acompanhe o saldo do mês.",
     },
     en: {
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
@@ -35,6 +36,7 @@
       closeHelp: "Close instructions",
       presentationCta: "✨ Discover EduCashPro",
       affiliateCalc: "Affiliate program simulator", affiliateCalcSub: "Simulate five levels and unlock requirements.",
+      finance: "Monthly Finance Control", financeSub: "Record income and expenses and track the monthly balance.",
     },
     es: {
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
@@ -52,6 +54,7 @@
       closeHelp: "Cerrar explicación",
       presentationCta: "✨ Descubre EduCashPro",
       affiliateCalc: "Simulador del programa de afiliados", affiliateCalcSub: "Simula cinco niveles y los requisitos de desbloqueo.",
+      finance: "Control Financiero Mensual", financeSub: "Registra ingresos y gastos y controla el saldo del mes.",
     },
     ru: {
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
@@ -69,6 +72,7 @@
       closeHelp: "Закрыть инструкцию",
       presentationCta: "✨ Откройте EduCashPro",
       affiliateCalc: "Симулятор партнёрской программы", affiliateCalcSub: "Пять уровней и условия их открытия.",
+      finance: "Ежемесячный финансовый контроль", financeSub: "Записывайте доходы и расходы и следите за остатком.",
     },
   };
 
@@ -193,9 +197,14 @@
     learn();
   }
 
+  async function openFinanceControl() {
+    await window.EduCashProResources?.loadFinance?.();
+    window.EduCashProFinance?.render?.({ language: language(), session, active: session?.profile?.active === true, back: renderToolsHub });
+  }
+
   function renderToolsHub() {
     const active = session?.profile?.active === true;
-    content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid">${active ? `<button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
+    content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid">${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
     const gamesButton = document.createElement("button");
     gamesButton.className = "quickCard";
     gamesButton.innerHTML = `<span class="emoji">🎮</span><strong>${esc(tr("games"))}</strong><small>${esc(tr("gamesSub"))}</small>`;
@@ -204,6 +213,7 @@
     document.getElementById("toolsHubBack").onclick = home;
     document.getElementById("randomizerTool").onclick = renderRandomizers;
     document.getElementById("affiliateTool")?.addEventListener("click", openAffiliateCalculator);
+    document.getElementById("financeTool")?.addEventListener("click", openFinanceControl);
     document.getElementById("linkPageTool").onclick = () => window.EduCashProLinks?.renderPageEditor?.();
     document.getElementById("smartLinkTool").onclick = () => window.EduCashProLinks?.renderShortener?.();
   }

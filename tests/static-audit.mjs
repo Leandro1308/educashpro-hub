@@ -19,11 +19,12 @@ const [index,app,agenda,support,links,games,professional,loader,help,courses]=aw
 ]);
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
+const financeControl=await read("monthly-finance-control.js");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
 assert(!index.includes('<script defer src="./technical-analysis-course.js'),"Courses must be lazy-loaded");
-assert(loader.includes("loadGames")&&loader.includes("loadCourses"),"Resource loader is incomplete");
+assert(loader.includes("loadGames")&&loader.includes("loadCourses")&&loader.includes("loadFinance"),"Resource loader is incomplete");
 assert(!loader.includes("business-21st-century-course.js")&&!loader.includes("course-final-notice.js"),"Retired course patches are still loaded");
 assert(!loader.includes("video-course-access.js"),"The free video course must not load a subscriber gate");
 assert(app.includes('quickCard("professional"'),"Professional Profile is missing from active home");
@@ -38,7 +39,13 @@ assert(index.includes("market-learning-center.js")&&app.includes("EduCashProMark
 assert(index.includes('<script async src="./market-learning-center.js')&&app.includes("else init();"),"Complementary modules must not block startup");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=43340"),"Partner attribution is missing from the markets center");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
-assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js"),"TradingView widgets are incomplete");
+assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js"),"TradingView widgets are incomplete");
+assert(marketCenter.includes('studies: ["STD;Moving Average"]')&&marketCenter.includes('"moving average.length": 20'),"The advanced chart must contain only the configured 20-period moving average");
+assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("active:state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
+assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
+assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");
+assert(financeControl.includes("editExpense")&&financeControl.includes("removeExpense")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
+for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(language),`Missing finance translation: ${language}`);
 assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate lead-magnet guidance is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(help.includes(language),`Missing help translation: ${language}`);
 assert(!courses.includes('"id": "negocio_seculo_xxi"')&&!courses.includes('"id": "apresentacao"'),"Retired duplicate courses remain in catalog");
