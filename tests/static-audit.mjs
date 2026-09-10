@@ -38,6 +38,7 @@ assert(technicalCourse.includes('button: "CURSO EM VÍDEO"')&&technicalCourse.in
 assert(index.includes("market-learning-center.js")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
 assert(index.includes('<script async src="./market-learning-center.js')&&app.includes("else init();"),"Complementary modules must not block startup");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=43340"),"Partner attribution is missing from the markets center");
+assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js"),"TradingView widgets are incomplete");
 assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("active:state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
