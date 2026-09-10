@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "courses": [
     {
       "id": "fundamentos_marketing_rede",
@@ -8,9 +8,9 @@
       "access": "free",
       "link": "",
       "order": 1,
-      "title": { "pt": "Fundamentos do Marketing de Rede", "en": "Network Marketing Fundamentals", "es": "Fundamentos del Marketing de Red", "ru": "Основы сетевого маркетинга" },
-      "description": { "pt": "Formação gratuita sobre produto, relacionamento, ética e construção profissional.", "en": "Free training on product, relationships, ethics and professional development.", "es": "Formación gratuita sobre producto, relaciones, ética y desarrollo profesional.", "ru": "Бесплатный курс о продукте, отношениях, этике и профессиональном развитии." },
-      "preview": { "pt": ["Marketing de rede com produto real", "Comunicação sem pressão", "Plano prático de sete dias"], "en": ["Network marketing with a real product", "Communication without pressure", "A practical seven-day plan"], "es": ["Marketing de red con producto real", "Comunicación sin presión", "Plan práctico de siete días"], "ru": ["Сетевой маркетинг с реальным продуктом", "Общение без давления", "Практический план на семь дней"] }
+      "title": { "pt": "Da Educação Financeira ao Marketing de Rede", "en": "From Financial Education to Network Marketing", "es": "De la Educación Financiera al Marketing de Red", "ru": "От финансовой грамотности к сетевому маркетингу" },
+      "description": { "pt": "Formação gratuita sobre educação financeira, criação de valor, modelos de distribuição, relacionamento e fundamentos da duplicação.", "en": "Free training on financial education, value creation, distribution models, relationships and the foundations of duplication.", "es": "Formación gratuita sobre educación financiera, creación de valor, modelos de distribución, relaciones y fundamentos de la duplicación.", "ru": "Бесплатный курс о финансовой грамотности, создании ценности, моделях распространения, отношениях и основах дубликации." },
+      "preview": { "pt": ["Educação escolar e educação financeira", "Venda direta, afiliados e Marketing de Rede", "Relacionamento, convite e apresentação", "Aprender, fazer, ensinar e duplicar"], "en": ["School education and financial education", "Direct sales, affiliates and Network Marketing", "Relationships, invitation and presentation", "Learn, do, teach and duplicate"], "es": ["Educación escolar y educación financiera", "Venta directa, afiliados y Marketing de Red", "Relaciones, invitación y presentación", "Aprender, hacer, enseñar y duplicar"], "ru": ["Школьное и финансовое образование", "Прямые продажи, партнёрство и сетевой маркетинг", "Отношения, приглашение и презентация", "Изучить, сделать, научить и дублировать"] }
     },
     {
       "id": "marketing_rede_educashpro",
@@ -21,9 +21,9 @@
       "link": "",
       "order": 2,
       "tool": "network_projection",
-      "title": { "pt": "Profissão Afiliado e Marketing Digital", "en": "Affiliate Profession and Digital Marketing", "es": "Profesión Afiliado y Marketing Digital", "ru": "Профессия партнёра и цифровой маркетинг" },
-      "description": { "pt": "Conteúdo, relacionamento, iscas digitais e indicação organizados como possível atividade complementar.", "en": "Content, relationships, lead magnets and referrals organized as a possible complementary activity.", "es": "Contenido, relaciones, imanes digitales e indicación como posible actividad complementaria.", "ru": "Контент, отношения, лид-магниты и рекомендации как дополнительная деятельность." },
-      "preview": { "pt": ["Produto, público e posicionamento", "Páginas com identificação integrada", "Iscas digitais e relacionamento", "Atividade secundária e possível segunda fonte de renda"], "en": ["Product, audience and positioning", "Pages with embedded identification", "Lead magnets and relationships", "Secondary activity and possible second income source"], "es": ["Producto, público y posicionamiento", "Páginas con identificación integrada", "Imanes digitales y relaciones", "Actividad secundaria y posible segunda fuente de ingresos"], "ru": ["Продукт, аудитория и позиционирование", "Страницы со встроенным идентификатором", "Лид-магниты и отношения", "Дополнительная деятельность и возможный второй доход"] }
+      "title": { "pt": "Marketing de Rede Profissional: Duplicação e Liderança", "en": "Professional Network Marketing: Duplication and Leadership", "es": "Marketing de Red Profesional: Duplicación y Liderazgo", "ru": "Профессиональный сетевой маркетинг: дубликация и лидерство" },
+      "description": { "pt": "Formação completa sobre posicionamento, prospecção, apresentação, vendas, retenção, duplicação, liderança e aplicação no EduCashPro.", "en": "Complete training on positioning, prospecting, presentation, sales, retention, duplication, leadership and application in EduCashPro.", "es": "Formación completa sobre posicionamiento, prospección, presentación, ventas, retención, duplicación, liderazgo y aplicación en EduCashPro.", "ru": "Полный курс по позиционированию, поиску, презентации, продажам, удержанию, дубликации, лидерству и применению в EduCashPro." },
+      "preview": { "pt": ["Relacionamento e prospecção profissional", "Convite, apresentação, follow-up e fechamento", "Onboarding, retenção e renovação", "Duplicação, profundidade e formação de líderes", "Escala digital e aplicação do plano EduCashPro"], "en": ["Professional relationships and prospecting", "Invitation, presentation, follow-up and closing", "Onboarding, retention and renewal", "Duplication, depth and leadership development", "Digital scale and the EduCashPro plan"], "es": ["Relaciones y prospección profesional", "Invitación, presentación, seguimiento y cierre", "Integración, retención y renovación", "Duplicación, profundidad y formación de líderes", "Escala digital y plan EduCashPro"], "ru": ["Профессиональные отношения и поиск", "Приглашение, презентация, сопровождение и завершение", "Адаптация, удержание и продление", "Дубликация, глубина и развитие лидеров", "Цифровой масштаб и план EduCashPro"] }
     },
     {
       "id": "profissionalize_telegram",
