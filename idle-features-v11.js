@@ -21,19 +21,11 @@
   }
 
   document.addEventListener("DOMContentLoaded",()=>{
-    schedule(()=>load("./presentation-en-us.js"),700);
-    schedule(()=>load("./experience-enhancements.js"),900);
-    schedule(()=>load("./official-community-access.js"),1100);
-    schedule(()=>load("./privacy-ui.js"),1350);
-
-    // Pré-aquece somente recursos pequenos e muito usados, e apenas quando a
-    // conexão não sinaliza economia de dados. Recursos pesados continuam sob demanda.
-    schedule(()=>{
-      const connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
-      const saveData=connection?.saveData===true;
-      const slow=/^(slow-2g|2g)$/i.test(String(connection?.effectiveType||""));
-      if(saveData||slow) return;
-      window.EduCashProResources?.loadLinks?.().catch(()=>{});
-    },2200);
+    // Complementos pequenos entram somente quando o navegador estiver ocioso.
+    // Recursos funcionais maiores permanecem 100% sob demanda.
+    schedule(()=>load("./presentation-en-us.js"),800);
+    schedule(()=>load("./experience-enhancements.js"),1050);
+    schedule(()=>load("./official-community-access.js"),1300);
+    schedule(()=>load("./privacy-ui.js"),1550);
   },{once:true});
 })();
