@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Marketplace • EduCashPro</title>
+  <link rel="stylesheet" href="./marketplace.css?v=20260911.1" />
+</head>
+<body>
+  <header class="marketHeader">
+    <a class="backButton" href="./index.html" aria-label="Voltar">‹</a>
+    <div>
+      <strong>EduCashPro</strong>
+      <span id="headerTitle">Marketplace</span>
+    </div>
+  </header>
+
+  <main class="marketMain">
+    <section id="listView">
+      <div class="hero">
+        <div>
+          <span class="eyebrow" id="eyebrow">EMPRESAS E PARCEIROS</span>
+          <h1 id="marketTitle">Encontre empresas no EduCashPro</h1>
+          <p id="marketSubtitle">Pesquise por nome, categoria ou localidade e acesse a página de cada empresa.</p>
+        </div>
+      </div>
+
+      <section class="filters" aria-label="Filtros do marketplace">
+        <label class="searchWide">
+          <span id="searchLabel">Pesquisar</span>
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Nome, produto ou serviço" />
+        </label>
+        <label>
+          <span id="categoryLabel">Categoria</span>
+          <select id="segmentSelect"></select>
+        </label>
+        <label>
+          <span id="locationLabel">Localidade</span>
+          <input id="locationInput" type="search" autocomplete="address-level2" placeholder="Cidade, estado ou país" />
+        </label>
+        <button id="filterButton" class="primaryButton" type="button">Pesquisar</button>
+      </section>
+
+      <div class="resultMeta">
+        <span id="resultStatus">Carregando empresas…</span>
+        <button id="clearButton" class="textButton" type="button">Limpar filtros</button>
+      </div>
+
+      <section id="companyGrid" class="companyGrid" aria-live="polite"></section>
+
+      <div id="emptyState" class="emptyState hidden">
+        <div>🏪</div>
+        <strong id="emptyTitle">Nenhuma empresa encontrada</strong>
+        <p id="emptyText">Tente alterar os filtros de pesquisa.</p>
+      </div>
+
+      <div id="errorState" class="emptyState hidden">
+        <div>⚠️</div>
+        <strong id="errorTitle">Não foi possível carregar agora</strong>
+        <p id="errorText">Tente novamente em alguns instantes.</p>
+        <button id="retryButton" class="secondaryButton" type="button">Tentar novamente</button>
+      </div>
+
+      <nav class="pagination" aria-label="Paginação">
+        <button id="previousButton" type="button">‹ <span id="previousText">Anterior</span></button>
+        <span id="pageLabel">Página 1</span>
+        <button id="nextButton" type="button"><span id="nextText">Próxima</span> ›</button>
+      </nav>
+    </section>
+
+    <section id="detailView" class="hidden" aria-live="polite">
+      <button id="detailBack" class="detailBack" type="button">‹ <span id="detailBackText">Voltar ao Marketplace</span></button>
+      <article id="companyDetail" class="companyDetail"></article>
+    </section>
+  </main>
+
+  <script src="./marketplace.js?v=20260911.1"></script>
+</body>
+</html>
