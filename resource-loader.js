@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260911.3";
+  const VERSION="20260911.4";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -63,7 +63,7 @@
         "./game-polish-v3.css","./game-experience-v4.css","./extra-games-v5.css","./extra-games-fix-v6.css","./falling-blocks-v7.css","./color-lines-v8.css","./game-promo-v9.css"
       ]);
       await series([
-        "./mental-games.js","./game-suite.js","./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js","./game-promo-v9.js"
+        "./mental-games.js","./game-suite.js","./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js","./game-promo-v9.js","./game-interaction-fix-v10.js"
       ]);
       const value=currentSession();
       if(value){
