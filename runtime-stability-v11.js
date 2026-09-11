@@ -34,9 +34,6 @@
     else setTimeout(run,16);
   }
 
-  // Vários módulos antigos observavam toda a árvore do documento e podiam disparar
-  // centenas de callbacks na mesma renderização. Mantemos compatibilidade, mas
-  // agrupamos as notificações em no máximo uma execução por frame.
   if(NativeMutationObserver){
     window.MutationObserver=class EduCashProMutationObserver{
       constructor(callback){
@@ -63,10 +60,6 @@
     };
   }
 
-  // Mantém a sessão somente em memória. Nenhum token é persistido no navegador.
-  // Para version.json, atualizamos a referência de build antes de app.js comparar,
-  // evitando reload automático no meio do uso. A próxima abertura já recebe o HTML
-  // e os assets versionados atuais do GitHub Pages.
   window.fetch=async function(input,init){
     const response=await nativeFetch(input,init);
     try{
@@ -158,12 +151,18 @@
 
     let loader=null;
     let ready=null;
+    const toolEmoji=target.querySelector?.(".emoji")?.textContent||"";
+    const insideTools=!!document.getElementById("toolsHubBack");
+
     if(target.id==="linkPageTool"||target.id==="smartLinkTool"||target.id==="areaLinkPage"||target.id==="areaSmartLink"){
       loader=()=>resources.loadLinks?.();
       ready=()=>!!window.EduCashProLinks;
     }else if(target.id==="financeTool"){
       loader=()=>resources.loadFinance?.();
       ready=()=>!!window.EduCashProFinance;
+    }else if(insideTools&&toolEmoji.includes("🎮")){
+      loader=()=>resources.loadGames?.();
+      ready=()=>!!window.EduCashProMentalGames;
     }else if(target.id==="openHelpCenter"){
       loader=()=>resources.loadHelp?.();
       ready=()=>!!window.EduCashProHelp;
@@ -202,13 +201,5 @@
     emitRender();
   },{once:true});
 
-  window.EduCashProRuntime={
-    get session(){return session},
-    setSession,
-    onSession,
-    onRender,
-    emitRender,
-    idle,
-    toast
-  };
+  window.EduCashProRuntime={get session(){return session},setSession,onSession,onRender,emitRender,idle,toast};
 })();
