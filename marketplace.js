@@ -13,8 +13,10 @@
       searchButton: "Pesquisar", clear: "Limpar filtros", loading: "Carregando empresas…", results: (n) => `${n} empresa${n === 1 ? "" : "s"} nesta página`,
       emptyTitle: "Nenhuma empresa encontrada", emptyText: "Tente alterar os filtros de pesquisa.", errorTitle: "Não foi possível carregar agora", errorText: "Tente novamente em alguns instantes.", retry: "Tentar novamente",
       previous: "Anterior", next: "Próxima", page: (n) => `Página ${n}`, all: "Todas as categorias", view: "Ver empresa", back: "Voltar ao Marketplace",
-      about: "Sobre a empresa", contact: "Informações", location: "Localidade", type: "Atendimento", online: "Online", physical: "Presencial", both: "Presencial e online", website: "Acessar empresa", benefit: "Benefício EduCashPro", benefitText: (v) => `Benefício informado: ${v}`,
+      about: "Sobre a empresa", contact: "Informações", contactField: "Contato", location: "Localidade", type: "Atendimento", online: "Online", physical: "Presencial", both: "Presencial e online", website: "Acessar empresa", benefit: "Benefício EduCashPro", benefitText: (v) => `Benefício informado: ${v}`,
       noDescription: "Esta empresa ainda não adicionou uma descrição pública.", noLocation: "Localidade não informada", gallery: "Fotos",
+      reportLink: "Denunciar esta empresa", reportTitle: "Denunciar esta empresa", reportIntro: "Use esta opção apenas para informar um problema real com esta publicação.", reportReason: "Motivo", reportSelect: "Selecione", reportDetails: "Detalhes adicionais (opcional)", reportCancel: "Cancelar", reportSend: "Enviar denúncia", reportSending: "Enviando…", reportSuccess: "Obrigado. A denúncia foi registrada para análise e nenhuma ação automática foi tomada.", reportError: "Não foi possível enviar a denúncia agora.", reportLimited: "Limite de denúncias atingido. Tente novamente mais tarde.",
+      reasons: { fraud:"Possível golpe ou fraude", misleading:"Informação falsa ou enganosa", spam:"Spam ou publicidade abusiva", inappropriate:"Conteúdo impróprio", broken_link:"Link quebrado ou destino incorreto", nonexistent:"Empresa inexistente", rights_violation:"Possível violação de direitos", other:"Outro motivo" },
     },
     en: {
       eyebrow: "BUSINESSES AND PARTNERS", title: "Find businesses on EduCashPro", subtitle: "Search by name, category or location and open each business page.",
@@ -22,8 +24,10 @@
       searchButton: "Search", clear: "Clear filters", loading: "Loading businesses…", results: (n) => `${n} business${n === 1 ? "" : "es"} on this page`,
       emptyTitle: "No businesses found", emptyText: "Try changing your search filters.", errorTitle: "Unable to load right now", errorText: "Please try again in a moment.", retry: "Try again",
       previous: "Previous", next: "Next", page: (n) => `Page ${n}`, all: "All categories", view: "View business", back: "Back to Marketplace",
-      about: "About", contact: "Information", location: "Location", type: "Service", online: "Online", physical: "In person", both: "In person and online", website: "Visit business", benefit: "EduCashPro benefit", benefitText: (v) => `Available benefit: ${v}`,
+      about: "About", contact: "Information", contactField: "Contact", location: "Location", type: "Service", online: "Online", physical: "In person", both: "In person and online", website: "Visit business", benefit: "EduCashPro benefit", benefitText: (v) => `Available benefit: ${v}`,
       noDescription: "This business has not added a public description yet.", noLocation: "Location not provided", gallery: "Photos",
+      reportLink: "Report this business", reportTitle: "Report this business", reportIntro: "Use this option only to report a genuine problem with this listing.", reportReason: "Reason", reportSelect: "Select", reportDetails: "Additional details (optional)", reportCancel: "Cancel", reportSend: "Send report", reportSending: "Sending…", reportSuccess: "Thank you. The report was submitted for review and no automatic action was taken.", reportError: "The report could not be sent right now.", reportLimited: "Report limit reached. Please try again later.",
+      reasons: { fraud:"Possible scam or fraud", misleading:"False or misleading information", spam:"Spam or abusive advertising", inappropriate:"Inappropriate content", broken_link:"Broken or incorrect link", nonexistent:"Business does not exist", rights_violation:"Possible rights violation", other:"Other reason" },
     },
     es: {
       eyebrow: "EMPRESAS Y SOCIOS", title: "Encuentra empresas en EduCashPro", subtitle: "Busca por nombre, categoría o ubicación y accede a la página de cada empresa.",
@@ -31,8 +35,10 @@
       searchButton: "Buscar", clear: "Limpiar filtros", loading: "Cargando empresas…", results: (n) => `${n} empresa${n === 1 ? "" : "s"} en esta página`,
       emptyTitle: "No se encontraron empresas", emptyText: "Prueba cambiar los filtros de búsqueda.", errorTitle: "No fue posible cargar ahora", errorText: "Inténtalo de nuevo en unos instantes.", retry: "Intentar de nuevo",
       previous: "Anterior", next: "Siguiente", page: (n) => `Página ${n}`, all: "Todas las categorías", view: "Ver empresa", back: "Volver al Marketplace",
-      about: "Sobre la empresa", contact: "Información", location: "Ubicación", type: "Atención", online: "Online", physical: "Presencial", both: "Presencial y online", website: "Acceder a la empresa", benefit: "Beneficio EduCashPro", benefitText: (v) => `Beneficio informado: ${v}`,
+      about: "Sobre la empresa", contact: "Información", contactField: "Contacto", location: "Ubicación", type: "Atención", online: "Online", physical: "Presencial", both: "Presencial y online", website: "Acceder a la empresa", benefit: "Beneficio EduCashPro", benefitText: (v) => `Beneficio informado: ${v}`,
       noDescription: "Esta empresa aún no agregó una descripción pública.", noLocation: "Ubicación no informada", gallery: "Fotos",
+      reportLink: "Denunciar esta empresa", reportTitle: "Denunciar esta empresa", reportIntro: "Usa esta opción solo para informar un problema real con esta publicación.", reportReason: "Motivo", reportSelect: "Selecciona", reportDetails: "Detalles adicionales (opcional)", reportCancel: "Cancelar", reportSend: "Enviar denuncia", reportSending: "Enviando…", reportSuccess: "Gracias. La denuncia fue registrada para revisión y no se tomó ninguna acción automática.", reportError: "No fue posible enviar la denuncia ahora.", reportLimited: "Se alcanzó el límite de denuncias. Inténtalo más tarde.",
+      reasons: { fraud:"Posible fraude o estafa", misleading:"Información falsa o engañosa", spam:"Spam o publicidad abusiva", inappropriate:"Contenido inapropiado", broken_link:"Enlace roto o incorrecto", nonexistent:"La empresa no existe", rights_violation:"Posible violación de derechos", other:"Otro motivo" },
     },
     ru: {
       eyebrow: "КОМПАНИИ И ПАРТНЕРЫ", title: "Найдите компании в EduCashPro", subtitle: "Ищите по названию, категории или местоположению и открывайте страницу компании.",
@@ -40,8 +46,10 @@
       searchButton: "Искать", clear: "Очистить фильтры", loading: "Загрузка компаний…", results: (n) => `${n} компаний на этой странице`,
       emptyTitle: "Компании не найдены", emptyText: "Попробуйте изменить фильтры поиска.", errorTitle: "Не удалось загрузить", errorText: "Повторите попытку через несколько секунд.", retry: "Повторить",
       previous: "Назад", next: "Далее", page: (n) => `Страница ${n}`, all: "Все категории", view: "Открыть компанию", back: "Назад к Marketplace",
-      about: "О компании", contact: "Информация", location: "Местоположение", type: "Формат", online: "Онлайн", physical: "Очно", both: "Очно и онлайн", website: "Перейти к компании", benefit: "Преимущество EduCashPro", benefitText: (v) => `Доступное преимущество: ${v}`,
+      about: "О компании", contact: "Информация", contactField: "Контакт", location: "Местоположение", type: "Формат", online: "Онлайн", physical: "Очно", both: "Очно и онлайн", website: "Перейти к компании", benefit: "Преимущество EduCashPro", benefitText: (v) => `Доступное преимущество: ${v}`,
       noDescription: "Компания пока не добавила публичное описание.", noLocation: "Местоположение не указано", gallery: "Фото",
+      reportLink: "Пожаловаться на компанию", reportTitle: "Пожаловаться на компанию", reportIntro: "Используйте эту функцию только для сообщения о реальной проблеме с публикацией.", reportReason: "Причина", reportSelect: "Выберите", reportDetails: "Дополнительные сведения (необязательно)", reportCancel: "Отмена", reportSend: "Отправить жалобу", reportSending: "Отправка…", reportSuccess: "Спасибо. Жалоба отправлена на проверку, автоматических действий не предпринято.", reportError: "Сейчас не удалось отправить жалобу.", reportLimited: "Достигнут лимит жалоб. Повторите попытку позже.",
+      reasons: { fraud:"Возможное мошенничество", misleading:"Ложная или вводящая в заблуждение информация", spam:"Спам или навязчивая реклама", inappropriate:"Неприемлемый контент", broken_link:"Неработающая или неверная ссылка", nonexistent:"Компания не существует", rights_violation:"Возможное нарушение прав", other:"Другая причина" },
     },
   }[lang];
 
@@ -53,7 +61,7 @@
   }[lang];
 
   const el = (id) => document.getElementById(id);
-  const state = { page: 1, hasMore: false, loading: false, items: [] };
+  const state = { page: 1, hasMore: false, loading: false, items: [], reportCompanyId: "", reportSending: false };
 
   function setText(id, value) { const node = el(id); if (node) node.textContent = value; }
   function escapeHtml(value) { return String(value || "").replace(/[&<>'"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
@@ -61,6 +69,12 @@
   function locationText(item) { return [item.city, item.state, item.country].filter(Boolean).join(" · ") || copy.noLocation; }
   function typeText(type) { return type === "physical" ? copy.physical : type === "both" ? copy.both : copy.online; }
   function segmentText(segment) { return segmentLabels[segment] || segmentLabels.other; }
+
+  function renderReportReasons() {
+    const select = el("reportReason");
+    if (!select) return;
+    select.innerHTML = `<option value="">${escapeHtml(copy.reportSelect)}</option>` + Object.entries(copy.reasons).map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join("");
+  }
 
   function applyCopy() {
     document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
@@ -70,6 +84,8 @@
     setText("filterButton", copy.searchButton); setText("clearButton", copy.clear); setText("emptyTitle", copy.emptyTitle); setText("emptyText", copy.emptyText);
     setText("errorTitle", copy.errorTitle); setText("errorText", copy.errorText); setText("retryButton", copy.retry);
     setText("previousText", copy.previous); setText("nextText", copy.next); setText("detailBackText", copy.back);
+    setText("reportTitle", copy.reportTitle); setText("reportIntro", copy.reportIntro); setText("reportReasonLabel", copy.reportReason); setText("reportDetailsLabel", copy.reportDetails); setText("reportCancel", copy.reportCancel); setText("reportSubmit", copy.reportSend);
+    renderReportReasons();
   }
 
   function renderSegments(segments) {
@@ -153,14 +169,16 @@
         <div class="detailBlock"><h3>${escapeHtml(copy.contact)}</h3><div class="detailList">
           <div class="detailRow"><span>${escapeHtml(copy.location)}</span><strong>${escapeHtml(locationText(item))}</strong></div>
           <div class="detailRow"><span>${escapeHtml(copy.type)}</span><strong>${escapeHtml(typeText(item.storeType))}</strong></div>
-          ${item.contact ? `<div class="detailRow"><span>Contato</span><strong>${escapeHtml(item.contact)}</strong></div>` : ""}
+          ${item.contact ? `<div class="detailRow"><span>${escapeHtml(copy.contactField)}</span><strong>${escapeHtml(item.contact)}</strong></div>` : ""}
         </div></div>
       </div>${gallery}
+      <footer class="companyReportFooter"><a class="reportTextLink" href="#" data-report-company="${escapeHtml(item.id)}">${escapeHtml(copy.reportLink)}</a></footer>
     </div>`;
   }
 
   async function openCompany(id, { push = true } = {}) {
     if (!id) return;
+    closeReport();
     el("listView").classList.add("hidden"); el("detailView").classList.remove("hidden"); el("companyDetail").innerHTML = `<div class="skeleton" style="height:420px;border-radius:0"></div>`;
     if (push) { const url = new URL(location.href); url.searchParams.set("company", id); url.searchParams.set("lang", lang); history.pushState({ company: id }, "", url); }
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -175,9 +193,90 @@
   }
 
   function closeDetail({ push = true } = {}) {
+    closeReport();
     el("detailView").classList.add("hidden"); el("listView").classList.remove("hidden");
     if (push) { const url = new URL(location.href); url.searchParams.delete("company"); url.searchParams.set("lang", lang); history.pushState({}, "", url); }
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function setReportStatus(message, type = "") {
+    const node = el("reportStatus");
+    if (!node) return;
+    node.textContent = message || "";
+    node.className = `reportStatus${type ? ` ${type}` : ""}`;
+  }
+
+  function openReport(companyId) {
+    if (!companyId || state.reportSending) return;
+    state.reportCompanyId = String(companyId);
+    el("reportForm").reset();
+    renderReportReasons();
+    setReportStatus("");
+    setText("reportSubmit", copy.reportSend);
+    el("reportSubmit").disabled = false;
+    el("reportModal").classList.remove("hidden");
+    setTimeout(() => el("reportReason")?.focus(), 30);
+  }
+
+  function closeReport() {
+    if (!el("reportModal") || state.reportSending) return;
+    el("reportModal").classList.add("hidden");
+    state.reportCompanyId = "";
+    setReportStatus("");
+  }
+
+  async function submitReport(event) {
+    event.preventDefault();
+    if (state.reportSending || !state.reportCompanyId) return;
+    const reason = String(el("reportReason").value || "");
+    if (!reason) { el("reportReason").focus(); return; }
+
+    state.reportSending = true;
+    el("reportSubmit").disabled = true;
+    setText("reportSubmit", copy.reportSending);
+    setReportStatus("");
+
+    try {
+      const response = await fetch(`${API_BASE}/api/public/moderation/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          entityType: "company",
+          entityId: state.reportCompanyId,
+          reason,
+          details: String(el("reportDetails").value || "").trim(),
+          website: String(el("reportWebsite").value || ""),
+        }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.ok) {
+        const err = new Error(data?.reason || "report_failed");
+        err.status = response.status;
+        throw err;
+      }
+      setReportStatus(copy.reportSuccess, "success");
+      el("reportReason").disabled = true;
+      el("reportDetails").disabled = true;
+      setText("reportSubmit", copy.reportSend);
+      setTimeout(() => {
+        state.reportSending = false;
+        el("reportReason").disabled = false;
+        el("reportDetails").disabled = false;
+        el("reportSubmit").disabled = false;
+        closeReport();
+      }, 2200);
+      return;
+    } catch (error) {
+      console.error("[Marketplace report]", error);
+      const limited = error?.status === 429 || error?.message === "report_rate_limited";
+      setReportStatus(limited ? copy.reportLimited : copy.reportError, "error");
+    } finally {
+      if (!el("reportReason").disabled) {
+        state.reportSending = false;
+        el("reportSubmit").disabled = false;
+        setText("reportSubmit", copy.reportSend);
+      }
+    }
   }
 
   let debounceTimer = null;
@@ -192,7 +291,11 @@
   el("previousButton").addEventListener("click", () => { if (state.page <= 1) return; state.page -= 1; loadCompanies(); window.scrollTo({ top: 0, behavior: "smooth" }); });
   el("nextButton").addEventListener("click", () => { if (!state.hasMore) return; state.page += 1; loadCompanies(); window.scrollTo({ top: 0, behavior: "smooth" }); });
   el("companyGrid").addEventListener("click", (event) => { const button = event.target.closest("[data-company]"); if (button) openCompany(button.dataset.company); });
+  el("companyDetail").addEventListener("click", (event) => { const link = event.target.closest("[data-report-company]"); if (!link) return; event.preventDefault(); openReport(link.dataset.reportCompany); });
   el("detailBack").addEventListener("click", () => closeDetail());
+  el("reportForm").addEventListener("submit", submitReport);
+  document.querySelectorAll("[data-close-report]").forEach((node) => node.addEventListener("click", closeReport));
+  addEventListener("keydown", (event) => { if (event.key === "Escape" && !el("reportModal").classList.contains("hidden")) closeReport(); });
   addEventListener("popstate", () => { const id = new URLSearchParams(location.search).get("company"); if (id) openCompany(id, { push: false }); else closeDetail({ push: false }); });
 
   const initialCompany = qs.get("company");
