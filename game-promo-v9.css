@@ -1,0 +1,11 @@
+.gamePromoCard{position:relative;overflow:hidden;margin:16px 0 20px;padding:22px 20px 18px;border:1px solid rgba(72,239,180,.28);border-radius:24px;background:radial-gradient(circle at 92% 8%,rgba(48,230,166,.24),transparent 34%),linear-gradient(145deg,#132d47,#0b1e34 58%,#0a1829);box-shadow:0 16px 34px rgba(0,0,0,.2)}
+.gamePromoCard:before{content:"";position:absolute;right:-48px;bottom:-62px;width:170px;height:170px;border-radius:50%;background:rgba(48,230,166,.08);pointer-events:none}
+.gamePromoClose{position:absolute;z-index:2;top:10px;right:10px;display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid rgba(255,255,255,.15);border-radius:50%;background:rgba(4,14,25,.52);color:#dfeaf4;font-size:18px;line-height:1;cursor:pointer}
+.gamePromoEyebrow{display:inline-flex;align-items:center;gap:7px;margin:0 40px 8px 0;padding:6px 10px;border-radius:999px;background:rgba(48,230,166,.12);color:#5cf0bd;font-size:11px;font-weight:950;letter-spacing:.08em}
+.gamePromoCard h2{max-width:570px;margin:0 40px 9px 0;color:#fff;font-size:clamp(23px,5vw,34px);line-height:1.08;letter-spacing:-.025em}
+.gamePromoCard p{max-width:640px;margin:0;color:#c0d0df;font-size:15px;line-height:1.52}
+.gamePromoFeatures{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 15px}.gamePromoFeatures span{padding:6px 9px;border:1px solid rgba(151,180,210,.17);border-radius:999px;background:rgba(5,17,31,.42);color:#e6f0f8;font-size:11px;font-weight:800}
+.gamePromoDisclaimer{display:block;margin-top:9px;color:#8fa6bb;font-size:10px;line-height:1.35}
+.gamePromoButton{position:relative;z-index:1;width:100%;min-height:48px;border:0;border-radius:15px;background:linear-gradient(135deg,#30e6a6,#58f2c0);color:#05151c;font-size:15px;font-weight:950;cursor:pointer;box-shadow:0 10px 24px rgba(48,230,166,.15)}
+.gamePromoButton:active{transform:translateY(1px)}
+@media(max-width:520px){.gamePromoCard{margin:12px 0 18px;padding:19px 16px 16px;border-radius:20px}.gamePromoCard h2{font-size:25px}.gamePromoCard p{font-size:14px}.gamePromoFeatures{gap:6px}.gamePromoFeatures span{font-size:10px}}
