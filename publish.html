@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Publicar projeto • EduCashPro</title>
+  <link rel="stylesheet" href="./publish.css?v=20260911.1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="./index.html" aria-label="Voltar">‹</a>
+    <div><strong>EduCashPro</strong><span id="headerSubtitle">Publicar projeto</span></div>
+  </header>
+
+  <main class="page">
+    <section class="introCard">
+      <span class="eyebrow" id="eyebrow">PUBLICAÇÃO LIVRE</span>
+      <h1 id="title">Divulgue seu projeto no EduCashPro</h1>
+      <p id="subtitle">Grupos, canais, bots e páginas podem ser publicados automaticamente, sem fila de aprovação prévia.</p>
+    </section>
+
+    <section class="disclosureCard" aria-labelledby="disclosureTitle">
+      <div class="disclosureIcon">🔗</div>
+      <div>
+        <h2 id="disclosureTitle">Antes de publicar, conheça esta regra</h2>
+        <p id="disclosureText"></p>
+        <a id="affiliateRulesLink" href="./affiliate.html">Conhecer o Programa de Afiliados</a>
+      </div>
+    </section>
+
+    <section class="formCard">
+      <form id="publishForm" novalidate>
+        <label>
+          <span id="typeLabel">Tipo de projeto</span>
+          <select id="typeInput" required>
+            <option value="group">Grupo</option>
+            <option value="channel">Canal</option>
+            <option value="bot">Bot</option>
+            <option value="page">Site ou página</option>
+          </select>
+        </label>
+
+        <label>
+          <span id="nameLabel">Nome</span>
+          <input id="nameInput" type="text" maxlength="60" required placeholder="Nome do projeto" />
+        </label>
+
+        <label>
+          <span id="urlLabel">Link público</span>
+          <input id="urlInput" type="url" maxlength="500" required placeholder="https://t.me/... ou https://..." />
+          <small id="urlHelp">Para grupos e canais públicos, informe o link correspondente do Telegram.</small>
+        </label>
+
+        <label>
+          <span id="descriptionLabel">Descrição</span>
+          <textarea id="descriptionInput" rows="4" minlength="10" maxlength="160" required placeholder="Explique em poucas palavras o conteúdo ou finalidade"></textarea>
+          <small id="descriptionCount">0/160</small>
+        </label>
+
+        <div class="twoCols">
+          <label>
+            <span id="categoryLabel">Categoria</span>
+            <select id="categoryInput" required>
+              <option value="financial_education">Educação financeira</option>
+              <option value="crypto">Cripto</option>
+              <option value="web3">Web3</option>
+              <option value="ai">Inteligência Artificial</option>
+              <option value="digital_marketing">Marketing digital</option>
+              <option value="price_action">Price Action</option>
+              <option value="business">Negócios</option>
+              <option value="technology">Tecnologia</option>
+              <option value="languages">Idiomas</option>
+              <option value="personal_development">Desenvolvimento pessoal</option>
+              <option value="other">Outros</option>
+            </select>
+          </label>
+
+          <label>
+            <span id="languageLabel">Idioma</span>
+            <select id="languageInput" required>
+              <option value="pt">Português</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="ru">Русский</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="consentRow">
+          <input id="consentInput" type="checkbox" required />
+          <span id="consentText">Li e compreendi que meu link de indicação poderá ser divulgado automaticamente em grupos ou canais que eu autorizar a integrar ao EduCashPro e que o recebimento de comissões depende das regras vigentes e da minha elegibilidade.</span>
+        </label>
+
+        <button id="submitButton" class="primaryButton" type="submit">Publicar agora</button>
+        <p id="formStatus" class="formStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="successCard" class="successCard hidden">
+      <div class="successIcon">✓</div>
+      <div>
+        <h2 id="successTitle">Projeto publicado</h2>
+        <p id="successText">Seu projeto já está disponível no diretório EduCashPro.</p>
+      </div>
+    </section>
+
+    <section id="integrationCard" class="integrationCard hidden">
+      <span class="eyebrow" id="integrationEyebrow">INTEGRAÇÃO TELEGRAM</span>
+      <h2 id="integrationTitle">Conecte o grupo ou canal ao EduCashPro</h2>
+      <p id="integrationText"></p>
+      <div class="rightsBox">
+        <strong id="rightsTitle">Permissões mínimas</strong>
+        <p id="rightsText"></p>
+      </div>
+      <button id="integrationButton" class="integrationButton" type="button">Autorizar e integrar no Telegram</button>
+      <p id="integrationStatus" class="integrationStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="footNote">
+      <p id="footNoteText">Publicações podem ser denunciadas e avaliadas posteriormente. O EduCashPro poderá suspender ou remover conteúdo que viole as regras da plataforma.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="./publish.js?v=20260911.1"></script>
+</body>
+</html>
