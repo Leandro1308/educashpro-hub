@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07111f" />
+  <title>Programa de Afiliados • EduCashPro</title>
+  <link rel="stylesheet" href="./affiliate.css?v=20260911.1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="./index.html" aria-label="Voltar">‹</a>
+    <div><strong>EduCashPro</strong><span id="headerSubtitle">Programa de Afiliados</span></div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="eyebrow" id="eyebrow">PROGRAMA DE AFILIADOS</span>
+      <h1 id="title">Seu link já existe. Sua elegibilidade depende da sua atividade.</h1>
+      <p id="subtitle">Todo usuário cadastrado recebe um link pessoal. Receber comissões é um benefício condicionado às regras vigentes do programa.</p>
+      <div id="statusBadge" class="statusBadge loading">Carregando situação…</div>
+    </section>
+
+    <section class="linkCard">
+      <div>
+        <span id="yourLinkLabel">Seu link pessoal de indicação</span>
+        <code id="affiliateLink">Carregando…</code>
+      </div>
+      <div class="linkActions">
+        <button id="copyButton" type="button">Copiar link</button>
+        <button id="shareButton" type="button">Compartilhar</button>
+      </div>
+    </section>
+
+    <section class="card highlight">
+      <h2 id="directTitle">1. Primeira assinatura direta</h2>
+      <p id="directText"></p>
+      <div class="metric"><strong id="joinPercent">60%</strong><span id="joinLabel">da primeira assinatura direta válida</span></div>
+      <p id="directExample" class="example"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="renewTitle">2. Renovações e rede de até cinco níveis</h2>
+      <p id="renewIntro"></p>
+      <div class="tableWrap"><table><thead><tr><th id="thLevel">Nível</th><th id="thCommission">Comissão</th><th id="thRequirement">Critério</th></tr></thead><tbody id="levelsBody"></tbody></table></div>
+      <p id="qualificationNote" class="note"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="dupTitle">3. O poder da duplicação</h2>
+      <div class="network"><b id="networkYou">Você</b><span>↓</span><b id="networkDirect">Pessoas indicadas diretamente</b><span>↓</span><b id="networkExpansion">A rede pode continuar se expandindo</b></div>
+      <p id="dupText"></p>
+    </section>
+
+    <section class="card warningCard">
+      <h2 id="activeTitle">4. Por que manter a assinatura ativa?</h2>
+      <p id="activeLead"></p>
+      <ul id="inactiveRules"></ul>
+      <div id="inactiveAlert" class="inactiveAlert hidden"></div>
+      <a id="activateButton" class="activateButton hidden" href="#">Ativar assinatura</a>
+    </section>
+
+    <section class="card">
+      <h2 id="linkInactiveTitle">5. Seu link continua disponível mesmo se você estiver inativo</h2>
+      <p id="linkInactiveText"></p>
+    </section>
+
+    <section class="card">
+      <h2 id="communityTitle">6. Integre seus grupos e canais</h2>
+      <p id="communityText"></p>
+      <a id="publishButton" class="secondaryCta" href="./publish.html">Publicar ou integrar projeto</a>
+    </section>
+
+    <section class="card legal">
+      <h2 id="importantTitle">7. Informação importante</h2>
+      <p id="importantText"></p>
+    </section>
+
+    <div id="errorBox" class="errorBox hidden"></div>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="./affiliate.js?v=20260911.1"></script>
+</body>
+</html>
