@@ -1,0 +1,29 @@
+name: Dual Mode Frontend Checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Syntax check dual-mode modules
+        run: |
+          node --check platform-adapter.js
+          node --check platform-web-auth.js
+          node --check web-auth-entry.js
+          node --check tests/dual-mode-audit.mjs
+      - name: Run dual-mode audit
+        run: node tests/dual-mode-audit.mjs
