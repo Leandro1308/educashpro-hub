@@ -70,8 +70,18 @@
     requestAnimationFrame(()=>window.scrollTo(0,y));
   }
 
+  function loadPairingUx(){
+    if(document.querySelector('script[data-device-pairing-ux="1"]'))return;
+    const script=document.createElement("script");
+    script.defer=true;
+    script.dataset.devicePairingUx="1";
+    script.src="./device-pairing-ux.js?v=20260913.1";
+    document.head.appendChild(script);
+  }
+
   const observer=new MutationObserver(stabilize);
   observer.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(stabilize,0),{once:true});else setTimeout(stabilize,0);
   window.addEventListener("educashpro:web-session-ready",()=>setTimeout(stabilize,0));
+  loadPairingUx();
 })();
