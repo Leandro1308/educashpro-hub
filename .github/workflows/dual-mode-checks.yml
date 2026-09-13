@@ -23,6 +23,7 @@ jobs:
         run: |
           node --check platform-adapter.js
           node --check platform-web-auth.js
+          node --check web-auth-entry.js
           node --check tests/dual-mode-audit.mjs
       - name: Run dual-mode audit
         run: node tests/dual-mode-audit.mjs
