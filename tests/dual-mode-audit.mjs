@@ -14,4 +14,11 @@ assert(adapter.includes("educashpro:web-session"), "Independent web-session stor
 assert(adapter.includes("educashpro:pending-referral"), "Web referral capture is missing");
 assert(adapter.includes('params.get("ref")'), "Referral query parameter is missing");
 
-console.log("EduCashPro dual-mode frontend audit: OK");
+// This branch prepares identity/navigation only. It must not enable Web payments.
+for (const source of [index, adapter]) {
+  assert(!source.includes("sendTransaction("), "Dual-mode preparation must not send TON transactions");
+  assert(!source.includes("/api/ton/build-tx"), "Dual-mode preparation must not call payment transaction builder");
+  assert(!source.includes("/api/webapp/pay"), "Dual-mode preparation must not call legacy payment endpoints");
+}
+
+console.log("EduCashPro dual-mode frontend audit: OK (payments disabled)");
