@@ -18,6 +18,8 @@ assert(webAuth.includes("/api/platform-auth/challenge"),"Auth challenge client i
 assert(webAuth.includes("setConnectRequestParameters"),"TON proof request is missing");
 assert(webAuth.includes("connectItems?.tonProof"),"TON proof response handling is missing");
 assert(webAuth.includes("/api/platform-auth/from-telegram"),"Telegram platform-session bridge is missing");
+assert(webAuth.includes("/api/platform-auth/link-telegram"),"Authenticated Telegram linking client is missing");
+assert(webAuth.includes("Authorization:`Bearer ${session.token}`"),"Telegram linking must use the stored EduCashPro session");
 
 for(const source of [index,adapter,webAuth]){
   assert(!source.includes("sendTransaction("),"Dual-mode preparation must not send TON transactions");
