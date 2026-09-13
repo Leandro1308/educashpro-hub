@@ -18,19 +18,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     window.__EDUCASHPRO_BOOT__={startedAt:Date.now(),telegramReady:false,scriptErrors:[]};
-    window.addEventListener("error",function(event){
-      var source=event&&event.target&&event.target.src;
-      if(!source)return;
-      window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);
-      console.error("[EduCashPro] Falha ao carregar recurso:",source);
-    },true);
-    try{
-      if(window.Telegram&&window.Telegram.WebApp){
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        window.__EDUCASHPRO_BOOT__.telegramReady=true;
-      }
-    }catch(error){console.error("[EduCashPro] Falha ao sinalizar inicialização ao Telegram:",error)}
+    window.addEventListener("error",function(event){var source=event&&event.target&&event.target.src;if(!source)return;window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);console.error("[EduCashPro] Falha ao carregar recurso:",source)},true);
+    try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand();window.__EDUCASHPRO_BOOT__.telegramReady=true}}catch(error){console.error("[EduCashPro] Falha ao sinalizar inicialização ao Telegram:",error)}
   </script>
   <link rel="stylesheet" href="./style.css?v=20260911.3" />
   <link rel="stylesheet" href="./experience-v2.css?v=20260911.3" />
@@ -41,84 +30,36 @@
   <div id="app">
     <header class="topbar">
       <div class="brandmark">E</div>
-      <div class="brandcopy">
-        <strong>EduCashPro</strong>
-        <span id="headerSubtitle">Ferramentas para seu negócio no Telegram</span>
-      </div>
+      <div class="brandcopy"><strong>EduCashPro</strong><span id="headerSubtitle">Ferramentas para seu negócio no Telegram</span></div>
       <a id="marketplaceButton" class="iconButton" href="./marketplace.html" aria-label="Marketplace" title="Marketplace">🏪</a>
       <button id="closeButton" class="iconButton" aria-label="Fechar">✕</button>
     </header>
-
     <div class="growthQuickActions" aria-label="Crescimento e divulgação">
       <a id="affiliateQuickAction" class="growthQuickAction" href="./affiliate.html"><span aria-hidden="true">🔗</span><b id="affiliateQuickLabel">Meu Link de Afiliado</b></a>
       <a id="publishQuickAction" class="growthQuickAction" href="./publish.html"><span aria-hidden="true">➕</span><b id="publishQuickLabel">Publicar projeto</b></a>
     </div>
-
-    <main id="content" class="content">
-      <section class="splash">
-        <div class="splashLogo">E</div>
-        <h1>EduCashPro</h1>
-        <p id="loadingText">Organizando sua experiência…</p>
-        <div class="loader"><span></span></div>
-      </section>
-    </main>
-
-    <nav id="bottomNav" class="bottomNav hidden" aria-label="Navegação principal">
-      <button data-view="home" class="active"><span>🏠</span><small data-i18n="navHome">Início</small></button>
-      <button data-view="learn"><span>🎓</span><small data-i18n="navLearn">Aprender</small></button>
-      <button data-view="explore"><span>🔎</span><small data-i18n="navExplore">Explorar</small></button>
-      <button data-view="benefits"><span>🎁</span><small data-i18n="navBenefits">Benefícios</small></button>
-      <button data-view="area"><span>❤️</span><small data-i18n="navArea">Minha área</small></button>
-    </nav>
+    <main id="content" class="content"><section class="splash"><div class="splashLogo">E</div><h1>EduCashPro</h1><p id="loadingText">Organizando sua experiência…</p><div class="loader"><span></span></div></section></main>
+    <nav id="bottomNav" class="bottomNav hidden" aria-label="Navegação principal"><button data-view="home" class="active"><span>🏠</span><small data-i18n="navHome">Início</small></button><button data-view="learn"><span>🎓</span><small data-i18n="navLearn">Aprender</small></button><button data-view="explore"><span>🔎</span><small data-i18n="navExplore">Explorar</small></button><button data-view="benefits"><span>🎁</span><small data-i18n="navBenefits">Benefícios</small></button><button data-view="area"><span>❤️</span><small data-i18n="navArea">Minha área</small></button></nav>
   </div>
-
-  <div id="globalLoading" class="globalLoading hidden" role="status" aria-live="polite">
-    <div class="globalLoadingCard">
-      <span class="globalSpinner" aria-hidden="true"></span>
-      <strong id="globalLoadingText">Carregando…</strong>
-      <small id="globalLoadingHint">Aguarde um instante</small>
-    </div>
-  </div>
-
+  <div id="globalLoading" class="globalLoading hidden" role="status" aria-live="polite"><div class="globalLoadingCard"><span class="globalSpinner" aria-hidden="true"></span><strong id="globalLoadingText">Carregando…</strong><small id="globalLoadingHint">Aguarde um instante</small></div></div>
   <div id="toast" class="toast" role="status"></div>
-  <div id="accessModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modalBackdrop" data-close-modal></div>
-    <section class="modalSheet">
-      <button class="modalClose" data-close-modal aria-label="Fechar">✕</button>
-      <div id="modalIcon" class="modalIcon">🎓</div>
-      <h2 id="modalTitle"></h2>
-      <p id="modalDescription"></p>
-      <ul id="modalLearning"></ul>
-      <button id="modalSubscribe" class="wideButton"></button>
-      <button class="secondaryButton modalCancel" data-close-modal></button>
-    </section>
-  </div>
-
+  <div id="accessModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalBackdrop" data-close-modal></div><section class="modalSheet"><button class="modalClose" data-close-modal aria-label="Fechar">✕</button><div id="modalIcon" class="modalIcon">🎓</div><h2 id="modalTitle"></h2><p id="modalDescription"></p><ul id="modalLearning"></ul><button id="modalSubscribe" class="wideButton"></button><button class="secondaryButton modalCancel" data-close-modal></button></section></div>
+  <!-- Dual-mode adapters are inert until the app explicitly calls them. -->
+  <script defer src="./platform-adapter.js?v=20260913.2"></script>
+  <script defer src="./platform-web-auth.js?v=20260913.2"></script>
   <!-- Núcleo mínimo. Recursos pesados são carregados somente quando usados. -->
   <script defer src="./runtime-stability-v11.js?v=20260911.3"></script>
   <script defer src="./startup-lite.js?v=20260911.3"></script>
   <script defer src="./resource-loader.js?v=20260911.5"></script>
   <script defer src="./visitor-experience.js?v=20260911.3"></script>
   <script defer src="./local-tools-and-games.js?v=20260911.3"></script>
-  <!-- Mantido no núcleo porque captura a sessão autenticada; suas ações continuam locais e leves. -->
   <script defer src="./link-tools.js?v=20260911.3"></script>
   <script defer src="./growth-entry-v10.js?v=20260911.3"></script>
   <script defer src="./app.js?v=20260911.3"></script>
   <script defer src="./academy-back-v10.js?v=20260911.4"></script>
   <script defer src="./idle-features-v11.js?v=20260911.3"></script>
-
   <script>
-    window.setTimeout(function(){
-      if(window.__EDUCASHPRO_APP_STARTED__)return;
-      var loadingText=document.getElementById("loadingText");
-      var loader=document.querySelector(".splash .loader");
-      if(loader)loader.hidden=true;
-      if(loadingText){
-        loadingText.classList.add("error");
-        loadingText.textContent="Não foi possível iniciar. Feche e abra novamente pelo botão do EduCashPro.";
-      }
-      console.error("[EduCashPro] Tempo limite de inicialização excedido.",window.__EDUCASHPRO_BOOT__);
-    },12000);
+    window.setTimeout(function(){if(window.__EDUCASHPRO_APP_STARTED__)return;var loadingText=document.getElementById("loadingText");var loader=document.querySelector(".splash .loader");if(loader)loader.hidden=true;if(loadingText){loadingText.classList.add("error");loadingText.textContent="Não foi possível iniciar. Feche e abra novamente pelo botão do EduCashPro."}console.error("[EduCashPro] Tempo limite de inicialização excedido.",window.__EDUCASHPRO_BOOT__)},12000);
   </script>
 </body>
 </html>
