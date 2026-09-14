@@ -11,10 +11,15 @@
   class EduCashProTonConnectUI extends Original{
     constructor(options){
       super(options);
-      const restored=this.wallet;
+      const restored=super.wallet;
       if(restored&&!hasFreshProof(restored)&&typeof this.disconnect==="function"){
         Promise.resolve(this.disconnect()).catch(()=>{});
       }
+    }
+
+    get wallet(){
+      const current=super.wallet;
+      return hasFreshProof(current)?current:null;
     }
   }
 
