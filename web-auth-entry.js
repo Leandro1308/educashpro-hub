@@ -51,12 +51,9 @@
     const button=document.getElementById("webOpenShopeeVideo");
     if(button){button.disabled=true;button.querySelector("small").textContent=t("openingShopee")}
     try{
-      const response=await fetch("https://educashpro-all.onrender.com/api/platform-auth/hub-session",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${state.session?.token||""}`},body:"{}",cache:"no-store"});
-      const hubSession=await response.json().catch(()=>({}));
-      if(!response.ok||!hubSession?.token)throw new Error(hubSession?.reason||"hub_session_failed");
-      window.__EDUCASHPRO_SESSION__=hubSession;
       await window.EduCashProResources?.loadShopeeVideo?.();
-      window.EduCashProShopeeVideo?.render?.({session:hubSession,language:locale(),back:renderAuthenticated});
+      window.__EDUCASHPRO_SESSION__=state.session;
+      window.EduCashProShopeeVideo?.render?.({session:state.session,language:locale(),back:renderAuthenticated});
     }catch(error){if(button){button.disabled=false;button.querySelector("small").textContent=error?.message||t("webUnavailable")}}
   }
 
