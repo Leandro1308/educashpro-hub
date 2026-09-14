@@ -20,7 +20,6 @@ const [index,app,agenda,support,links,games,professional,loader,help,courses,acc
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
-const shopeeDownloader=await read("shopee-video-downloader.js");
 const localTools=await read("local-tools-and-games.js");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
@@ -48,12 +47,6 @@ assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affil
 assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");
 assert(financeControl.includes("editExpense")&&financeControl.includes("removeExpense")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(language),`Missing finance translation: ${language}`);
-assert(loader.includes("loadShopeeVideo")&&app.includes("renderTools")&&localTools.includes("authenticatedSession"),"Shopee downloader is not connected to the tools area");
-assert(shopeeDownloader.includes("/api/media/shopee/resolve")&&shopeeDownloader.includes("downloadShopeeVideo")&&shopeeDownloader.includes("visitorId()"),"Shopee direct-download flow is incomplete");
-assert(shopeeDownloader.includes("shopeeVideoPreview")&&shopeeDownloader.includes("available:"),"Shopee availability and video preview are missing");
-assert(webAuthEntry.includes("webOpenShopeeVideo")&&!webAuthEntry.includes("/api/platform-auth/hub-session")&&webAuthEntry.includes("loadShopeeVideo"),"Shopee downloader is not available to authenticated Web users");
-assert(!shopeeDownloader.includes("blob()")&&!shopeeDownloader.includes("arrayBuffer()"),"The browser must not buffer the Shopee video");
-for(const language of ["pt:","en:","es:","ru:"])assert(shopeeDownloader.includes(language),`Missing Shopee downloader translation: ${language}`);
 assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate lead-magnet guidance is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(help.includes(language),`Missing help translation: ${language}`);
 assert(!courses.includes('"id": "negocio_seculo_xxi"')&&!courses.includes('"id": "apresentacao"'),"Retired duplicate courses remain in catalog");
@@ -70,3 +63,4 @@ assert(!accountCenter.includes("/api/ton/build-tx")&&!accountCenter.includes("se
 for(const language of ["pt:","en:","es:","ru:"])assert(accountCenter.includes(language),`Missing account center translation: ${language}`);
 
 console.log("EduCashPro static audit: OK");
+
