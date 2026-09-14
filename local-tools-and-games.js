@@ -208,7 +208,8 @@
 
   async function openShopeeVideo() {
     await window.EduCashProResources?.loadShopeeVideo?.();
-    window.EduCashProShopeeVideo?.render?.({ language: language(), session, back: renderToolsHub });
+    const authenticatedSession = window.EduCashProWebEntry?.getSession?.() || window.__EDUCASHPRO_SESSION__ || session;
+    window.EduCashProShopeeVideo?.render?.({ language: language(), session: authenticatedSession, back: renderToolsHub });
   }
 
   function renderToolsHub() {

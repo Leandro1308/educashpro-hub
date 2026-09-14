@@ -21,6 +21,7 @@ const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
 const shopeeDownloader=await read("shopee-video-downloader.js");
+const localTools=await read("local-tools-and-games.js");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
@@ -47,7 +48,7 @@ assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affil
 assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");
 assert(financeControl.includes("editExpense")&&financeControl.includes("removeExpense")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(language),`Missing finance translation: ${language}`);
-assert(loader.includes("loadShopeeVideo")&&app.includes("renderTools"),"Shopee downloader is not connected to the tools area");
+assert(loader.includes("loadShopeeVideo")&&app.includes("renderTools")&&localTools.includes("authenticatedSession"),"Shopee downloader is not connected to the tools area");
 assert(shopeeDownloader.includes("/api/media/shopee/resolve")&&shopeeDownloader.includes("downloadShopeeVideo")&&shopeeDownloader.includes("visitorId()"),"Shopee direct-download flow is incomplete");
 assert(shopeeDownloader.includes("shopeeVideoPreview")&&shopeeDownloader.includes("available:"),"Shopee availability and video preview are missing");
 assert(webAuthEntry.includes("webOpenShopeeVideo")&&!webAuthEntry.includes("/api/platform-auth/hub-session")&&webAuthEntry.includes("loadShopeeVideo"),"Shopee downloader is not available to authenticated Web users");
