@@ -19,7 +19,6 @@
       presentationCta: "✨ Descubra o EduCashPro",
       affiliateCalc: "Simulador do programa de afiliados", affiliateCalcSub: "Simule os cinco níveis e os critérios de desbloqueio.",
       finance: "Controle Financeiro Mensal", financeSub: "Registre renda e gastos e acompanhe o saldo do mês.",
-      shopeeVideo: "Baixar vídeos da Shopee", shopeeVideoSub: "Experimente grátis e baixe diretamente da origem.",
     },
     en: {
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
@@ -38,7 +37,6 @@
       presentationCta: "✨ Discover EduCashPro",
       affiliateCalc: "Affiliate program simulator", affiliateCalcSub: "Simulate five levels and unlock requirements.",
       finance: "Monthly Finance Control", financeSub: "Record income and expenses and track the monthly balance.",
-      shopeeVideo: "Download Shopee videos", shopeeVideoSub: "Try it free, delivered directly from the source.",
     },
     es: {
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
@@ -57,7 +55,6 @@
       presentationCta: "✨ Descubre EduCashPro",
       affiliateCalc: "Simulador del programa de afiliados", affiliateCalcSub: "Simula cinco niveles y los requisitos de desbloqueo.",
       finance: "Control Financiero Mensual", financeSub: "Registra ingresos y gastos y controla el saldo del mes.",
-      shopeeVideo: "Descargar videos de Shopee", shopeeVideoSub: "Pruébalo gratis, directamente desde el origen.",
     },
     ru: {
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
@@ -76,7 +73,6 @@
       presentationCta: "✨ Откройте EduCashPro",
       affiliateCalc: "Симулятор партнёрской программы", affiliateCalcSub: "Пять уровней и условия их открытия.",
       finance: "Ежемесячный финансовый контроль", financeSub: "Записывайте доходы и расходы и следите за остатком.",
-      shopeeVideo: "Скачать видео Shopee", shopeeVideoSub: "Попробуйте бесплатно — загрузка напрямую из источника.",
     },
   };
 
