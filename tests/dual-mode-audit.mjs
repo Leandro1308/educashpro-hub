@@ -11,7 +11,7 @@ assert(index.includes("platform-adapter.js"),"Platform adapter must load");
 assert(index.includes("platform-web-auth.js"),"Platform auth client must load");
 assert(index.indexOf("platform-adapter.js")<index.indexOf("platform-web-auth.js"),"Adapter must load before auth");
 assert(index.indexOf("platform-web-auth.js")<index.indexOf('src="./app.js'),"Auth helper must load before the EduCashPro app");
-assert(adapter.includes('return tg?.initData?"telegram":"web"'),"Environment detection is missing");
+assert(adapter.includes("WEB_SENTINEL")&&adapter.includes("isRealTelegramInitData")&&adapter.includes('return isRealTelegramInitData()?"telegram":"web"'),"Environment detection is missing");
 assert(adapter.includes("educashpro:web-session"),"Web session storage is missing");
 assert(adapter.includes("educashpro:pending-referral"),"Referral capture storage is missing");
 assert(webAuth.includes("/api/platform-auth/challenge"),"Auth challenge client is missing");
