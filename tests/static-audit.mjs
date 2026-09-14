@@ -50,7 +50,7 @@ for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(l
 assert(loader.includes("loadShopeeVideo")&&app.includes("renderTools"),"Shopee downloader is not connected to the tools area");
 assert(shopeeDownloader.includes("/api/media/shopee/resolve")&&shopeeDownloader.includes("downloadShopeeVideo"),"Shopee direct-download flow is incomplete");
 assert(shopeeDownloader.includes("shopeeVideoPreview")&&shopeeDownloader.includes("available:"),"Shopee availability and video preview are missing");
-assert(webAuthEntry.includes("webOpenShopeeVideo")&&webAuthEntry.includes("/api/platform-auth/hub-session")&&webAuthEntry.includes("loadShopeeVideo"),"Shopee downloader is not available to authenticated Web users");
+assert(webAuthEntry.includes("webOpenShopeeVideo")&&!webAuthEntry.includes("/api/platform-auth/hub-session")&&webAuthEntry.includes("loadShopeeVideo"),"Shopee downloader is not available to authenticated Web users");
 assert(!shopeeDownloader.includes("blob()")&&!shopeeDownloader.includes("arrayBuffer()"),"The browser must not buffer the Shopee video");
 for(const language of ["pt:","en:","es:","ru:"])assert(shopeeDownloader.includes(language),`Missing Shopee downloader translation: ${language}`);
 assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate lead-magnet guidance is incomplete");
