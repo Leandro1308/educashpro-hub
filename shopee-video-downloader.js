@@ -89,6 +89,22 @@
     return value;
   }
 
+  function storedWebSession() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("educashpro:web-session") || "null");
+      return saved?.token ? saved : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function currentSession(preferred) {
+    return preferred?.token ? preferred
+      : window.EduCashProWebEntry?.getSession?.()?.token ? window.EduCashProWebEntry.getSession()
+      : window.__EDUCASHPRO_SESSION__?.token ? window.__EDUCASHPRO_SESSION__
+      : storedWebSession();
+  }
+
   async function api(path, payload = {}) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 28_000);
@@ -227,7 +243,7 @@
   }
 
   async function render(options = {}) {
-    context = { session: options.session || context.session || window.__EDUCASHPRO_SESSION__, language: options.language || options.session?.profile?.language || context.language || "pt", back: options.back || context.back || (() => history.back()) };
+    context = { session: currentSession(options.session || context.session), language: options.language || options.session?.profile?.language || context.language || "pt", back: options.back || context.back || (() => history.back()) };
     content().innerHTML = `<main class="shopeeDownloader"><button id="shopeeBack" class="textButton">← ${esc(tr("back"))}</button><section class="hero shopeeHero"><div class="shopeeTitleIcon">🛍️</div><h1>${esc(tr("title"))}</h1><p>${esc(tr("finding"))}</p></section></main>`;
     document.getElementById("shopeeBack").onclick = context.back;
     try { status = await api("/api/media/shopee/status"); renderMain(); }

@@ -208,7 +208,9 @@
 
   async function openShopeeVideo() {
     await window.EduCashProResources?.loadShopeeVideo?.();
-    const authenticatedSession = window.EduCashProWebEntry?.getSession?.() || window.__EDUCASHPRO_SESSION__ || session;
+    let storedSession = null;
+    try { storedSession = JSON.parse(localStorage.getItem("educashpro:web-session") || "null"); } catch {}
+    const authenticatedSession = window.EduCashProWebEntry?.getSession?.() || window.__EDUCASHPRO_SESSION__ || storedSession || session;
     window.EduCashProShopeeVideo?.render?.({ language: language(), session: authenticatedSession, back: renderToolsHub });
   }
 
