@@ -13,9 +13,9 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,games,professional,loader,help,courses]=await Promise.all([
+const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter]=await Promise.all([
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
-  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json")
+  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js")
 ]);
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
@@ -53,4 +53,12 @@ assert(professional.includes('id="recommendedProfessionalAction"'),"Recommended 
 assert(professional.includes('step("configureServices"')&&professional.includes('step("configureAppearance"'),"Professional setup steps are incomplete");
 assert(app.includes('query.set("view", view)')&&agenda.includes('p.get("view")'),"Professional setup cannot open the requested agenda section");
 for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(language),`Missing professional translation: ${language}`);
+
+assert(index.includes("account-center.js"),"Web account center is not loaded");
+assert(accountCenter.includes("/api/platform-account/overview")&&accountCenter.includes("/api/platform-account/network"),"Account overview or network parity is missing");
+assert(accountCenter.includes("/api/platform-account/preferences")&&accountCenter.includes("openPreferences"),"Bot notification preferences are not available on the Web account");
+assert(accountCenter.includes('data-action="explore"')&&accountCenter.includes('data-action="benefits"')&&accountCenter.includes('data-action="documents"'),"Bot menu parity shortcuts are incomplete");
+assert(!accountCenter.includes("/api/ton/build-tx")&&!accountCenter.includes("sendTransaction("),"Account center must not initiate subscription payments");
+for(const language of ["pt:","en:","es:","ru:"])assert(accountCenter.includes(language),`Missing account center translation: ${language}`);
+
 console.log("EduCashPro static audit: OK");
