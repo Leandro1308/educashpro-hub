@@ -47,26 +47,6 @@
     try{state.pair=await auth.startDevicePairing();const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br>${esc(t("expires"))}</div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.session=platform.readWebSession?.();closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
   }
 
-  async function openShopeeVideo(){
-    const button=document.getElementById("webOpenShopeeVideo");
-    if(button){button.disabled=true;button.querySelector("small").textContent=t("openingShopee")}
-    try{
-      await window.EduCashProResources?.loadShopeeVideo?.();
-      window.__EDUCASHPRO_SESSION__=state.session;
-      window.EduCashProShopeeVideo?.render?.({session:state.session,language:locale(),back:renderAuthenticated});
-    }catch(error){if(button){button.disabled=false;button.querySelector("small").textContent=error?.message||t("webUnavailable")}}
-  }
-
-  function enhanceShopeeModule(){
-    const grid=document.querySelector(".webModuleGrid");
-    if(!grid||document.getElementById("webOpenShopeeVideo"))return;
-    const button=document.createElement("button");
-    button.id="webOpenShopeeVideo";button.className="webModule";button.type="button";
-    button.innerHTML=`<span>🎬</span><b>${esc(t("shopeeVideo"))}</b><small>${esc(t("shopeeVideoSub"))}</small>`;
-    button.addEventListener("click",openShopeeVideo);grid.prepend(button);
-  }
-
-  new MutationObserver(enhanceShopeeModule).observe(document.getElementById("content")||document.body,{childList:true,subtree:true});
 
   function logout(){platform.writeWebSession?.(null);state.session=null;location.reload()}
   function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}${location.pathname}?ref=${encodeURIComponent(code)}`}
