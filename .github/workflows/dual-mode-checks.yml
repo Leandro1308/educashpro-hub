@@ -1,6 +1,8 @@
 name: Dual Mode Frontend Checks
 
 on:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -24,6 +26,10 @@ jobs:
           node --check platform-adapter.js
           node --check platform-web-auth.js
           node --check web-auth-entry.js
+          node --check account-center.js
           node --check tests/dual-mode-audit.mjs
+          node --check tests/static-audit.mjs
       - name: Run dual-mode audit
         run: node tests/dual-mode-audit.mjs
+      - name: Run static audit
+        run: node tests/static-audit.mjs
