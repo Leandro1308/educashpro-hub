@@ -79,6 +79,15 @@
   const tr = (key, values = {}) => Object.entries(values).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, String(value)), COPY[lang()][key] || COPY.pt[key] || key);
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   const content = () => document.getElementById("content");
+  function visitorId() {
+    const key = "educashpro:shopee-visitor-id";
+    let value = String(localStorage.getItem(key) || "");
+    if (!/^[a-f0-9-]{20,80}$/i.test(value)) {
+      value = crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem(key, value);
+    }
+    return value;
+  }
 
   async function api(path, payload = {}) {
     const controller = new AbortController();
@@ -86,7 +95,7 @@
     try {
       const response = await fetch(`${API_BASE}${path}`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: context.session?.token, ...payload }), cache: "no-store", signal: controller.signal,
+        body: JSON.stringify({ token: context.session?.token, visitorId: visitorId(), ...payload }), cache: "no-store", signal: controller.signal,
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) { const error = new Error(data.reason || "request_failed"); error.data = data; throw error; }
