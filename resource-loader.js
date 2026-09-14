@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260911.5";
+  const VERSION="20260914.2";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -54,7 +54,7 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null;
+  let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,shopeePromise=null;
 
   function loadGames(){
     if(gamesPromise) return gamesPromise;
@@ -77,6 +77,11 @@
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadFinance(){return financePromise||(financePromise=script("./monthly-finance-control.js").catch(error=>{financePromise=null;throw error}))}
+  function loadShopeeVideo(){
+    return shopeePromise||(shopeePromise=parallelStyles(["./shopee-video-downloader.css"])
+      .then(()=>script("./shopee-video-downloader.js"))
+      .catch(error=>{shopeePromise=null;throw error}));
+  }
   function loadLinks(){return linksPromise||(linksPromise=script("./link-tools.js").catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
     return professionalPromise||(professionalPromise=script("./professional-profile.js")
@@ -93,5 +98,5 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,loadGames,loadCourses,loadFinance,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,idle};
+  window.EduCashProResources={version:VERSION,script,style,loadGames,loadCourses,loadFinance,loadShopeeVideo,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,idle};
 })();
