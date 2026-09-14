@@ -64,3 +64,12 @@ for(const language of ["pt:","en:","es:","ru:"])assert(accountCenter.includes(la
 
 console.log("EduCashPro static audit: OK");
 
+
+const crossPlatformNav=await read("cross-platform-nav.js");
+for(const page of ["index.html","agenda.html","affiliate.html","marketplace.html","publish.html","support.html"]){
+  const source=await read(page);
+  assert(source.includes("cross-platform-nav.js"),`Cross-platform navigation missing from ${page}`);
+}
+assert(crossPlatformNav.includes("EduCashProBot")&&crossPlatformNav.includes("go.educashpro.vip"),"Site and bot cross-navigation is incomplete");
+assert(crossPlatformNav.includes("searchParams.set(\"ref\"")&&crossPlatformNav.includes("ref_"),"Cross-navigation must preserve affiliate attribution");
+assert(crossPlatformNav.includes("ensureBack")&&crossPlatformNav.includes("decorateInternalLinks"),"Back-button or internal-link normalization is missing");
