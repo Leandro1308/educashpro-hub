@@ -1,6 +1,10 @@
 (function(){
   const platform=window.EduCashProPlatform;
   const auth=window.EduCashProWebAuth;
+
+  // A ponte Web pode expor um initData sintético apenas para reutilizar o núcleo
+  // do Hub. Ele nunca deve ser enviado ao endpoint de validação do Telegram.
+  if(window.__EDUCASHPRO_WEB_HUB__?.active)return;
   if(!platform?.isTelegram?.()||!auth?.authenticateFromTelegram)return;
 
   async function connectTelegramSession(){
