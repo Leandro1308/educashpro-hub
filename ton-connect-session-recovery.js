@@ -10,10 +10,24 @@
 
   class EduCashProTonConnectUI extends Original{
     constructor(options){
-      super(options);
-      const restored=super.wallet;
-      if(restored&&!hasFreshProof(restored)&&typeof this.disconnect==="function"){
-        Promise.resolve(this.disconnect()).catch(()=>{});
+      const merged={
+        ...(options||{}),
+        actionsConfiguration:{
+          returnStrategy:"back",
+          ...((options&&options.actionsConfiguration)||{}),
+        },
+      };
+      super(merged);
+      this.__educashproResetPromise=Promise.resolve();
+      if(this.connected&&typeof this.disconnect==="function"){
+        this.__educashproResetPromise=Promise.resolve(this.disconnect()).catch(()=>{});
+      }
+    }
+
+    async ensureFreshLogin(){
+      await this.__educashproResetPromise;
+      if(this.connected&&typeof this.disconnect==="function"){
+        await Promise.resolve(this.disconnect()).catch(()=>{});
       }
     }
 
