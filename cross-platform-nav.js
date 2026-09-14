@@ -111,9 +111,12 @@
     link.title = value.label;
     link.setAttribute("aria-label", value.label);
     link.dataset.label = value.label;
-    link.textContent = value.icon;
+    if (link.textContent !== value.icon) link.textContent = value.icon;
     const affiliateLabel = document.getElementById("affiliateQuickLabel");
-    if (affiliateLabel && !isTelegram() && !session()?.profile) affiliateLabel.textContent = language() === "pt" ? "Programa de Afiliados" : language() === "es" ? "Programa de Afiliados" : language() === "ru" ? "Партнёрская программа" : "Affiliate Program";
+    if (affiliateLabel && !isTelegram() && !session()?.profile) {
+      const label = language() === "pt" ? "Programa de Afiliados" : language() === "es" ? "Programa de Afiliados" : language() === "ru" ? "Партнёрская программа" : "Affiliate Program";
+      if (affiliateLabel.textContent !== label) affiliateLabel.textContent = label;
+    }
     const close = target.querySelector("#closeButton, #close");
     if (close && !isTelegram()) close.hidden = true;
   }

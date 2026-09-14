@@ -73,3 +73,5 @@ for(const page of ["index.html","agenda.html","affiliate.html","marketplace.html
 assert(crossPlatformNav.includes("EduCashProBot")&&crossPlatformNav.includes("go.educashpro.vip"),"Site and bot cross-navigation is incomplete");
 assert(crossPlatformNav.includes("searchParams.set(\"ref\"")&&crossPlatformNav.includes("ref_"),"Cross-navigation must preserve affiliate attribution");
 assert(crossPlatformNav.includes("ensureBack")&&crossPlatformNav.includes("decorateInternalLinks"),"Back-button or internal-link normalization is missing");
+
+assert(crossPlatformNav.includes("link.textContent !== value.icon"),"Cross-platform navigation must be idempotent and must not create a mutation loop");
