@@ -11,7 +11,7 @@
       remaining: "{count} disponíveis", reset: "O limite diário é renovado à meia-noite UTC.",
       disabled: "Esta ferramenta está temporariamente desativada.", freeLimit: "Você utilizou seus downloads gratuitos.",
       dailyLimit: "Você atingiu o limite de hoje. O acesso será renovado automaticamente amanhã.", subscribe: "Ativar assinatura e continuar",
-      result: "Vídeo localizado", download: "Baixar vídeo", source: "Abrir produto na Shopee", newSearch: "Localizar outro vídeo",
+      result: "Vídeo localizado", available: "VÍDEO DISPONÍVEL PARA DOWNLOAD", preview: "Prévia do vídeo localizado", download: "Baixar vídeo", source: "Abrir produto na Shopee", newSearch: "Localizar outro vídeo",
       mobileHint: "Se o vídeo abrir no player do celular, use Compartilhar e escolha Salvar vídeo ou Salvar em Arquivos.",
       invalid: "Cole um link válido da Shopee.", notFound: "Não foi possível localizar um vídeo reproduzível nesse link.",
       sourceUnavailable: "A Shopee não respondeu agora. Aguarde um instante e tente novamente.", error: "Não foi possível concluir. Tente novamente.",
@@ -28,7 +28,7 @@
       remaining: "{count} available", reset: "The daily limit resets at midnight UTC.",
       disabled: "This tool is temporarily disabled.", freeLimit: "You have used all free downloads.",
       dailyLimit: "You reached today's limit. Access will reset automatically tomorrow.", subscribe: "Activate subscription and continue",
-      result: "Video found", download: "Download video", source: "Open product on Shopee", newSearch: "Find another video",
+      result: "Video found", available: "VIDEO AVAILABLE TO DOWNLOAD", preview: "Preview of the located video", download: "Download video", source: "Open product on Shopee", newSearch: "Find another video",
       mobileHint: "If the video opens in your phone's player, use Share and choose Save Video or Save to Files.",
       invalid: "Paste a valid Shopee link.", notFound: "No playable video could be found at this link.",
       sourceUnavailable: "Shopee is not responding right now. Wait a moment and try again.", error: "Unable to complete the request. Try again.",
@@ -45,7 +45,7 @@
       remaining: "{count} disponibles", reset: "El límite diario se renueva a medianoche UTC.",
       disabled: "Esta herramienta está temporalmente desactivada.", freeLimit: "Ya utilizaste tus descargas gratuitas.",
       dailyLimit: "Alcanzaste el límite de hoy. El acceso se renovará automáticamente mañana.", subscribe: "Activar suscripción y continuar",
-      result: "Video localizado", download: "Descargar video", source: "Abrir producto en Shopee", newSearch: "Localizar otro video",
+      result: "Video localizado", available: "VIDEO DISPONIBLE PARA DESCARGAR", preview: "Vista previa del video localizado", download: "Descargar video", source: "Abrir producto en Shopee", newSearch: "Localizar otro video",
       mobileHint: "Si el video se abre en el reproductor del teléfono, usa Compartir y elige Guardar video o Guardar en Archivos.",
       invalid: "Pega un enlace válido de Shopee.", notFound: "No fue posible localizar un video reproducible en este enlace.",
       sourceUnavailable: "Shopee no responde ahora. Espera un momento e inténtalo de nuevo.", error: "No fue posible completar la solicitud. Inténtalo de nuevo.",
@@ -62,7 +62,7 @@
       remaining: "Доступно: {count}", reset: "Дневной лимит обновляется в полночь UTC.",
       disabled: "Инструмент временно отключён.", freeLimit: "Бесплатные загрузки закончились.",
       dailyLimit: "Дневной лимит исчерпан. Доступ обновится автоматически завтра.", subscribe: "Активировать подписку",
-      result: "Видео найдено", download: "Скачать видео", source: "Открыть товар в Shopee", newSearch: "Найти другое видео",
+      result: "Видео найдено", available: "ВИДЕО ДОСТУПНО ДЛЯ СКАЧИВАНИЯ", preview: "Предпросмотр найденного видео", download: "Скачать видео", source: "Открыть товар в Shopee", newSearch: "Найти другое видео",
       mobileHint: "Если видео открылось в проигрывателе телефона, нажмите «Поделиться» и выберите сохранение видео или файла.",
       invalid: "Вставьте корректную ссылку Shopee.", notFound: "По этой ссылке не удалось найти доступное для воспроизведения видео.",
       sourceUnavailable: "Shopee сейчас не отвечает. Подождите немного и повторите попытку.", error: "Не удалось выполнить запрос. Попробуйте снова.",
@@ -185,7 +185,13 @@
       status.usage = data.usage;
       renderResult(data.media);
     } catch (error) {
-      if (error.data?.usage) { status.usage = error.data.usage; renderMain(); if (!status.active) document.getElementById("shopeeSubscribe")?.focus(); return; }
+      if (error.data?.usage) {
+        status.usage = error.data.usage; renderMain();
+        const visibleError = document.getElementById("shopeeError");
+        if (visibleError) { visibleError.textContent = errorMessage(error.message); visibleError.classList.remove("hidden"); }
+        else if (!status.active) document.getElementById("shopeeSubscribe")?.focus();
+        return;
+      }
       errorBox.textContent = errorMessage(error.message); errorBox.classList.remove("hidden");
       button.disabled = false; button.textContent = `🔎 ${tr("find")}`;
     }
@@ -203,7 +209,7 @@
   }
 
   function renderResult(media) {
-    content().innerHTML = `<main class="shopeeDownloader"><button id="shopeeBack" class="textButton">← ${esc(tr("back"))}</button><section class="hero shopeeHero"><span class="eyebrow">${esc(tr("result"))}</span><h1>✅ ${esc(media.title || tr("result"))}</h1></section><section class="toolCard shopeeResult">${media.thumbnail ? `<img src="${esc(media.thumbnail)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : `<div class="shopeeVideoPlaceholder">▶</div>`}<button id="downloadShopeeVideo" class="wideButton">⬇️ ${esc(tr("download"))}</button><p>${esc(tr("mobileHint"))}</p><div class="cardActions"><button id="openShopeeSource" class="secondaryButton">🛍️ ${esc(tr("source"))}</button><button id="newShopeeSearch" class="secondaryButton">↻ ${esc(tr("newSearch"))}</button></div>${usageHtml(status.usage, status.active)}</section>${referralHtml()}</main>`;
+    content().innerHTML = `<main class="shopeeDownloader"><button id="shopeeBack" class="textButton">← ${esc(tr("back"))}</button><section class="hero shopeeHero"><span class="eyebrow">${esc(tr("result"))}</span><h1>✅ ${esc(media.title || tr("result"))}</h1></section><section class="toolCard shopeeResult"><div class="shopeeAvailable">✓ ${esc(tr("available"))}</div><video class="shopeeVideoPreview" controls playsinline preload="metadata" ${media.thumbnail ? `poster="${esc(media.thumbnail)}"` : ""} src="${esc(media.videoUrl)}" aria-label="${esc(tr("preview"))}"></video><button id="downloadShopeeVideo" class="wideButton">⬇️ ${esc(tr("download"))}</button><p>${esc(tr("mobileHint"))}</p><div class="cardActions"><button id="openShopeeSource" class="secondaryButton">🛍️ ${esc(tr("source"))}</button><button id="newShopeeSearch" class="secondaryButton">↻ ${esc(tr("newSearch"))}</button></div>${usageHtml(status.usage, status.active)}</section>${referralHtml()}</main>`;
     document.getElementById("shopeeBack").onclick = context.back;
     document.getElementById("downloadShopeeVideo").onclick = () => startDownload(media);
     document.getElementById("openShopeeSource").onclick = () => openUrl(media.sourceUrl);
@@ -221,4 +227,3 @@
 
   window.EduCashProShopeeVideo = { render };
 })();
-

@@ -13,9 +13,9 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter]=await Promise.all([
+const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry]=await Promise.all([
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
-  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js")
+  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js")
 ]);
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
@@ -49,6 +49,8 @@ assert(financeControl.includes("editExpense")&&financeControl.includes("removeEx
 for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(language),`Missing finance translation: ${language}`);
 assert(loader.includes("loadShopeeVideo")&&app.includes("renderTools"),"Shopee downloader is not connected to the tools area");
 assert(shopeeDownloader.includes("/api/media/shopee/resolve")&&shopeeDownloader.includes("downloadShopeeVideo"),"Shopee direct-download flow is incomplete");
+assert(shopeeDownloader.includes("shopeeVideoPreview")&&shopeeDownloader.includes("available:"),"Shopee availability and video preview are missing");
+assert(webAuthEntry.includes("webOpenShopeeVideo")&&webAuthEntry.includes("/api/platform-auth/hub-session")&&webAuthEntry.includes("loadShopeeVideo"),"Shopee downloader is not available to authenticated Web users");
 assert(!shopeeDownloader.includes("blob()")&&!shopeeDownloader.includes("arrayBuffer()"),"The browser must not buffer the Shopee video");
 for(const language of ["pt:","en:","es:","ru:"])assert(shopeeDownloader.includes(language),`Missing Shopee downloader translation: ${language}`);
 assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate lead-magnet guidance is incomplete");

@@ -18,6 +18,11 @@
       accountBadge:"АККАУНТ EDUCASHPRO",walletLogin:"Войти через TON-кошелёк",walletLoginText:"Кошелёк используется только для подтверждения владения. При входе не запрашиваются платежи или переводы.",connectWallet:"Подключить кошелёк",phoneLogin:"Войти с уже подключённого телефона",phoneLoginText:"Используйте телефон, где вход уже выполнен, чтобы разрешить доступ на этом компьютере без повторного подключения кошелька.",startPair:"Создать код подключения",pairTitle:"Войти на этом компьютере",pairInstructions:"На телефоне, где EduCashPro уже открыт, выберите ‘Подключить другое устройство’ и введите этот код:",waiting:"Ожидание подтверждения на телефоне…",expires:"Код действует несколько минут.",welcome:"Мой аккаунт EduCashPro",welcomeText:"Один аккаунт работает на телефоне, компьютере и в Telegram после привязки. Создавать отдельный аккаунт для каждого устройства не нужно.",accountTitle:"Мой аккаунт",referralCode:"Реферальный код",wallet:"TON-кошелёк",connected:"Подключён",notConnected:"Не подключён",telegram:"Telegram",linked:"Привязан",notLinked:"Ещё не привязан",subscription:"Подписка",active:"Активна",inactive:"Не активна",subscriptionHint:"Статус подписки принадлежит вашему аккаунту EduCashPro и доступен на связанных устройствах.",referralTitle:"Ваша реферальная ссылка",copy:"Копировать",copied:"Скопировано",devicesTitle:"Ваши устройства",devicesText:"Чтобы открыть тот же аккаунт на другом устройстве, создайте код на новом устройстве и подтвердите его здесь.",pairInput:"Введите 6-значный код",approve:"Разрешить устройство",approved:"Устройство разрешено. Вернитесь на другое устройство.",invalidCode:"Код недействителен или истёк.",resources:"Доступные возможности",presentation:"О EduCashPro",presentationSub:"Обзор и презентация платформы.",games:"Бесплатные игры",gamesSub:"Локальные игры на внимание и логику.",marketplace:"Маркетплейс",marketplaceSub:"Компании и публичные страницы.",telegramTitle:"Telegram",telegramSub:"Открыть интеграцию с Telegram.",technical:"Техническая информация",accountId:"Внутренний ID аккаунта",logout:"Выйти",close:"Закрыть",authError:"Не удалось подтвердить кошелёк.",webUnavailable:"Веб-аутентификация недоступна.",deviceConnected:"Это устройство подключено к вашему аккаунту.",pairSuccess:"Аккаунт подключён на этом устройстве.",pairFailed:"Не удалось связать устройства."}
   };
 
+  Object.assign(I18N.pt,{shopeeVideo:"Vídeos da Shopee",shopeeVideoSub:"Localize e baixe vídeos de produtos. 3 downloads gratuitos.",openingShopee:"Abrindo a ferramenta…"});
+  Object.assign(I18N.en,{shopeeVideo:"Shopee videos",shopeeVideoSub:"Find and download product videos. 3 free downloads.",openingShopee:"Opening the tool…"});
+  Object.assign(I18N.es,{shopeeVideo:"Videos de Shopee",shopeeVideoSub:"Localiza y descarga videos de productos. 3 descargas gratuitas.",openingShopee:"Abriendo la herramienta…"});
+  Object.assign(I18N.ru,{shopeeVideo:"Видео Shopee",shopeeVideoSub:"Находите и скачивайте видео товаров. 3 бесплатные загрузки.",openingShopee:"Открываем инструмент…"});
+
   function locale(){const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
   function t(key){return I18N[locale()]?.[key]||I18N.pt[key]||key}
   function esc(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
@@ -41,6 +46,30 @@
   async function openPairLogin(){injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("phoneLoginText"))}</p><div id="webPairLoading" class="webPairStatus">${esc(t("waiting"))}</div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;
     try{state.pair=await auth.startDevicePairing();const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br>${esc(t("expires"))}</div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.session=platform.readWebSession?.();closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
   }
+
+  async function openShopeeVideo(){
+    const button=document.getElementById("webOpenShopeeVideo");
+    if(button){button.disabled=true;button.querySelector("small").textContent=t("openingShopee")}
+    try{
+      const response=await fetch("https://educashpro-all.onrender.com/api/platform-auth/hub-session",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${state.session?.token||""}`},body:"{}",cache:"no-store"});
+      const hubSession=await response.json().catch(()=>({}));
+      if(!response.ok||!hubSession?.token)throw new Error(hubSession?.reason||"hub_session_failed");
+      window.__EDUCASHPRO_SESSION__=hubSession;
+      await window.EduCashProResources?.loadShopeeVideo?.();
+      window.EduCashProShopeeVideo?.render?.({session:hubSession,language:locale(),back:renderAuthenticated});
+    }catch(error){if(button){button.disabled=false;button.querySelector("small").textContent=error?.message||t("webUnavailable")}}
+  }
+
+  function enhanceShopeeModule(){
+    const grid=document.querySelector(".webModuleGrid");
+    if(!grid||document.getElementById("webOpenShopeeVideo"))return;
+    const button=document.createElement("button");
+    button.id="webOpenShopeeVideo";button.className="webModule";button.type="button";
+    button.innerHTML=`<span>🎬</span><b>${esc(t("shopeeVideo"))}</b><small>${esc(t("shopeeVideoSub"))}</small>`;
+    button.addEventListener("click",openShopeeVideo);grid.prepend(button);
+  }
+
+  new MutationObserver(enhanceShopeeModule).observe(document.getElementById("content")||document.body,{childList:true,subtree:true});
 
   function logout(){platform.writeWebSession?.(null);state.session=null;location.reload()}
   function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}${location.pathname}?ref=${encodeURIComponent(code)}`}
