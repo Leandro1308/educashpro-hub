@@ -10,17 +10,17 @@
   const MARKET_STATE_KEY = "educashpro:market-selection:v1";
   const RESTRICTED = new Set(["chart", "technical"]);
   const TIMEFRAMES = [
-    { id: "1m", label: "1m", chart: "1", technical: "1m" },
-    { id: "2m", label: "2m", chart: "2", technical: "2m" },
-    { id: "3m", label: "3m", chart: "3", technical: "3m" },
-    { id: "5m", label: "5m", chart: "5", technical: "5m" },
-    { id: "10m", label: "10m", chart: "10", technical: "10m" },
-    { id: "15m", label: "15m", chart: "15", technical: "15m" },
-    { id: "30m", label: "30m", chart: "30", technical: "30m" },
-    { id: "1h", label: "1h", chart: "60", technical: "1h" },
-    { id: "2h", label: "2h", chart: "120", technical: "2h" },
-    { id: "4h", label: "4h", chart: "240", technical: "4h" },
-    { id: "1D", label: "D", chart: "D", technical: "1D" }
+    { id: "1m", label: "1m", chart: "1", technical: "1m", market: "1m", aggregate: 1 },
+    { id: "2m", label: "2m", chart: "2", technical: "2m", market: "1m", aggregate: 2 },
+    { id: "3m", label: "3m", chart: "3", technical: "3m", market: "3m", aggregate: 1 },
+    { id: "5m", label: "5m", chart: "5", technical: "5m", market: "5m", aggregate: 1 },
+    { id: "10m", label: "10m", chart: "10", technical: "10m", market: "5m", aggregate: 2 },
+    { id: "15m", label: "15m", chart: "15", technical: "15m", market: "15m", aggregate: 1 },
+    { id: "30m", label: "30m", chart: "30", technical: "30m", market: "30m", aggregate: 1 },
+    { id: "1h", label: "1h", chart: "60", technical: "1h", market: "1h", aggregate: 1 },
+    { id: "2h", label: "2h", chart: "120", technical: "2h", market: "2h", aggregate: 1 },
+    { id: "4h", label: "4h", chart: "240", technical: "4h", market: "4h", aggregate: 1 },
+    { id: "1D", label: "D", chart: "D", technical: "1D", market: "1d", aggregate: 1 }
   ];
 
   const DIRECTION_SYMBOLS = [
@@ -52,6 +52,20 @@
       searchPlaceholder: "Ex.: AVAXUSDT ou NASDAQ:AAPL",
       openAsset: "Abrir",
       searchHelp: "Este ativo será usado no gráfico e no resumo técnico, mesmo que não apareça na seleção de alta ou baixa.",
+      fibTitle: "Rompeu? Fibo nela!",
+      fibLoading: "Procurando rompimentos confirmados e calculando Fibonacci…",
+      fibUnavailable: "A leitura automática de Fibonacci está disponível para pares da Binance.",
+      fibNone: "Nenhum rompimento confirmado do canal nos 12 candles mais recentes.",
+      fibBullish: "Rompimento de alta",
+      fibBearish: "Rompimento de baixa",
+      fibImpulse: "Impulso",
+      fibCurrent: "Preço atual",
+      fibInvalidation: "Invalidação",
+      fibVolume: "Volume no rompimento",
+      fibConfirmed: "Confirmado",
+      fibModerate: "Sem expansão",
+      fibLevels: "Retrações e extensões",
+      fibEducational: "Leitura técnica educacional. Os níveis se ajustam ao ativo e período selecionados.",
       loading: "Carregando dados de mercado…",
       error: "Não foi possível carregar esta ferramenta agora.",
       locked: "Recurso exclusivo para assinantes ativos",
@@ -114,6 +128,7 @@
       searchPlaceholder: "E.g. AVAXUSDT or NASDAQ:AAPL",
       openAsset: "Open",
       searchHelp: "This asset will be used in both the chart and technical summary, even when it is not listed as trending up or down.",
+      fibTitle: "Breakout? Apply Fibonacci!", fibLoading: "Scanning confirmed breakouts and calculating Fibonacci…", fibUnavailable: "Automatic Fibonacci analysis is available for Binance pairs.", fibNone: "No confirmed channel breakout in the latest 12 candles.", fibBullish: "Bullish breakout", fibBearish: "Bearish breakout", fibImpulse: "Impulse", fibCurrent: "Current price", fibInvalidation: "Invalidation", fibVolume: "Breakout volume", fibConfirmed: "Confirmed", fibModerate: "No expansion", fibLevels: "Retracements and extensions", fibEducational: "Educational technical reading. Levels adapt to the selected asset and timeframe.",
       loading: "Loading market data…",
       error: "This tool could not be loaded right now.",
       locked: "Active subscribers only",
@@ -176,6 +191,7 @@
       searchPlaceholder: "Ej.: AVAXUSDT o NASDAQ:AAPL",
       openAsset: "Abrir",
       searchHelp: "Este activo se utilizará en el gráfico y el resumen técnico, aunque no aparezca en la selección de alza o baja.",
+      fibTitle: "¿Rompió? ¡Fibonacci!", fibLoading: "Buscando rupturas confirmadas y calculando Fibonacci…", fibUnavailable: "El análisis automático de Fibonacci está disponible para pares de Binance.", fibNone: "No hubo ruptura confirmada del canal en las últimas 12 velas.", fibBullish: "Ruptura alcista", fibBearish: "Ruptura bajista", fibImpulse: "Impulso", fibCurrent: "Precio actual", fibInvalidation: "Invalidación", fibVolume: "Volumen de ruptura", fibConfirmed: "Confirmado", fibModerate: "Sin expansión", fibLevels: "Retrocesos y extensiones", fibEducational: "Lectura técnica educativa. Los niveles se adaptan al activo y período seleccionados.",
       loading: "Cargando datos del mercado…",
       error: "No fue posible cargar esta herramienta.",
       locked: "Recurso exclusivo para suscriptores activos",
@@ -238,6 +254,7 @@
       searchPlaceholder: "Напр.: AVAXUSDT или NASDAQ:AAPL",
       openAsset: "Открыть",
       searchHelp: "Этот актив будет использоваться на графике и в технической сводке, даже если его нет в списке роста или снижения.",
+      fibTitle: "Пробой? Фибоначчи!", fibLoading: "Поиск подтверждённых пробоев и расчёт Фибоначчи…", fibUnavailable: "Автоматический анализ Фибоначчи доступен для пар Binance.", fibNone: "За последние 12 свечей подтверждённого пробоя канала нет.", fibBullish: "Пробой вверх", fibBearish: "Пробой вниз", fibImpulse: "Импульс", fibCurrent: "Текущая цена", fibInvalidation: "Отмена", fibVolume: "Объём пробоя", fibConfirmed: "Подтверждено", fibModerate: "Без роста", fibLevels: "Коррекции и расширения", fibEducational: "Учебный технический анализ. Уровни адаптируются к активу и периоду.",
       loading: "Загрузка рыночных данных…",
       error: "Не удалось загрузить инструмент.",
       locked: "Только для активных подписчиков",
@@ -338,6 +355,7 @@
   let directionSnapshot = [];
   let directionSnapshotAt = 0;
   let scanRequestId = 0;
+  let fibonacciRequestId = 0;
 
   const esc = (value) => String(value || "").replace(/[&<>'"]/g, (char) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -362,6 +380,7 @@
       .marketDirectionFoot{color:#9db0c6;font-size:10px;line-height:1.45}.marketChartFrame{height:720px;overflow:hidden;border-radius:15px}.marketTechnicalFrame{height:560px;overflow:hidden;border-radius:15px}
       .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
       .marketSymbolPicker{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0a1728}.marketSymbolPicker>strong{font-size:12px;color:#f7fbff}.marketSymbolForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.marketSymbolForm input{min-width:0;height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#f7fbff;background:#071322;font:700 13px inherit;text-transform:uppercase}.marketSymbolForm button{min-height:42px;padding:8px 14px;border:0;border-radius:10px;color:#071322;background:#30e6a6;font-size:12px;font-weight:950}.marketSymbolPicker small{color:#9db0c6;font-size:10px;line-height:1.45}
+      .marketFibPanel{display:grid;gap:10px;margin:0 0 12px;padding:13px;border:1px solid rgba(255,200,92,.24);border-radius:15px;background:linear-gradient(145deg,#0a1728,#0b1421)}.marketFibHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.marketFibHead strong{color:#ffc85c;font-size:14px}.marketFibHead span{color:#9db0c6;font-size:10px}.marketFibStatus{color:#b8c8da;font-size:11px;line-height:1.5}.marketFibMetrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.marketFibMetrics article,.marketFibLevels article{padding:8px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#071322}.marketFibMetrics small,.marketFibLevels small{display:block;color:#9db0c6;font-size:9px}.marketFibMetrics b,.marketFibLevels b{display:block;margin-top:3px;color:#f7fbff;font-size:11px}.marketFibLevels{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.marketFibPanel.positive .marketFibHead strong{color:#30e6a6}.marketFibPanel.negative .marketFibHead strong{color:#ff7d89}.marketFibFoot{color:#7f93aa;font-size:9px;line-height:1.4}
       .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame{height:calc(100dvh - 190px);min-height:430px}
       @media(max-width:560px){.marketDirectionColumns{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
     `;
@@ -575,14 +594,91 @@
       const [exchange, ...parts] = raw.split(":");
       const symbol = parts.join(":").replace(/[\/-]/g, "");
       if (!exchange || !symbol) return null;
-      return { tv: `${exchange}:${symbol}`, label: symbol };
+      return { api: exchange === "BINANCE" ? symbol : null, tv: `${exchange}:${symbol}`, label: symbol };
     }
     const symbol = raw.replace(/[\/-]/g, "");
     if (!symbol) return null;
     const metals = new Set(["XAUUSD", "XAGUSD"]);
     const forex = /^(EUR|GBP|USD|JPY|AUD|NZD|CAD|CHF)(EUR|GBP|USD|JPY|AUD|NZD|CAD|CHF)$/.test(symbol);
     const exchange = metals.has(symbol) ? "OANDA" : forex ? "FX" : "BINANCE";
-    return { tv: `${exchange}:${symbol}`, label: symbol };
+    return { api: exchange === "BINANCE" ? symbol : null, tv: `${exchange}:${symbol}`, label: symbol };
+  }
+
+  function aggregateCandles(rows, factor) {
+    const source = rows.map((row) => ({ time: Number(row[0]), open: Number(row[1]), high: Number(row[2]), low: Number(row[3]), close: Number(row[4]), volume: Number(row[5]) }));
+    if (factor <= 1) return source;
+    const result = [];
+    for (let i = 0; i < source.length; i += factor) {
+      const group = source.slice(i, i + factor);
+      if (group.length < factor) continue;
+      result.push({ time: group[0].time, open: group[0].open, high: Math.max(...group.map((c) => c.high)), low: Math.min(...group.map((c) => c.low)), close: group[group.length - 1].close, volume: group.reduce((sum, c) => sum + c.volume, 0) });
+    }
+    return result;
+  }
+
+  function fibonacciBreakout(candles) {
+    const lookback = 20;
+    for (let i = candles.length - 1; i >= Math.max(lookback, candles.length - 12); i -= 1) {
+      const channel = candles.slice(i - lookback, i);
+      const candle = candles[i];
+      const upper = Math.max(...channel.map((c) => c.high));
+      const lower = Math.min(...channel.map((c) => c.low));
+      const range = Math.max(0, candle.high - candle.low);
+      const bodyShare = range ? Math.abs(candle.close - candle.open) / range : 0;
+      const avgVolume = channel.reduce((sum, c) => sum + c.volume, 0) / channel.length;
+      const direction = candle.close > upper ? "up" : candle.close < lower ? "down" : null;
+      if (!direction || bodyShare < 0.25) continue;
+      const after = candles.slice(i);
+      const start = direction === "up" ? Math.min(...channel.map((c) => c.low)) : Math.max(...channel.map((c) => c.high));
+      const end = direction === "up" ? Math.max(...after.map((c) => c.high)) : Math.min(...after.map((c) => c.low));
+      const amplitude = Math.abs(end - start);
+      if (!amplitude) continue;
+      const value = (ratio) => direction === "up" ? end - amplitude * ratio : end + amplitude * ratio;
+      return { direction, start, end, current: candles[candles.length - 1].close, invalidation: start, volumeConfirmed: candle.volume >= avgVolume * 1.1, levels: [["23,6%", value(.236)], ["38,2%", value(.382)], ["50%", value(.5)], ["61,8%", value(.618)], ["78,6%", value(.786)], ["127,2%", direction === "up" ? start + amplitude * 1.272 : start - amplitude * 1.272], ["161,8%", direction === "up" ? start + amplitude * 1.618 : start - amplitude * 1.618]] };
+    }
+    return null;
+  }
+
+  function price(value) {
+    if (!Number.isFinite(value)) return "—";
+    return value >= 1000 ? value.toLocaleString("en-US", { maximumFractionDigits: 2 }) : value >= 1 ? value.toFixed(4) : value.toPrecision(6);
+  }
+
+  function fibonacciMarkup(copy, result) {
+    if (!result) return `<div class="marketFibStatus">${esc(copy.fibNone)}</div><div class="marketFibFoot">${esc(copy.fibEducational)}</div>`;
+    const up = result.direction === "up";
+    return `<div class="marketFibStatus"><b>${up ? "▲" : "▼"} ${esc(up ? copy.fibBullish : copy.fibBearish)}</b></div><div class="marketFibMetrics"><article><small>${esc(copy.fibImpulse)}</small><b>${price(result.start)} → ${price(result.end)}</b></article><article><small>${esc(copy.fibCurrent)}</small><b>${price(result.current)}</b></article><article><small>${esc(copy.fibInvalidation)}</small><b>${price(result.invalidation)}</b></article><article><small>${esc(copy.fibVolume)}</small><b>${esc(result.volumeConfirmed ? copy.fibConfirmed : copy.fibModerate)}</b></article></div><small>${esc(copy.fibLevels)}</small><div class="marketFibLevels">${result.levels.map(([label, value]) => `<article><small>${label}</small><b>${price(value)}</b></article>`).join("")}</div><div class="marketFibFoot">${esc(copy.fibEducational)}</div>`;
+  }
+
+  async function loadFibonacci(host) {
+    const panel = host.querySelector("[data-market-fibonacci]");
+    if (!panel) return;
+    const copy = COPY[options.language] || COPY.pt;
+    const asset = selectedAsset;
+    if (!asset?.api || !String(asset.tv).startsWith("BINANCE:")) {
+      panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(selectedTimeframe)}</span></div><div class="marketFibStatus">${esc(copy.fibUnavailable)}</div>`;
+      return;
+    }
+    const requestId = ++fibonacciRequestId;
+    const timeframe = TIMEFRAMES.find((item) => item.id === selectedTimeframe) || TIMEFRAMES[7];
+    panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(asset.label)} · ${esc(selectedTimeframe)}</span></div><div class="marketFibStatus">${esc(copy.fibLoading)}</div>`;
+    try {
+      const limit = Math.min(500, 180 * timeframe.aggregate);
+      const response = await fetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("fib_market");
+      const rows = await response.json();
+      const result = fibonacciBreakout(aggregateCandles(rows, timeframe.aggregate));
+      if (requestId !== fibonacciRequestId || !panel.isConnected) return;
+      panel.classList.toggle("positive", result?.direction === "up");
+      panel.classList.toggle("negative", result?.direction === "down");
+      panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(asset.label)} · ${esc(selectedTimeframe)}</span></div>${fibonacciMarkup(copy, result)}`;
+    } catch {
+      if (requestId === fibonacciRequestId && panel.isConnected) panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong></div><div class="marketFibStatus">${esc(copy.error)}</div>`;
+    }
+  }
+
+  function fibonacciPanelMarkup() {
+    return `<section class="marketFibPanel" data-market-fibonacci></section>`;
   }
 
   function symbolPickerMarkup(copy) {
@@ -637,10 +733,12 @@
     host.innerHTML = scannerMarkup(snapshot, copy, error);
     host.insertAdjacentHTML("beforeend", symbolPickerMarkup(copy));
     host.insertAdjacentHTML("beforeend", timeframeMarkup(copy));
+    host.insertAdjacentHTML("beforeend", fibonacciPanelMarkup());
     host.appendChild(tradingViewContainer("marketChartFrame", WIDGETS.chart, selectedAsset?.tv || WIDGETS.chart.config.symbol));
     bindScanner(host, snapshot);
     bindSymbolPicker(host);
     bindTimeframes(host);
+    loadFibonacci(host);
   }
 
   async function loadChart(force = false) {
@@ -671,10 +769,11 @@
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
     host.style.height = "auto";
-    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${symbolPickerMarkup(copy)}${timeframeMarkup(copy)}`;
+    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${symbolPickerMarkup(copy)}${timeframeMarkup(copy)}${fibonacciPanelMarkup()}`;
     host.appendChild(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
     bindSymbolPicker(host);
     bindTimeframes(host);
+    loadFibonacci(host);
   }
 
   function loadWidget(kind) {
