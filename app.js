@@ -572,17 +572,66 @@
     bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
   }
 
+  const LAST_ROUTE_KEY = "educashpro:last-route:v1";
+  const RESTORABLE_VIEWS = new Set(["home", "learn", "explore", "benefits", "area", "tools", "course"]);
+
+  function readRememberedRoute() {
+    try {
+      const route = JSON.parse(localStorage.getItem(LAST_ROUTE_KEY) || "null");
+      const view = String(route?.view || "");
+      const detail = String(route?.detail || "").slice(0, 160);
+      return RESTORABLE_VIEWS.has(view) ? { view, detail } : null;
+    } catch {
+      return null;
+    }
+  }
+
   function rememberRoute(view, detail = "") {
     try {
+      if (RESTORABLE_VIEWS.has(view)) {
+        localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ view, detail: String(detail || "").slice(0, 160) }));
+      }
       const url = new URL(window.location.href);
       if (view && view !== "home") url.searchParams.set("view", view);
       else url.searchParams.delete("view");
       url.searchParams.delete("academy");
       url.searchParams.delete("course");
+      url.searchParams.delete("section");
       if (view === "learn" && detail) url.searchParams.set("academy", detail);
       if (view === "course" && detail) url.searchParams.set("course", detail);
+      if (view === "benefits" && detail) url.searchParams.set("section", detail);
       history.replaceState({ view, detail }, "", url.toString());
     } catch {}
+  }
+
+  async function restoreRoute(route) {
+    if (!route || !RESTORABLE_VIEWS.has(route.view)) return false;
+    if (route.view === "course" && route.detail) {
+      await openCourse(route.detail);
+      return true;
+    }
+    if (route.view === "learn" && route.detail === "technical_analysis") {
+      await openMarkets();
+      return true;
+    }
+    if (route.view === "learn" && ["network_marketing", "financial_education", "telegram"].includes(route.detail)) {
+      await openAcademyCategory(route.detail);
+      return true;
+    }
+    if (route.view === "benefits" && route.detail === "exclusive-benefits") {
+      await renderExclusiveBenefits();
+      return true;
+    }
+    if (route.view === "benefits" && route.detail === "partner-stores") {
+      await renderPartnerStores();
+      return true;
+    }
+    if (route.view === "tools") {
+      renderTools();
+      return true;
+    }
+    await Promise.resolve(setView(route.view));
+    return true;
   }
 
   function setView(view) {
@@ -1139,6 +1188,9 @@
   }
 
   async function renderBenefits() {
+    state.view = "benefits";
+    rememberRoute("benefits");
+    updateNav();
     content.innerHTML = `<section class="hero"><span class="eyebrow">CLUB</span><h1>${escapeHtml(t("benefitsTitle"))}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2></div></div><section class="quickGrid">${quickCard("exclusive-benefits", "🎁", benefitNavigationCopy("exclusive"), benefitNavigationCopy("exclusiveSub"))}${quickCard("partner-stores", "🏪", benefitNavigationCopy("stores"), benefitNavigationCopy("storesSub"))}</section>`;
     content.querySelector('[data-target="exclusive-benefits"]').onclick = () => state.profile?.active ? renderExclusiveBenefits() : openSubscription();
     content.querySelector('[data-target="partner-stores"]').onclick = () => state.profile?.active ? renderPartnerStores() : openSubscription();
@@ -1146,6 +1198,7 @@
 
   async function renderExclusiveBenefits() {
     state.view = "benefits";
+    rememberRoute("benefits", "exclusive-benefits");
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
     content.innerHTML = `<button id="benefitsBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🎁 ${escapeHtml(benefitNavigationCopy("exclusive"))}</h1><p>${escapeHtml(benefitNavigationCopy("exclusiveSub"))}</p></section><article class="benefitOffer"><div><span>🎁</span><h2>${escapeHtml(featureCopy("offerBenefit"))}</h2><p>${escapeHtml(featureCopy("offerBenefitDesc"))}</p></div><button id="offerBenefit" class="secondaryButton">${escapeHtml(featureCopy("offerBenefit"))}</button></article><div id="benefitList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
@@ -1162,6 +1215,7 @@
 
   async function renderPartnerStores({ segment = state.partnerSegment, page = state.partnerPage } = {}) {
     state.view = "benefits";
+    rememberRoute("benefits", "partner-stores");
     state.partnerSegment = PARTNER_SEGMENTS.includes(segment) ? segment : "";
     state.partnerPage = Math.max(1, Number(page || 1));
     updateNav();
@@ -1234,6 +1288,9 @@
   }
 
   function renderTools() {
+    state.view = "tools";
+    rememberRoute("tools");
+    updateNav();
     if (window.EduCashProLocal?.renderToolsHub) return window.EduCashProLocal.renderToolsHub();
     renderNetworkProjection();
   }
@@ -1543,10 +1600,16 @@
       const requestedCourse = String(publicParams.get("course") || "");
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
+      const requestedSection = String(publicParams.get("section") || "");
+      const hasExplicitRoute = Boolean(requestedCourse || requestedAcademy || requestedView || requestedSection);
       if (requestedCourse) await openCourse(requestedCourse);
       else if (requestedAcademy === "technical_analysis") await openMarkets();
       else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
+      else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
+      else if (requestedView === "benefits" && requestedSection === "partner-stores") await renderPartnerStores();
+      else if (requestedView === "tools") renderTools();
       else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
+      else if (!hasExplicitRoute && await restoreRoute(readRememberedRoute())) {}
       else renderHome();
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();

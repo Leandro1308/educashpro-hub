@@ -3,6 +3,7 @@
 
   const SITE_URL = "https://go.educashpro.vip/";
   const BOT_URL = "https://t.me/EduCashProBot";
+  const LAST_ROUTE_KEY = "educashpro:last-route:v1";
   const platform = window.EduCashProPlatform;
 
   function language() {
@@ -84,10 +85,26 @@
     if (document.querySelector('[aria-label*="Voltar" i], .back, .backButton, #back')) return;
     const link = document.createElement("a");
     link.className = "educashFallbackBack";
-    link.href = "./index.html";
+    link.href = rememberedIndexUrl();
     link.setAttribute("aria-label", copy[language()].back);
     link.textContent = `← ${copy[language()].back}`;
     document.body.prepend(link);
+  }
+
+  function rememberedIndexUrl() {
+    const url = new URL("./index.html", location.href);
+    try {
+      const route = JSON.parse(localStorage.getItem(LAST_ROUTE_KEY) || "null");
+      const view = String(route?.view || "");
+      const detail = String(route?.detail || "");
+      if (view && view !== "home") url.searchParams.set("view", view);
+      if (view === "learn" && detail) url.searchParams.set("academy", detail);
+      if (view === "course" && detail) url.searchParams.set("course", detail);
+      if (view === "benefits" && detail) url.searchParams.set("section", detail);
+    } catch {}
+    const code = referral();
+    if (code) url.searchParams.set("ref", code);
+    return url.toString();
   }
 
   function render() {
