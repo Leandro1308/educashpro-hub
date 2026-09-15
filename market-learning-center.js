@@ -544,9 +544,11 @@
   function bindTimeframes(host) {
     host.querySelectorAll("[data-timeframe]").forEach((button) => {
       button.onclick = () => {
+        const scrollTop = window.scrollY;
         selectedTimeframe = button.dataset.timeframe;
         if (currentWidget === "technical") loadTechnical();
         else renderChart(directionSnapshot);
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: "auto" })));
       };
     });
   }
@@ -626,6 +628,7 @@
   }
 
   function render(args = {}) {
+    window.__EDUCASHPRO_MARKETS_OPEN__ = true;
     options = {
       language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "pt",
       active: args.active === true,
@@ -671,6 +674,7 @@
     </div>`;
 
     document.getElementById("marketBack").onclick = () => {
+      window.__EDUCASHPRO_MARKETS_OPEN__ = false;
       document.body.classList.remove("marketExpandedOpen");
       options.back?.();
     };
@@ -681,7 +685,10 @@
     document.querySelectorAll("[data-url]").forEach((button) => {
       button.onclick = () => open(button.dataset.url);
     });
-    document.querySelector("[data-own-course]").onclick = () => options.openCourse?.("analise_tecnica_completa");
+    document.querySelector("[data-own-course]").onclick = () => {
+      window.__EDUCASHPRO_MARKETS_OPEN__ = false;
+      options.openCourse?.("analise_tecnica_completa");
+    };
 
     loadWidget("chart");
     window.scrollTo({ top: 0, behavior: "smooth" });
