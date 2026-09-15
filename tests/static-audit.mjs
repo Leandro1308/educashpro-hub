@@ -13,9 +13,9 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry]=await Promise.all([
+const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu]=await Promise.all([
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
-  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js")
+  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js")
 ]);
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
@@ -114,3 +114,10 @@ assert(app.includes('id="publicCredentialQr"')&&app.includes('id="publicScanCred
 assert(app.includes("openWebMembershipScanner")&&app.includes("Html5QrcodeScanner"),"Website scanner must use the browser camera");
 assert(app.includes("crypto.subtle.verify")&&app.includes('featureCopy("credentialUntil")'),"Scanned credential must verify signature and show validity");
 assert(loader.includes("loadQrScanner")&&loader.includes("html5-qrcode@2.3.8"),"QR scanner library must load on demand");
+
+assert(index.includes("web-site-menu.js"),"The organized website menu must be loaded");
+assert(webSiteMenu.includes("if(!platform?.isWeb?.())return"),"The organized menu must not alter Telegram Mini App");
+for(const group of ["Principal","Aprendizado","Ferramentas","Negócios e oportunidades","Conta e assinatura","Programa de afiliados","Ajuda e preferências","Telegram"])assert(webSiteMenu.includes(group),`Missing website menu group: ${group}`);
+assert(webSiteMenu.includes("html.educashproWeb .growthQuickActions{display:none!important}"),"Duplicate top shortcuts must be removed on the website");
+assert(webSiteMenu.includes("publicMarketplace")===false&&webSiteMenu.includes('action==="marketplace"'),"Marketplace must have a functional menu destination");
+assert(app.includes("renderTools, renderExplore, renderBenefits")&&app.includes("renderMembershipProof"),"Website menu routes must be exposed by the app");

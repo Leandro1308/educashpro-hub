@@ -810,5 +810,6 @@
     openSettings,
     openLanguage,
     openPreferences,
+    openDocuments,
   };
 })();
