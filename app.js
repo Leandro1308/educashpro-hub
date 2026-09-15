@@ -1244,6 +1244,10 @@
 
   async function renderArea() {
     const p = state.profile;
+    const profileImageUrl = String(p?.profileImage?.url || "");
+    const profileAvatar = profileImageUrl
+      ? `<img src="${escapeHtml(profileImageUrl)}" alt="${escapeHtml(p.firstName || t("member"))}">`
+      : escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase());
     const areaLabels = ({
       pt: ["Minha assinatura", "Status, validade e divulgação", "Minhas ferramentas", "Recursos gratuitos para sua presença digital", "Comunidade e suporte", "Meus cadastros", "Projetos enviados para avaliação"],
       en: ["My subscription", "Status, validity and promotion", "My tools", "Free resources for your digital presence", "Community and support", "My submissions", "Projects submitted for review"],
@@ -1254,7 +1258,7 @@
     const linkPageSubtitle = window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página personalizada";
     const smartLinkTitle = window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente";
     const smartLinkSubtitle = window.EduCashProLinks?.text?.("shortCardSub") || "Crie um endereço curto com sua chamada";
-    content.innerHTML = `<section class="profileCard"><div class="avatar">${escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase())}</div><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div>` : ""}${state.membershipCredential ? `<button id="membershipProof" class="wideButton" style="margin-top:10px">✅ ${escapeHtml(featureCopy("activeProof"))}</button>` : ""}</section><div class="sectionHead"><div><h2>${escapeHtml(t("tools"))}</h2><p>${escapeHtml(t("toolsSub"))}</p></div></div><section class="quickGrid"><button id="areaLinkPage" class="quickCard"><span class="emoji">🔗</span><strong>${escapeHtml(linkPageTitle)}</strong><small>${escapeHtml(linkPageSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button><button id="areaSmartLink" class="quickCard"><span class="emoji">✂️</span><strong>${escapeHtml(smartLinkTitle)}</strong><small>${escapeHtml(smartLinkSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button></section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
+    content.innerHTML = `<section class="profileCard"><div class="avatar">${profileAvatar}</div><button id="editProfilePhoto" class="textButton profilePhotoEdit">📷 ${escapeHtml({pt:"Editar foto",en:"Edit photo",es:"Editar foto",ru:"Изменить фото"}[state.language] || "Editar foto")}</button><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div>` : ""}<button id="membershipProof" class="wideButton" style="margin-top:10px">✅ ${escapeHtml(featureCopy("activeProof"))}</button></section><div class="sectionHead"><div><h2>${escapeHtml(t("tools"))}</h2><p>${escapeHtml(t("toolsSub"))}</p></div></div><section class="quickGrid"><button id="areaLinkPage" class="quickCard"><span class="emoji">🔗</span><strong>${escapeHtml(linkPageTitle)}</strong><small>${escapeHtml(linkPageSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button><button id="areaSmartLink" class="quickCard"><span class="emoji">✂️</span><strong>${escapeHtml(smartLinkTitle)}</strong><small>${escapeHtml(smartLinkSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button></section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
     const profileHeading = document.createElement("div");
     profileHeading.className = "sectionHead areaFirstHead";
     profileHeading.innerHTML = `<div><h2>${escapeHtml(areaLabels[0])}</h2><p>${escapeHtml(areaLabels[1])}</p></div>`;
@@ -1269,8 +1273,9 @@
       sectionHeads[3].querySelector("div")?.appendChild(detail);
     }
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
+    document.getElementById("editProfilePhoto")?.addEventListener("click", renderProfilePhotoEditor);
     document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
-    document.getElementById("membershipProof")?.addEventListener("click", renderMembershipProof);
+    document.getElementById("membershipProof")?.addEventListener("click", () => void renderMembershipProof());
     document.getElementById("areaLinkPage")?.addEventListener("click", () => window.EduCashProLinks?.renderPageEditor?.());
     document.getElementById("areaSmartLink")?.addEventListener("click", () => window.EduCashProLinks?.renderShortener?.());
     document.getElementById("manageProjects").textContent = fc("project");
@@ -1352,6 +1357,82 @@
     element.innerHTML = "";
     if (!window.QRCode) { element.textContent = text; return; }
     new window.QRCode(element, { text, width: 240, height: 240, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+  }
+
+  async function compressProfilePhoto(file) {
+    if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) throw new Error("IMAGE");
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 640 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("IMAGE")), "image/webp", .84));
+  }
+
+  async function uploadProfilePhoto(file) {
+    const sign = await api("/api/hub/link-page/media-signature", { token: state.token });
+    const blob = await compressProfilePhoto(file);
+    const form = new FormData();
+    form.append("file", blob, "profile.webp");
+    form.append("api_key", sign.apiKey);
+    form.append("timestamp", String(sign.timestamp));
+    form.append("folder", sign.folder);
+    form.append("signature", sign.signature);
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`, { method: "POST", body: form });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.secure_url || !data.public_id) throw new Error("IMAGE");
+    return { url: data.secure_url, publicId: data.public_id };
+  }
+
+  function updateLocalProfileImage(profileImage) {
+    state.profile = { ...(state.profile || {}), profileImage: profileImage || null };
+    if (window.__EDUCASHPRO_SESSION__) window.__EDUCASHPRO_SESSION__ = { ...window.__EDUCASHPRO_SESSION__, profile: state.profile };
+    try {
+      const stored = JSON.parse(localStorage.getItem("educashpro:web-session") || "null");
+      if (stored?.profile) localStorage.setItem("educashpro:web-session", JSON.stringify({ ...stored, profile: { ...stored.profile, profileImage: profileImage || null } }));
+    } catch {}
+  }
+
+  function renderProfilePhotoEditor() {
+    const copy = {
+      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível salvar a foto. Use JPG, PNG ou WebP."],
+      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be saved. Use JPG, PNG or WebP."],
+      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo guardar la foto. Usa JPG, PNG o WebP."],
+      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось сохранить фото. Используйте JPG, PNG или WebP."],
+    }[state.language] || [];
+    const current = String(state.profile?.profileImage?.url || "");
+    content.innerHTML = `<button id="profilePhotoBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard profilePhotoEditor"><h1>📷 ${escapeHtml(copy[0])}</h1><p>${escapeHtml(copy[1])}</p><div id="profilePhotoPreview" class="profilePhotoPreview">${current ? `<img src="${escapeHtml(current)}" alt="">` : `<span>${escapeHtml((state.profile?.firstName || "E").slice(0,1).toUpperCase())}</span>`}</div><label class="secondaryButton profilePhotoChoose">${escapeHtml(copy[2])}<input id="profilePhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button id="saveProfilePhoto" class="wideButton" disabled>${escapeHtml(copy[3])}</button>${current ? `<button id="removeProfilePhoto" class="secondaryButton">${escapeHtml(copy[4])}</button>` : ""}<div id="profilePhotoStatus" class="accountStatus" role="status"></div></section>`;
+    document.getElementById("profilePhotoBack").onclick = renderArea;
+    const input = document.getElementById("profilePhotoInput");
+    const preview = document.getElementById("profilePhotoPreview");
+    const save = document.getElementById("saveProfilePhoto");
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) return;
+      input.selectedFile = file;
+      preview.innerHTML = `<img src="${escapeHtml(URL.createObjectURL(file))}" alt="">`;
+      save.disabled = false;
+    };
+    save.onclick = async () => {
+      const status = document.getElementById("profilePhotoStatus");
+      try {
+        save.disabled = true; save.textContent = copy[5];
+        const profileImage = await uploadProfilePhoto(input.selectedFile);
+        await api("/api/hub/profile-photo/save", { token: state.token, profileImage });
+        updateLocalProfileImage(profileImage);
+        renderArea();
+      } catch { status.textContent = copy[6]; save.disabled = false; save.textContent = copy[3]; }
+    };
+    document.getElementById("removeProfilePhoto")?.addEventListener("click", async () => {
+      const status = document.getElementById("profilePhotoStatus");
+      try {
+        await api("/api/hub/profile-photo/save", { token: state.token, profileImage: null });
+        updateLocalProfileImage(null);
+        renderArea();
+      } catch { status.textContent = copy[6]; }
+    });
   }
 
   function currentMembershipCredential() {
@@ -1463,7 +1544,8 @@
     }
   }
 
-  async function renderMembershipProof() {
+  async function renderMembershipProof(backAction = renderArea) {
+    const returnTo = typeof backAction === "function" ? backAction : renderArea;
     const credential = await refreshMembershipCredential();
     const payload = decodeCredential(credential);
     if (!credential || !payload) {
@@ -1474,7 +1556,7 @@
         ru: ["Карта недоступна", "Не удалось загрузить QR-код. Обновите данные и попробуйте снова.", "Попробовать снова"],
       }[state.language] || ["Credencial indisponível", "Não foi possível carregar seu QR Code agora.", "Tentar novamente"];
       content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard verificationCard"><div class="verificationIcon">⚠️</div><h1>${escapeHtml(unavailable[0])}</h1><p>${escapeHtml(unavailable[1])}</p><button id="proofRetry" class="wideButton">↻ ${escapeHtml(unavailable[2])}</button></section>`;
-      document.getElementById("proofBack").onclick = renderArea;
+      document.getElementById("proofBack").onclick = returnTo;
       document.getElementById("proofRetry").onclick = () => void renderMembershipProof();
       return;
     }
@@ -1483,7 +1565,7 @@
     content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><div class="qrActions"><button id="scanMembershipQr" class="wideButton">📷 ${escapeHtml(scanLabel)}</button></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
     await window.EduCashProResources?.loadQr?.().catch(() => null);
     createQr(document.getElementById("proofQr"), verificationUrl);
-    document.getElementById("proofBack").onclick = renderArea;
+    document.getElementById("proofBack").onclick = returnTo;
     document.getElementById("scanMembershipQr").onclick = scanMembershipQr;
   }
 
@@ -1558,7 +1640,10 @@
         <h3>${escapeHtml(credentialPayload.name || state.profile?.firstName || "EduCashPro")}</h3>
         <p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(credentialPayload.validUntil))}</b></p>
       </section>` : ""}
-      <button id="publicScanCredential" class="publicGamesButton publicScanButton" type="button">📷 <span><strong>${escapeHtml(value[20])}</strong><small>${escapeHtml(value[21])}</small></span></button>
+      <div class="publicAccessGrid publicCredentialActions">
+        ${state.profile ? `<button id="publicShowCredential" class="publicGamesButton" type="button">🔳 <span><strong>${escapeHtml(value[18])}</strong><small>${escapeHtml(value[19])}</small></span></button>` : ""}
+        <button id="publicScanCredential" class="publicGamesButton publicScanButton" type="button">📷 <span><strong>${escapeHtml(value[20])}</strong><small>${escapeHtml(value[21])}</small></span></button>
+      </div>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
     </section>`;
     document.getElementById("publicGames")?.addEventListener("click", async () => {
@@ -1577,6 +1662,7 @@
       window.EduCashProResources?.loadQr?.().then(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl)).catch(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl));
     }
     document.getElementById("publicScanCredential")?.addEventListener("click", scanMembershipQr);
+    document.getElementById("publicShowCredential")?.addEventListener("click", () => void renderMembershipProof(renderPublicLanding));
     bottomNav.classList.add("hidden");
   }
 
@@ -1677,5 +1763,5 @@
   window.addEventListener("focus", checkForUpdates);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory };
 })();
