@@ -103,3 +103,7 @@ assert(webAuthEntry.includes("resolvePairExpiry")&&webAuthEntry.includes("webPai
 
 assert(app.includes('id="publicPairDevice"')&&app.indexOf('id="publicPairDevice"')>app.indexOf('id="publicGames"'),"Device pairing must be visible immediately below Free Games on the mobile website");
 assert(app.includes("EduCashProAccountCenter?.openDevicePairing?.()"),"Visible pairing action must open the mobile approval form");
+
+assert(index.includes('classList.add(initData?"educashproTelegram":"educashproWeb")'),"The site and Telegram Mini App must receive separate layout classes");
+assert(style.includes("html.educashproWeb #app")&&style.includes("@media (min-width:900px)"),"Desktop web layout must expand responsively");
+assert(!style.includes("html.educashproTelegram #app"),"Desktop expansion must not change the Telegram Mini App layout");
