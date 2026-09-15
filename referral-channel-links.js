@@ -27,7 +27,7 @@
     if(!legacyCard||legacyCard.dataset.channelLinks==="1")return;
     legacyCard.dataset.channelLinks="1";
 
-    const siteUrl=`${location.origin}${location.pathname}?ref=${encodeURIComponent(code)}`;
+    const siteUrl=`${location.origin}/?ref=${encodeURIComponent(code)}`;
     const telegramUrl=`https://t.me/${BOT_USERNAME}?start=ref_${encodeURIComponent(code)}`;
     legacyCard.innerHTML=`<h2>${legacyCard.querySelector("h2")?.textContent||"Seu link de indicação"}</h2><p style="margin-bottom:12px">${t("hint")}</p><div class="webReferralChannels"><div style="margin-bottom:12px"><small style="display:block;color:#9db0c6;margin-bottom:6px">🌐 ${t("site")}</small><div class="webCopyRow"><input id="webSiteReferral" value="${siteUrl}" readonly><button id="webSiteReferralCopy" type="button">${t("copy")}</button></div></div><div><small style="display:block;color:#9db0c6;margin-bottom:6px">✈️ ${t("telegram")}</small><div class="webCopyRow"><input id="webTelegramReferral" value="${telegramUrl}" readonly><button id="webTelegramReferralCopy" type="button">${t("copy")}</button></div></div></div>`;
     const siteButton=legacyCard.querySelector("#webSiteReferralCopy");

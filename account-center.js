@@ -415,6 +415,14 @@
     location.assign(url);
   }
 
+  function affiliatePage() {
+    const code=String(session()?.profile?.referralCode||"").trim().toUpperCase();
+    const url=new URL("./affiliate.html",location.href);
+    if(code)url.searchParams.set("ref",code);
+    url.searchParams.set("lang",language());
+    page(url.toString());
+  }
+
   async function loadOverview(force = false) {
     if (overview && !force) return overview;
     overview = await api("/api/platform-account/overview");
@@ -693,7 +701,7 @@
           case "explore": nav("explore"); break;
           case "benefits": nav("benefits"); break;
           case "publish": page("./publish.html"); break;
-          case "affiliate": page("./affiliate.html"); break;
+          case "affiliate": affiliatePage(); break;
           case "network": openNetwork(); break;
           case "subscription": openSubscription(); break;
           case "agenda": page("./agenda.html"); break;

@@ -45,7 +45,7 @@
 
 
   function logout(){platform.writeWebSession?.(null);state.session=null;location.reload()}
-  function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}${location.pathname}?ref=${encodeURIComponent(code)}`}
+  function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}/?ref=${encodeURIComponent(code)}`}
   async function copyReferral(){const value=referralUrl();if(!value)return;try{await navigator.clipboard.writeText(value)}catch{}const button=document.getElementById("webReferralCopy");if(button){const old=button.textContent;button.textContent=t("copied");setTimeout(()=>button.textContent=old,1200)}}
   async function approvePair(){const input=document.getElementById("webPairApproveCode");const status=document.getElementById("webPairApproveStatus");const code=String(input?.value||"").replace(/\D/g,"").slice(0,6);if(code.length!==6){if(status)status.textContent=t("invalidCode");return}try{await auth.approveDevicePairing(code);if(status)status.textContent=t("approved");if(input)input.value=""}catch{if(status)status.textContent=t("invalidCode")}}
 

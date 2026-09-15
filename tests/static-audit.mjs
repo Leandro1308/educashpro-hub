@@ -21,6 +21,7 @@ const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
 const localTools=await read("local-tools-and-games.js");
+const affiliatePage=await read("affiliate.js");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
@@ -84,3 +85,10 @@ assert(app.includes("setSession")&&webAuthEntry.includes("EduCashProApp?.setSess
 assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["network_marketing", "financial_education", "telegram"])'),"The three Academy learning paths must use the central route");
 assert(app.includes('closest?.("[data-academy-category]")')&&app.includes("void openAcademyCategory(category)"),"Academy cards need a delegated click handler that survives later modules");
 assert(app.includes("setSession, openAcademyCategory };"),"The Academy category route must be available in both Web and Telegram modes");
+
+assert(affiliatePage.includes('setLink("",contextReferral())')&&affiliatePage.includes("copyCurrentLink")&&affiliatePage.includes("shareCurrentLink"),"Affiliate link must be actionable before status APIs finish");
+assert(affiliatePage.includes("location.origin")&&affiliatePage.includes("/?ref="),"Affiliate page must generate the canonical website referral URL");
+assert(affiliatePage.includes("AbortController")&&affiliatePage.includes("12000"),"Affiliate status requests must not load forever");
+assert(app.includes("personalReferralLink")&&!app.includes("p.active && state.affiliateLink"),"The personal link must remain visible while the subscriber is inactive");
+assert(webAuthEntry.includes("location.origin")&&webAuthEntry.includes("/?ref="),"Web account must generate the canonical root referral URL");
+assert(accountCenter.includes("affiliatePage()")&&accountCenter.includes('url.searchParams.set("ref",code)'),"Account Center must send the personal referral code to the affiliate page");

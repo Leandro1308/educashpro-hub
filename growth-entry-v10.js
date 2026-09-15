@@ -14,6 +14,6 @@
   const publishLabel=document.getElementById("publishQuickLabel");
   if(affiliateLabel)affiliateLabel.textContent=copy.affiliate;
   if(publishLabel)publishLabel.textContent=copy.publish;
-  if(affiliate)affiliate.href=`./affiliate.html?lang=${encodeURIComponent(lang)}`;
+  if(affiliate){const code=String(window.__EDUCASHPRO_SESSION__?.profile?.referralCode||"").trim().toUpperCase();affiliate.href=`./affiliate.html?lang=${encodeURIComponent(lang)}${code?`&ref=${encodeURIComponent(code)}`:""}`;}
   if(publish)publish.href=`./publish.html?lang=${encodeURIComponent(lang)}`;
 })();
