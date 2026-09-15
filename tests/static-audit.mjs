@@ -100,3 +100,6 @@ assert(app.includes("rememberRoute(view")&&app.includes('publicParams.get("acade
 
 assert(accountCenter.includes('data-action="pair-device"')&&accountCenter.includes("openDevicePairing")&&accountCenter.includes("approveDevicePairing(code)"),"Logged-in mobile account must expose device pairing approval");
 assert(webAuthEntry.includes("resolvePairExpiry")&&webAuthEntry.includes("webPairCountdown")&&webAuthEntry.includes("setInterval(updatePairCountdown"),"Device pairing must show a live server-based expiration countdown");
+
+assert(app.includes('id="publicPairDevice"')&&app.indexOf('id="publicPairDevice"')>app.indexOf('id="publicGames"'),"Device pairing must be visible immediately below Free Games on the mobile website");
+assert(app.includes("EduCashProAccountCenter?.openDevicePairing?.()"),"Visible pairing action must open the mobile approval form");

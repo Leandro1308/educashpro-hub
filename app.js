@@ -1342,10 +1342,10 @@
   function renderPublicLanding() {
     const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
     const copies = {
-      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico."],
-      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking."],
-      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Juegos gratuitos", "Entrena atención y pensamiento lógico."],
-      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику."],
+      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho."],
+      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device."],
+      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Juegos gratuitos", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo."],
+      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства."],
     };
     const value = copies[browserLanguage] || copies.pt;
     document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
@@ -1361,11 +1361,20 @@
       </div>
       <a class="publicTelegramButton" href="https://t.me/+1mP5ad7vJH5lOGNh">📚 ${escapeHtml(value[8])}</a>
       <button id="publicGames" class="publicGamesButton" type="button">🎮 <span><strong>${escapeHtml(value[10])}</strong><small>${escapeHtml(value[11])}</small></span></button>
+      <button id="publicPairDevice" class="publicGamesButton" type="button">📱 <span><strong>${escapeHtml(value[12])}</strong><small>${escapeHtml(value[13])}</small></span></button>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
     </section>`;
     document.getElementById("publicGames")?.addEventListener("click", async () => {
       await window.EduCashProResources?.loadGames?.();
       window.EduCashProMentalGames?.renderCatalog?.({ public: true, lang: browserLanguage, back: renderPublicLanding });
+    });
+    document.getElementById("publicPairDevice")?.addEventListener("click", () => {
+      const webSession = window.EduCashProWebEntry?.getSession?.() || window.EduCashProPlatform?.readWebSession?.();
+      if (!webSession?.token) {
+        window.EduCashProWebEntry?.open?.();
+        return;
+      }
+      window.EduCashProAccountCenter?.openDevicePairing?.();
     });
     bottomNav.classList.add("hidden");
   }
