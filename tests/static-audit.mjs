@@ -75,3 +75,8 @@ assert(crossPlatformNav.includes("searchParams.set(\"ref\"")&&crossPlatformNav.i
 assert(crossPlatformNav.includes("ensureBack")&&crossPlatformNav.includes("decorateInternalLinks"),"Back-button or internal-link normalization is missing");
 
 assert(crossPlatformNav.includes("link.textContent !== value.icon"),"Cross-platform navigation must be idempotent and must not create a mutation loop");
+
+assert(app.includes("async function renderLearn()")&&app.includes("syncExternalSession()"),"Academy must synchronize the Web session before opening learning paths");
+assert(app.includes("const active = state.profile?.active === true"),"Academy categories must not crash while the Web session is being restored");
+assert(app.includes("if (!state.courseCatalog.length) await loadCourseCatalog()"),"Academy must load its course catalog in both Web and Telegram modes");
+assert(app.includes("setSession };")&&webAuthEntry.includes("EduCashProApp?.setSession?.(state.session)"),"Web authentication must share the subscription session with the Academy");

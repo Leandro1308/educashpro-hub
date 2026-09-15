@@ -464,6 +464,31 @@
     }
   }
 
+  function syncExternalSession(session = null) {
+    const externalSession = session || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
+    if (!externalSession?.profile) return null;
+    state.token = externalSession.token || state.token;
+    state.profile = externalSession.profile;
+    state.affiliateLink = externalSession.affiliateLink || state.affiliateLink;
+    state.subscribeUrl = externalSession.subscribeUrl || externalSession.botUrl || state.subscribeUrl;
+    state.referrerId = String(externalSession.referrerId || state.referrerId || "");
+    state.planPriceUsdt = Number(externalSession.planPriceUsdt || state.planPriceUsdt || 12);
+    state.botUrl = externalSession.botUrl || state.botUrl;
+    state.language = externalSession.profile.language || state.language || "pt";
+    state.membershipCredential = externalSession.membershipCredential || state.membershipCredential;
+    window.__EDUCASHPRO_SESSION__ = externalSession;
+    window.EduCashProProfessional?.setSession?.(externalSession);
+    window.EduCashProHelp?.setSession?.(externalSession);
+    return externalSession;
+  }
+
+  async function setSession(session) {
+    if (!syncExternalSession(session)) return false;
+    if (!state.courseCatalog.length) await loadCourseCatalog();
+    applyLanguage();
+    return true;
+  }
+
   function subscribeNow() { openSubscription(); }
   function openAgenda(publicId = "", view = "") {
     const query = new URLSearchParams();
@@ -755,8 +780,10 @@
     return copy[state.language] || copy.pt;
   }
 
-  function renderLearn() {
+  async function renderLearn() {
     stopBookTracking();
+    syncExternalSession();
+    if (!state.courseCatalog.length) await loadCourseCatalog();
     const menu = academyMenuCopy();
     const helpCopy = {
       pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, serviços, agenda, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
@@ -779,8 +806,10 @@
     });
   }
 
-  function renderCourseCategory(category) {
-    const active = state.profile.active;
+  async function renderCourseCategory(category) {
+    syncExternalSession();
+    if (!state.courseCatalog.length) await loadCourseCatalog();
+    const active = state.profile?.active === true;
     const menu = academyMenuCopy();
     const categoryCopy = menu.categories.find(([id]) => id === category);
     const visibleCourses = state.courseCatalog.filter((item) => item.category === category);
@@ -805,6 +834,7 @@
   }
 
   async function openCourse(courseId) {
+    syncExternalSession();
     await window.EduCashProResources?.loadCourses?.();
     content.innerHTML = loadingCard();
     try {
@@ -826,7 +856,7 @@
       try {
         const cached = JSON.parse(localStorage.getItem(courseCacheKey(courseId)) || "null");
         const meta = state.courseCatalog.find((item) => item.id === courseId);
-        if (cached && (meta?.access === "free" || state.profile.active)) {
+        if (cached && (meta?.access === "free" || state.profile?.active === true)) {
           state.currentCourse = cached;
           state.currentLesson = Math.min(getProgress(courseId), Math.max(0, cached.lessons.length - 1));
           renderCourseIndex();
@@ -1357,5 +1387,5 @@
   window.addEventListener("focus", checkForUpdates);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda, setSession };
 })();
