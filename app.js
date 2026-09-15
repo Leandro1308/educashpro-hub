@@ -1359,23 +1359,24 @@
     new window.QRCode(element, { text, width: 240, height: 240, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
   }
 
-  async function compressProfilePhoto(file) {
-    if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) throw new Error("IMAGE");
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, 640 / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close?.();
-    return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("IMAGE")), "image/webp", .84));
+  function validProfilePhoto(file) {
+    const imageType = /^image\//i.test(String(file?.type || ""));
+    const imageExtension = /\.(?:avif|bmp|gif|heic|heif|jpe?g|png|tiff?|webp)$/i.test(String(file?.name || ""));
+    return Boolean(file && (imageType || imageExtension) && file.size > 0 && file.size <= 20 * 1024 * 1024);
+  }
+
+  function optimizedCloudinaryUrl(value) {
+    const url = String(value || "");
+    return url.includes("/image/upload/")
+      ? url.replace("/image/upload/", "/image/upload/f_auto,q_auto,w_640,h_640,c_fill,g_auto/")
+      : url;
   }
 
   async function uploadProfilePhoto(file) {
     const sign = await api("/api/hub/link-page/media-signature", { token: state.token });
-    const blob = await compressProfilePhoto(file);
+    if (!validProfilePhoto(file)) throw new Error("IMAGE");
     const form = new FormData();
-    form.append("file", blob, "profile.webp");
+    form.append("file", file, file.name || "profile-image");
     form.append("api_key", sign.apiKey);
     form.append("timestamp", String(sign.timestamp));
     form.append("folder", sign.folder);
@@ -1383,7 +1384,7 @@
     const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`, { method: "POST", body: form });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.secure_url || !data.public_id) throw new Error("IMAGE");
-    return { url: data.secure_url, publicId: data.public_id };
+    return { url: optimizedCloudinaryUrl(data.secure_url), publicId: data.public_id };
   }
 
   function updateLocalProfileImage(profileImage) {
@@ -1395,22 +1396,23 @@
     } catch {}
   }
 
-  function renderProfilePhotoEditor() {
+  function renderProfilePhotoEditor(backAction = renderArea) {
     const copy = {
-      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível salvar a foto. Use JPG, PNG ou WebP."],
-      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be saved. Use JPG, PNG or WebP."],
-      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo guardar la foto. Usa JPG, PNG o WebP."],
-      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось сохранить фото. Используйте JPG, PNG или WebP."],
+      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível salvar a foto. Escolha uma imagem de até 20 MB."],
+      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be saved. Choose an image up to 20 MB."],
+      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo guardar la foto. Elige una imagen de hasta 20 MB."],
+      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось сохранить фото. Выберите изображение до 20 МБ."],
     }[state.language] || [];
     const current = String(state.profile?.profileImage?.url || "");
-    content.innerHTML = `<button id="profilePhotoBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard profilePhotoEditor"><h1>📷 ${escapeHtml(copy[0])}</h1><p>${escapeHtml(copy[1])}</p><div id="profilePhotoPreview" class="profilePhotoPreview">${current ? `<img src="${escapeHtml(current)}" alt="">` : `<span>${escapeHtml((state.profile?.firstName || "E").slice(0,1).toUpperCase())}</span>`}</div><label class="secondaryButton profilePhotoChoose">${escapeHtml(copy[2])}<input id="profilePhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden></label><button id="saveProfilePhoto" class="wideButton" disabled>${escapeHtml(copy[3])}</button>${current ? `<button id="removeProfilePhoto" class="secondaryButton">${escapeHtml(copy[4])}</button>` : ""}<div id="profilePhotoStatus" class="accountStatus" role="status"></div></section>`;
-    document.getElementById("profilePhotoBack").onclick = renderArea;
+    const returnTo = typeof backAction === "function" ? backAction : renderArea;
+    content.innerHTML = `<button id="profilePhotoBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard profilePhotoEditor"><h1>📷 ${escapeHtml(copy[0])}</h1><p>${escapeHtml(copy[1])}</p><div id="profilePhotoPreview" class="profilePhotoPreview">${current ? `<img src="${escapeHtml(current)}" alt="">` : `<span>${escapeHtml((state.profile?.firstName || "E").slice(0,1).toUpperCase())}</span>`}</div><label class="secondaryButton profilePhotoChoose">${escapeHtml(copy[2])}<input id="profilePhotoInput" type="file" accept="image/*,.heic,.heif,.avif,.tif,.tiff" hidden></label><button id="saveProfilePhoto" class="wideButton" disabled>${escapeHtml(copy[3])}</button>${current ? `<button id="removeProfilePhoto" class="secondaryButton">${escapeHtml(copy[4])}</button>` : ""}<div id="profilePhotoStatus" class="accountStatus" role="status"></div></section>`;
+    document.getElementById("profilePhotoBack").onclick = returnTo;
     const input = document.getElementById("profilePhotoInput");
     const preview = document.getElementById("profilePhotoPreview");
     const save = document.getElementById("saveProfilePhoto");
     input.onchange = () => {
       const file = input.files?.[0];
-      if (!file || !/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) return;
+      if (!validProfilePhoto(file)) return;
       input.selectedFile = file;
       preview.innerHTML = `<img src="${escapeHtml(URL.createObjectURL(file))}" alt="">`;
       save.disabled = false;
@@ -1557,7 +1559,7 @@
       }[state.language] || ["Credencial indisponível", "Não foi possível carregar seu QR Code agora.", "Tentar novamente"];
       content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard verificationCard"><div class="verificationIcon">⚠️</div><h1>${escapeHtml(unavailable[0])}</h1><p>${escapeHtml(unavailable[1])}</p><button id="proofRetry" class="wideButton">↻ ${escapeHtml(unavailable[2])}</button></section>`;
       document.getElementById("proofBack").onclick = returnTo;
-      document.getElementById("proofRetry").onclick = () => void renderMembershipProof();
+      document.getElementById("proofRetry").onclick = () => void renderMembershipProof(returnTo);
       return;
     }
     const verificationUrl = `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(state.language)}`;

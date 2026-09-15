@@ -403,6 +403,11 @@
     document.querySelector(".accountCenterLayer")?.remove();
   }
 
+  function returnToAccountCenter() {
+    window.EduCashProApp?.renderArea?.();
+    window.setTimeout(open, 0);
+  }
+
   function shell(inner = "") {
     styles();
     close();
@@ -664,11 +669,11 @@
       body.querySelector("#accountLinkTelegram")?.addEventListener("click", linkTelegram);
       body.querySelector("#accountEditProfilePhoto")?.addEventListener("click", () => {
         close();
-        window.EduCashProApp?.renderProfilePhotoEditor?.();
+        window.EduCashProApp?.renderProfilePhotoEditor?.(returnToAccountCenter);
       });
       body.querySelector("#accountShowQrCode")?.addEventListener("click", () => {
         close();
-        window.EduCashProApp?.renderMembershipProof?.();
+        window.EduCashProApp?.renderMembershipProof?.(returnToAccountCenter);
       });
       body.querySelector("#accountOpenPreferences")?.addEventListener("click", openPreferences);
       body.querySelector("#accountOpenDocuments")?.addEventListener("click", openDocuments);
@@ -788,11 +793,11 @@
           case "projects": nav("area"); break;
           case "profile-photo":
             close();
-            window.EduCashProApp?.renderProfilePhotoEditor?.();
+            window.EduCashProApp?.renderProfilePhotoEditor?.(returnToAccountCenter);
             break;
           case "my-qr":
             close();
-            window.EduCashProApp?.renderMembershipProof?.();
+            window.EduCashProApp?.renderMembershipProof?.(returnToAccountCenter);
             break;
           case "language": openLanguage(); break;
           case "preferences": openPreferences(); break;
