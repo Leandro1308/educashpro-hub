@@ -35,6 +35,7 @@
     currentCourse: null,
     currentLesson: 0,
     courseCatalog: [],
+    hubSessionReady: false,
   };
   let activeBookScrollHandler = null;
   function stopBookTracking(){if(activeBookScrollHandler){removeEventListener("scroll",activeBookScrollHandler);activeBookScrollHandler=null}}
@@ -469,22 +470,31 @@
     return code ? `${window.location.origin}/?ref=${encodeURIComponent(code)}` : String(fallback || "");
   }
 
+  function normalizeProfile(profile, current = null) {
+    const source = profile || {};
+    const activeValue = source.active ?? source.isActive ?? source.subscription?.active ?? current?.active ?? current?.isActive ?? false;
+    const activeUntil = source.activeUntil ?? source.subscription?.activeUntil ?? current?.activeUntil ?? null;
+    return { ...(current || {}), ...source, active: activeValue === true, isActive: activeValue === true, activeUntil };
+  }
+
   function syncExternalSession(session = null) {
     const externalSession = session || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
     if (!externalSession?.profile) return null;
-    state.token = externalSession.token || state.token;
-    state.profile = externalSession.profile;
-    state.affiliateLink = personalReferralLink(externalSession.profile, externalSession.affiliateLink || state.affiliateLink);
-    state.subscribeUrl = externalSession.subscribeUrl || externalSession.botUrl || state.subscribeUrl;
+    const hubToken = state.hubSessionReady ? state.token : "";
+    state.token = hubToken || externalSession.token || state.token;
+    state.profile = normalizeProfile(externalSession.profile, state.profile);
+    state.affiliateLink = personalReferralLink(state.profile, externalSession.affiliateLink || state.affiliateLink);
+    state.subscribeUrl = externalSession.subscribeUrl || externalSession.server?.subscribeUrl || externalSession.botUrl || state.subscribeUrl;
     state.referrerId = String(externalSession.referrerId || state.referrerId || "");
     state.planPriceUsdt = Number(externalSession.planPriceUsdt || state.planPriceUsdt || 12);
     state.botUrl = externalSession.botUrl || state.botUrl;
-    state.language = externalSession.profile.language || state.language || "pt";
+    state.language = state.profile.language || state.language || "pt";
     state.membershipCredential = externalSession.membershipCredential || state.membershipCredential;
-    window.__EDUCASHPRO_SESSION__ = externalSession;
-    window.EduCashProProfessional?.setSession?.(externalSession);
-    window.EduCashProHelp?.setSession?.(externalSession);
-    return externalSession;
+    const effectiveSession = { ...externalSession, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
+    window.__EDUCASHPRO_SESSION__ = effectiveSession;
+    window.EduCashProProfessional?.setSession?.(effectiveSession);
+    window.EduCashProHelp?.setSession?.(effectiveSession);
+    return effectiveSession;
   }
 
   async function setSession(session) {
@@ -548,6 +558,19 @@
     bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
   }
 
+  function rememberRoute(view, detail = "") {
+    try {
+      const url = new URL(window.location.href);
+      if (view && view !== "home") url.searchParams.set("view", view);
+      else url.searchParams.delete("view");
+      url.searchParams.delete("academy");
+      url.searchParams.delete("course");
+      if (view === "learn" && detail) url.searchParams.set("academy", detail);
+      if (view === "course" && detail) url.searchParams.set("course", detail);
+      history.replaceState({ view, detail }, "", url.toString());
+    } catch {}
+  }
+
   function setView(view) {
     stopBookTracking();
     if (!state.profile?.active && ["explore"].includes(view)) {
@@ -556,6 +579,7 @@
       return;
     }
     state.view = view;
+    rememberRoute(view);
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (view === "home") return renderHome();
@@ -581,6 +605,9 @@
   }
 
   function renderHome() {
+    state.view = "home";
+    rememberRoute("home");
+    updateNav();
     const p = state.profile;
     const supportLabels = {
       pt: ["Fale com o administrador", "Relate problemas, falhas ou envie sugestões"],
@@ -787,6 +814,9 @@
 
   async function renderLearn() {
     stopBookTracking();
+    state.view = "learn";
+    rememberRoute("learn");
+    updateNav();
     syncExternalSession();
     if (!state.courseCatalog.length) await loadCourseCatalog();
     const menu = academyMenuCopy();
@@ -829,6 +859,9 @@
 
   async function renderCourseCategory(category) {
     syncExternalSession();
+    state.view = "learn";
+    rememberRoute("learn", category);
+    updateNav();
     if (!state.courseCatalog.length) await loadCourseCatalog();
     const active = state.profile?.active === true;
     const menu = academyMenuCopy();
@@ -856,6 +889,9 @@
 
   async function openCourse(courseId) {
     syncExternalSession();
+    state.view = "course";
+    rememberRoute("course", courseId);
+    updateNav();
     await window.EduCashProResources?.loadCourses?.();
     content.innerHTML = loadingCard();
     try {
@@ -1365,7 +1401,8 @@
     try {
       const session = await api("/api/hub/session", { initData: tg.initData });
       state.token = session.token;
-      state.profile = session.profile;
+      state.hubSessionReady = true;
+      state.profile = normalizeProfile(session.profile);
       state.affiliateLink = personalReferralLink(session.profile, session.affiliateLink);
       state.subscribeUrl = session.subscribeUrl || session.botUrl;
       state.referrerId = String(session.referrerId || "");
@@ -1394,7 +1431,13 @@
       await loadCourseCatalog();
       applyLanguage();
       bottomNav.classList.remove("hidden");
-      renderHome();
+      const requestedCourse = String(publicParams.get("course") || "");
+      const requestedAcademy = String(publicParams.get("academy") || "");
+      const requestedView = String(publicParams.get("view") || "");
+      if (requestedCourse) await openCourse(requestedCourse);
+      else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
+      else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
+      else renderHome();
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();
     } catch (error) {
