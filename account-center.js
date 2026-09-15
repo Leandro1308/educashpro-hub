@@ -40,6 +40,14 @@
       notLinked: "Não vinculado",
       approve: "Autorizar dispositivo",
       code: "Código de 6 dígitos",
+      pairDevice: "Conectar otro dispositivo",
+      pairDeviceTitle: "Autorizar nuevo dispositivo",
+      pairDeviceText: "Introduce el código de 6 dígitos mostrado en el ordenador o móvil que deseas conectar a esta cuenta.",
+      pairWorking: "Autorizando…",
+      pairDevice: "Conectar outro dispositivo",
+      pairDeviceTitle: "Autorizar novo dispositivo",
+      pairDeviceText: "Digite o código de 6 dígitos exibido no computador ou celular que deseja conectar a esta conta.",
+      pairWorking: "Autorizando…",
       networkTitle: "Minha Rede",
       directs: "Diretos ativos",
       unlocked: "Nível liberado",
@@ -108,6 +116,10 @@
       notLinked: "Not linked",
       approve: "Authorize device",
       code: "6-digit code",
+      pairDevice: "Connect another device",
+      pairDeviceTitle: "Authorize new device",
+      pairDeviceText: "Enter the 6-digit code shown on the computer or phone you want to connect to this account.",
+      pairWorking: "Authorizing…",
       networkTitle: "My Network",
       directs: "Active direct referrals",
       unlocked: "Unlocked level",
@@ -244,6 +256,10 @@
       notLinked: "Не привязан",
       approve: "Разрешить устройство",
       code: "6-значный код",
+      pairDevice: "Подключить другое устройство",
+      pairDeviceTitle: "Разрешить новое устройство",
+      pairDeviceText: "Введите 6-значный код с компьютера или телефона, который нужно подключить к этому аккаунту.",
+      pairWorking: "Подтверждение…",
       networkTitle: "Моя сеть",
       directs: "Активные прямые",
       unlocked: "Открытый уровень",
@@ -427,6 +443,48 @@
     if (overview && !force) return overview;
     overview = await api("/api/platform-account/overview");
     return overview;
+  }
+
+  function openDevicePairing() {
+    const body = shell(`
+      <div class="accountPanel">
+        <h3>📱 ${esc(t("pairDeviceTitle"))}</h3>
+        <p class="accountNote">${esc(t("pairDeviceText"))}</p>
+        <label for="accountPairCode" class="accountNote"><b>${esc(t("code"))}</b></label>
+        <input id="accountPairCode" class="accountField" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]*" placeholder="${esc(t("code"))}">
+        <button id="accountPairApprove" class="accountPrimary" type="button" style="margin-top:10px">${esc(t("approve"))}</button>
+        <div id="accountPairStatus" class="accountStatus" role="status" aria-live="polite"></div>
+      </div>`);
+    const input = body.querySelector("#accountPairCode");
+    const button = body.querySelector("#accountPairApprove");
+    const status = body.querySelector("#accountPairStatus");
+    const approve = async () => {
+      const code = String(input?.value || "").replace(/\D/g, "").slice(0, 6);
+      if (input) input.value = code;
+      if (code.length !== 6) {
+        if (status) status.textContent = t("invalidCode");
+        input?.focus();
+        return;
+      }
+      if (busy) return;
+      busy = true;
+      if (button) button.disabled = true;
+      if (status) status.textContent = t("pairWorking");
+      try {
+        await auth.approveDevicePairing(code);
+        if (status) status.textContent = t("authorized");
+        if (input) input.value = "";
+      } catch {
+        if (status) status.textContent = t("invalidCode");
+      } finally {
+        busy = false;
+        if (button) button.disabled = false;
+      }
+    };
+    input?.addEventListener("input", () => { input.value = input.value.replace(/\D/g, "").slice(0, 6); });
+    input?.addEventListener("keydown", (event) => { if (event.key === "Enter") void approve(); });
+    button?.addEventListener("click", () => void approve());
+    window.setTimeout(() => input?.focus(), 50);
   }
 
   async function openNetwork() {
@@ -683,6 +741,7 @@
         <button class="accountAction" data-action="affiliate"><span>💰</span><b>${esc(t("affiliate"))}</b></button>
         <button class="accountAction" data-action="network"><span>📊</span><b>${esc(t("network"))}</b></button>
         <button class="accountAction" data-action="subscription"><span>💳</span><b>${esc(t("subscription"))}</b></button>
+        <button class="accountAction" data-action="pair-device"><span>📱</span><b>${esc(t("pairDevice"))}</b></button>
         <button class="accountAction" data-action="agenda"><span>📅</span><b>${esc(t("agenda"))}</b></button>
         <button class="accountAction" data-action="projects"><span>🗂️</span><b>${esc(t("projects"))}</b></button>
         <button class="accountAction" data-action="language"><span>🌐</span><b>${esc(t("language"))}</b></button>
@@ -704,6 +763,7 @@
           case "affiliate": affiliatePage(); break;
           case "network": openNetwork(); break;
           case "subscription": openSubscription(); break;
+          case "pair-device": openDevicePairing(); break;
           case "agenda": page("./agenda.html"); break;
           case "projects": nav("area"); break;
           case "language": openLanguage(); break;
@@ -746,6 +806,7 @@
     open,
     openNetwork,
     openSubscription,
+    openDevicePairing,
     openSettings,
     openLanguage,
     openPreferences,
