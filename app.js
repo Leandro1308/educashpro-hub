@@ -802,8 +802,24 @@
     content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
       if (button.dataset.academyCategory === "tools") return renderTools();
       if (button.dataset.academyCategory === "technical_analysis") return window.EduCashProMarkets?.render?.({language:state.language,active:state.profile?.active === true,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
-      renderCourseCategory(button.dataset.academyCategory);
+      return openAcademyCategory(button.dataset.academyCategory);
     });
+  }
+
+  async function openAcademyCategory(category) {
+    const supported = new Set(["network_marketing", "financial_education", "telegram"]);
+    if (!supported.has(category)) return false;
+    showGlobalLoading();
+    try {
+      await renderCourseCategory(category);
+      return true;
+    } catch (error) {
+      console.error("[EduCashPro] Falha ao abrir trilha da Academy:", category, error);
+      handleError(error);
+      return false;
+    } finally {
+      hideGlobalLoading();
+    }
   }
 
   async function renderCourseCategory(category) {
@@ -1381,11 +1397,20 @@
     }
   }
 
+  document.addEventListener("click", (event) => {
+    const button = event.target?.closest?.("[data-academy-category]");
+    const category = button?.dataset?.academyCategory;
+    if (!["network_marketing", "financial_education", "telegram"].includes(category)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void openAcademyCategory(category);
+  }, true);
+
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") checkForUpdates();
   });
   window.addEventListener("focus", checkForUpdates);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda, setSession };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderHome, renderLearn, renderArea, renderSubmissionForm, openAgenda, setSession, openAcademyCategory };
 })();
