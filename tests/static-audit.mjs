@@ -121,3 +121,8 @@ for(const group of ["Principal","Aprendizado","Ferramentas","Negócios e oportun
 assert(webSiteMenu.includes("html.educashproWeb .growthQuickActions{display:none!important}"),"Duplicate top shortcuts must be removed on the website");
 assert(webSiteMenu.includes("publicMarketplace")===false&&webSiteMenu.includes('action==="marketplace"'),"Marketplace must have a functional menu destination");
 assert(app.includes("renderTools, renderExplore, renderBenefits")&&app.includes("renderMembershipProof"),"Website menu routes must be exposed by the app");
+
+assert(app.includes("function subscriptionDestination()")&&app.includes('"https://t.me/EduCashProBot"'),"Presentation subscription must always have a Telegram destination");
+assert(app.includes('url.searchParams.set("start", referral ? `ref_${referral}` : "subscribe")'),"Subscription fallback must preserve affiliate attribution");
+assert(app.includes("window.location.assign(url)")&&!app.includes('window.open(url, "_blank", "noopener")'),"Website subscription must use a direct navigation that is not blocked as a popup");
+assert(app.includes("content.querySelectorAll(\".presentationSubscribe\")")&&app.includes("button.onclick = subscribeNow"),"Every presentation subscription button must be wired");

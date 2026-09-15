@@ -385,19 +385,26 @@
   function localKey(courseId) { return `educashpro:progress:${state.profile?.tgId || "guest"}:${courseId}`; }
   function getProgress(courseId) { return Math.max(0, Number(localStorage.getItem(localKey(courseId)) || 0)); }
   function saveProgress(courseId, index) { localStorage.setItem(localKey(courseId), String(Math.max(0, index))); }
-  function openUrl(url) { if (!url) return; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url); else if (tg?.openLink) tg.openLink(url); else window.open(url, "_blank", "noopener"); }
+  function openUrl(url) { if (!url) return false; if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) tg.openTelegramLink(url); else if (tg?.openLink) tg.openLink(url); else window.location.assign(url); return true; }
+
+  function subscriptionDestination() {
+    const configured = String(state.subscribeUrl || state.botUrl || "").trim();
+    if (configured) return configured;
+    const params = new URL(window.location.href).searchParams;
+    const referral = String(state.referrerId || state.profile?.referralCode || window.EduCashProPlatform?.pendingReferral?.() || params.get("ref") || params.get("r") || "").trim();
+    const url = new URL("https://t.me/EduCashProBot");
+    url.searchParams.set("start", referral ? `ref_${referral}` : "subscribe");
+    return url.toString();
+  }
 
   function openSubscription() {
-    const url = String(state.subscribeUrl || state.botUrl || "").trim();
-    if (!url) return;
-
+    const url = subscriptionDestination();
     if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) {
       tg.openTelegramLink(url);
       window.setTimeout(() => tg?.close?.(), 180);
-      return;
+      return true;
     }
-
-    openUrl(url);
+    return openUrl(url);
   }
 
   function localized(value) { return value?.[state.language] || value?.pt || ""; }
@@ -1532,5 +1539,5 @@
   window.addEventListener("focus", checkForUpdates);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, setView, setSession, openAcademyCategory };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory };
 })();
