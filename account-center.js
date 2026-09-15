@@ -25,6 +25,8 @@
       language: "Idioma",
       preferences: "Preferências",
       settings: "Configurações",
+      profilePhoto: "Foto do perfil",
+      myQrCode: "Meu QR Code",
       support: "Suporte",
       documents: "Sobre e Política de Uso",
       admin: "Admin",
@@ -101,6 +103,8 @@
       language: "Language",
       preferences: "Preferences",
       settings: "Settings",
+      profilePhoto: "Profile photo",
+      myQrCode: "My QR Code",
       support: "Support",
       documents: "About and Usage Policy",
       admin: "Admin",
@@ -173,6 +177,8 @@
       language: "Idioma",
       preferences: "Preferencias",
       settings: "Configuración",
+      profilePhoto: "Foto de perfil",
+      myQrCode: "Mi código QR",
       support: "Soporte",
       documents: "Acerca de y Política de Uso",
       admin: "Admin",
@@ -241,6 +247,8 @@
       language: "Язык",
       preferences: "Предпочтения",
       settings: "Настройки",
+      profilePhoto: "Фото профиля",
+      myQrCode: "Мой QR-код",
       support: "Поддержка",
       documents: "О сервисе и правила использования",
       admin: "Админ",
@@ -642,6 +650,8 @@
             <div class="accountMetric"><small>${esc(t("referral"))}</small><b>${esc(account.referralCode || "—")}</b></div>
           </div>
           ${!account.telegramLinked ? `<button id="accountLinkTelegram" class="accountSecondary" type="button">✈️ ${esc(t("linkTelegram"))}</button>` : ""}
+          <button id="accountEditProfilePhoto" class="accountSecondary" type="button">📷 ${esc(t("profilePhoto"))}</button>
+          <button id="accountShowQrCode" class="accountSecondary" type="button">🔳 ${esc(t("myQrCode"))}</button>
           <button id="accountOpenPreferences" class="accountSecondary" type="button">🔔 ${esc(t("preferences"))}</button>
           <button id="accountOpenDocuments" class="accountSecondary" type="button">📄 ${esc(t("documents"))}</button>
           <div style="margin-top:14px">
@@ -652,6 +662,14 @@
         </div>`;
 
       body.querySelector("#accountLinkTelegram")?.addEventListener("click", linkTelegram);
+      body.querySelector("#accountEditProfilePhoto")?.addEventListener("click", () => {
+        close();
+        window.EduCashProApp?.renderProfilePhotoEditor?.();
+      });
+      body.querySelector("#accountShowQrCode")?.addEventListener("click", () => {
+        close();
+        window.EduCashProApp?.renderMembershipProof?.();
+      });
       body.querySelector("#accountOpenPreferences")?.addEventListener("click", openPreferences);
       body.querySelector("#accountOpenDocuments")?.addEventListener("click", openDocuments);
       body.querySelector("#accountPairApprove")?.addEventListener("click", async () => {
@@ -744,6 +762,8 @@
         <button class="accountAction" data-action="pair-device"><span>📱</span><b>${esc(t("pairDevice"))}</b></button>
         <button class="accountAction" data-action="agenda"><span>📅</span><b>${esc(t("agenda"))}</b></button>
         <button class="accountAction" data-action="projects"><span>🗂️</span><b>${esc(t("projects"))}</b></button>
+        <button class="accountAction" data-action="profile-photo"><span>📷</span><b>${esc(t("profilePhoto"))}</b></button>
+        <button class="accountAction" data-action="my-qr"><span>🔳</span><b>${esc(t("myQrCode"))}</b></button>
         <button class="accountAction" data-action="language"><span>🌐</span><b>${esc(t("language"))}</b></button>
         <button class="accountAction" data-action="preferences"><span>🔔</span><b>${esc(t("preferences"))}</b></button>
         <button class="accountAction" data-action="settings"><span>⚙️</span><b>${esc(t("settings"))}</b></button>
@@ -766,6 +786,14 @@
           case "pair-device": openDevicePairing(); break;
           case "agenda": page("./agenda.html"); break;
           case "projects": nav("area"); break;
+          case "profile-photo":
+            close();
+            window.EduCashProApp?.renderProfilePhotoEditor?.();
+            break;
+          case "my-qr":
+            close();
+            window.EduCashProApp?.renderMembershipProof?.();
+            break;
           case "language": openLanguage(); break;
           case "preferences": openPreferences(); break;
           case "settings": openSettings(); break;
