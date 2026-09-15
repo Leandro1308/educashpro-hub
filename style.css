@@ -740,3 +740,19 @@ html[aria-busy="true"]{cursor:progress}
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   }
 }
+
+
+/* Ações públicas acessíveis e credencial de assinatura no site. */
+.publicAccessGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.publicAccessButton{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:112px;padding:16px;border:1px solid rgba(48,230,166,.28);border-radius:18px;background:#10243a;color:#f7fbff;text-decoration:none;box-sizing:border-box}
+.publicAccessButton.telegram{border-color:rgba(74,140,255,.38);background:linear-gradient(145deg,rgba(74,140,255,.18),#10243a)}
+.publicAccessButton span{font-size:31px}.publicAccessButton b{margin-top:8px;font-size:16px}.publicAccessButton small{margin-top:5px;color:#b8c8da;line-height:1.4}
+.publicCredentialCard{margin:18px auto;padding:22px;border:1px solid rgba(48,230,166,.32);border-radius:22px;background:#0b1d31;text-align:center}
+.publicCredentialCard h2{margin:14px 0 6px}.publicCredentialCard h3{margin:13px 0 4px}.publicCredentialCard p{color:#b8c8da}
+.publicCredentialCard .qrCanvas{width:fit-content;max-width:100%;margin:18px auto;padding:12px;border-radius:17px;background:#fff;overflow:auto}
+.publicScanButton{border-color:rgba(255,200,92,.36)!important}
+.scannerCard{max-width:680px;margin:20px auto}
+#webQrReader{margin-top:15px;padding:10px;border-radius:16px;background:#fff;color:#07111f;overflow:hidden}
+#webQrReader video{border-radius:12px}
+@media(max-width:560px){.publicAccessGrid{grid-template-columns:1fr}.publicAccessButton{min-height:92px}.publicCredentialCard{padding:18px 12px}.publicCredentialCard .qrCanvas canvas,.publicCredentialCard .qrCanvas img{max-width:100%;height:auto!important}}
+@media(min-width:900px){html.educashproWeb .publicAccessGrid{width:min(100%,900px);margin:14px auto}html.educashproWeb .publicCredentialCard{width:min(100%,900px);box-sizing:border-box}}

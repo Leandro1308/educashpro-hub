@@ -107,3 +107,10 @@ assert(app.includes("EduCashProAccountCenter?.openDevicePairing?.()"),"Visible p
 assert(index.includes('classList.add(initData?"educashproTelegram":"educashproWeb")'),"The site and Telegram Mini App must receive separate layout classes");
 assert(style.includes("html.educashproWeb #app")&&style.includes("@media (min-width:900px)"),"Desktop web layout must expand responsively");
 assert(!style.includes("html.educashproTelegram #app"),"Desktop expansion must not change the Telegram Mini App layout");
+
+assert(app.includes('id="publicMarketplace"')&&app.includes('href="./marketplace.html"'),"Marketplace must have a prominent public homepage button");
+assert(app.includes('id="publicTelegramApp"')&&app.includes('searchParams.set("startapp"'),"Homepage must open the Telegram App and preserve referral attribution");
+assert(app.includes('id="publicCredentialQr"')&&app.includes('id="publicScanCredential"'),"Website must show the subscriber credential and public scan action");
+assert(app.includes("openWebMembershipScanner")&&app.includes("Html5QrcodeScanner"),"Website scanner must use the browser camera");
+assert(app.includes("crypto.subtle.verify")&&app.includes('featureCopy("credentialUntil")'),"Scanned credential must verify signature and show validity");
+assert(loader.includes("loadQrScanner")&&loader.includes("html5-qrcode@2.3.8"),"QR scanner library must load on demand");

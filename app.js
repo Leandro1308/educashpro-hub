@@ -38,6 +38,7 @@
     hubSessionReady: false,
   };
   let activeBookScrollHandler = null;
+  let webQrScanner = null;
   function stopBookTracking(){if(activeBookScrollHandler){removeEventListener("scroll",activeBookScrollHandler);activeBookScrollHandler=null}}
 
   const COPY = {
@@ -489,7 +490,7 @@
     state.planPriceUsdt = Number(externalSession.planPriceUsdt || state.planPriceUsdt || 12);
     state.botUrl = externalSession.botUrl || state.botUrl;
     state.language = state.profile.language || state.language || "pt";
-    state.membershipCredential = externalSession.membershipCredential || state.membershipCredential;
+    state.membershipCredential = externalSession.membershipCredential || state.membershipCredential || String(localStorage.getItem("educashpro:membership-credential") || "");
     const effectiveSession = { ...externalSession, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
     window.__EDUCASHPRO_SESSION__ = effectiveSession;
     window.EduCashProProfessional?.setSession?.(effectiveSession);
@@ -501,6 +502,7 @@
     if (!syncExternalSession(session)) return false;
     if (!state.courseCatalog.length) await loadCourseCatalog();
     applyLanguage();
+    if (document.querySelector(".publicWelcome")) renderPublicLanding();
     return true;
   }
 
@@ -1272,6 +1274,43 @@
     document.getElementById("downloadQr").onclick = () => downloadQr(container, "educashpro-qrcode.png");
   }
 
+  async function openWebMembershipScanner() {
+    const copies = {
+      pt: ["Verificar credencial", "Aponte a câmera para o QR Code apresentado pelo assinante.", "Voltar", "Não foi possível abrir a câmera. Verifique a permissão do navegador."],
+      en: ["Verify credential", "Point the camera at the QR Code shown by the subscriber.", "Back", "The camera could not be opened. Check the browser permission."],
+      es: ["Verificar credencial", "Apunta la cámara al QR mostrado por el suscriptor.", "Volver", "No se pudo abrir la cámara. Comprueba el permiso del navegador."],
+      ru: ["Проверить карту", "Наведите камеру на QR-код подписчика.", "Назад", "Не удалось открыть камеру. Проверьте разрешение браузера."],
+    };
+    const copy = copies[state.language] || copies.pt;
+    content.innerHTML = `<button id="webScannerBack" class="textButton">← ${escapeHtml(copy[2])}</button><section class="profileCard scannerCard"><h1>📷 ${escapeHtml(copy[0])}</h1><p>${escapeHtml(copy[1])}</p><div id="webQrReader"></div><div id="webQrStatus" class="accountStatus" role="status"></div></section>`;
+    const back = async () => { try { await webQrScanner?.clear?.(); } catch {} webQrScanner = null; renderPublicLanding(); };
+    document.getElementById("webScannerBack").onclick = () => void back();
+    try {
+      await window.EduCashProResources?.loadQrScanner?.();
+      if (!window.Html5QrcodeScanner) throw new Error("scanner_unavailable");
+      const config = { fps:10, qrbox:{width:250,height:250}, rememberLastUsedCamera:true };
+      if (window.Html5QrcodeScanType) config.supportedScanTypes=[window.Html5QrcodeScanType.SCAN_TYPE_CAMERA];
+      webQrScanner = new window.Html5QrcodeScanner("webQrReader", config, false);
+      webQrScanner.render(async (value) => {
+        try {
+          const scanned = new URL(String(value || ""));
+          const scannedCredential = scanned.searchParams.get("credential");
+          if (!scannedCredential) throw new Error("credential_missing");
+          const language = scanned.searchParams.get("lang") || state.language;
+          try { await webQrScanner?.clear?.(); } catch {}
+          webQrScanner = null;
+          await verifyMembershipCredential(scannedCredential, language, true, renderPublicLanding);
+        } catch {
+          const status = document.getElementById("webQrStatus");
+          if (status) status.textContent = featureCopy("invalidCredential");
+        }
+      }, () => {});
+    } catch {
+      const status = document.getElementById("webQrStatus");
+      if (status) status.textContent = copy[3];
+    }
+  }
+
   function scanMembershipQr() {
     const scannerText = {
       pt: "Aponte a câmera para o QR Code do assinante",
@@ -1280,7 +1319,7 @@
       ru: "Наведите камеру на QR-код подписчика",
     }[state.language] || "Aponte a câmera para o QR Code do assinante";
     if (!tg?.showScanQrPopup) {
-      showToast({ pt: "Leitor disponível dentro do Telegram.", en: "Scanner available inside Telegram.", es: "Lector disponible dentro de Telegram.", ru: "Сканер доступен внутри Telegram." }[state.language]);
+      void openWebMembershipScanner();
       return;
     }
     tg.showScanQrPopup({ text: scannerText }, (value) => {
@@ -1298,19 +1337,20 @@
     });
   }
 
-  function renderMembershipProof() {
+  async function renderMembershipProof() {
     const credential = state.membershipCredential;
     const payload = decodeCredential(credential);
     if (!credential || !payload) return;
     const verificationUrl = `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(state.language)}`;
     const scanLabel = { pt: "Ler QR Code", en: "Scan QR Code", es: "Leer código QR", ru: "Сканировать QR-код" }[state.language];
     content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><div class="qrActions"><button id="scanMembershipQr" class="wideButton">📷 ${escapeHtml(scanLabel)}</button></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
+    await window.EduCashProResources?.loadQr?.().catch(() => null);
     createQr(document.getElementById("proofQr"), verificationUrl);
     document.getElementById("proofBack").onclick = renderArea;
     document.getElementById("scanMembershipQr").onclick = scanMembershipQr;
   }
 
-  async function verifyMembershipCredential(credential, language, embedded = false) {
+  async function verifyMembershipCredential(credential, language, embedded = false, backAction = null) {
     state.language = ["pt", "en", "es", "ru"].includes(language) ? language : "pt";
     applyLanguage();
     const parts = String(credential || "").split(".");
@@ -1327,7 +1367,7 @@
     }
     const back = embedded ? `<button id="verificationBack" class="textButton">← ${escapeHtml(t("back"))}</button>` : "";
     content.innerHTML = `${back}<section class="profileCard verificationCard"><div class="verificationIcon">${authentic ? active ? "✅" : "❌" : "⚠️"}</div><h1>${escapeHtml(authentic ? active ? featureCopy("credentialActive") : featureCopy("credentialExpired") : featureCopy("invalidCredential"))}</h1>${authentic ? `<h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div class="providerLine"><span>🛡️ ${escapeHtml(featureCopy("authentic"))}</span></div>` : ""}</section>`;
-    if (embedded) document.getElementById("verificationBack").onclick = renderArea;
+    if (embedded) document.getElementById("verificationBack").onclick = typeof backAction === "function" ? backAction : renderArea;
   }
 
   function loadingCard() { return `<div class="empty"><div class="loader" style="margin:auto"><span></span></div></div>`; }
@@ -1342,13 +1382,20 @@
   function renderPublicLanding() {
     const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
     const copies = {
-      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho."],
-      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device."],
-      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Juegos gratuitos", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo."],
-      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства."],
+      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
+      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
+      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Juegos gratuitos", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo.", "Marketplace", "Encuentra empresas, beneficios y proyectos.", "Abrir App en Telegram", "Accede a EduCashPro directamente en Telegram.", "Credencial del suscriptor", "Muestra este QR a la tienda acreditada.", "Escanear QR", "Abre la cámara y comprueba titular, estado y validez."],
+      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
     };
     const value = copies[browserLanguage] || copies.pt;
     document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
+    const referralCode = String(state.profile?.referralCode || new URL(window.location.href).searchParams.get("ref") || "").trim();
+    const telegramAppUrl = new URL("https://t.me/EduCashProBot");
+    telegramAppUrl.searchParams.set("startapp", referralCode ? `ref_${referralCode}` : "site");
+    const credential = String(state.membershipCredential || "");
+    const credentialPayload = decodeCredential(credential);
+    const credentialActive = Boolean(credentialPayload && Number(credentialPayload.validUntil || 0) > Date.now() / 1000);
+    const credentialUrl = credentialPayload ? `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(browserLanguage)}` : "";
     content.innerHTML = `<section class="publicWelcome">
       <div class="publicWelcomeMark"><span>E</span></div>
       <span class="eyebrow">EDUCASHPRO</span>
@@ -1362,6 +1409,18 @@
       <a class="publicTelegramButton" href="https://t.me/+1mP5ad7vJH5lOGNh">📚 ${escapeHtml(value[8])}</a>
       <button id="publicGames" class="publicGamesButton" type="button">🎮 <span><strong>${escapeHtml(value[10])}</strong><small>${escapeHtml(value[11])}</small></span></button>
       <button id="publicPairDevice" class="publicGamesButton" type="button">📱 <span><strong>${escapeHtml(value[12])}</strong><small>${escapeHtml(value[13])}</small></span></button>
+      <div class="publicAccessGrid">
+        <a id="publicMarketplace" class="publicAccessButton" href="./marketplace.html"><span>🏪</span><b>${escapeHtml(value[14])}</b><small>${escapeHtml(value[15])}</small></a>
+        <a id="publicTelegramApp" class="publicAccessButton telegram" href="${escapeHtml(telegramAppUrl.toString())}" target="_blank" rel="noopener"><span>✈️</span><b>${escapeHtml(value[16])}</b><small>${escapeHtml(value[17])}</small></a>
+      </div>
+      ${credentialPayload ? `<section class="publicCredentialCard">
+        <span class="statusPill ${credentialActive ? "" : "inactive"}">${escapeHtml(credentialActive ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span>
+        <h2>${escapeHtml(value[18])}</h2><p>${escapeHtml(value[19])}</p>
+        <div id="publicCredentialQr" class="qrCanvas"></div>
+        <h3>${escapeHtml(credentialPayload.name || state.profile?.firstName || "EduCashPro")}</h3>
+        <p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(credentialPayload.validUntil))}</b></p>
+      </section>` : ""}
+      <button id="publicScanCredential" class="publicGamesButton publicScanButton" type="button">📷 <span><strong>${escapeHtml(value[20])}</strong><small>${escapeHtml(value[21])}</small></span></button>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
     </section>`;
     document.getElementById("publicGames")?.addEventListener("click", async () => {
@@ -1376,6 +1435,10 @@
       }
       window.EduCashProAccountCenter?.openDevicePairing?.();
     });
+    if (credentialPayload) {
+      window.EduCashProResources?.loadQr?.().then(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl)).catch(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl));
+    }
+    document.getElementById("publicScanCredential")?.addEventListener("click", scanMembershipQr);
     bottomNav.classList.add("hidden");
   }
 
