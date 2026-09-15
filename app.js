@@ -424,6 +424,7 @@
   }
 
   async function checkForUpdates() {
+    if (window.__EDUCASHPRO_MARKETS_OPEN__ === true) return false;
     if (updateCheckPromise) return updateCheckPromise;
     updateCheckPromise = (async () => {
       const controller = new AbortController();
@@ -581,6 +582,7 @@
   }
 
   function setView(view) {
+    window.__EDUCASHPRO_MARKETS_OPEN__ = false;
     stopBookTracking();
     if (!state.profile?.active && ["explore"].includes(view)) {
       const lockedId = view === "explore" ? "communities" : "courses";
@@ -845,9 +847,17 @@
     document.getElementById("openHelpCenter").onclick = () => window.EduCashProHelp?.render?.();
     content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
       if (button.dataset.academyCategory === "tools") return renderTools();
-      if (button.dataset.academyCategory === "technical_analysis") return window.EduCashProMarkets?.render?.({language:state.language,active:state.profile?.active === true,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
+      if (button.dataset.academyCategory === "technical_analysis") return void openMarkets();
       return openAcademyCategory(button.dataset.academyCategory);
     });
+  }
+
+  async function openMarkets() {
+    state.view = "learn";
+    rememberRoute("learn", "technical_analysis");
+    updateNav();
+    await window.EduCashProResources?.loadMarkets?.();
+    return window.EduCashProMarkets?.render?.({language:state.language,active:state.profile?.active === true,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
   }
 
   async function openAcademyCategory(category) {
@@ -1514,6 +1524,7 @@
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
       if (requestedCourse) await openCourse(requestedCourse);
+      else if (requestedAcademy === "technical_analysis") await openMarkets();
       else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
       else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
       else renderHome();
