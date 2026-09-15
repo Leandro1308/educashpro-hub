@@ -858,11 +858,26 @@
 
   async function openMarkets() {
     syncExternalSession();
+    try {
+      const access = await window.EduCashProAccess?.refresh?.();
+      if (access?.known === true) {
+        const active = access.active === true;
+        state.profile = normalizeProfile({
+          ...(state.profile || {}),
+          active,
+          isActive: active,
+          activeUntil: access.activeUntil || state.profile?.activeUntil || null,
+        }, state.profile);
+        const currentSession = window.__EDUCASHPRO_SESSION__ || {};
+        window.__EDUCASHPRO_SESSION__ = { ...currentSession, profile: state.profile };
+      }
+    } catch {}
     state.view = "learn";
     rememberRoute("learn", "technical_analysis");
     updateNav();
     await window.EduCashProResources?.loadMarkets?.();
-    return window.EduCashProMarkets?.render?.({language:state.language,active:state.profile?.active === true,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
+    const active = window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true;
+    return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
   }
 
   async function openAcademyCategory(category) {
