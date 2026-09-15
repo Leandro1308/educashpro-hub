@@ -6,9 +6,10 @@
   const EXNESS_AFFILIATE = "https://one.exnessonelink.com/a/93bgo7jpfo/?campaign=43340";
   const VIDEO_COURSE = "https://t.me/boost?c=3706880680";
   const BINANCE_MARKET_DATA = "https://data-api.binance.vision/api/v3/klines";
+  const BINANCE_24H_DATA = "https://data-api.binance.vision/api/v3/ticker/24hr";
   const DIRECTION_CACHE_MS = 45000;
   const MARKET_STATE_KEY = "educashpro:market-selection:v1";
-  const RESTRICTED = new Set(["chart", "technical"]);
+  const RESTRICTED = new Set(["chart", "technical", "pairs"]);
   const TIMEFRAMES = [
     { id: "1m", label: "1m", chart: "1", technical: "1m", market: "1m", aggregate: 1 },
     { id: "2m", label: "2m", chart: "2", technical: "2m", market: "1m", aggregate: 2 },
@@ -46,6 +47,12 @@
       toolsSub: "O filtro de ativos usa 1H e oculta os laterais. No gráfico e no resumo, escolha livremente entre todos os minutos e períodos disponíveis.",
       chart: "Gráfico",
       technical: "Resumo técnico",
+      pairs: "Pares Binance",
+      pairsTitle: "Tendências dos principais pares USDT",
+      pairsHelp: "Classificação calculada no período selecionado. Toque em um par para abri-lo no gráfico e no resumo.",
+      sideways: "Lateralidade",
+      noSideways: "Nenhum par lateral neste período.",
+      pairsLoading: "Carregando os principais pares por volume e calculando tendências…",
       timeframe: "Período da análise",
       daily: "Diário",
       searchAsset: "Abrir qualquer ativo",
@@ -122,6 +129,7 @@
       toolsSub: "The asset filter uses 1H and hides sideways markets. In the chart and summary, freely choose any available minute or timeframe.",
       chart: "Chart",
       technical: "Technical summary",
+      pairs: "Binance pairs", pairsTitle: "Trends for leading USDT pairs", pairsHelp: "Classification calculated for the selected timeframe. Tap a pair to open it in the chart and summary.", sideways: "Sideways", noSideways: "No sideways pair in this timeframe.", pairsLoading: "Loading leading pairs by volume and calculating trends…",
       timeframe: "Analysis timeframe",
       daily: "Daily",
       searchAsset: "Open any asset",
@@ -185,6 +193,7 @@
       toolsSub: "El filtro de activos usa 1H y oculta los laterales. En el gráfico y el resumen, elige libremente todos los minutos y períodos disponibles.",
       chart: "Gráfico",
       technical: "Resumen técnico",
+      pairs: "Pares Binance", pairsTitle: "Tendencias de los principales pares USDT", pairsHelp: "Clasificación calculada en el período seleccionado. Toca un par para abrirlo en el gráfico y el resumen.", sideways: "Lateralidad", noSideways: "No hay pares laterales en este período.", pairsLoading: "Cargando los principales pares por volumen y calculando tendencias…",
       timeframe: "Período del análisis",
       daily: "Diario",
       searchAsset: "Abrir cualquier activo",
@@ -248,6 +257,7 @@
       toolsSub: "Фильтр активов использует 1H и скрывает боковой рынок. На графике и в сводке доступны все поддерживаемые минуты и периоды.",
       chart: "График",
       technical: "Техническая сводка",
+      pairs: "Пары Binance", pairsTitle: "Тренды ведущих пар USDT", pairsHelp: "Классификация рассчитана для выбранного периода. Нажмите пару, чтобы открыть её на графике и в сводке.", sideways: "Боковой рынок", noSideways: "На этом периоде боковых пар нет.", pairsLoading: "Загрузка ведущих пар по объёму и расчёт трендов…",
       timeframe: "Период анализа",
       daily: "День",
       searchAsset: "Открыть любой актив",
@@ -356,6 +366,8 @@
   let directionSnapshotAt = 0;
   let scanRequestId = 0;
   let fibonacciRequestId = 0;
+  let pairsRequestId = 0;
+  const pairsCache = new Map();
 
   const esc = (value) => String(value || "").replace(/[&<>'"]/g, (char) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
@@ -381,8 +393,9 @@
       .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
       .marketSymbolPicker{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0a1728}.marketSymbolPicker>strong{font-size:12px;color:#f7fbff}.marketSymbolForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.marketSymbolForm input{min-width:0;height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#f7fbff;background:#071322;font:700 13px inherit;text-transform:uppercase}.marketSymbolForm button{min-height:42px;padding:8px 14px;border:0;border-radius:10px;color:#071322;background:#30e6a6;font-size:12px;font-weight:950}.marketSymbolPicker small{color:#9db0c6;font-size:10px;line-height:1.45}
       .marketFibPanel{display:grid;gap:10px;margin:0 0 12px;padding:13px;border:1px solid rgba(255,200,92,.24);border-radius:15px;background:linear-gradient(145deg,#0a1728,#0b1421)}.marketFibHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.marketFibHead strong{color:#ffc85c;font-size:14px}.marketFibHead span{color:#9db0c6;font-size:10px}.marketFibStatus{color:#b8c8da;font-size:11px;line-height:1.5}.marketFibMetrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.marketFibMetrics article,.marketFibLevels article{padding:8px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#071322}.marketFibMetrics small,.marketFibLevels small{display:block;color:#9db0c6;font-size:9px}.marketFibMetrics b,.marketFibLevels b{display:block;margin-top:3px;color:#f7fbff;font-size:11px}.marketFibLevels{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.marketFibPanel.positive .marketFibHead strong{color:#30e6a6}.marketFibPanel.negative .marketFibHead strong{color:#ff7d89}.marketFibFoot{color:#7f93aa;font-size:9px;line-height:1.4}
+      .marketPairsIntro{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0a1728}.marketPairsIntro strong{display:block;font-size:14px}.marketPairsIntro small{display:block;margin-top:5px;color:#9db0c6;font-size:10px;line-height:1.45}.marketPairsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.marketPairGroup{min-width:0;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:#0d1b2d}.marketPairGroup h3{display:flex;justify-content:space-between;gap:8px;margin:0 0 9px;font-size:12px}.marketPairGroup.up h3{color:#30e6a6}.marketPairGroup.down h3{color:#ff7d89}.marketPairGroup.sideways h3{color:#ffc85c}.marketPairList{display:grid;gap:6px}.marketPairList button{min-height:36px;padding:7px 8px;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#f7fbff;background:#071322;font-size:10px;font-weight:850;text-align:left}.marketPairList button small{float:right;color:#9db0c6}.marketPairEmpty{color:#9db0c6;font-size:10px;line-height:1.4}
       .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame{height:calc(100dvh - 190px);min-height:430px}
-      @media(max-width:560px){.marketDirectionColumns{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
+      @media(max-width:560px){.marketDirectionColumns,.marketPairsGrid{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
     `;
     document.head.appendChild(style);
   }
@@ -616,6 +629,97 @@
     return result;
   }
 
+  async function mapConcurrent(items, limit, mapper) {
+    const results = new Array(items.length);
+    let cursor = 0;
+    async function worker() {
+      while (cursor < items.length) {
+        const index = cursor++;
+        try { results[index] = await mapper(items[index]); } catch { results[index] = null; }
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+    return results.filter(Boolean);
+  }
+
+  async function leadingBinancePairs() {
+    const response = await fetch(BINANCE_24H_DATA, { cache: "no-store" });
+    if (!response.ok) throw new Error("pairs_market");
+    const rows = await response.json();
+    const excluded = new Set(["USDC", "FDUSD", "TUSD", "USDP", "DAI", "EUR", "TRY", "BRL"]);
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => String(row.symbol || "").endsWith("USDT"))
+      .map((row) => ({ symbol: String(row.symbol), base: String(row.symbol).slice(0, -4), volume: Number(row.quoteVolume || 0) }))
+      .filter((row) => row.base && !excluded.has(row.base) && !/(UP|DOWN|BULL|BEAR)$/.test(row.base) && Number.isFinite(row.volume))
+      .sort((a, b) => b.volume - a.volume)
+      .slice(0, 36)
+      .map((row) => ({ api: row.symbol, tv: `BINANCE:${row.symbol}`, label: `${row.base}/USDT` }));
+  }
+
+  async function pairDirectionAt(asset, timeframe) {
+    const limit = Math.min(180, 60 * timeframe.aggregate);
+    const response = await fetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
+    if (!response.ok) throw new Error("pair_direction");
+    const rows = await response.json();
+    const candles = aggregateCandles(rows, timeframe.aggregate);
+    const normalized = candles.map((c) => [c.time, c.open, c.high, c.low, c.close, c.volume]);
+    return readDirection(asset, normalized);
+  }
+
+  function pairList(items) {
+    return items.map((item) => {
+      const sign = item.bodyPct > 0 ? "+" : "";
+      return `<button type="button" data-pair-asset="${esc(item.asset.api)}">${esc(item.asset.label)}<small>${sign}${item.bodyPct.toFixed(2)}%</small></button>`;
+    }).join("");
+  }
+
+  function renderPairsResult(host, snapshot, copy) {
+    const groups = [
+      ["up", copy.up, snapshot.filter((item) => item.direction === "up"), copy.noUp],
+      ["down", copy.down, snapshot.filter((item) => item.direction === "down"), copy.noDown],
+      ["sideways", copy.sideways, snapshot.filter((item) => !item.direction), copy.noSideways]
+    ];
+    host.innerHTML = `${timeframeMarkup(copy)}<div class="marketPairsIntro"><strong>${esc(copy.pairsTitle)}</strong><small>${esc(copy.pairsHelp)}</small></div><div class="marketPairsGrid">${groups.map(([kind, title, items, empty]) => `<section class="marketPairGroup ${kind}"><h3><span>${kind === "up" ? "▲" : kind === "down" ? "▼" : "◆"} ${esc(title)}</span><span>${items.length}</span></h3><div class="marketPairList">${items.length ? pairList(items) : `<div class="marketPairEmpty">${esc(empty)}</div>`}</div></section>`).join("")}</div>`;
+    bindTimeframes(host);
+    host.querySelectorAll("[data-pair-asset]").forEach((button) => {
+      button.onclick = () => {
+        const reading = snapshot.find((item) => item.asset.api === button.dataset.pairAsset);
+        if (!reading) return;
+        selectedAsset = reading.asset;
+        saveMarketState();
+        loadWidget("chart");
+      };
+    });
+  }
+
+  async function loadPairs(force = false) {
+    const host = document.getElementById("marketWidget");
+    const copy = COPY[options.language] || COPY.pt;
+    if (!host) return;
+    if (!options.active) return lockedView("pairs");
+    document.getElementById("marketExpand").hidden = false;
+    const cacheKey = selectedTimeframe;
+    const cached = pairsCache.get(cacheKey);
+    if (!force && cached && Date.now() - cached.at < DIRECTION_CACHE_MS) {
+      renderPairsResult(host, cached.items, copy);
+      return;
+    }
+    host.style.height = "auto";
+    host.innerHTML = `${timeframeMarkup(copy)}<div class="marketPairsIntro"><strong>${esc(copy.pairsTitle)}</strong><small>${esc(copy.pairsLoading)}</small></div>`;
+    bindTimeframes(host);
+    const requestId = ++pairsRequestId;
+    try {
+      const timeframe = TIMEFRAMES.find((item) => item.id === selectedTimeframe) || TIMEFRAMES[7];
+      const assets = await leadingBinancePairs();
+      const items = await mapConcurrent(assets, 6, (asset) => pairDirectionAt(asset, timeframe));
+      if (requestId !== pairsRequestId || currentWidget !== "pairs") return;
+      pairsCache.set(cacheKey, { at: Date.now(), items });
+      renderPairsResult(host, items, copy);
+    } catch {
+      if (requestId === pairsRequestId && currentWidget === "pairs") host.innerHTML = `<div class="marketWidgetError">${esc(copy.error)}</div>`;
+    }
+  }
+
   function fibonacciBreakout(candles) {
     const lookback = 20;
     for (let i = candles.length - 1; i >= Math.max(lookback, candles.length - 12); i -= 1) {
@@ -710,6 +814,7 @@
         selectedTimeframe = button.dataset.timeframe;
         saveMarketState();
         if (currentWidget === "technical") loadTechnical();
+        else if (currentWidget === "pairs") loadPairs(false);
         else renderChart(directionSnapshot);
         window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: "auto" })));
       };
@@ -783,6 +888,7 @@
     document.querySelectorAll("[data-market-widget]").forEach((button) => button.classList.toggle("active", button.dataset.marketWidget === kind));
     if (RESTRICTED.has(kind) && !options.active) return lockedView(kind);
     if (kind === "technical") return loadTechnical();
+    if (kind === "pairs") return loadPairs(false);
     return loadChart(false);
   }
 
@@ -822,6 +928,7 @@
         <div class="marketTabs">
           <button data-market-widget="chart">${options.active ? "" : "🔒 "}${esc(copy.chart)}</button>
           <button data-market-widget="technical">${options.active ? "" : "🔒 "}${esc(copy.technical)}</button>
+          <button data-market-widget="pairs">${options.active ? "" : "🔒 "}${esc(copy.pairs)}</button>
         </div>
         <div id="marketWidget" class="marketWidget"></div>
       </section>
