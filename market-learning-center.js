@@ -8,6 +8,19 @@
   const BINANCE_MARKET_DATA = "https://data-api.binance.vision/api/v3/klines";
   const DIRECTION_CACHE_MS = 45000;
   const RESTRICTED = new Set(["chart", "technical"]);
+  const TIMEFRAMES = [
+    { id: "1m", label: "1m", chart: "1", technical: "1m" },
+    { id: "2m", label: "2m", chart: "2", technical: "2m" },
+    { id: "3m", label: "3m", chart: "3", technical: "3m" },
+    { id: "5m", label: "5m", chart: "5", technical: "5m" },
+    { id: "10m", label: "10m", chart: "10", technical: "10m" },
+    { id: "15m", label: "15m", chart: "15", technical: "15m" },
+    { id: "30m", label: "30m", chart: "30", technical: "30m" },
+    { id: "1h", label: "1h", chart: "60", technical: "1h" },
+    { id: "2h", label: "2h", chart: "120", technical: "2h" },
+    { id: "4h", label: "4h", chart: "240", technical: "4h" },
+    { id: "1D", label: "D", chart: "D", technical: "1D" }
+  ];
 
   const DIRECTION_SYMBOLS = [
     ["BTCUSDT", "BINANCE:BTCUSDT", "BTC/USDT"],
@@ -32,6 +45,8 @@
       toolsSub: "O filtro de ativos usa 1H e oculta os laterais. No gráfico e no resumo, escolha livremente entre todos os minutos e períodos disponíveis.",
       chart: "Gráfico",
       technical: "Resumo técnico",
+      timeframe: "Período da análise",
+      daily: "Diário",
       loading: "Carregando dados de mercado…",
       error: "Não foi possível carregar esta ferramenta agora.",
       locked: "Recurso exclusivo para assinantes ativos",
@@ -88,6 +103,8 @@
       toolsSub: "The asset filter uses 1H and hides sideways markets. In the chart and summary, freely choose any available minute or timeframe.",
       chart: "Chart",
       technical: "Technical summary",
+      timeframe: "Analysis timeframe",
+      daily: "Daily",
       loading: "Loading market data…",
       error: "This tool could not be loaded right now.",
       locked: "Active subscribers only",
@@ -144,6 +161,8 @@
       toolsSub: "El filtro de activos usa 1H y oculta los laterales. En el gráfico y el resumen, elige libremente todos los minutos y períodos disponibles.",
       chart: "Gráfico",
       technical: "Resumen técnico",
+      timeframe: "Período del análisis",
+      daily: "Diario",
       loading: "Cargando datos del mercado…",
       error: "No fue posible cargar esta herramienta.",
       locked: "Recurso exclusivo para suscriptores activos",
@@ -200,6 +219,8 @@
       toolsSub: "Фильтр активов использует 1H и скрывает боковой рынок. На графике и в сводке доступны все поддерживаемые минуты и периоды.",
       chart: "График",
       technical: "Техническая сводка",
+      timeframe: "Период анализа",
+      daily: "День",
       loading: "Загрузка рыночных данных…",
       error: "Не удалось загрузить инструмент.",
       locked: "Только для активных подписчиков",
@@ -286,7 +307,7 @@
         isTransparent: true,
         height: "100%",
         symbol: "OANDA:XAUUSD",
-        showIntervalTabs: true,
+        showIntervalTabs: false,
         displayMode: "single",
         colorTheme: "dark"
       }
@@ -296,6 +317,7 @@
   let options = null;
   let currentWidget = "chart";
   let selectedAsset = null;
+  let selectedTimeframe = "1h";
   let directionSnapshot = [];
   let directionSnapshotAt = 0;
   let scanRequestId = 0;
@@ -321,6 +343,7 @@
       .marketInstantMeter{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.marketInstantMeter article{min-width:0;padding:9px 7px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:#071322;text-align:center}
       .marketInstantMeter small{display:block;color:#9db0c6;font-size:9px}.marketInstantMeter b{display:block;overflow:hidden;margin-top:3px;text-overflow:ellipsis;font-size:11px;white-space:nowrap}.marketInstantMeter .positive{color:#30e6a6}.marketInstantMeter .negative{color:#ff7d89}
       .marketDirectionFoot{color:#9db0c6;font-size:10px;line-height:1.45}.marketChartFrame{height:720px;overflow:hidden;border-radius:15px}.marketTechnicalFrame{height:560px;overflow:hidden;border-radius:15px}
+      .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
       .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame{height:calc(100dvh - 190px);min-height:430px}
       @media(max-width:560px){.marketDirectionColumns{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
     `;
@@ -498,6 +521,7 @@
     script.textContent = JSON.stringify({
       ...item.config,
       symbol: symbol || item.config.symbol,
+      interval: currentInterval(item === WIDGETS.technical ? "technical" : "chart"),
       locale: LOCALE[options.language] || "en"
     });
     script.onerror = () => {
@@ -506,6 +530,25 @@
     container.appendChild(script);
     frame.appendChild(container);
     return frame;
+  }
+
+  function currentInterval(kind) {
+    const timeframe = TIMEFRAMES.find((item) => item.id === selectedTimeframe) || TIMEFRAMES[7];
+    return timeframe[kind];
+  }
+
+  function timeframeMarkup(copy) {
+    return `<div class="marketTimeframePanel"><strong>${esc(copy.timeframe)}</strong><div class="marketTimeframes" role="group" aria-label="${esc(copy.timeframe)}">${TIMEFRAMES.map((item) => `<button type="button" data-timeframe="${item.id}" class="${item.id === selectedTimeframe ? "active" : ""}">${item.id === "1D" ? esc(copy.daily) : item.label}</button>`).join("")}</div></div>`;
+  }
+
+  function bindTimeframes(host) {
+    host.querySelectorAll("[data-timeframe]").forEach((button) => {
+      button.onclick = () => {
+        selectedTimeframe = button.dataset.timeframe;
+        if (currentWidget === "technical") loadTechnical();
+        else renderChart(directionSnapshot);
+      };
+    });
   }
 
   function lockedView(kind) {
@@ -523,8 +566,10 @@
     const copy = COPY[options.language] || COPY.pt;
     host.style.height = "auto";
     host.innerHTML = scannerMarkup(snapshot, copy, error);
+    host.insertAdjacentHTML("beforeend", timeframeMarkup(copy));
     host.appendChild(tradingViewContainer("marketChartFrame", WIDGETS.chart, selectedAsset?.tv || WIDGETS.chart.config.symbol));
     bindScanner(host, snapshot);
+    bindTimeframes(host);
   }
 
   async function loadChart(force = false) {
@@ -556,8 +601,9 @@
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
     host.style.height = "auto";
-    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>`;
+    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${timeframeMarkup(copy)}`;
     host.appendChild(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
+    bindTimeframes(host);
   }
 
   function loadWidget(kind) {
@@ -591,6 +637,7 @@
     ensureStyles();
     currentWidget = "chart";
     selectedAsset = null;
+    selectedTimeframe = "1h";
     const copy = COPY[options.language];
     const target = document.getElementById("content");
     if (!target) return;
