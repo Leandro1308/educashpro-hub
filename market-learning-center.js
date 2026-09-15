@@ -7,6 +7,7 @@
   const VIDEO_COURSE = "https://t.me/boost?c=3706880680";
   const BINANCE_MARKET_DATA = "https://data-api.binance.vision/api/v3/klines";
   const DIRECTION_CACHE_MS = 45000;
+  const MARKET_STATE_KEY = "educashpro:market-selection:v1";
   const RESTRICTED = new Set(["chart", "technical"]);
   const TIMEFRAMES = [
     { id: "1m", label: "1m", chart: "1", technical: "1m" },
@@ -47,6 +48,10 @@
       technical: "Resumo técnico",
       timeframe: "Período da análise",
       daily: "Diário",
+      searchAsset: "Abrir qualquer ativo",
+      searchPlaceholder: "Ex.: AVAXUSDT ou NASDAQ:AAPL",
+      openAsset: "Abrir",
+      searchHelp: "Este ativo será usado no gráfico e no resumo técnico, mesmo que não apareça na seleção de alta ou baixa.",
       loading: "Carregando dados de mercado…",
       error: "Não foi possível carregar esta ferramenta agora.",
       locked: "Recurso exclusivo para assinantes ativos",
@@ -105,6 +110,10 @@
       technical: "Technical summary",
       timeframe: "Analysis timeframe",
       daily: "Daily",
+      searchAsset: "Open any asset",
+      searchPlaceholder: "E.g. AVAXUSDT or NASDAQ:AAPL",
+      openAsset: "Open",
+      searchHelp: "This asset will be used in both the chart and technical summary, even when it is not listed as trending up or down.",
       loading: "Loading market data…",
       error: "This tool could not be loaded right now.",
       locked: "Active subscribers only",
@@ -163,6 +172,10 @@
       technical: "Resumen técnico",
       timeframe: "Período del análisis",
       daily: "Diario",
+      searchAsset: "Abrir cualquier activo",
+      searchPlaceholder: "Ej.: AVAXUSDT o NASDAQ:AAPL",
+      openAsset: "Abrir",
+      searchHelp: "Este activo se utilizará en el gráfico y el resumen técnico, aunque no aparezca en la selección de alza o baja.",
       loading: "Cargando datos del mercado…",
       error: "No fue posible cargar esta herramienta.",
       locked: "Recurso exclusivo para suscriptores activos",
@@ -221,6 +234,10 @@
       technical: "Техническая сводка",
       timeframe: "Период анализа",
       daily: "День",
+      searchAsset: "Открыть любой актив",
+      searchPlaceholder: "Напр.: AVAXUSDT или NASDAQ:AAPL",
+      openAsset: "Открыть",
+      searchHelp: "Этот актив будет использоваться на графике и в технической сводке, даже если его нет в списке роста или снижения.",
       loading: "Загрузка рыночных данных…",
       error: "Не удалось загрузить инструмент.",
       locked: "Только для активных подписчиков",
@@ -287,7 +304,7 @@
         timezone: "Etc/UTC",
         theme: "dark",
         style: "1",
-        allow_symbol_change: true,
+        allow_symbol_change: false,
         calendar: false,
         studies: ["STD;Moving Average"],
         studies_overrides: {
@@ -344,6 +361,7 @@
       .marketInstantMeter small{display:block;color:#9db0c6;font-size:9px}.marketInstantMeter b{display:block;overflow:hidden;margin-top:3px;text-overflow:ellipsis;font-size:11px;white-space:nowrap}.marketInstantMeter .positive{color:#30e6a6}.marketInstantMeter .negative{color:#ff7d89}
       .marketDirectionFoot{color:#9db0c6;font-size:10px;line-height:1.45}.marketChartFrame{height:720px;overflow:hidden;border-radius:15px}.marketTechnicalFrame{height:560px;overflow:hidden;border-radius:15px}
       .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
+      .marketSymbolPicker{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0a1728}.marketSymbolPicker>strong{font-size:12px;color:#f7fbff}.marketSymbolForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.marketSymbolForm input{min-width:0;height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#f7fbff;background:#071322;font:700 13px inherit;text-transform:uppercase}.marketSymbolForm button{min-height:42px;padding:8px 14px;border:0;border-radius:10px;color:#071322;background:#30e6a6;font-size:12px;font-weight:950}.marketSymbolPicker small{color:#9db0c6;font-size:10px;line-height:1.45}
       .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame{height:calc(100dvh - 190px);min-height:430px}
       @media(max-width:560px){.marketDirectionColumns{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
     `;
@@ -491,6 +509,7 @@
         const reading = snapshot.find((item) => item.asset.api === button.dataset.directionAsset);
         if (!reading) return;
         selectedAsset = reading.asset;
+        saveMarketState();
         renderChart(snapshot);
       };
     });
@@ -537,6 +556,53 @@
     return timeframe[kind];
   }
 
+  function saveMarketState() {
+    try { sessionStorage.setItem(MARKET_STATE_KEY, JSON.stringify({ selectedAsset, selectedTimeframe })); } catch {}
+  }
+
+  function restoreMarketState() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(MARKET_STATE_KEY) || "null");
+      if (saved?.selectedAsset?.tv && saved?.selectedAsset?.label) selectedAsset = saved.selectedAsset;
+      if (TIMEFRAMES.some((item) => item.id === saved?.selectedTimeframe)) selectedTimeframe = saved.selectedTimeframe;
+    } catch {}
+  }
+
+  function normalizeTradingViewSymbol(value) {
+    const raw = String(value || "").trim().toUpperCase().replace(/\s+/g, "");
+    if (!raw) return null;
+    if (raw.includes(":")) {
+      const [exchange, ...parts] = raw.split(":");
+      const symbol = parts.join(":").replace(/[\/-]/g, "");
+      if (!exchange || !symbol) return null;
+      return { tv: `${exchange}:${symbol}`, label: symbol };
+    }
+    const symbol = raw.replace(/[\/-]/g, "");
+    if (!symbol) return null;
+    const metals = new Set(["XAUUSD", "XAGUSD"]);
+    const forex = /^(EUR|GBP|USD|JPY|AUD|NZD|CAD|CHF)(EUR|GBP|USD|JPY|AUD|NZD|CAD|CHF)$/.test(symbol);
+    const exchange = metals.has(symbol) ? "OANDA" : forex ? "FX" : "BINANCE";
+    return { tv: `${exchange}:${symbol}`, label: symbol };
+  }
+
+  function symbolPickerMarkup(copy) {
+    return `<div class="marketSymbolPicker"><strong>⌕ ${esc(copy.searchAsset)}</strong><form class="marketSymbolForm" data-market-symbol-form><input name="symbol" value="${esc(selectedAsset?.label || "")}" placeholder="${esc(copy.searchPlaceholder)}" autocomplete="off" autocapitalize="characters" spellcheck="false"><button type="submit">${esc(copy.openAsset)}</button></form><small>${esc(copy.searchHelp)}</small></div>`;
+  }
+
+  function bindSymbolPicker(host) {
+    const form = host.querySelector("[data-market-symbol-form]");
+    if (!form) return;
+    form.onsubmit = (event) => {
+      event.preventDefault();
+      const asset = normalizeTradingViewSymbol(new FormData(form).get("symbol"));
+      if (!asset) return;
+      selectedAsset = asset;
+      saveMarketState();
+      if (currentWidget === "technical") loadTechnical();
+      else renderChart(directionSnapshot);
+    };
+  }
+
   function timeframeMarkup(copy) {
     return `<div class="marketTimeframePanel"><strong>${esc(copy.timeframe)}</strong><div class="marketTimeframes" role="group" aria-label="${esc(copy.timeframe)}">${TIMEFRAMES.map((item) => `<button type="button" data-timeframe="${item.id}" class="${item.id === selectedTimeframe ? "active" : ""}">${item.id === "1D" ? esc(copy.daily) : item.label}</button>`).join("")}</div></div>`;
   }
@@ -546,6 +612,7 @@
       button.onclick = () => {
         const scrollTop = window.scrollY;
         selectedTimeframe = button.dataset.timeframe;
+        saveMarketState();
         if (currentWidget === "technical") loadTechnical();
         else renderChart(directionSnapshot);
         window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.scrollTo({ top: scrollTop, behavior: "auto" })));
@@ -568,9 +635,11 @@
     const copy = COPY[options.language] || COPY.pt;
     host.style.height = "auto";
     host.innerHTML = scannerMarkup(snapshot, copy, error);
+    host.insertAdjacentHTML("beforeend", symbolPickerMarkup(copy));
     host.insertAdjacentHTML("beforeend", timeframeMarkup(copy));
     host.appendChild(tradingViewContainer("marketChartFrame", WIDGETS.chart, selectedAsset?.tv || WIDGETS.chart.config.symbol));
     bindScanner(host, snapshot);
+    bindSymbolPicker(host);
     bindTimeframes(host);
   }
 
@@ -586,9 +655,8 @@
     try {
       const snapshot = await scanDirections(force);
       const directional = [...sortedDirectional(snapshot, "up"), ...sortedDirectional(snapshot, "down")];
-      if (!selectedAsset || !directional.some((item) => item.asset.api === selectedAsset.api)) {
-        selectedAsset = directional[0]?.asset || selectedAsset || DIRECTION_SYMBOLS[0];
-      }
+      if (!selectedAsset) selectedAsset = directional[0]?.asset || DIRECTION_SYMBOLS[0];
+      saveMarketState();
       renderChart(snapshot, false);
     } catch {
       selectedAsset = selectedAsset || DIRECTION_SYMBOLS[0];
@@ -603,8 +671,9 @@
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
     host.style.height = "auto";
-    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${timeframeMarkup(copy)}`;
+    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${symbolPickerMarkup(copy)}${timeframeMarkup(copy)}`;
     host.appendChild(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
+    bindSymbolPicker(host);
     bindTimeframes(host);
   }
 
@@ -641,6 +710,7 @@
     currentWidget = "chart";
     selectedAsset = null;
     selectedTimeframe = "1h";
+    restoreMarketState();
     const copy = COPY[options.language];
     const target = document.getElementById("content");
     if (!target) return;
