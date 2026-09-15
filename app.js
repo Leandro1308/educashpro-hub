@@ -1348,9 +1348,35 @@
   }
 
   function createQr(element, text) {
+    if (!element) return;
     element.innerHTML = "";
     if (!window.QRCode) { element.textContent = text; return; }
     new window.QRCode(element, { text, width: 240, height: 240, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+  }
+
+  function currentMembershipCredential() {
+    syncExternalSession();
+    const credential = String(
+      state.membershipCredential
+      || window.__EDUCASHPRO_SESSION__?.membershipCredential
+      || window.EduCashProWebEntry?.getSession?.()?.membershipCredential
+      || localStorage.getItem("educashpro:membership-credential")
+      || ""
+    );
+    if (decodeCredential(credential)) state.membershipCredential = credential;
+    return decodeCredential(credential) ? credential : "";
+  }
+
+  async function refreshMembershipCredential() {
+    let credential = currentMembershipCredential();
+    if (credential || !tg?.initData) return credential;
+    try {
+      const session = await api("/api/hub/session", { initData: tg.initData });
+      syncExternalSession(session);
+      credential = currentMembershipCredential();
+      if (credential) localStorage.setItem("educashpro:membership-credential", credential);
+    } catch {}
+    return credential;
   }
 
   function downloadQr(container, filename) {
@@ -1412,29 +1438,46 @@
       es: "Apunta la cámara al código QR del suscriptor",
       ru: "Наведите камеру на QR-код подписчика",
     }[state.language] || "Aponte a câmera para o QR Code do assinante";
-    if (!tg?.showScanQrPopup) {
+    const initData = String(tg?.initData || "");
+    const isNativeTelegram = Boolean(initData && initData !== "__EDUCASHPRO_PLATFORM_WEB_SESSION_V1__");
+    if (!isNativeTelegram || !tg?.showScanQrPopup) {
       void openWebMembershipScanner();
       return;
     }
-    tg.showScanQrPopup({ text: scannerText }, (value) => {
-      try {
-        const scanned = new URL(String(value || ""));
-        const credential = scanned.searchParams.get("credential");
-        if (!credential) return false;
-        tg.closeScanQrPopup?.();
-        verifyMembershipCredential(credential, scanned.searchParams.get("lang") || state.language, true);
-        return true;
-      } catch {
-        showToast(featureCopy("invalidCredential"));
-        return false;
-      }
-    });
+    try {
+      tg.showScanQrPopup({ text: scannerText }, (value) => {
+        try {
+          const scanned = new URL(String(value || ""));
+          const credential = scanned.searchParams.get("credential");
+          if (!credential) return false;
+          tg.closeScanQrPopup?.();
+          verifyMembershipCredential(credential, scanned.searchParams.get("lang") || state.language, true);
+          return true;
+        } catch {
+          showToast(featureCopy("invalidCredential"));
+          return false;
+        }
+      });
+    } catch {
+      void openWebMembershipScanner();
+    }
   }
 
   async function renderMembershipProof() {
-    const credential = state.membershipCredential;
+    const credential = await refreshMembershipCredential();
     const payload = decodeCredential(credential);
-    if (!credential || !payload) return;
+    if (!credential || !payload) {
+      const unavailable = {
+        pt: ["Credencial indisponível", "Não foi possível carregar seu QR Code agora. Atualize a credencial e tente novamente.", "Tentar novamente"],
+        en: ["Credential unavailable", "Your QR Code could not be loaded right now. Refresh the credential and try again.", "Try again"],
+        es: ["Credencial no disponible", "No se pudo cargar tu código QR ahora. Actualiza la credencial e inténtalo de nuevo.", "Intentar de nuevo"],
+        ru: ["Карта недоступна", "Не удалось загрузить QR-код. Обновите данные и попробуйте снова.", "Попробовать снова"],
+      }[state.language] || ["Credencial indisponível", "Não foi possível carregar seu QR Code agora.", "Tentar novamente"];
+      content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard verificationCard"><div class="verificationIcon">⚠️</div><h1>${escapeHtml(unavailable[0])}</h1><p>${escapeHtml(unavailable[1])}</p><button id="proofRetry" class="wideButton">↻ ${escapeHtml(unavailable[2])}</button></section>`;
+      document.getElementById("proofBack").onclick = renderArea;
+      document.getElementById("proofRetry").onclick = () => void renderMembershipProof();
+      return;
+    }
     const verificationUrl = `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(state.language)}`;
     const scanLabel = { pt: "Ler QR Code", en: "Scan QR Code", es: "Leer código QR", ru: "Сканировать QR-код" }[state.language];
     content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard qrCard"><span class="statusPill ${Number(payload.validUntil) > Date.now() / 1000 ? "" : "inactive"}">${escapeHtml(Number(payload.validUntil) > Date.now() / 1000 ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span><h2>${escapeHtml(payload.name)}</h2><p>${escapeHtml(featureCopy("credentialUpdated"))}: ${escapeHtml(formatDate(payload.issuedAt))}</p><p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(payload.validUntil))}</b></p><div id="proofQr" class="qrCanvas"></div><div class="qrActions"><button id="scanMembershipQr" class="wideButton">📷 ${escapeHtml(scanLabel)}</button></div><p>${escapeHtml(featureCopy("proofHelp"))}</p></section>`;
@@ -1474,6 +1517,7 @@
   }
 
   function renderPublicLanding() {
+    syncExternalSession();
     const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
     const copies = {
       pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
@@ -1486,7 +1530,7 @@
     const referralCode = String(state.profile?.referralCode || new URL(window.location.href).searchParams.get("ref") || "").trim();
     const telegramAppUrl = new URL("https://t.me/EduCashProBot");
     telegramAppUrl.searchParams.set("startapp", referralCode ? `ref_${referralCode}` : "site");
-    const credential = String(state.membershipCredential || "");
+    const credential = currentMembershipCredential();
     const credentialPayload = decodeCredential(credential);
     const credentialActive = Boolean(credentialPayload && Number(credentialPayload.validUntil || 0) > Date.now() / 1000);
     const credentialUrl = credentialPayload ? `${window.location.origin}${window.location.pathname}?credential=${encodeURIComponent(credential)}&lang=${encodeURIComponent(browserLanguage)}` : "";
