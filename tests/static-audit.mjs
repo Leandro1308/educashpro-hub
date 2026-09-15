@@ -79,7 +79,7 @@ assert(crossPlatformNav.includes("link.textContent !== value.icon"),"Cross-platf
 assert(app.includes("async function renderLearn()")&&app.includes("syncExternalSession()"),"Academy must synchronize the Web session before opening learning paths");
 assert(app.includes("const active = state.profile?.active === true"),"Academy categories must not crash while the Web session is being restored");
 assert(app.includes("if (!state.courseCatalog.length) await loadCourseCatalog()"),"Academy must load its course catalog in both Web and Telegram modes");
-assert(app.includes("setSession };")&&webAuthEntry.includes("EduCashProApp?.setSession?.(state.session)"),"Web authentication must share the subscription session with the Academy");
+assert(app.includes("setSession")&&webAuthEntry.includes("EduCashProApp?.setSession?.(state.session)"),"Web authentication must share the subscription session with the Academy");
 
 assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["network_marketing", "financial_education", "telegram"])'),"The three Academy learning paths must use the central route");
 assert(app.includes('closest?.("[data-academy-category]")')&&app.includes("void openAcademyCategory(category)"),"Academy cards need a delegated click handler that survives later modules");
