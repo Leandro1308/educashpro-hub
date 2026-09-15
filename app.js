@@ -510,6 +510,10 @@
     if (!syncExternalSession(session)) return false;
     if (!state.courseCatalog.length) await loadCourseCatalog();
     applyLanguage();
+    if (window.__EDUCASHPRO_MARKETS_OPEN__ === true) {
+      await openMarkets();
+      return true;
+    }
     if (document.querySelector(".publicWelcome")) renderPublicLanding();
     return true;
   }
@@ -853,6 +857,7 @@
   }
 
   async function openMarkets() {
+    syncExternalSession();
     state.view = "learn";
     rememberRoute("learn", "technical_analysis");
     updateNav();
