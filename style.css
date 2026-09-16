@@ -358,8 +358,8 @@ body::before {
 .quizOption { width: 100%; text-align: left; margin-top: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; color: var(--text); background: var(--surface2); }
 
 .profileCard { text-align: center; padding: 22px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); }
-.avatar { width: 72px; height: 72px; margin: 0 auto 7px; border-radius: 24px; display: grid; place-items: center; overflow:hidden; color: #06151c; background: linear-gradient(135deg, var(--green), var(--blue)); font-size: 29px; font-weight: 950; }
-.avatar img{width:100%;height:100%;object-fit:cover}.profilePhotoEdit{display:block;margin:0 auto 9px}.profilePhotoEditor{display:grid;gap:12px}.profilePhotoPreview{width:160px;height:160px;margin:8px auto;display:grid;place-items:center;overflow:hidden;border:3px solid rgba(48,230,166,.38);border-radius:42px;background:linear-gradient(135deg,var(--green),var(--blue));color:#06151c;font-size:54px;font-weight:950}.profilePhotoPreview img{width:100%;height:100%;object-fit:cover}.profilePhotoChoose{display:flex;justify-content:center}.publicCredentialActions{margin-top:14px}.publicCredentialActions .publicGamesButton{width:100%;box-sizing:border-box}
+.avatar { width: 72px; height: 72px; margin: 0 auto 7px; border-radius: 50%; display: grid; place-items: center; overflow:hidden; color: #06151c; background: linear-gradient(135deg, var(--green), var(--blue)); font-size: 29px; font-weight: 950; }
+.avatar img{width:100%;height:100%;object-fit:cover}.profilePhotoEdit{display:block;margin:0 auto 9px}.profilePhotoEditor{display:grid;gap:12px}.profilePhotoPreview{width:160px;height:160px;margin:8px auto;display:grid;place-items:center;overflow:hidden;border:3px solid rgba(48,230,166,.38);border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));color:#06151c;font-size:54px;font-weight:950}.profilePhotoPreview img{width:100%;height:100%;object-fit:cover}.profilePhotoChoose{display:flex;justify-content:center}.publicCredentialActions{margin-top:14px}.publicCredentialActions .publicGamesButton{width:100%;box-sizing:border-box}
 .profileCard h2 { margin: 0 0 5px; }
 .profileCard p { margin: 0; color: var(--muted); }
 .affiliateBox { margin-top: 12px; padding: 13px; border: 1px dashed rgba(48,230,166,.35); border-radius: 14px; color: #bffde7; word-break: break-all; font-size: 12px; }
@@ -589,7 +589,7 @@ body::before {
 .publishedLink strong { color:var(--green); }
 .publishedLink span,.publishedLink .publishedUrl { overflow-wrap:anywhere; color:var(--muted); font-size:12px; text-decoration:underline; text-underline-offset:3px; }
 .publicLinkShell { width:min(100%,560px); margin:28px auto; padding:28px 20px; text-align:center; }
-.publicAvatar,.publicBrand { display:grid; place-items:center; width:82px; height:82px; margin:0 auto 16px; border-radius:27px; color:#06151c; background:linear-gradient(135deg,var(--green),var(--blue)); font-size:34px; font-weight:950; box-shadow:var(--shadow); }
+.publicAvatar,.publicBrand { display:grid; place-items:center; width:82px; height:82px; margin:0 auto 16px; border-radius:50%; overflow:hidden; color:#06151c; background:linear-gradient(135deg,var(--green),var(--blue)); font-size:34px; font-weight:950; box-shadow:var(--shadow); }
 .publicBrand { width:62px; height:62px; border-radius:20px; font-size:26px; }
 .publicLinkShell h1 { margin:8px 0; font-size:clamp(27px,8vw,42px); line-height:1.12; }
 .publicLinkShell > p { margin:8px auto 22px; max-width:480px; color:var(--muted); line-height:1.55; }
@@ -640,6 +640,7 @@ html[aria-busy="true"]{cursor:progress}
 .imagePicker{display:grid;grid-template-columns:72px 1fr auto;gap:9px;align-items:center;grid-column:1/-1;padding:10px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
 .imagePicker>span{grid-column:1/-1;color:var(--muted);font-size:12px;font-weight:750}
 .imagePreview{grid-row:2/4;display:grid;place-items:center;width:72px;height:72px;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--surface2);font-size:24px}
+.imagePicker[data-image-kind="profile"] .imagePreview{border-radius:50%}
 .imagePreview img,.publicAvatar img{width:100%;height:100%;object-fit:cover}
 .partnerLogoField{margin-bottom:4px}.partnerLogoUpload{display:flex;align-items:center;gap:14px;padding:14px;border:1px dashed rgba(255,255,255,.16);border-radius:16px;background:rgba(255,255,255,.025)}.partnerLogoPreview{display:grid;place-items:center;flex:0 0 78px;width:78px;height:78px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.07);font-size:28px}.partnerLogoPreview img,.partnerLogoIcon img{width:100%;height:100%;object-fit:cover}.partnerLogoPreview.ready{background:#fff}.partnerLogoControls{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}.partnerLogoControls small,.partnerLogoStatus,.fieldAssist{font-size:12px;line-height:1.4;opacity:.78}.partnerLogoButton{display:inline-flex!important;width:auto!important;min-height:44px!important;padding:9px 13px!important}.partnerLogoStatus{opacity:.95}.fieldAssist{display:flex;justify-content:space-between;gap:12px;margin-top:6px}.fieldAssist span:last-child{white-space:nowrap}.toolCard textarea{min-height:132px;resize:vertical;line-height:1.45}.toolCard #discountRules{min-height:152px}.partnerLogoIcon{display:grid;place-items:center;overflow:hidden}
 .imageChoose{display:flex;align-items:center;justify-content:center;margin:0}
