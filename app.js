@@ -1405,19 +1405,82 @@
       : url;
   }
 
+  function canvasBlob(canvas, type, quality) {
+    return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+  }
+
+  async function normalizeProfilePhoto(file) {
+    if (!validProfilePhoto(file)) throw new Error("INVALID_PROFILE_IMAGE");
+    const sourceUrl = URL.createObjectURL(file);
+    const image = new Image();
+    image.decoding = "async";
+    try {
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error("UNSUPPORTED_PROFILE_IMAGE"));
+        image.src = sourceUrl;
+      });
+      const width = Number(image.naturalWidth || image.width || 0);
+      const height = Number(image.naturalHeight || image.height || 0);
+      if (!width || !height) throw new Error("UNSUPPORTED_PROFILE_IMAGE");
+
+      const maxSide = 1280;
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const context = canvas.getContext("2d", { alpha: true });
+      if (!context) throw new Error("UNSUPPORTED_PROFILE_IMAGE");
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      let blob = await canvasBlob(canvas, "image/webp", 0.84);
+      let filename = "profile.webp";
+      if (!blob) {
+        blob = await canvasBlob(canvas, "image/jpeg", 0.86);
+        filename = "profile.jpg";
+      }
+      if (!blob) throw new Error("UNSUPPORTED_PROFILE_IMAGE");
+      return { blob, filename };
+    } finally {
+      URL.revokeObjectURL(sourceUrl);
+    }
+  }
+
   async function uploadProfilePhoto(file) {
+    const normalized = await normalizeProfilePhoto(file);
     const sign = await api("/api/hub/link-page/media-signature", { token: state.token });
-    if (!validProfilePhoto(file)) throw new Error("IMAGE");
     const form = new FormData();
-    form.append("file", file, file.name || "profile-image");
+    form.append("file", normalized.blob, normalized.filename);
     form.append("api_key", sign.apiKey);
     form.append("timestamp", String(sign.timestamp));
     form.append("folder", sign.folder);
     form.append("signature", sign.signature);
-    const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`, { method: "POST", body: form });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.secure_url || !data.public_id) throw new Error("IMAGE");
-    return { url: optimizedCloudinaryUrl(data.secure_url), publicId: data.public_id };
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 45000);
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`, { method: "POST", body: form, signal: controller.signal });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.secure_url || !data.public_id) {
+        const error = new Error(data?.error?.message || "PROFILE_IMAGE_UPLOAD_FAILED");
+        error.status = response.status;
+        throw error;
+      }
+      return { url: optimizedCloudinaryUrl(data.secure_url), publicId: data.public_id };
+    } catch (error) {
+      if (error?.name === "AbortError") throw new Error("PROFILE_IMAGE_TIMEOUT");
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  function profilePhotoErrorMessage(error, copy) {
+    const reason = String(error?.message || error || "");
+    if (/INVALID_PROFILE_IMAGE|UNSUPPORTED_PROFILE_IMAGE/i.test(reason)) return copy[7];
+    if (/SESSION|invalid_session|session_expired|telegram_link_required/i.test(reason)) return copy[8];
+    if (/image_upload_not_configured/i.test(reason)) return copy[9];
+    if (/TIMEOUT|Failed to fetch|Load failed|NetworkError|network request failed/i.test(reason)) return copy[6];
+    return copy[10];
   }
 
   function updateLocalProfileImage(profileImage) {
@@ -1431,10 +1494,10 @@
 
   function renderProfilePhotoEditor(backAction = renderArea) {
     const copy = {
-      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível concluir o envio. Verifique a conexão e tente novamente."],
-      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The upload could not be completed. Check your connection and try again."],
-      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo completar el envío. Comprueba la conexión e inténtalo de nuevo."],
-      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось завершить загрузку. Проверьте соединение и повторите попытку."],
+      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível enviar a foto. Verifique sua conexão e tente novamente.", "Escolha uma imagem válida de até 20 MB.", "Sua sessão expirou. Entre novamente e tente salvar a foto.", "O serviço de imagens ainda não está configurado. Tente novamente mais tarde.", "Não foi possível salvar a foto. Tente outra imagem ou tente novamente."],
+      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be uploaded. Check your connection and try again.", "Choose a valid image up to 20 MB.", "Your session has expired. Sign in again and try to save the photo.", "The image service is not configured yet. Try again later.", "The photo could not be saved. Try another image or try again."],
+      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo enviar la foto. Comprueba tu conexión e inténtalo de nuevo.", "Elige una imagen válida de hasta 20 MB.", "Tu sesión ha caducado. Inicia sesión de nuevo e intenta guardar la foto.", "El servicio de imágenes aún no está configurado. Inténtalo más tarde.", "No se pudo guardar la foto. Prueba con otra imagen o inténtalo de nuevo."],
+      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось загрузить фото. Проверьте соединение и повторите попытку.", "Выберите допустимое изображение размером до 20 МБ.", "Срок сеанса истёк. Войдите снова и сохраните фото.", "Сервис изображений ещё не настроен. Повторите попытку позже.", "Не удалось сохранить фото. Выберите другое изображение или повторите попытку."],
     }[state.language] || [];
     const current = String(state.profile?.profileImage?.url || "");
     const returnTo = typeof backAction === "function" ? backAction : renderArea;
@@ -1445,9 +1508,18 @@
     const save = document.getElementById("saveProfilePhoto");
     input.onchange = () => {
       const file = input.files?.[0];
-      if (!validProfilePhoto(file)) return;
+      const status = document.getElementById("profilePhotoStatus");
+      if (input.previewUrl) URL.revokeObjectURL(input.previewUrl);
+      if (!validProfilePhoto(file)) {
+        input.selectedFile = null;
+        save.disabled = true;
+        status.textContent = copy[7];
+        return;
+      }
       input.selectedFile = file;
-      preview.innerHTML = `<img src="${escapeHtml(URL.createObjectURL(file))}" alt="">`;
+      input.previewUrl = URL.createObjectURL(file);
+      preview.innerHTML = `<img src="${escapeHtml(input.previewUrl)}" alt="">`;
+      status.textContent = "";
       save.disabled = false;
     };
     save.onclick = async () => {
@@ -1458,7 +1530,12 @@
         await api("/api/hub/profile-photo/save", { token: state.token, profileImage });
         updateLocalProfileImage(profileImage);
         renderArea();
-      } catch { status.textContent = copy[6]; save.disabled = false; save.textContent = copy[3]; }
+      } catch (error) {
+        console.error("[EduCashPro] Falha ao salvar foto do perfil:", error?.message || error);
+        status.textContent = profilePhotoErrorMessage(error, copy);
+        save.disabled = false;
+        save.textContent = copy[3];
+      }
     };
     document.getElementById("removeProfilePhoto")?.addEventListener("click", async () => {
       const status = document.getElementById("profilePhotoStatus");
@@ -1466,7 +1543,7 @@
         await api("/api/hub/profile-photo/save", { token: state.token, profileImage: null });
         updateLocalProfileImage(null);
         renderArea();
-      } catch { status.textContent = copy[6]; }
+      } catch (error) { status.textContent = profilePhotoErrorMessage(error, copy); }
     });
   }
 
