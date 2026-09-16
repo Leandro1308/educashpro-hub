@@ -52,8 +52,10 @@
 
     const session = platform.readWebSession?.() || null;
     if (session?.token) {
-      const profile = { ...(session.profile || {}) };
+      const account = status?.account || {};
+      const profile = { ...(session.profile || {}), ...account };
       profile.active = snapshot.active;
+      profile.isActive = snapshot.active;
       profile.activeUntil = snapshot.activeUntil;
       profile.subscription = {
         ...(profile.subscription || {}),
@@ -61,7 +63,12 @@
         activeUntil: snapshot.activeUntil,
         source: snapshot.source,
       };
-      platform.writeWebSession?.({ ...session, profile, storedAt: Date.now() });
+      const membershipCredential = snapshot.active ? String(status?.membershipCredential || "") : "";
+      const canonicalSession = { ...session, profile, membershipCredential, storedAt: Date.now() };
+      platform.writeWebSession?.(canonicalSession);
+      window.__EDUCASHPRO_SESSION__ = canonicalSession;
+      if (membershipCredential) localStorage.setItem("educashpro:membership-credential", membershipCredential);
+      else localStorage.removeItem("educashpro:membership-credential");
     }
 
     window.dispatchEvent(new CustomEvent("educashpro:subscription-synced", { detail: { ...snapshot } }));
@@ -100,7 +107,9 @@
         return writeCanonicalStatus({
           active: data.subscription.active === true,
           activeUntil: data.subscription.activeUntil,
-          source: "platform_account",
+          source: data.subscription.source || "platform_account",
+          account: data.account || {},
+          membershipCredential: data.membershipCredential || "",
         });
       } catch {
         snapshot = fromStoredSession();
