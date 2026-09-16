@@ -1276,6 +1276,8 @@
   }
 
   async function renderArea() {
+    try { await window.EduCashProAccess?.refresh?.(); } catch {}
+    syncExternalSession();
     const p = state.profile;
     const profileImageUrl = String(p?.profileImage?.url || "");
     const profileAvatar = profileImageUrl
@@ -1538,6 +1540,7 @@
   }
 
   function renderProfilePhotoEditor(backAction = renderArea) {
+    syncExternalSession();
     const copy = {
       pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível enviar a foto. Verifique sua conexão e tente novamente.", "Escolha uma imagem válida de até 20 MB.", "Sua sessão expirou. Entre novamente e tente salvar a foto.", "O serviço de imagens ainda não está configurado. Tente novamente mais tarde.", "Não foi possível salvar a foto. Tente outra imagem ou tente novamente."],
       en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be uploaded. Check your connection and try again.", "Choose a valid image up to 20 MB.", "Your session has expired. Sign in again and try to save the photo.", "The image service is not configured yet. Try again later.", "The photo could not be saved. Try another image or try again."],
@@ -1606,8 +1609,18 @@
   }
 
   async function refreshMembershipCredential() {
+    if (platformWebPhotoSession()) {
+      let credential = "";
+      try {
+        await window.EduCashProAccess?.refresh?.();
+        syncExternalSession();
+        credential = currentMembershipCredential();
+      } catch {}
+      return credential;
+    }
     let credential = currentMembershipCredential();
-    if (credential || !tg?.initData) return credential;
+    if (credential) return credential;
+    if (!tg?.initData) return "";
     try {
       const session = await api("/api/hub/session", { initData: tg.initData });
       syncExternalSession(session);
