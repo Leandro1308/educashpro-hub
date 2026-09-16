@@ -1448,7 +1448,7 @@
 
   async function uploadProfilePhoto(file) {
     const normalized = await normalizeProfilePhoto(file);
-    const sign = await api("/api/hub/link-page/media-signature", { token: state.token });
+    const sign = await profilePhotoSignature();
     const form = new FormData();
     form.append("file", normalized.blob, normalized.filename);
     form.append("api_key", sign.apiKey);
@@ -1483,9 +1483,54 @@
     return copy[10];
   }
 
+  function platformWebPhotoSession() {
+    if (window.EduCashProPlatform?.environment?.() !== "web") return null;
+    const session = window.EduCashProPlatform?.readWebSession?.();
+    return session?.token ? session : null;
+  }
+
+  async function platformProfilePhotoApi(path, payload = {}) {
+    let session = platformWebPhotoSession();
+    if (!session?.token) throw new Error("invalid_session");
+    const send = async () => {
+      const response = await fetch(`${API_BASE}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
+      const data = await response.json().catch(() => ({}));
+      return { response, data };
+    };
+    let result = await send();
+    if (result.response.status === 401) {
+      session = await window.EduCashProWebAuth?.validateStoredSession?.().catch(() => null);
+      if (!session?.token) throw new Error("invalid_session");
+      result = await send();
+    }
+    if (!result.response.ok || result.data?.ok === false) {
+      throw new Error(result.data?.reason || "REQUEST");
+    }
+    return result.data;
+  }
+
+  async function profilePhotoSignature() {
+    return platformWebPhotoSession()
+      ? platformProfilePhotoApi("/api/platform-account/profile-photo/signature")
+      : api("/api/hub/link-page/media-signature", { token: state.token });
+  }
+
+  async function saveProfilePhoto(profileImage) {
+    return platformWebPhotoSession()
+      ? platformProfilePhotoApi("/api/platform-account/profile-photo/save", { profileImage })
+      : api("/api/hub/profile-photo/save", { token: state.token, profileImage });
+  }
+
   function updateLocalProfileImage(profileImage) {
     state.profile = { ...(state.profile || {}), profileImage: profileImage || null };
     if (window.__EDUCASHPRO_SESSION__) window.__EDUCASHPRO_SESSION__ = { ...window.__EDUCASHPRO_SESSION__, profile: state.profile };
+    const currentWebSession = window.EduCashProWebEntry?.getSession?.();
+    if (currentWebSession?.profile) currentWebSession.profile = { ...currentWebSession.profile, profileImage: profileImage || null };
     try {
       const stored = JSON.parse(localStorage.getItem("educashpro:web-session") || "null");
       if (stored?.profile) localStorage.setItem("educashpro:web-session", JSON.stringify({ ...stored, profile: { ...stored.profile, profileImage: profileImage || null } }));
@@ -1527,7 +1572,7 @@
       try {
         save.disabled = true; save.textContent = copy[5];
         const profileImage = await uploadProfilePhoto(input.selectedFile);
-        await api("/api/hub/profile-photo/save", { token: state.token, profileImage });
+        await saveProfilePhoto(profileImage);
         updateLocalProfileImage(profileImage);
         renderArea();
       } catch (error) {
@@ -1540,7 +1585,7 @@
     document.getElementById("removeProfilePhoto")?.addEventListener("click", async () => {
       const status = document.getElementById("profilePhotoStatus");
       try {
-        await api("/api/hub/profile-photo/save", { token: state.token, profileImage: null });
+        await saveProfilePhoto(null);
         updateLocalProfileImage(null);
         renderArea();
       } catch (error) { status.textContent = profilePhotoErrorMessage(error, copy); }
