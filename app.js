@@ -542,16 +542,49 @@
   function closeModal() { document.getElementById("accessModal").classList.add("hidden"); }
 
   const pendingApiRequests = new Map();
+  let hubSessionRefreshPromise = null;
+
+  async function renewHubSession() {
+    if (hubSessionRefreshPromise) return hubSessionRefreshPromise;
+    hubSessionRefreshPromise = (async () => {
+      const initData = String(tg?.initData || "");
+      if (!initData) throw new Error("SESSION");
+      const response = await fetch(`${API_BASE}/api/hub/session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData }),
+        cache: "no-store",
+      });
+      const session = await response.json().catch(() => ({}));
+      if (!response.ok || !session?.token) throw new Error(session?.reason || "SESSION");
+      state.token = session.token;
+      state.hubSessionReady = true;
+      syncExternalSession(session);
+      if (session.membershipCredential) {
+        state.membershipCredential = session.membershipCredential;
+        localStorage.setItem("educashpro:membership-credential", session.membershipCredential);
+      }
+      return session;
+    })();
+    try { return await hubSessionRefreshPromise; }
+    finally { hubSessionRefreshPromise = null; }
+  }
+
   async function api(path, payload = {}) {
     const requestKey = path + JSON.stringify(payload);
     if (pendingApiRequests.has(requestKey)) return pendingApiRequests.get(requestKey);
     const request = (async () => {
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 12000);
+      const timeout = window.setTimeout(() => controller.abort(), 30000);
       showGlobalLoading();
       try {
-        const response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store", signal: controller.signal });
-        const data = await response.json().catch(() => ({}));
+        let response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), cache: "no-store", signal: controller.signal });
+        let data = await response.json().catch(() => ({}));
+        if (response.status === 401 && path !== "/api/hub/session" && Object.prototype.hasOwnProperty.call(payload, "token")) {
+          await renewHubSession();
+          response = await fetch(`${API_BASE}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...payload, token: state.token }), cache: "no-store", signal: controller.signal });
+          data = await response.json().catch(() => ({}));
+        }
         if (response.status === 401) throw new Error("SESSION");
         if (!response.ok) throw new Error(data.reason || "REQUEST");
         return data;
@@ -1398,10 +1431,10 @@
 
   function renderProfilePhotoEditor(backAction = renderArea) {
     const copy = {
-      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível salvar a foto. Escolha uma imagem de até 20 MB."],
-      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The photo could not be saved. Choose an image up to 20 MB."],
-      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo guardar la foto. Elige una imagen de hasta 20 MB."],
-      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось сохранить фото. Выберите изображение до 20 МБ."],
+      pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível concluir o envio. Verifique a conexão e tente novamente."],
+      en: ["Profile photo", "This photo will appear in your EduCashPro profile on the website and mini app.", "Choose photo", "Save photo", "Remove photo", "Saving…", "The upload could not be completed. Check your connection and try again."],
+      es: ["Foto de perfil", "Esta foto aparecerá en tu perfil EduCashPro en el sitio y mini app.", "Elegir foto", "Guardar foto", "Eliminar foto", "Guardando…", "No se pudo completar el envío. Comprueba la conexión e inténtalo de nuevo."],
+      ru: ["Фото профиля", "Фото появится в профиле EduCashPro на сайте и в мини-приложении.", "Выбрать фото", "Сохранить", "Удалить", "Сохранение…", "Не удалось завершить загрузку. Проверьте соединение и повторите попытку."],
     }[state.language] || [];
     const current = String(state.profile?.profileImage?.url || "");
     const returnTo = typeof backAction === "function" ? backAction : renderArea;
