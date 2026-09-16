@@ -1537,6 +1537,7 @@
       const stored = JSON.parse(localStorage.getItem("educashpro:web-session") || "null");
       if (stored?.profile) localStorage.setItem("educashpro:web-session", JSON.stringify({ ...stored, profile: { ...stored.profile, profileImage: profileImage || null } }));
     } catch {}
+    window.dispatchEvent(new CustomEvent("educashpro:profile-photo-updated", { detail: { profileImage: profileImage || null } }));
   }
 
   function renderProfilePhotoEditor(backAction = renderArea) {
