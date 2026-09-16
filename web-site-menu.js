@@ -38,7 +38,9 @@
     html.educashproWeb #marketplaceButton,html.educashproWeb #closeButton,html.educashproWeb .topbar>.educashCrossNav{display:none!important}
     html.educashproWeb .topbar .brandcopy{margin-right:auto}
     .webSiteMenuButton{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 15px;border:1px solid rgba(48,230,166,.34);border-radius:13px;background:#10243a;color:#f7fbff;font-weight:900;cursor:pointer}
-    html.educashproWeb #accountCenterButton{width:auto;min-width:44px;padding:0 13px;white-space:nowrap;font-size:13px}
+    html.educashproWeb #accountCenterButton{width:auto;min-width:44px;padding:0 10px;gap:7px;white-space:nowrap;font-size:13px}
+    html.educashproWeb #accountCenterButton .accountHeaderAvatar{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;overflow:hidden;border-radius:50%;background:#18304b;font-size:17px}
+    html.educashproWeb #accountCenterButton .accountHeaderAvatar img{width:100%;height:100%;object-fit:cover}
     .webSiteMenuLayer{position:fixed;z-index:15000;inset:0;display:flex;justify-content:flex-end;background:rgba(1,7,15,.68);backdrop-filter:blur(7px)}
     .webSiteMenuSheet{width:min(92vw,470px);height:100%;box-sizing:border-box;overflow:auto;padding:22px;background:#0b192a;border-left:1px solid rgba(255,255,255,.1);box-shadow:-20px 0 60px rgba(0,0,0,.38);color:#f7fbff}
     .webSiteMenuHead{position:sticky;top:-22px;z-index:2;display:flex;justify-content:space-between;gap:12px;padding:22px 0 15px;background:#0b192a;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -46,7 +48,7 @@
     .webSiteMenuGroup{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.08)}.webSiteMenuGroup h3{margin:0 0 10px;color:#30e6a6;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
     .webSiteMenuGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.webSiteMenuItem{display:flex;align-items:center;gap:10px;min-height:58px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#11243a;color:#f7fbff;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}.webSiteMenuItem:hover{border-color:rgba(48,230,166,.38);transform:translateY(-1px)}.webSiteMenuItem span{font-size:22px}.webSiteMenuItem b{font-size:13px;line-height:1.25}
     body.webSiteMenuOpen{overflow:hidden}
-    @media(max-width:560px){.webSiteMenuButton{padding:0 11px}.webSiteMenuSheet{width:100%;padding:16px}.webSiteMenuHead{top:-16px;padding-top:16px}.webSiteMenuGrid{grid-template-columns:1fr}html.educashproWeb #accountCenterButton{padding:0 10px;font-size:0}html.educashproWeb #accountCenterButton::after{content:"👤";font-size:20px}}
+    @media(max-width:560px){.webSiteMenuButton{padding:0 11px}.webSiteMenuSheet{width:100%;padding:16px}.webSiteMenuHead{top:-16px;padding-top:16px}.webSiteMenuGrid{grid-template-columns:1fr}html.educashproWeb #accountCenterButton{width:44px;padding:0 6px}html.educashproWeb #accountCenterButton .accountHeaderLabel{display:none}}
   `;document.head.appendChild(style)}
   function open(){
     styles();close();const c=copy(),layer=document.createElement("div");layer.className="webSiteMenuLayer";layer.innerHTML=`<aside class="webSiteMenuSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><header class="webSiteMenuHead"><div><h2>☰ ${esc(c.title)}</h2><p>${esc(c.subtitle)}</p></div><button class="webSiteMenuClose" aria-label="${esc(c.close)}">✕</button></header>${c.groups.map(([title,items])=>`<section class="webSiteMenuGroup"><h3>${esc(title)}</h3><div class="webSiteMenuGrid">${items.map(([action,icon,label])=>`<button class="webSiteMenuItem" type="button" data-menu-action="${esc(action)}"><span>${icon}</span><b>${esc(label)}</b></button>`).join("")}</div></section>`).join("")}</aside>`;document.body.appendChild(layer);document.body.classList.add("webSiteMenuOpen");layer.querySelector(".webSiteMenuClose").onclick=close;layer.onclick=e=>{if(e.target===layer)close()};layer.querySelectorAll("[data-menu-action]").forEach(button=>button.onclick=()=>run(button.dataset.menuAction));layer.querySelector(".webSiteMenuClose")?.focus()}
@@ -87,7 +89,12 @@
   }
   function labelAccount(){
     const button=document.getElementById("accountCenterButton");if(!button)return;
-    const labels={pt:"👤 Minha conta",en:"👤 My account",es:"👤 Mi cuenta",ru:"👤 Мой аккаунт"};button.textContent=labels[lang()]||labels.pt;button.title=button.textContent;
+    const labels={pt:"Minha conta",en:"My account",es:"Mi cuenta",ru:"Мой аккаунт"},label=labels[lang()]||labels.pt;
+    const imageUrl=String(session()?.profile?.profileImage?.url||"");
+    const signature=`${imageUrl}|${label}`;if(button.dataset.accountLabelSignature===signature)return;
+    button.dataset.accountLabelSignature=signature;
+    button.innerHTML=`<span class="accountHeaderAvatar">${imageUrl?`<img src="${esc(imageUrl)}" alt="">`:"👤"}</span><span class="accountHeaderLabel">${esc(label)}</span>`;
+    button.title=label;button.setAttribute("aria-label",label);
   }
   function install(){
     styles();const topbar=document.querySelector(".topbar");if(!topbar)return;
@@ -96,5 +103,8 @@
   }
   const observer=new MutationObserver(install);observer.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+  window.addEventListener("educashpro:web-session-ready",install);
+  window.addEventListener("educashpro:subscription-synced",labelAccount);
+  window.addEventListener("educashpro:profile-photo-updated",labelAccount);
   window.EduCashProSiteMenu={open,close};
 })();
