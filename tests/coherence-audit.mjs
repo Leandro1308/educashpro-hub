@@ -11,6 +11,7 @@ assert(locale.includes('localStorage.getItem("educashpro:web-session")'), "Idiom
 assert(locale.indexOf("session?.profile?.language") < locale.indexOf('query.get("lang")'), "Idioma da conta deve prevalecer sobre URL e navegador");
 assert(app.includes("EduCashProLocale?.resolve"), "Página principal deve usar o resolvedor canônico de idioma");
 assert(!app.includes('const browserLanguage = String(navigator.language || "pt")'), "Página principal não pode depender diretamente do idioma do navegador");
+assert(app.includes("resolve?.({ language: state.profile?.language })"), "Visitante sem conta deve poder usar idioma da URL ou do navegador");
 assert(menu.includes("EduCashProLocale?.resolve"), "Menu deve seguir o idioma canônico da conta");
 assert(index.includes("locale-resolver.js"), "Resolvedor de idioma deve carregar antes da aplicação");
 assert(app.includes("/api/platform-public/config"), "Apresentação deve consultar a configuração pública do contrato");
