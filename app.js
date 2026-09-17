@@ -1779,6 +1779,12 @@
       ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
     };
     const value = copies[browserLanguage] || copies.pt;
+    const landingCopy = ({
+      pt: ["Escolha por onde começar", "Cada área tem um objetivo claro. O menu reúne todas as funções.", "Conhecer", "Entenda a proposta e os recursos do EduCashPro.", "Explorar", "Conheça empresas, benefícios e projetos.", "Minha área", "Perfil, assinatura, credencial e configurações.", "Comunidade EduCashPro", "Canal oficial", "Abrir no Telegram"],
+      en: ["Choose where to start", "Each area has a clear purpose. The menu contains every feature.", "Discover", "Understand EduCashPro and its resources.", "Explore", "Find businesses, benefits and projects.", "My area", "Profile, subscription, credential and settings.", "EduCashPro community", "Official channel", "Open in Telegram"],
+      es: ["Elige por dónde empezar", "Cada área tiene un objetivo claro. El menú reúne todas las funciones.", "Conocer", "Conoce la propuesta y los recursos de EduCashPro.", "Explorar", "Descubre empresas, beneficios y proyectos.", "Mi área", "Perfil, suscripción, credencial y ajustes.", "Comunidad EduCashPro", "Canal oficial", "Abrir en Telegram"],
+      ru: ["Выберите, с чего начать", "У каждого раздела своя задача. Все функции собраны в меню.", "О платформе", "Узнайте о возможностях EduCashPro.", "Обзор", "Компании, преимущества и проекты.", "Мой раздел", "Профиль, подписка, карта и настройки.", "Сообщество EduCashPro", "Официальный канал", "Открыть в Telegram"],
+    })[browserLanguage] || null;
     document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
     const referralCode = String(state.profile?.referralCode || new URL(window.location.href).searchParams.get("ref") || "").trim();
     const telegramAppUrl = new URL("https://t.me/EduCashProBot");
@@ -1792,18 +1798,15 @@
       <span class="eyebrow">EDUCASHPRO</span>
       <h1>${escapeHtml(value[0])}</h1>
       <p>${escapeHtml(value[1])}</p>
-      <div class="publicWelcomeGrid">
-        <article><span>🎓</span><strong>${escapeHtml(value[2])}</strong><small>${escapeHtml(value[3])}</small></article>
-        <article><span>🧰</span><strong>${escapeHtml(value[4])}</strong><small>${escapeHtml(value[5])}</small></article>
-        <article><span>🎁</span><strong>${escapeHtml(value[6])}</strong><small>${escapeHtml(value[7])}</small></article>
-      </div>
-      <a class="publicTelegramButton" href="https://t.me/+1mP5ad7vJH5lOGNh">📚 ${escapeHtml(value[8])}</a>
-      <button id="publicGames" class="publicGamesButton" type="button">🎮 <span><strong>${escapeHtml(value[10])}</strong><small>${escapeHtml(value[11])}</small></span></button>
-      <button id="publicPairDevice" class="publicGamesButton" type="button">📱 <span><strong>${escapeHtml(value[12])}</strong><small>${escapeHtml(value[13])}</small></span></button>
-      <div class="publicAccessGrid">
-        <a id="publicMarketplace" class="publicAccessButton" href="./marketplace.html"><span>🏪</span><b>${escapeHtml(value[14])}</b><small>${escapeHtml(value[15])}</small></a>
-        <a id="publicTelegramApp" class="publicAccessButton telegram" href="${escapeHtml(telegramAppUrl.toString())}" target="_blank" rel="noopener"><span>✈️</span><b>${escapeHtml(value[16])}</b><small>${escapeHtml(value[17])}</small></a>
-      </div>
+      <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
+      <section class="landingPathSection">
+        <header><h2>${escapeHtml(landingCopy[0])}</h2><p>${escapeHtml(landingCopy[1])}</p></header>
+        <div class="landingPathGrid">
+          <button id="publicPresentation" class="landingPathCard" type="button"><span>📘</span><strong>${escapeHtml(landingCopy[2])}</strong><small>${escapeHtml(landingCopy[3])}</small></button>
+          <a id="publicMarketplace" class="landingPathCard" href="./marketplace.html"><span>🏪</span><strong>${escapeHtml(landingCopy[4])}</strong><small>${escapeHtml(landingCopy[5])}</small></a>
+          <button id="publicMemberArea" class="landingPathCard" type="button"><span>👤</span><strong>${escapeHtml(landingCopy[6])}</strong><small>${escapeHtml(landingCopy[7])}</small></button>
+        </div>
+      </section>
       ${credentialPayload ? `<section class="publicCredentialCard">
         <span class="statusPill ${credentialActive ? "" : "inactive"}">${escapeHtml(credentialActive ? featureCopy("credentialActive") : featureCopy("credentialExpired"))}</span>
         <h2>${escapeHtml(value[18])}</h2><p>${escapeHtml(value[19])}</p>
@@ -1811,29 +1814,19 @@
         <h3>${escapeHtml(credentialPayload.name || state.profile?.firstName || "EduCashPro")}</h3>
         <p>${escapeHtml(featureCopy("credentialUntil"))}: <b>${escapeHtml(formatDate(credentialPayload.validUntil))}</b></p>
       </section>` : ""}
-      <div class="publicAccessGrid publicCredentialActions">
-        ${state.profile ? `<button id="publicShowCredential" class="publicGamesButton" type="button">🔳 <span><strong>${escapeHtml(value[18])}</strong><small>${escapeHtml(value[19])}</small></span></button>` : ""}
-        <button id="publicScanCredential" class="publicGamesButton publicScanButton" type="button">📷 <span><strong>${escapeHtml(value[20])}</strong><small>${escapeHtml(value[21])}</small></span></button>
-      </div>
-      <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
+      <section class="landingPathSection"><header><h2>${escapeHtml(landingCopy[8])}</h2></header><div class="landingCommunity">
+        <a href="https://t.me/+1mP5ad7vJH5lOGNh">📢 ${escapeHtml(landingCopy[9])}</a>
+        <a id="publicTelegramApp" href="${escapeHtml(telegramAppUrl.toString())}" target="_blank" rel="noopener">✈️ ${escapeHtml(landingCopy[10])}</a>
+      </div></section>
     </section>`;
-    document.getElementById("publicGames")?.addEventListener("click", async () => {
-      await window.EduCashProResources?.loadGames?.();
-      window.EduCashProMentalGames?.renderCatalog?.({ public: true, lang: browserLanguage, back: renderPublicLanding });
-    });
-    document.getElementById("publicPairDevice")?.addEventListener("click", () => {
-      const webSession = window.EduCashProWebEntry?.getSession?.() || window.EduCashProPlatform?.readWebSession?.();
-      if (!webSession?.token) {
-        window.EduCashProWebEntry?.open?.();
-        return;
-      }
-      window.EduCashProAccountCenter?.openDevicePairing?.();
+    document.getElementById("publicPresentation")?.addEventListener("click", () => renderPresentation(renderPublicLanding));
+    document.getElementById("publicMemberArea")?.addEventListener("click", () => {
+      if (state.profile) return renderArea();
+      window.EduCashProWebEntry?.open?.();
     });
     if (credentialPayload) {
       window.EduCashProResources?.loadQr?.().then(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl)).catch(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl));
     }
-    document.getElementById("publicScanCredential")?.addEventListener("click", scanMembershipQr);
-    document.getElementById("publicShowCredential")?.addEventListener("click", () => void renderMembershipProof(renderPublicLanding));
     bottomNav.classList.add("hidden");
   }
 
