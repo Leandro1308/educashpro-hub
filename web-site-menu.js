@@ -41,6 +41,7 @@
     html.educashproWeb #accountCenterButton{width:auto;min-width:44px;padding:0 10px;gap:7px;white-space:nowrap;font-size:13px}
     html.educashproWeb #accountCenterButton .accountHeaderAvatar{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;overflow:hidden;border-radius:50%;background:#18304b;font-size:17px}
     html.educashproWeb #accountCenterButton .accountHeaderAvatar img{width:100%;height:100%;object-fit:cover}
+    .webContextBack{display:inline-flex;align-items:center;gap:7px;margin:0 0 14px;padding:8px 2px;border:0;background:transparent;color:#30e6a6;font:inherit;font-weight:900;cursor:pointer}
     .webSiteMenuLayer{position:fixed;z-index:15000;inset:0;display:flex;justify-content:flex-end;background:rgba(1,7,15,.68);backdrop-filter:blur(7px)}
     .webSiteMenuSheet{width:min(92vw,470px);height:100%;box-sizing:border-box;overflow:auto;padding:22px;background:#0b192a;border-left:1px solid rgba(255,255,255,.1);box-shadow:-20px 0 60px rgba(0,0,0,.38);color:#f7fbff}
     .webSiteMenuHead{position:sticky;top:-22px;z-index:2;display:flex;justify-content:space-between;gap:12px;padding:22px 0 15px;background:#0b192a;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -51,7 +52,9 @@
     @media(max-width:560px){.webSiteMenuButton{padding:0 11px}.webSiteMenuSheet{width:100%;padding:16px}.webSiteMenuHead{top:-16px;padding-top:16px}.webSiteMenuGrid{grid-template-columns:1fr}html.educashproWeb #accountCenterButton{width:44px;padding:0 6px}html.educashproWeb #accountCenterButton .accountHeaderLabel{display:none}}
   `;document.head.appendChild(style)}
   function open(){
-    styles();close();const c=copy(),layer=document.createElement("div");layer.className="webSiteMenuLayer";layer.innerHTML=`<aside class="webSiteMenuSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><header class="webSiteMenuHead"><div><h2>☰ ${esc(c.title)}</h2><p>${esc(c.subtitle)}</p></div><button class="webSiteMenuClose" aria-label="${esc(c.close)}">✕</button></header>${c.groups.map(([title,items])=>`<section class="webSiteMenuGroup"><h3>${esc(title)}</h3><div class="webSiteMenuGrid">${items.map(([action,icon,label])=>`<button class="webSiteMenuItem" type="button" data-menu-action="${esc(action)}"><span>${icon}</span><b>${esc(label)}</b></button>`).join("")}</div></section>`).join("")}</aside>`;document.body.appendChild(layer);document.body.classList.add("webSiteMenuOpen");layer.querySelector(".webSiteMenuClose").onclick=close;layer.onclick=e=>{if(e.target===layer)close()};layer.querySelectorAll("[data-menu-action]").forEach(button=>button.onclick=()=>run(button.dataset.menuAction));layer.querySelector(".webSiteMenuClose")?.focus()}
+    styles();close();const c=copy(),groups=[...c.groups];
+    if(session()?.permissions?.admin===true)groups.push([lang()==="en"?"Administration":lang()==="es"?"Administración":lang()==="ru"?"Администрирование":"Administração",[["admin","🛠️",lang()==="en"?"Admin panel":lang()==="es"?"Panel administrativo":lang()==="ru"?"Панель администратора":"Painel administrativo"]]]);
+    const layer=document.createElement("div");layer.className="webSiteMenuLayer";layer.innerHTML=`<aside class="webSiteMenuSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><header class="webSiteMenuHead"><div><h2>☰ ${esc(c.title)}</h2><p>${esc(c.subtitle)}</p></div><button class="webSiteMenuClose" aria-label="${esc(c.close)}">✕</button></header>${groups.map(([title,items])=>`<section class="webSiteMenuGroup"><h3>${esc(title)}</h3><div class="webSiteMenuGrid">${items.map(([action,icon,label])=>`<button class="webSiteMenuItem" type="button" data-menu-action="${esc(action)}"><span>${icon}</span><b>${esc(label)}</b></button>`).join("")}</div></section>`).join("")}</aside>`;document.body.appendChild(layer);document.body.classList.add("webSiteMenuOpen");layer.querySelector(".webSiteMenuClose").onclick=close;layer.onclick=e=>{if(e.target===layer)close()};layer.querySelectorAll("[data-menu-action]").forEach(button=>button.onclick=()=>run(button.dataset.menuAction));layer.querySelector(".webSiteMenuClose")?.focus()}
   async function run(action){
     const app=window.EduCashProApp,account=window.EduCashProAccountCenter;
     if(action==="home"){close();app?.renderPublicLanding?.();return}
@@ -77,6 +80,7 @@
     if(action==="publish")return location.assign(internal("./publish.html"));
     if(action==="projects")return app?.renderArea?.();
     if(action==="account")return account?.open?.();
+    if(action==="admin")return account?.openAdmin?.();
     if(action==="subscription")return account?.openSubscription?.();
     if(action==="credential")return app?.renderMembershipProof?.();
     if(action==="pair")return account?.openDevicePairing?.();
@@ -100,6 +104,10 @@
     styles();const topbar=document.querySelector(".topbar");if(!topbar)return;
     if(!document.getElementById("webSiteMenuButton")){const button=document.createElement("button");button.id="webSiteMenuButton";button.className="webSiteMenuButton";button.type="button";button.innerHTML=`☰ <span>${esc(copy().menu)}</span>`;button.onclick=open;topbar.insertBefore(button,document.getElementById("marketplaceButton")||null)}
     labelAccount();
+    const content=document.getElementById("content");
+    if(content&&!content.querySelector(".publicWelcome,.splash")&&!content.querySelector(".webContextBack,[id$='Back'],.gameBack,#formBack,#qrBack,#proofBack,#profilePhotoBack")){
+      const back=document.createElement("button");back.className="webContextBack";back.type="button";back.textContent=`← ${lang()==="en"?"Back":lang()==="es"?"Volver":lang()==="ru"?"Назад":"Voltar"}`;back.onclick=()=>window.EduCashProApp?.renderPublicLanding?.();content.prepend(back);
+    }
   }
   const observer=new MutationObserver(install);observer.observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
