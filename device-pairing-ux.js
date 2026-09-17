@@ -47,6 +47,8 @@
 
   function lang(){
     const session=window.EduCashProWebEntry?.getSession?.()||platform.readWebSession?.();
+    const canonical=window.EduCashProLocale?.resolve?.({session});
+    if(canonical)return canonical;
     const raw=String(session?.profile?.language||navigator.language||"pt").toLowerCase();
     if(raw.startsWith("en"))return"en";
     if(raw.startsWith("es"))return"es";
