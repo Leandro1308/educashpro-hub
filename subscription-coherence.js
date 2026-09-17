@@ -64,7 +64,7 @@
         source: snapshot.source,
       };
       const membershipCredential = snapshot.active ? String(status?.membershipCredential || "") : "";
-      const canonicalSession = { ...session, profile, membershipCredential, storedAt: Date.now() };
+      const canonicalSession = { ...session, profile, permissions: status?.permissions || session.permissions || {}, membershipCredential, storedAt: Date.now() };
       platform.writeWebSession?.(canonicalSession);
       window.__EDUCASHPRO_SESSION__ = canonicalSession;
       if (membershipCredential) localStorage.setItem("educashpro:membership-credential", membershipCredential);
@@ -109,6 +109,7 @@
           activeUntil: data.subscription.activeUntil,
           source: data.subscription.source || "platform_account",
           account: data.account || {},
+          permissions: data.permissions || {},
           membershipCredential: data.membershipCredential || "",
         });
       } catch {
