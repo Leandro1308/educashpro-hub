@@ -75,6 +75,7 @@ body::before {
 .iconButton { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 13px; color: #bdcad8; background: var(--surface); }
 
 .content { padding: 18px 16px 110px; }
+.landingPathSection{margin-top:22px;text-align:left}.landingPathSection>header{margin-bottom:11px}.landingPathSection h2{margin:0 0 4px;font-size:20px}.landingPathSection p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}.landingPathGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.landingPathCard{display:grid;gap:7px;min-height:128px;padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--surface2);color:var(--text);text-align:left;text-decoration:none}.landingPathCard span{font-size:27px}.landingPathCard strong{font-size:15px}.landingPathCard small{color:var(--muted);line-height:1.4}.landingCommunity{display:flex;gap:9px;margin-top:18px}.landingCommunity a{display:flex;align-items:center;justify-content:center;flex:1;min-height:46px;padding:10px;border:1px solid rgba(48,230,166,.28);border-radius:14px;color:var(--green);background:rgba(48,230,166,.06);font-weight:850;text-decoration:none}@media(max-width:560px){.landingPathGrid{grid-template-columns:1fr}.landingPathCard{min-height:96px}.landingCommunity{display:grid}}
 .splash { min-height: 70vh; display: grid; place-content: center; justify-items: center; text-align: center; }
 .splashLogo { width: 82px; height: 82px; border-radius: 26px; font-size: 44px; }
 .splash h1 { margin: 18px 0 5px; font-size: 28px; }
