@@ -756,19 +756,10 @@
           </div>
         </div>` : ""}
       <div class="accountCenterGrid">
-        <button class="accountAction" data-action="home"><span>🏠</span><b>${esc(t("home"))}</b></button>
-        <button class="accountAction" data-action="learn"><span>📚</span><b>${esc(t("learn"))}</b></button>
-        <button class="accountAction" data-action="explore"><span>🔎</span><b>${esc(t("explore"))}</b></button>
-        <button class="accountAction" data-action="benefits"><span>🎁</span><b>${esc(t("benefits"))}</b></button>
-        <button class="accountAction" data-action="publish"><span>🚀</span><b>${esc(t("publish"))}</b></button>
-        <button class="accountAction" data-action="affiliate"><span>💰</span><b>${esc(t("affiliate"))}</b></button>
-        <button class="accountAction" data-action="network"><span>📊</span><b>${esc(t("network"))}</b></button>
-        <button class="accountAction" data-action="subscription"><span>💳</span><b>${esc(t("subscription"))}</b></button>
-        <button class="accountAction" data-action="pair-device"><span>📱</span><b>${esc(t("pairDevice"))}</b></button>
-        <button class="accountAction" data-action="agenda"><span>📅</span><b>${esc(t("agenda"))}</b></button>
-        <button class="accountAction" data-action="projects"><span>🗂️</span><b>${esc(t("projects"))}</b></button>
         <button class="accountAction" data-action="profile-photo"><span>📷</span><b>${esc(t("profilePhoto"))}</b></button>
+        <button class="accountAction" data-action="subscription"><span>💳</span><b>${esc(t("subscription"))}</b></button>
         <button class="accountAction" data-action="my-qr"><span>🔳</span><b>${esc(t("myQrCode"))}</b></button>
+        <button class="accountAction" data-action="pair-device"><span>📱</span><b>${esc(t("pairDevice"))}</b></button>
         <button class="accountAction" data-action="language"><span>🌐</span><b>${esc(t("language"))}</b></button>
         <button class="accountAction" data-action="preferences"><span>🔔</span><b>${esc(t("preferences"))}</b></button>
         <button class="accountAction" data-action="settings"><span>⚙️</span><b>${esc(t("settings"))}</b></button>
@@ -837,6 +828,7 @@
   window.addEventListener("educashpro:web-session-ready", () => setTimeout(install, 100));
   window.EduCashProAccountCenter = {
     open,
+    openAdmin,
     openNetwork,
     openSubscription,
     openDevicePairing,
