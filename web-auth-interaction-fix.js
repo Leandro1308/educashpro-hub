@@ -75,7 +75,7 @@
     const script=document.createElement("script");
     script.defer=true;
     script.dataset.devicePairingUx="1";
-    script.src="./device-pairing-ux.js?v=20260913.1";
+    script.src="./device-pairing-ux.js?v=20260917.6";
     document.head.appendChild(script);
   }
 
