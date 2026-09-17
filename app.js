@@ -36,6 +36,7 @@
     currentLesson: 0,
     courseCatalog: [],
     hubSessionReady: false,
+    contractConfig: { joinPercent: 60, renewalPercents: [30, 20, 10, 5, 5], levelRequirements: { 2: 5, 3: 10, 4: 15, 5: 20 }, qualificationEnabled: true, source: "fallback" },
   };
   let activeBookScrollHandler = null;
   let webQrScanner = null;
@@ -766,11 +767,45 @@
     return String(presentationCopy(key)).replace("{price}", formattedPrice);
   }
 
+  async function loadPublicContractConfig() {
+    try {
+      const response = await fetch(`${API_BASE}/api/platform-public/config`, { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || data?.ok !== true) return state.contractConfig;
+      state.contractConfig = {
+        joinPercent: Number(data.joinPercent ?? 60),
+        renewalPercents: Array.isArray(data.renewalPercents) ? data.renewalPercents.map(Number) : state.contractConfig.renewalPercents,
+        levelRequirements: data.levelRequirements || state.contractConfig.levelRequirements,
+        qualificationEnabled: data.qualificationEnabled !== false,
+        source: data.source || "contract",
+      };
+      if (Number(data.priceUsdt || 0) > 0) state.planPriceUsdt = Number(data.priceUsdt);
+    } catch {}
+    return state.contractConfig;
+  }
+
+  function currentContractRules() {
+    const config = state.contractConfig || {};
+    const renewals = featureCopy("renewals").map((item, index) => {
+      const label = String(item).split("·")[0].trim();
+      return `${label} · ${Number(config.renewalPercents?.[index] ?? [30, 20, 10, 5, 5][index])}%`;
+    });
+    const qualifications = featureCopy("qualifications").map((item, index) => {
+      if (index === 0) return item;
+      const label = String(item).split("·")[0].trim();
+      const required = Number(config.levelRequirements?.[index + 1] ?? [0, 5, 10, 15, 20][index]);
+      const suffix = state.language === "en" ? "active directs" : state.language === "es" ? "directos activos" : state.language === "ru" ? "активных прямых" : "diretos ativos";
+      return `${label} · ${required} ${suffix}`;
+    });
+    return { direct: Number(config.joinPercent ?? 60), renewals, qualifications };
+  }
+
   function renderPresentation(returnTo) {
     const isActive = Boolean(state.profile?.active);
     const included = presentationCopy("included");
     const works = presentationCopy("works");
     const goals = presentationCopy("goals");
+    const contractRules = currentContractRules();
     state.view = "presentation";
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -809,11 +844,11 @@
       <section class="networkHighlight">
         <span>💰</span><h2>${escapeHtml(featureCopy("planTitle"))}</h2>
         <p>${escapeHtml(featureCopy("planIntro"))}</p>
-        <div class="directCommission"><b>60%</b><span>${escapeHtml(featureCopy("direct"))}</span></div>
+        <div class="directCommission"><b>${escapeHtml(contractRules.direct)}%</b><span>${escapeHtml(featureCopy("direct"))}</span></div>
         <h3>${escapeHtml(featureCopy("renewalsTitle"))}</h3>
-        <div class="planGrid">${featureCopy("renewals").map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
+        <div class="planGrid">${contractRules.renewals.map((item) => `<span>${escapeHtml(item)}</span>`).join("")}</div>
         <h3>${escapeHtml(featureCopy("qualificationsTitle"))}</h3>
-        <div class="qualificationList">${featureCopy("qualifications").map((item) => `<span>✓ ${escapeHtml(item)}</span>`).join("")}</div>
+        <div class="qualificationList">${contractRules.qualifications.map((item) => `<span>✓ ${escapeHtml(item)}</span>`).join("")}</div>
         <p class="automaticPayment">💵 ${escapeHtml(featureCopy("automatic"))}</p>
         <small>⚠️ ${escapeHtml(presentationCopy("networkNote"))}</small>
       </section>
@@ -1758,14 +1793,18 @@
   function handleError(error, target = content) { const message = error?.message === "SESSION" ? t("expires") : t("error"); target.innerHTML = `<div class="empty error">${escapeHtml(message)}</div>`; }
 
   function applyLanguage() {
-    document.documentElement.lang = state.language;
+    state.language = window.EduCashProLocale?.normalize?.(state.language) || state.language || "pt";
+    if (window.EduCashProLocale?.apply) window.EduCashProLocale.apply(state.language);
+    else document.documentElement.lang = state.language;
     headerSubtitle.textContent = t("subtitle");
     document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   }
 
   function renderPublicLanding() {
     syncExternalSession();
-    const browserLanguage = String(navigator.language || "pt").slice(0, 2).toLowerCase();
+    const browserLanguage = window.EduCashProLocale?.resolve?.({ language: state.profile?.language || state.language })
+      || String(state.profile?.language || state.language || navigator.language || "pt").slice(0, 2).toLowerCase();
+    state.language = ["pt", "en", "es", "ru"].includes(browserLanguage) ? browserLanguage : "pt";
     const copies = {
       pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
       en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
@@ -1779,7 +1818,8 @@
       es: ["Elige por dónde empezar", "Cada área tiene un objetivo claro. El menú reúne todas las funciones.", "Conocer", "Conoce la propuesta y los recursos de EduCashPro.", "Explorar", "Descubre empresas, beneficios y proyectos.", "Mi área", "Perfil, suscripción, credencial y ajustes.", "Comunidad EduCashPro", "Canal oficial", "Abrir en Telegram"],
       ru: ["Выберите, с чего начать", "У каждого раздела своя задача. Все функции собраны в меню.", "О платформе", "Узнайте о возможностях EduCashPro.", "Обзор", "Компании, преимущества и проекты.", "Мой раздел", "Профиль, подписка, карта и настройки.", "Сообщество EduCashPro", "Официальный канал", "Открыть в Telegram"],
     })[browserLanguage] || null;
-    document.documentElement.lang = browserLanguage === "pt" ? "pt-BR" : browserLanguage;
+    if (window.EduCashProLocale?.apply) window.EduCashProLocale.apply(state.language);
+    else document.documentElement.lang = state.language === "pt" ? "pt-BR" : state.language;
     const referralCode = String(state.profile?.referralCode || new URL(window.location.href).searchParams.get("ref") || "").trim();
     const telegramAppUrl = new URL("https://t.me/EduCashProBot");
     telegramAppUrl.searchParams.set("startapp", referralCode ? `ref_${referralCode}` : "site");
@@ -1834,6 +1874,7 @@
       console.error("[EduCashPro] Falha ao confirmar inicialização do aplicativo:", error);
     }
     const publicParams = new URL(window.location.href).searchParams;
+    await loadPublicContractConfig();
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
     if (!tg?.initData && publicParams.get("game")) {
       await window.EduCashProResources?.loadGames?.();
