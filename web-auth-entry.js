@@ -19,7 +19,7 @@
   };
 
 
-  function locale(){const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
+  function locale(){const canonical=window.EduCashProLocale?.resolve?.({language:profile()?.language});if(canonical)return canonical;const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
   function t(key){return I18N[locale()]?.[key]||I18N.pt[key]||key}
   function esc(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
   function profile(){return state.session?.profile||null}
