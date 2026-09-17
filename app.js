@@ -1802,8 +1802,8 @@
 
   function renderPublicLanding() {
     syncExternalSession();
-    const browserLanguage = window.EduCashProLocale?.resolve?.({ language: state.profile?.language || state.language })
-      || String(state.profile?.language || state.language || navigator.language || "pt").slice(0, 2).toLowerCase();
+    const browserLanguage = window.EduCashProLocale?.resolve?.({ language: state.profile?.language })
+      || String(state.profile?.language || navigator.language || "pt").slice(0, 2).toLowerCase();
     state.language = ["pt", "en", "es", "ru"].includes(browserLanguage) ? browserLanguage : "pt";
     const copies = {
       pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
