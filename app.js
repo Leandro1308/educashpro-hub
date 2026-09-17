@@ -412,7 +412,6 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RELOAD_GUARD_KEY = "educashpro:reload-build";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -436,16 +435,11 @@
         const publishedBuild = String(data?.build || "").trim();
         if (!publishedBuild) return false;
         const currentBuild = String(localStorage.getItem(APP_BUILD_KEY) || "");
-        const requestedBuild = String(new URL(window.location.href).searchParams.get("release") || "");
-        const guardedBuild = String(sessionStorage.getItem(APP_RELOAD_GUARD_KEY) || "");
         localStorage.setItem(APP_BUILD_KEY, publishedBuild);
-        if (!currentBuild || currentBuild === publishedBuild || requestedBuild === publishedBuild || guardedBuild === publishedBuild) return false;
+        if (!currentBuild || currentBuild === publishedBuild) return false;
         clearPublishedContentCache();
-        sessionStorage.setItem(APP_RELOAD_GUARD_KEY, publishedBuild);
-        const url = new URL(window.location.href);
-        url.searchParams.set("release", publishedBuild);
-        window.location.replace(url.toString());
-        return true;
+        window.dispatchEvent(new CustomEvent("educashpro:update-ready", { detail: { build: publishedBuild } }));
+        return false;
       } catch {
         return false;
       } finally {
