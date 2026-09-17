@@ -3,8 +3,7 @@
   const CACHE_TTL = 5 * 60 * 1000;
 
   const qs = new URLSearchParams(location.search);
-  const requestedLang = String(qs.get("lang") || navigator.language || "pt").toLowerCase();
-  const lang = requestedLang.startsWith("en") ? "en" : requestedLang.startsWith("es") ? "es" : requestedLang.startsWith("ru") ? "ru" : "pt";
+  const lang = window.EduCashProLocale?.resolve?.() || "pt";
 
   const copy = {
     pt: {
