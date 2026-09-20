@@ -29,9 +29,14 @@
     $("shareButton").onclick=shareCurrentLink;
     const initialCode=contextReferral();
     $("publishButton").href=`./publish.html?lang=${encodeURIComponent(lang)}${initialCode?`&ref=${encodeURIComponent(initialCode)}`:""}`;
-    if(!tg?.initData){const badge=$("statusBadge");badge.classList.remove("loading");badge.classList.add("inactive");badge.textContent=C.inactive;if(!currentLink){$("errorBox").classList.remove("hidden");txt("errorBox",C.telegramOnly)}return}
     try{
-      const session=await post("/api/hub/session",{initData:tg.initData});
+      const stored=window.EduCashProPlatform?.readWebSession?.();
+      const usingWeb=Boolean(stored?.token&&stored?.profile?.userId);
+      const initData=window.EduCashProPlatform?.telegramInitData?.()||"";
+      if(!usingWeb&&!initData){const badge=$("statusBadge");badge.classList.remove("loading");badge.classList.add("inactive");badge.textContent=C.inactive;if(!currentLink){$("errorBox").classList.remove("hidden");txt("errorBox",C.telegramOnly)}return}
+      const session=usingWeb
+        ? {token:stored.token,profile:stored.profile||{},affiliateLink:siteReferral(stored.profile?.referralCode)}
+        : await post("/api/hub/session",{initData});
       const sessionCode=cleanReferral(session?.profile?.referralCode);
       setLink(session.affiliateLink||"",sessionCode||contextReferral());
       const cfg=await post("/api/affiliate/config",{token:session.token});
