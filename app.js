@@ -1222,7 +1222,7 @@
     return `<div class="field fullField"><label for="${id}">${escapeHtml(label)}${required ? " *" : ""}</label><input id="${id}" ${id.toLowerCase().includes("url") || id === "affiliateLink" ? 'inputmode="url"' : ""} ${required ? "required" : ""}></div>`;
   }
 
-  function renderSubmissionForm(kind) {
+  function renderSubmissionForm(kind, existingPartner = null) {
     if (!state.profile?.active) return openSubscription();
     const title = fc(kind);
     const common = field("description", fc("description"), "textarea") + field("destinationUrl", fc("url"));
@@ -1239,20 +1239,45 @@
       : kind === "benefit"
         ? field("name", fc("name")) + common
         : partnerFields;
-    content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${escapeHtml(featureCopy("creatorReferralTitle"))}</h2><p>${escapeHtml(featureCopy("creatorReferralText"))}</p></div></section><form id="submissionForm" class="toolCard"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
+    content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section>${kind === "partner" ? `<div id="ownedCompanies" class="cardList" style="margin-bottom:14px"></div>` : `<section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${escapeHtml(featureCopy("creatorReferralTitle"))}</h2><p>${escapeHtml(featureCopy("creatorReferralText"))}</p></div></section>`}<form id="submissionForm" class="toolCard"><input id="partnerId" type="hidden" value="${escapeHtml(existingPartner?.id || "")}"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(fc("save"))}</button></form>`;
     document.getElementById("language").value = state.language;
     if (kind === "partner") {
       let unitCount = 1;
+      const setValue = (id, value) => { const input = document.getElementById(id); if (input) input.value = value ?? ""; };
+      if (existingPartner) {
+        const partnerForm = document.getElementById("submissionForm");
+        partnerForm.dataset.logoUrl = existingPartner.logoUrl || "";
+        partnerForm.dataset.logoPublicId = existingPartner.logoPublicId || "";
+        partnerForm.dataset.coverUrl = existingPartner.coverUrl || "";
+        partnerForm.dataset.coverPublicId = existingPartner.coverPublicId || "";
+        partnerForm.dataset.galleryUrls = JSON.stringify(existingPartner.galleryUrls || []);
+        partnerForm.dataset.galleryPublicIds = JSON.stringify(existingPartner.galleryPublicIds || []);
+        const units = Array.isArray(existingPartner.locations) && existingPartner.locations.length ? existingPartner.locations : [{}];
+        document.getElementById("companyUnits").innerHTML = units.map((_, index) => unitMarkup(index)).join("");
+        unitCount = units.length;
+        units.forEach((unit, index) => Object.entries({unitName:unit.name,address:unit.address,number:unit.number,complement:unit.complement,neighborhood:unit.neighborhood,city:unit.city,state:unit.state,country:unit.country,postalCode:unit.postalCode,mapUrl:unit.mapUrl,unitContact:unit.contact,hours:unit.hours,notes:unit.notes}).forEach(([name,value]) => setValue(`${name}_${index}`, value)));
+        const privateData = existingPartner.privateRegistration || {}, benefit = existingPartner.benefit || {};
+        Object.entries({companyName:existingPartner.companyName,segment:existingPartner.segment,description:existingPartner.description,services:(existingPartner.services||[]).join("\n"),publicPhone:existingPartner.publicContact?.phone,publicEmail:existingPartner.publicContact?.email,publicWebsite:existingPartner.publicContact?.website,discountRange:benefit.value||existingPartner.discountRange,discountRules:benefit.rules||existingPartner.discountRules,benefitIncluded:benefit.included,benefitExcluded:benefit.excluded,usageLimit:benefit.usageLimit,minimumPurchase:benefit.minimumPurchase,legalName:privateData.legalName,registrationNumber:privateData.registrationNumber,responsibleName:privateData.responsibleName,responsibleRole:privateData.responsibleRole,responsiblePhone:privateData.responsiblePhone,responsibleEmail:privateData.responsibleEmail}).forEach(([id,value])=>setValue(id,value));
+        document.getElementById("acceptedTerms").checked = privateData.acceptedTerms === true;
+        document.getElementById("allLocations").checked = benefit.allLocations !== false;
+      }
       document.getElementById("addCompanyUnit").onclick = () => {
         document.getElementById("companyUnits").insertAdjacentHTML("beforeend", unitMarkup(unitCount++));
       };
       document.getElementById("companyUnits").addEventListener("click", (event) => event.target.closest(".removeUnit")?.closest(".companyUnit")?.remove());
+      api("/api/hub/partners/mine", { token:state.token }).then((data) => {
+        const box = document.getElementById("ownedCompanies"); if (!box || !data.items?.length) return;
+        box.innerHTML = `<div class="sectionHead"><div><h2>🏪 ${escapeHtml(companyCopy.about)}</h2></div></div>${data.items.map((item)=>`<article class="itemCard"><div class="itemTop"><div class="itemIcon">🏪</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.active ? "Publicado" : item.status)}</p></div></div><div class="cardActions"><button class="secondaryButton" data-edit-company="${escapeHtml(item.id)}">✏️ Editar</button><button class="secondaryButton" data-delete-company="${escapeHtml(item.id)}">🗑️ Excluir</button></div></article>`).join("")}`;
+        box.querySelectorAll("[data-edit-company]").forEach((button)=>button.onclick=()=>renderSubmissionForm("partner", data.items.find((item)=>item.id===button.dataset.editCompany)));
+        box.querySelectorAll("[data-delete-company]").forEach((button)=>button.onclick=async()=>{if(!confirm(fc("confirmRemove")))return;await api("/api/hub/delete",{token:state.token,kind:"partner",id:button.dataset.deleteCompany});showToast(fc("removed"));renderSubmissionForm("partner");});
+      }).catch(()=>{});
     }
     document.getElementById("formBack").onclick = kind === "project" ? renderArea : kind === "partner" ? renderPartnerStores : renderExclusiveBenefits;
     document.getElementById("submissionForm").onsubmit = async (event) => {
       event.preventDefault();
       const values = Object.fromEntries(Array.from(event.currentTarget.querySelectorAll("input,textarea,select")).filter((el) => el.id).map((el) => [el.id, el.type === "checkbox" ? el.checked : el.value.trim()]));
       if (kind === "partner") {
+        values.id = values.partnerId || "";
         values.services = String(values.services || "").split(/\r?\n/).map((v) => v.trim()).filter(Boolean);
         values.locations = Array.from(event.currentTarget.querySelectorAll(".companyUnit")).map((unit, index) => {
           const get = (name) => unit.querySelector(`[id^="${name}_"]`)?.value?.trim() || "";

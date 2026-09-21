@@ -325,12 +325,21 @@
     field.innerHTML = `<label>${escapeHtml(tr("logo"))}</label><div class="partnerLogoUpload"><div class="partnerLogoPreview"><span>🏪</span></div><div class="partnerLogoControls"><label class="secondaryButton partnerLogoButton">${escapeHtml(tr("logoChoose"))}<input id="partnerLogoFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><small>${escapeHtml(tr("logoHelp"))}</small><span class="partnerLogoStatus"></span></div></div><input id="logoUrl" type="hidden" value=""><input id="logoPublicId" type="hidden" value="">`;
     companyName.closest(".field")?.insertAdjacentElement("beforebegin", field);
 
+    const mediaCopy = ({pt:{cover:"Capa da empresa",gallery:"Galeria (até 6 fotos)",coverHelp:"Imagem horizontal para o topo da página da empresa.",galleryHelp:"Fotos reais da empresa, das unidades, produtos ou serviços."},en:{cover:"Business cover",gallery:"Gallery (up to 6 photos)",coverHelp:"Horizontal image for the top of the business page.",galleryHelp:"Real photos of the business, locations, products or services."},es:{cover:"Portada de la empresa",gallery:"Galería (hasta 6 fotos)",coverHelp:"Imagen horizontal para la parte superior de la página.",galleryHelp:"Fotos reales de la empresa, sucursales, productos o servicios."},ru:{cover:"Обложка компании",gallery:"Галерея (до 6 фото)",coverHelp:"Горизонтальное изображение для страницы компании.",galleryHelp:"Реальные фотографии компании, отделений, товаров или услуг."}})[document.documentElement.lang?.slice(0,2)] || null;
+    const mediaField = document.createElement("div");
+    mediaField.className = "field fullField partnerMediaFields";
+    mediaField.innerHTML = `<div class="partnerMediaGrid"><div><label>${escapeHtml(mediaCopy.cover)}</label><div class="partnerLogoUpload"><div class="partnerLogoPreview" id="partnerCoverPreview"><span>🖼️</span></div><div class="partnerLogoControls"><label class="secondaryButton partnerLogoButton">${escapeHtml(tr("logoChoose"))}<input id="partnerCoverFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></label><small>${escapeHtml(mediaCopy.coverHelp)}</small><span id="partnerCoverStatus" class="partnerLogoStatus"></span></div></div><input id="coverUrl" type="hidden"><input id="coverPublicId" type="hidden"></div><div><label>${escapeHtml(mediaCopy.gallery)}</label><div class="partnerLogoControls"><label class="secondaryButton partnerLogoButton">${escapeHtml(tr("logoChoose"))}<input id="partnerGalleryFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden></label><small>${escapeHtml(mediaCopy.galleryHelp)}</small><div id="partnerGalleryPreview" class="partnerGalleryPreview"></div><span id="partnerGalleryStatus" class="partnerLogoStatus"></span></div><input id="galleryUrls" type="hidden"><input id="galleryPublicIds" type="hidden"></div></div>`;
+    field.insertAdjacentElement("afterend", mediaField);
+
     const fileInput = field.querySelector("#partnerLogoFile");
     const logoUrl = field.querySelector("#logoUrl");
     const publicId = field.querySelector("#logoPublicId");
     const preview = field.querySelector(".partnerLogoPreview");
     const status = field.querySelector(".partnerLogoStatus");
     const submit = document.getElementById("submitForm");
+    logoUrl.value = form.dataset.logoUrl || "";
+    publicId.value = form.dataset.logoPublicId || "";
+    if (logoUrl.value) { preview.innerHTML = `<img src="${escapeHtml(logoUrl.value)}" alt="">`; preview.classList.add("ready"); }
     fileInput.addEventListener("change", async () => {
       const file = fileInput.files?.[0];
       if (!file) return;
@@ -342,6 +351,26 @@
       } finally {
         submit.disabled = false;
       }
+    });
+
+    const coverFile = mediaField.querySelector("#partnerCoverFile"), coverUrl = mediaField.querySelector("#coverUrl"), coverPublicId = mediaField.querySelector("#coverPublicId"), coverPreview = mediaField.querySelector("#partnerCoverPreview"), coverStatus = mediaField.querySelector("#partnerCoverStatus");
+    coverUrl.value = form.dataset.coverUrl || ""; coverPublicId.value = form.dataset.coverPublicId || "";
+    if (coverUrl.value) { coverPreview.innerHTML = `<img src="${escapeHtml(coverUrl.value)}" alt="">`; coverPreview.classList.add("ready"); }
+    coverFile.addEventListener("change", async () => { const file = coverFile.files?.[0]; if (!file) return; try { await uploadPartnerLogo(file,{logoUrl:coverUrl,publicId:coverPublicId,preview:coverPreview,status:coverStatus,submit}); } catch { coverStatus.textContent=tr("logoError"); } finally { submit.disabled=false; } });
+
+    const galleryFile = mediaField.querySelector("#partnerGalleryFiles"), galleryUrls = mediaField.querySelector("#galleryUrls"), galleryPublicIds = mediaField.querySelector("#galleryPublicIds"), galleryPreview = mediaField.querySelector("#partnerGalleryPreview"), galleryStatus = mediaField.querySelector("#partnerGalleryStatus");
+    const oldGalleryUrls = JSON.parse(form.dataset.galleryUrls || "[]"), oldGalleryIds = JSON.parse(form.dataset.galleryPublicIds || "[]");
+    const renderGallery = (urls) => { galleryPreview.innerHTML = urls.map((url)=>`<img src="${escapeHtml(url)}" alt="">`).join(""); };
+    galleryUrls.value = oldGalleryUrls.join("\n"); galleryPublicIds.value = oldGalleryIds.join("\n"); renderGallery(oldGalleryUrls);
+    galleryFile.addEventListener("change", async () => {
+      const files = Array.from(galleryFile.files || []).slice(0,6); if (!files.length) return;
+      const urls=[], ids=[]; galleryStatus.textContent=tr("logoUploading"); submit.disabled=true;
+      try {
+        for (const file of files) { const urlInput=document.createElement("input"), idInput=document.createElement("input"), tempPreview=document.createElement("div"); await uploadPartnerLogo(file,{logoUrl:urlInput,publicId:idInput,preview:tempPreview,status:galleryStatus,submit}); urls.push(urlInput.value); ids.push(idInput.value); }
+        galleryUrls.value=urls.join("\n"); galleryPublicIds.value=ids.join("\n"); renderGallery(urls);
+        oldGalleryIds.filter(Boolean).forEach((oldId)=>originalFetch(`${API_BASE}/api/hub/media/delete`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:visitorState.session?.token||"",publicId:oldId}),cache:"no-store"}).catch(()=>{}));
+        galleryStatus.textContent=tr("logoReady");
+      } catch { galleryStatus.textContent=tr("logoError"); } finally { submit.disabled=false; }
     });
   }
 
