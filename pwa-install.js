@@ -92,7 +92,7 @@
     if(isInstalled()){toast(c.installed);return}
     if(deferredPrompt){await promptInstall();return}
     if(isIOS()){modal({title:c.iosTitle,body:c.iosBody,hint:c.iosHint});return}
-    modal({title:c.title,body:c.subtitle,primary:true});
+    modal({title:c.manualTitle,body:c.manualBody});
   }
 
   window.addEventListener("beforeinstallprompt",event=>{
