@@ -1928,7 +1928,7 @@
     const publicParams = new URL(window.location.href).searchParams;
     await loadPublicContractConfig();
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
-    if (!tg?.initData && publicParams.get("game")) {
+    if (!tg?.initData && (publicParams.get("game") || publicParams.get("raffle"))) {
       await window.EduCashProResources?.loadGames?.();
       if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
     }
@@ -1958,7 +1958,7 @@
       window.__EDUCASHPRO_SESSION__ = session;
       window.EduCashProProfessional?.setSession?.(session);
       window.EduCashProHelp?.setSession?.(session);
-      if (publicParams.get("game") || publicParams.get("tournament")) {
+      if (publicParams.get("game") || publicParams.get("tournament") || publicParams.get("raffle")) {
         await window.EduCashProResources?.loadGames?.();
         window.EduCashProMentalGames?.setSession?.(session);
         if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;

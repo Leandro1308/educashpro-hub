@@ -82,14 +82,62 @@
   function raffleMessage(r,url,l){return {pt:`🎟️ RIFA / SORTEIO ABERTO\n\n${r.name}\nEscolha seu número diretamente pelo link:\n${url}\n\nOs números já escolhidos podem ser acompanhados na própria página. Quando as inscrições forem encerradas, o resultado será divulgado pelo organizador.`,en:`🎟️ NUMBER DRAW\n\n${r.name}\nChoose your number here:\n${url}\n\nChosen numbers are visible on the page.`,es:`🎟️ RIFA / SORTEO\n\n${r.name}\nElige tu número:\n${url}\n\nLos números elegidos se ven en la página.`,ru:`🎟️ РОЗЫГРЫШ\n\n${r.name}\nВыберите номер:\n${url}`}[l]||""}
   function renderRaffleCreated(r,url,l){const msg=raffleMessage(r,url,l);content().innerHTML=`<main class="gamePage">${backButton(l)}<section class="hero"><span class="eyebrow">${esc(c("raffleCreated",l))}</span><h1>🎟️ ${esc(r.name)}</h1><p>${esc(c("code",l))}: ${esc(r.code)}</p></section><section class="socialCard"><div class="shareBox">${esc(url)}</div><div id="rQr" class="qrHost" style="margin-top:12px"></div><div class="socialActions"><button id="copyR" class="secondaryButton">${esc(c("copyLink",l))}</button><button id="shareR" class="secondaryButton">${esc(c("share",l))}</button></div><p style="white-space:pre-line">${esc(msg)}</p><button id="manageR" class="wideButton">${esc(c("openRoom",l))}</button></section></main>`;bindBack();qr($("#rQr"),url);$("#copyR").onclick=e=>copy(url,e.currentTarget);$("#shareR").onclick=()=>shareTelegram(url,msg);$("#manageR").onclick=()=>renderRaffle(r.code,l,{owner:true});}
   async function listRaffles(l){content().innerHTML=`<main class="gamePage">${backButton(l)}<div id="raffleList" class="cardList"><div class="empty">•••</div></div></main>`;bindBack(()=>openRaffle({lang:l}));try{const data=await api("/api/games/raffles/list-owner",{});$("#raffleList").innerHTML=data.items?.length?data.items.map(r=>`<button class="quickCard" data-r-code="${esc(r.code)}"><span class="emoji">🎟️</span><strong>${esc(r.name)}</strong><small>${esc(r.status)} · ${esc(r.code)}</small></button>`).join(""):`<div class="empty">—</div>`;document.querySelectorAll("[data-r-code]").forEach(b=>b.onclick=()=>renderRaffle(b.dataset.rCode,l,{owner:true}));}catch{$("#raffleList").innerHTML=`<div class="empty">—</div>`}}
-  async function renderRaffle(code,l,opts={}){selectedRaffleNumber=null;content().innerHTML=`<main class="gamePage">${backButton(l)}<div class="empty">•••</div></main>`;bindBack();try{const data=await api("/api/games/raffles/get",{code}),r=data.raffle,claimed=data.claimed||[],byNum=new Map(claimed.map(x=>[Number(x.number),x]));content().innerHTML=`<main class="gamePage">${backButton(l)}<section class="hero"><span class="eyebrow">🎟️ ${esc(r.code)}</span><h1>${esc(r.name)}</h1><p>${esc(r.description||"")}</p><div class="meta"><span class="chip">${esc(c("owner",l))}: ${esc(r.organizerName)}</span><span class="chip">${esc(c("status",l))}: ${esc(r.status)}</span></div></section>${r.status==="drawn"?`<section class="socialCard" style="text-align:center"><h2>🏆 ${esc(c("winner",l))}</h2><div style="font-size:54px;font-weight:950">${Number(r.winner?.number||0)}</div><p>${esc(r.winner?.displayName||"")}</p></section>`:""}<section class="socialCard"><h3>${esc(c("choose",l))}</h3><div class="raffleNumbers">${Array.from({length:r.numberCount},(_,i)=>{const n=i+1,row=byNum.get(n);return `<button class="raffleNumber ${row?"taken":""}" data-rnum="${n}" ${row||r.status!=="open"?"disabled":""}>${row?`${String(n).padStart(2,"0")}<br>${esc(row.displayName)}`:String(n).padStart(2,"0")}</button>`}).join("")}</div>${r.status==="open"?`<form id="claimForm" class="socialForm" style="margin-top:13px"><label>${esc(c("displayName",l))}<input id="claimName" maxlength="50" value="${esc(bridge.session?.profile?.firstName||"")}"></label><button class="wideButton" type="submit">${esc(c("confirmNumber",l))}</button></form>`:""}</section>${r.isOwner?`<section class="socialCard"><h3>👤 ${esc(c("owner",l))}</h3><div class="socialActions one">${r.status==="open"?`<button id="closeRaffle" class="secondaryButton">${esc(c("closeEntries",l))}</button>`:""}${r.status==="closed"?`<button id="drawRaffle" class="wideButton">🎲 ${esc(c("draw",l))}</button>`:""}<button id="refreshRaffle" class="secondaryButton">↻ ${esc(c("refresh",l))}</button></div></section>`:""}<p class="notice">⚠️ ${esc(c("responsibility",l))}</p></main>`;bindBack();document.querySelectorAll("[data-rnum]").forEach(b=>b.onclick=()=>{selectedRaffleNumber=Number(b.dataset.rnum);document.querySelectorAll("[data-rnum]").forEach(x=>x.classList.toggle("selected",x===b))});$("#claimForm")?.addEventListener("submit",e=>{e.preventDefault();claimRaffle(code,l)});$("#closeRaffle")?.addEventListener("click",()=>closeRaffle(code,l));$("#drawRaffle")?.addEventListener("click",()=>drawRaffle(code,l));$("#refreshRaffle")?.addEventListener("click",()=>renderRaffle(code,l,opts));window.scrollTo({top:0,behavior:"smooth"});}catch(err){alert(err?.data?.reason||err.message)}}
-  async function claimRaffle(code,l){if(!selectedRaffleNumber)return;try{await api("/api/games/raffles/claim",{code,number:selectedRaffleNumber,displayName:$("#claimName").value});renderRaffle(code,l,{public:true})}catch(err){alert(err?.data?.reason||err.message);renderRaffle(code,l,{public:true})}}
+  function raffleFieldText(l,key){return({
+    pt:{fullName:"Nome completo",mobilePhone:"Número de celular",linkTelegram:"Vincular Telegram e confirmar",confirmSecure:"O ID do Telegram será confirmado pelo próprio Telegram. Relações de indicação já existentes não serão alteradas.",fillRequired:"Preencha nome completo, celular e escolha um número."},
+    en:{fullName:"Full name",mobilePhone:"Mobile number",linkTelegram:"Link Telegram and confirm",confirmSecure:"Your Telegram ID is verified by Telegram. Existing referral relationships are never changed.",fillRequired:"Enter your full name, mobile number and choose a number."},
+    es:{fullName:"Nombre completo",mobilePhone:"Número de celular",linkTelegram:"Vincular Telegram y confirmar",confirmSecure:"Telegram verificará tu ID. Las relaciones de referencia existentes nunca se cambian.",fillRequired:"Completa el nombre, celular y elige un número."},
+    ru:{fullName:"Полное имя",mobilePhone:"Номер телефона",linkTelegram:"Привязать Telegram и подтвердить",confirmSecure:"Telegram подтвердит ваш ID. Существующие реферальные связи не изменяются.",fillRequired:"Введите имя, телефон и выберите номер."}
+  }[l]||{})[key]||key}
+  async function renderRaffle(code,l,opts={}){
+    selectedRaffleNumber=null;
+    content().innerHTML=`<main class="gamePage">${backButton(l)}<div class="empty">•••</div></main>`;
+    bindBack();
+    try{
+      const data=await api("/api/games/raffles/get",{code}),r=data.raffle;
+      if(opts.draftToken){
+        await api("/api/games/raffles/claim",{code,draftToken:opts.draftToken});
+        return renderRaffle(code,l,{public:true});
+      }
+      const claimed=data.claimed||[],byNum=new Map(claimed.map(x=>[Number(x.number),x]));
+      const participantForm=r.status==="open"?`<form id="claimForm" class="socialForm" style="margin-top:13px"><label>${esc(raffleFieldText(l,"fullName"))}<input id="claimName" maxlength="100" autocomplete="name" value="${esc(bridge.session?.profile?.firstName||"")}"></label><label>${esc(raffleFieldText(l,"mobilePhone"))}<input id="claimPhone" type="tel" maxlength="30" autocomplete="tel"></label><p class="notice">🔒 ${esc(raffleFieldText(l,"confirmSecure"))}</p><button class="wideButton" type="submit">${esc(bridge.session?.token?c("confirmNumber",l):raffleFieldText(l,"linkTelegram"))}</button></form>`:"";
+      content().innerHTML=`<main class="gamePage">${backButton(l)}<section class="hero"><span class="eyebrow">🎟️ ${esc(r.code)}</span><h1>${esc(r.name)}</h1><p>${esc(r.description||"")}</p><div class="meta"><span class="chip">${esc(c("owner",l))}: ${esc(r.organizerName)}</span><span class="chip">${esc(c("status",l))}: ${esc(r.status)}</span></div></section>${r.status==="drawn"?`<section class="socialCard" style="text-align:center"><h2>🏆 ${esc(c("winner",l))}</h2><div style="font-size:54px;font-weight:950">${Number(r.winner?.number||0)}</div><p>${esc(r.winner?.displayName||"")}</p></section>`:""}<section class="socialCard"><h3>${esc(c("choose",l))}</h3><div class="raffleNumbers">${Array.from({length:r.numberCount},(_,i)=>{const n=i+1,row=byNum.get(n);return `<button class="raffleNumber ${row?"taken":""}" data-rnum="${n}" ${row||r.status!=="open"?"disabled":""}>${row?`${String(n).padStart(2,"0")}<br>${esc(row.displayName)}`:String(n).padStart(2,"0")}</button>`}).join("")}</div>${participantForm}</section>${r.isOwner?`<section class="socialCard"><h3>👤 ${esc(c("owner",l))}</h3><div class="socialActions one">${r.status==="open"?`<button id="closeRaffle" class="secondaryButton">${esc(c("closeEntries",l))}</button>`:""}${r.status==="closed"?`<button id="drawRaffle" class="wideButton">🎲 ${esc(c("draw",l))}</button>`:""}<button id="refreshRaffle" class="secondaryButton">↻ ${esc(c("refresh",l))}</button></div></section>`:""}<p class="notice">⚠️ ${esc(c("responsibility",l))}</p></main>`;
+      bindBack();
+      document.querySelectorAll("[data-rnum]").forEach(b=>b.onclick=()=>{selectedRaffleNumber=Number(b.dataset.rnum);document.querySelectorAll("[data-rnum]").forEach(x=>x.classList.toggle("selected",x===b))});
+      $("#claimForm")?.addEventListener("submit",e=>{e.preventDefault();claimRaffle(code,l)});
+      $("#closeRaffle")?.addEventListener("click",()=>closeRaffle(code,l));
+      $("#drawRaffle")?.addEventListener("click",()=>drawRaffle(code,l));
+      $("#refreshRaffle")?.addEventListener("click",()=>renderRaffle(code,l,opts));
+      window.scrollTo({top:0,behavior:"smooth"});
+    }catch(err){alert(err?.data?.reason||err.message)}
+  }
+  async function claimRaffle(code,l){
+    const fullName=$("#claimName")?.value?.trim()||"",mobilePhone=$("#claimPhone")?.value?.trim()||"";
+    if(!selectedRaffleNumber||fullName.length<3||mobilePhone.length<8)return alert(raffleFieldText(l,"fillRequired"));
+    try{
+      if(!bridge.session?.token){
+        const prepared=await api("/api/games/raffles/prepare",{code,number:selectedRaffleNumber,fullName,mobilePhone});
+        if(!prepared.telegramUrl)throw new Error("telegram_unavailable");
+        return openUrl(prepared.telegramUrl);
+      }
+      await api("/api/games/raffles/claim",{code,number:selectedRaffleNumber,fullName,mobilePhone});
+      renderRaffle(code,l,{public:true});
+    }catch(err){alert(err?.data?.reason||err.message);renderRaffle(code,l,{public:true})}
+  }
   async function closeRaffle(code,l){try{await api("/api/games/raffles/close",{code});renderRaffle(code,l,{owner:true})}catch(err){alert(err?.data?.reason||err.message)}}
   async function drawRaffle(code,l){try{const data=await api("/api/games/raffles/draw",{code});renderRaffle(code,l,{owner:true})}catch(err){alert(err?.data?.reason||err.message)}}
 
-  function socialStartParam(params){const tg=window.Telegram?.WebApp,start=String(tg?.initDataUnsafe?.start_param||params?.get?.("tgWebAppStartParam")||"");const directT=String(params?.get?.("tournament")||""),directR=String(params?.get?.("raffle")||"");if(directT)return{type:"tournament",code:directT};if(directR)return{type:"raffle",code:directR};if(start.startsWith("tournament_"))return{type:"tournament",code:start.slice(11)};if(start.startsWith("raffle_"))return{type:"raffle",code:start.slice(7)};return null}
+  function socialStartParam(params){
+    const tg=window.Telegram?.WebApp,start=String(tg?.initDataUnsafe?.start_param||params?.get?.("tgWebAppStartParam")||"");
+    const directT=String(params?.get?.("tournament")||""),directR=String(params?.get?.("raffle")||"");
+    if(directT)return{type:"tournament",code:directT};
+    if(directR)return{type:"raffle",code:directR};
+    if(start.startsWith("tournament_"))return{type:"tournament",code:start.slice(11)};
+    if(start.startsWith("raffle_")){const parts=start.slice(7).split("_");return{type:"raffle",code:parts[0],draftToken:parts[1]||""}}
+    return null
+  }
   const previousBoot=base.bootPublic?.bind(base);
-  base.bootPublic=async function(params){const social=socialStartParam(params);if(social&&bridge.session?.token){if(social.type==="tournament")renderTournamentRoom(social.code,lang(params?.get?.("lang")),{public:true});else renderRaffle(social.code,lang(params?.get?.("lang")),{public:true});return true}return previousBoot?previousBoot(params):false};
+  base.bootPublic=async function(params){const social=socialStartParam(params);if(social&&(bridge.session?.token||social.type==="raffle")){if(social.type==="tournament")renderTournamentRoom(social.code,lang(params?.get?.("lang")),{public:true});else renderRaffle(social.code,lang(params?.get?.("lang")),{public:true,draftToken:social.draftToken||""});return true}return previousBoot?previousBoot(params):false};
 
   window.EduCashProSocial={openTournament,openRaffle,renderTournamentRoom,renderRaffle,submitTournamentResult,returnToTournament};
 })();
+
