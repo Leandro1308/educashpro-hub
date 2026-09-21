@@ -52,6 +52,13 @@
     },
   }[lang];
 
+  const clubCopy = ({
+    pt:{name:"Clube de Benefícios",register:"Cadastrar minha empresa",credential:"Abrir minha credencial",services:"Serviços",units:"Unidades",rules:"Regras do benefício",subscriber:"O benefício é válido somente para assinantes ativos do EduCashPro. Apresente sua credencial com QR Code no atendimento presencial.",submitted:"Oferta cadastrada pelo parceiro. Dados empresariais e do responsável são mantidos restritos à administração.",verified:"Empresa verificada"},
+    en:{name:"Benefits Club",register:"Register my business",credential:"Open my credential",services:"Services",units:"Locations",rules:"Benefit rules",subscriber:"This benefit is valid only for active EduCashPro subscribers. Present your QR Code credential at the physical location.",submitted:"Offer submitted by the partner. Business registration and responsible-person data remain restricted to administration.",verified:"Verified business"},
+    es:{name:"Club de Beneficios",register:"Registrar mi empresa",credential:"Abrir mi credencial",services:"Servicios",units:"Sucursales",rules:"Reglas del beneficio",subscriber:"El beneficio es válido solo para suscriptores activos de EduCashPro. Presenta tu credencial QR en la atención presencial.",submitted:"Oferta registrada por el socio. Los datos fiscales y del responsable están restringidos a la administración.",verified:"Empresa verificada"},
+    ru:{name:"Клуб преимуществ",register:"Добавить мою компанию",credential:"Открыть мою карту",services:"Услуги",units:"Отделения",rules:"Правила преимущества",subscriber:"Преимущество доступно только активным подписчикам EduCashPro. Покажите QR-код карты в физическом отделении.",submitted:"Предложение добавлено партнёром. Регистрационные данные и данные ответственного лица доступны только администрации.",verified:"Проверенная компания"},
+  })[lang];
+
   const segmentLabels = {
     pt: { pharmacy:"Farmácias", clinic:"Clínicas", physiotherapy:"Fisioterapia", gym:"Academias", dental:"Odontologia", laboratory:"Laboratórios", nutrition:"Nutrição", psychology:"Psicologia", beauty:"Beleza", education:"Educação", restaurants:"Restaurantes", retail:"Comércio", services:"Serviços", technology:"Tecnologia", other:"Outros" },
     en: { pharmacy:"Pharmacies", clinic:"Clinics", physiotherapy:"Physiotherapy", gym:"Gyms", dental:"Dental", laboratory:"Laboratories", nutrition:"Nutrition", psychology:"Psychology", beauty:"Beauty", education:"Education", restaurants:"Restaurants", retail:"Retail", services:"Services", technology:"Technology", other:"Other" },
@@ -84,6 +91,8 @@
     setText("errorTitle", copy.errorTitle); setText("errorText", copy.errorText); setText("retryButton", copy.retry);
     setText("previousText", copy.previous); setText("nextText", copy.next); setText("detailBackText", copy.back);
     setText("reportTitle", copy.reportTitle); setText("reportIntro", copy.reportIntro); setText("reportReasonLabel", copy.reportReason); setText("reportDetailsLabel", copy.reportDetails); setText("reportCancel", copy.reportCancel); setText("reportSubmit", copy.reportSend);
+    setText("headerTitle", clubCopy.name); setText("detailBackText", `${copy.back.replace(/Marketplace/g, clubCopy.name)}`);
+    setText("registerCompanyLink", `🏪 ${clubCopy.register}`); setText("membershipLink", `✅ ${clubCopy.credential}`);
     renderReportReasons();
   }
 
@@ -159,18 +168,20 @@
     const logo = item.logoUrl ? `<img src="${escapeHtml(item.logoUrl)}" alt="" />` : escapeHtml(initials(item.companyName));
     const coverStyle = item.coverUrl ? ` style="background-image:url('${escapeHtml(item.coverUrl)}')"` : "";
     const gallery = Array.isArray(item.galleryUrls) && item.galleryUrls.length ? `<div class="detailBlock"><h3>${escapeHtml(copy.gallery)}</h3><div class="gallery">${item.galleryUrls.map((url) => `<img src="${escapeHtml(url)}" alt="" loading="lazy" />`).join("")}</div></div>` : "";
-    const destination = item.destinationUrl ? `<a class="detailCta" href="${escapeHtml(item.destinationUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.website)} ↗</a>` : "";
-    const benefit = item.discountRange ? `<div class="benefitBadge"><strong>${escapeHtml(copy.benefit)}</strong><br>${escapeHtml(copy.benefitText(item.discountRange))}</div>` : "";
+    const services = Array.isArray(item.services) && item.services.length ? `<div class="detailBlock"><h3>${escapeHtml(clubCopy.services)}</h3><div class="servicesList">${item.services.map((service) => `<span class="pill">${escapeHtml(service)}</span>`).join("")}</div></div>` : "";
+    const locations = Array.isArray(item.locations) ? item.locations : [];
+    const units = locations.length ? `<div class="detailBlock"><h3>${escapeHtml(clubCopy.units)}</h3><div class="unitList">${locations.map((unit) => `<div class="unitCard"><h4>${escapeHtml(unit.name)}</h4><p>${escapeHtml([unit.address,unit.number,unit.complement,unit.neighborhood].filter(Boolean).join(", "))}</p><p>${escapeHtml([unit.city,unit.state,unit.country,unit.postalCode].filter(Boolean).join(" · "))}</p>${unit.hours?`<p>🕒 ${escapeHtml(unit.hours)}</p>`:""}${unit.contact?`<p>☎ ${escapeHtml(unit.contact)}</p>`:""}${unit.mapUrl?`<a class="detailCta" href="${escapeHtml(unit.mapUrl)}" target="_blank" rel="noopener noreferrer">📍 ${escapeHtml(copy.location)}</a>`:""}</div>`).join("")}</div></div>` : "";
+    const benefit = item.discountRange ? `<div class="benefitBadge"><strong>${escapeHtml(copy.benefit)}</strong><br>${escapeHtml(copy.benefitText(item.discountRange))}${item.discountRules?`<hr><strong>${escapeHtml(clubCopy.rules)}</strong><br>${escapeHtml(item.discountRules)}`:""}</div><div class="subscriberNotice">${escapeHtml(clubCopy.subscriber)} <a href="./index.html?view=credential">${escapeHtml(clubCopy.credential)}</a></div><p class="disclosure">${escapeHtml(item.verificationStatus === "verified" ? clubCopy.verified : clubCopy.submitted)}</p>` : "";
     return `<div class="detailCover"${coverStyle}></div><div class="detailContent">
       <div class="detailIdentity"><div class="detailLogo">${logo}</div><div class="detailTitle"><h1>${escapeHtml(item.companyName)}</h1><p>${escapeHtml(segmentText(item.segment))}</p></div></div>
       <div class="detailGrid">
-        <div class="detailBlock"><h3>${escapeHtml(copy.about)}</h3><p>${escapeHtml(item.description || copy.noDescription)}</p>${benefit}${destination}</div>
+        <div class="detailBlock"><h3>${escapeHtml(copy.about)}</h3><p>${escapeHtml(item.description || copy.noDescription)}</p>${benefit}</div>
         <div class="detailBlock"><h3>${escapeHtml(copy.contact)}</h3><div class="detailList">
           <div class="detailRow"><span>${escapeHtml(copy.location)}</span><strong>${escapeHtml(locationText(item))}</strong></div>
           <div class="detailRow"><span>${escapeHtml(copy.type)}</span><strong>${escapeHtml(typeText(item.storeType))}</strong></div>
           ${item.contact ? `<div class="detailRow"><span>${escapeHtml(copy.contactField)}</span><strong>${escapeHtml(item.contact)}</strong></div>` : ""}
         </div></div>
-      </div>${gallery}
+      </div>${services}${units}${gallery}
       <footer class="companyReportFooter"><a class="reportTextLink" href="#" data-report-company="${escapeHtml(item.id)}">${escapeHtml(copy.reportLink)}</a></footer>
     </div>`;
   }

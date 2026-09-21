@@ -759,3 +759,7 @@ html[aria-busy="true"]{cursor:progress}
 #webQrReader video{border-radius:12px}
 @media(max-width:560px){.publicAccessGrid{grid-template-columns:1fr}.publicAccessButton{min-height:92px}.publicCredentialCard{padding:18px 12px}.publicCredentialCard .qrCanvas canvas,.publicCredentialCard .qrCanvas img{max-width:100%;height:auto!important}}
 @media(min-width:900px){html.educashproWeb .publicAccessGrid{width:min(100%,900px);margin:14px auto}html.educashproWeb .publicCredentialCard{width:min(100%,900px);box-sizing:border-box}}
+.formSection{display:grid;gap:12px;margin:0 0 18px;padding:16px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(8,23,38,.45)}
+.formSection h2{margin:0;font-size:18px}.privateSection{border-color:rgba(143,177,210,.22)}
+.companyUnit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 14px;padding:14px;border:1px solid rgba(48,230,166,.18);border-radius:16px}.companyUnit legend{padding:0 8px;color:#30e6a6;font-weight:900}.companyUnit .fullField{min-width:0}.checkField{display:flex;align-items:flex-start;gap:10px;color:#c3d1df;line-height:1.5}.checkField input{width:20px;height:20px;flex:0 0 auto;accent-color:#30e6a6}.formSection .notice{margin:0;color:#9fb2c8;font-size:13px;line-height:1.55}
+@media(max-width:620px){.companyUnit{grid-template-columns:1fr}}

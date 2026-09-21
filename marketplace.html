@@ -4,15 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
-  <title>Marketplace • EduCashPro</title>
+  <title>Clube de Benefícios • EduCashPro</title>
   <link rel="stylesheet" href="./marketplace.css?v=20260911.2" />
+  <link rel="stylesheet" href="./marketplace-enhancements.css?v=20260921.1" />
 </head>
 <body>
   <header class="marketHeader">
     <a class="backButton" href="./index.html" aria-label="Voltar">‹</a>
     <div>
       <strong>EduCashPro</strong>
-      <span id="headerTitle">Marketplace</span>
+      <span id="headerTitle">Clube de Benefícios</span>
     </div>
   </header>
 
@@ -45,6 +46,11 @@
       <div class="resultMeta">
         <span id="resultStatus">Carregando empresas…</span>
         <button id="clearButton" class="textButton" type="button">Limpar filtros</button>
+      </div>
+
+      <div class="clubActions">
+        <a id="registerCompanyLink" class="secondaryButton" href="./index.html?view=benefits&amp;section=company-register">🏪 Cadastrar minha empresa</a>
+        <a id="membershipLink" class="primaryButton" href="./index.html?view=credential">✅ Abrir minha credencial</a>
       </div>
 
       <section id="companyGrid" class="companyGrid" aria-live="polite"></section>
@@ -103,7 +109,7 @@
   </div>
 
   <script src="./locale-resolver.js?v=20260917.3"></script>
-  <script src="./marketplace.js?v=20260917.3"></script>
+  <script src="./marketplace.js?v=20260921.1"></script>
   <script src="./cross-platform-nav.js?v=20260914.12"></script>
 </body>
 </html>
