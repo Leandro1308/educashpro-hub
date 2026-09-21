@@ -2001,7 +2001,8 @@
       else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
       else if (requestedView === "tools") renderTools();
       else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
-      else if (!hasExplicitRoute && await restoreRoute(readRememberedRoute())) {}
+      // Ao abrir pelo Telegram, a entrada deve ser sempre a Home. A última tela
+      // visitada (por exemplo, Minha área) não pode substituir a página inicial.
       else renderHome();
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();
