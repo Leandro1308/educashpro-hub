@@ -8,6 +8,7 @@
       all: "Todos", empty: "Nenhum jogo disponível nesta categoria.", external: "Conteúdo operado por terceiros.",
       tools: "Ferramentas", toolsSub: "Simulador de afiliados e sorteadores locais", free: "ACESSO LIVRE",
       drawTitle: "Sorteadores locais", drawDesc: "Os dados ficam somente neste aparelho e não são enviados ao EduCashPro.",
+      raffleTitle: "Criar rifa / sorteio", raffleSub: "Crie uma rifa por números, compartilhe o link e acompanhe as inscrições.", subscriber: "ASSINANTE",
       names: "Sortear nomes", numbers: "Sortear número", teams: "Formar equipes", listLabel: "Um nome por linha",
       min: "Número inicial", max: "Número final", teamCount: "Quantidade de equipes", winners: "Quantidade de vencedores",
       draw: "Sortear", clear: "Limpar", result: "Resultado", invalid: "Preencha os dados corretamente.",
@@ -26,6 +27,7 @@
       all: "All", empty: "No games available in this category.", external: "Third-party content.",
       tools: "Tools", toolsSub: "Affiliate simulator and local randomizers", free: "FREE ACCESS",
       drawTitle: "Local randomizers", drawDesc: "Data stays on this device and is not sent to EduCashPro.",
+      raffleTitle: "Create raffle / draw", raffleSub: "Create a number raffle, share its link and track entries.", subscriber: "SUBSCRIBER",
       names: "Draw names", numbers: "Draw number", teams: "Create teams", listLabel: "One name per line",
       min: "Starting number", max: "Ending number", teamCount: "Number of teams", winners: "Number of winners",
       draw: "Draw", clear: "Clear", result: "Result", invalid: "Enter valid data.",
@@ -44,6 +46,7 @@
       all: "Todos", empty: "No hay juegos disponibles en esta categoría.", external: "Contenido operado por terceros.",
       tools: "Herramientas", toolsSub: "Simulador de afiliados y sorteadores locales", free: "ACCESO LIBRE",
       drawTitle: "Sorteadores locales", drawDesc: "Los datos quedan en este dispositivo y no se envían a EduCashPro.",
+      raffleTitle: "Crear rifa / sorteo", raffleSub: "Crea una rifa por números, comparte el enlace y controla las inscripciones.", subscriber: "SUSCRIPTOR",
       names: "Sortear nombres", numbers: "Sortear número", teams: "Formar equipos", listLabel: "Un nombre por línea",
       min: "Número inicial", max: "Número final", teamCount: "Cantidad de equipos", winners: "Cantidad de ganadores",
       draw: "Sortear", clear: "Limpiar", result: "Resultado", invalid: "Completa los datos correctamente.",
@@ -62,6 +65,7 @@
       all: "Все", empty: "В этой категории пока нет игр.", external: "Контент стороннего поставщика.",
       tools: "Инструменты", toolsSub: "Партнёрский симулятор и локальная жеребьёвка", free: "СВОБОДНЫЙ ДОСТУП",
       drawTitle: "Локальная жеребьёвка", drawDesc: "Данные остаются на устройстве и не отправляются в EduCashPro.",
+      raffleTitle: "Создать розыгрыш", raffleSub: "Создайте розыгрыш по номерам, поделитесь ссылкой и следите за заявками.", subscriber: "ПОДПИСКА",
       names: "Выбрать имена", numbers: "Случайное число", teams: "Создать команды", listLabel: "Одно имя в строке",
       min: "Начальное число", max: "Конечное число", teamCount: "Количество команд", winners: "Количество победителей",
       draw: "Выбрать", clear: "Очистить", result: "Результат", invalid: "Введите корректные данные.",
@@ -155,10 +159,18 @@
   }
 
   function renderRandomizers() {
-    content().innerHTML = `<button id="drawBack" class="textButton">←</button><section class="hero"><span class="eyebrow">${esc(tr("free"))}</span><h1>🎲 ${esc(tr("drawTitle"))}</h1><p>${esc(tr("drawDesc"))}</p></section><div id="drawHelpOverlay" class="drawHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="drawHelpTitle"><section class="drawHelpCard"><button id="closeDrawHelp" class="drawHelpClose" type="button" aria-label="${esc(tr("closeHelp"))}">✕</button><span class="drawHelpIcon">🎲</span><h2 id="drawHelpTitle">${esc(tr("helpTitle"))}</h2><article><strong>👥 ${esc(tr("names"))}</strong><p>${esc(tr("helpNames"))}</p></article><article><strong>🔢 ${esc(tr("numbers"))}</strong><p>${esc(tr("helpNumbers"))}</p></article><article><strong>🤝 ${esc(tr("teams"))}</strong><p>${esc(tr("helpTeams"))}</p></article><button id="drawPresentationCta" class="drawPresentationCta" type="button">${esc(tr("presentationCta"))}</button></section></div><article class="toolCard"><div class="drawTabs"><button class="filter active" data-draw-tab="names">${esc(tr("names"))}</button><button class="filter" data-draw-tab="numbers">${esc(tr("numbers"))}</button><button class="filter" data-draw-tab="teams">${esc(tr("teams"))}</button></div><div id="drawFields"></div><button id="runDraw" class="wideButton">${esc(tr("draw"))}</button><button id="clearDraw" class="secondaryButton drawClear">${esc(tr("clear"))}</button><div id="localDrawResult" class="resultBox hidden"></div></article>`;
+    content().innerHTML = `<button id="drawBack" class="textButton">←</button><section class="hero"><span class="eyebrow">${esc(tr("free"))}</span><h1>🎲 ${esc(tr("drawTitle"))}</h1><p>${esc(tr("drawDesc"))}</p></section><button id="openRaffleCreator" class="quickCard"><span class="emoji">🎟️</span><strong>${esc(tr("raffleTitle"))}</strong><small>${esc(tr("raffleSub"))}</small><span class="freeAccessBadge">${esc(tr("subscriber"))}</span></button><div id="drawHelpOverlay" class="drawHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="drawHelpTitle"><section class="drawHelpCard"><button id="closeDrawHelp" class="drawHelpClose" type="button" aria-label="${esc(tr("closeHelp"))}">✕</button><span class="drawHelpIcon">🎲</span><h2 id="drawHelpTitle">${esc(tr("helpTitle"))}</h2><article><strong>👥 ${esc(tr("names"))}</strong><p>${esc(tr("helpNames"))}</p></article><article><strong>🔢 ${esc(tr("numbers"))}</strong><p>${esc(tr("helpNumbers"))}</p></article><article><strong>🤝 ${esc(tr("teams"))}</strong><p>${esc(tr("helpTeams"))}</p></article><button id="drawPresentationCta" class="drawPresentationCta" type="button">${esc(tr("presentationCta"))}</button></section></div><article class="toolCard"><div class="drawTabs"><button class="filter active" data-draw-tab="names">${esc(tr("names"))}</button><button class="filter" data-draw-tab="numbers">${esc(tr("numbers"))}</button><button class="filter" data-draw-tab="teams">${esc(tr("teams"))}</button></div><div id="drawFields"></div><button id="runDraw" class="wideButton">${esc(tr("draw"))}</button><button id="clearDraw" class="secondaryButton drawClear">${esc(tr("clear"))}</button><div id="localDrawResult" class="resultBox hidden"></div></article>`;
     document.getElementById("drawBack").onclick = home;
     document.getElementById("closeDrawHelp").onclick = () => document.getElementById("drawHelpOverlay")?.remove();
     document.getElementById("drawPresentationCta").onclick = () => window.EduCashProApp?.renderPresentation?.();
+    document.getElementById("openRaffleCreator").onclick = async () => {
+      try {
+        await window.EduCashProResources?.loadGames?.();
+        window.EduCashProSocial?.openRaffle?.({ lang: language(), back: renderRandomizers });
+      } catch (error) {
+        console.error("[EduCashPro] Falha ao abrir sorteio:", error);
+      }
+    };
     let mode = "names";
     const fields = () => {
       const node = document.getElementById("drawFields");
