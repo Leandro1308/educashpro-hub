@@ -49,6 +49,13 @@
   function showPro(l){content().innerHTML=`<main class="gamePage empirePage"><button class="textButton empireBack">←</button><section class="empireProGate"><span class="eyebrow">🔐 ${esc(t("pro",l))}</span><h2>${esc(t("proTitle",l))}</h2><p>${esc(t("proText",l))}</p><button id="emSubscribe" class="wideButton">🚀 ${esc(t("subscribe",l))}</button><button id="emClassic" class="secondaryButton">${esc(t("classic",l))}</button></section></main>`;$(".empireBack").onclick=()=>showHub(l);$("#emClassic").onclick=()=>showHub(l);$("#emSubscribe").onclick=()=>{const url=bridge.session?.subscribeUrl||bridge.session?.botUrl;if(url)window.Telegram?.WebApp?.openLink?window.Telegram.WebApp.openLink(url):window.open(url,"_blank","noopener");else suite.paywall?.("advanced",l)}}
   const oldText=suite.text?.bind(suite);suite.text=function(k,l){if(k==="empire")return t("title",l);if(k==="empireSub")return t("sub",l);return oldText?oldText(k,l):k};suite.GAME_META["educash-empire"]=["💎","empire","empireSub"];
   const oldLaunch=suite.launchGame.bind(suite);suite.launchGame=function(id,o={}){if(id==="educash-empire"){bridge.currentGame=id;const l=lang(o.lang),s=state();if(s.level>=13&&!active())return showPro(l);return showHub(l)}return oldLaunch(id,o)};
+  document.addEventListener("click",event=>{
+    const button=event.target.closest?.('[data-play="educash-empire"]');
+    if(!button)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    suite.launchGame("educash-empire",{lang:lang()});
+  },true);
   if(base?.bootPublic){const oldBoot=base.bootPublic.bind(base);base.bootPublic=async function(params){if(String(params?.get?.("game")||"")==="educash-empire"){suite.launchGame("educash-empire",{lang:params.get("lang")});return true}return oldBoot(params)}}
   window.EduCashEmpire={open:showHub,start:startRound};
 })();
