@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EduCashPro">
+  <link rel="manifest" href="/manifest.webmanifest?v=20260921.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/educashpro-ios-180.png?v=20260921.2">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/assets/icons/educashpro-ios-180.png?v=20260921.2">
+  <title>Instalar EduCashPro</title>
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#07111f;color:#f7fbff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{display:grid;place-items:center;padding:24px}.card{width:min(100%,520px);background:#0b192a;border:1px solid rgba(48,230,166,.35);border-radius:28px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+    .top{display:flex;align-items:center;gap:16px}.icon{width:92px;height:92px;border-radius:22px;object-fit:cover;box-shadow:0 10px 34px rgba(48,230,166,.22)}
+    h1{font-size:27px;line-height:1.05;margin:0}p{color:#b8c8da;line-height:1.55}.steps{display:grid;gap:12px;margin:22px 0}.step{display:flex;gap:12px;align-items:flex-start;background:#102238;border-radius:16px;padding:14px}
+    .n{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:#30e6a6;color:#05131a;font-weight:900}.step b{display:block;margin-bottom:4px}.note{font-size:13px;color:#91a7bf}
+    .button{display:block;width:100%;padding:15px 18px;border-radius:15px;border:0;background:linear-gradient(135deg,#30e6a6,#8fffd7);color:#05131a;text-decoration:none;text-align:center;font-weight:900;font-size:16px}
+    .safari,.chrome{display:none}.show{display:block}
+  </style>
+  <script>
+    if(window.navigator.standalone===true||window.matchMedia("(display-mode: standalone)").matches){location.replace("/");}
+  </script>
+</head>
+<body>
+  <main class="card">
+    <div class="top"><img class="icon" src="/assets/icons/educashpro-ios-180.png?v=20260921.2" alt="Ícone EduCashPro"><div><small>EDUCASHPRO</small><h1>Adicionar à Tela de Início</h1></div></div>
+    <div id="chrome" class="chrome">
+      <p>Você está no Chrome. Para instalar de forma confiável no iPhone, faça a etapa final pelo Safari.</p>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div><b>Toque no Compartilhar ⬆️ do Chrome</b><span>Use o ícone à direita da barra de endereço.</span></div></div>
+        <div class="step"><span class="n">2</span><div><b>Toque em “Abrir no Safari”</b><span>Esta mesma página será aberta no Safari.</span></div></div>
+        <div class="step"><span class="n">3</span><div><b>No Safari: Compartilhar → Adicionar à Tela de Início</b><span>Mantenha “Abrir como app web” ativado e toque em “Adicionar”.</span></div></div>
+      </div>
+    </div>
+    <div id="safari" class="safari">
+      <p>Você está no Safari. Agora a instalação pode ser concluída diretamente.</p>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><div><b>Toque em Compartilhar ⬆️</b><span>Use o botão do próprio Safari.</span></div></div>
+        <div class="step"><span class="n">2</span><div><b>Escolha “Adicionar à Tela de Início”</b><span>Se necessário, role a lista de ações.</span></div></div>
+        <div class="step"><span class="n">3</span><div><b>Ative “Abrir como app web”</b><span>Depois toque em “Adicionar”.</span></div></div>
+      </div>
+    </div>
+    <p class="note">O ícone acima é o mesmo que deverá aparecer na Tela de Início. Se ele não aparecer nesta página, atualize antes de instalar.</p>
+    <a class="button" href="/">Voltar ao EduCashPro</a>
+  </main>
+  <script>
+    (function(){
+      var ua=navigator.userAgent||"";
+      var chrome=/CriOS/i.test(ua);
+      var safari=/Safari/i.test(ua)&&!chrome;
+      document.getElementById(chrome?"chrome":"safari").classList.add("show");
+    })();
+  </script>
+</body>
+</html>

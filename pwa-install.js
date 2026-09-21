@@ -67,7 +67,7 @@
     layer.className="educashPwaLayer";
     layer.innerHTML=`<section class="educashPwaCard" role="dialog" aria-modal="true" aria-labelledby="educashPwaTitle">
       <button class="educashPwaX" type="button" aria-label="${c.close}">✕</button>
-      <div class="educashPwaTop"><img class="educashPwaIcon" src="./assets/icons/educashpro-192.png" alt=""><h2 id="educashPwaTitle">${title}</h2></div>
+      <div class="educashPwaTop"><img class="educashPwaIcon" src="/assets/icons/educashpro-ios-180.png?v=20260921.2" alt="EduCashPro"><h2 id="educashPwaTitle">${title}</h2></div>
       <p>${body}</p>
       ${hint?`<p class="educashPwaHint">${hint}</p>`:""}
       <div class="educashPwaActions">
@@ -114,7 +114,10 @@
     const c=copy();
     if(isInstalled()){toast(c.installed);return}
     if(deferredPrompt){await promptInstall();return}
-    if(isIOS()){showIOSInstructions();return}
+    if(isIOS()){
+      location.assign("/install.html");
+      return;
+    }
     modal({title:c.manualTitle,body:c.manualBody});
   }
 
