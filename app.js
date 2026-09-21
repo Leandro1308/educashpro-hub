@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 50785)
-Total output lines: 2030
-
 (function () {
   const tg = window.Telegram?.WebApp;
   const content = document.getElementById("content");
@@ -718,11 +715,11 @@ Total output lines: 2030
       ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
     }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
     const gamesLabels = {
-      pt: ["Jogos e desafios", "Jogue e crie campeonatos"],
-      en: ["Games and challenges", "Play and create tournaments"],
-      es: ["Juegos y desafíos", "Juega y crea torneos"],
-      ru: ["Игры и задания", "Играйте и создавайте турниры"],
-    }[state.language] || ["Jogos e desafios", "Jogue e crie campeonatos"];
+      pt: ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"],
+      en: ["Games and challenges", "Play, create tournaments and organize raffles"],
+      es: ["Juegos y desafíos", "Juega, crea torneos y organiza sorteos"],
+      ru: ["Игры и задания", "Играйте, создавайте турниры и розыгрыши"],
+    }[state.language] || ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"];
     const activeCards = `
       ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1])}
       ${quickCard("learn", "🎓", t("continueLearning"), t("coursesSub"))}
@@ -957,7 +954,48 @@ Total output lines: 2030
     rememberRoute("learn");
     updateNav();
     syncExternalSession();
-    if (!state.cours…785 tokens truncated…teNav();
+    if (!state.courseCatalog.length) await loadCourseCatalog();
+    const menu = academyMenuCopy();
+    const helpCopy = {
+      pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, serviços, agenda, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
+      en:["How to use EduCashPro","Quick guides for profile, page, services, schedule, card, projects and subscription.","Open Help Center","Learning paths"],
+      es:["Cómo usar EduCashPro","Guías rápidas para perfil, página, servicios, agenda, tarjeta, proyectos y suscripción.","Abrir Central de Ayuda","Rutas de aprendizaje"],
+      ru:["Как пользоваться EduCashPro","Краткие инструкции по профилю, странице, услугам, расписанию, проектам и подписке.","Открыть Центр помощи","Учебные направления"]
+    }[state.language] || ["Como usar o EduCashPro","Guias rápidos para configurar e utilizar os recursos.","Abrir Central de Ajuda","Trilhas de aprendizagem"];
+    content.innerHTML = `
+      <section class="courseHero academyMainHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
+      <button id="openHelpCenter" class="academyHelpCard"><span>🧭</span><div><b>${escapeHtml(helpCopy[0])}</b><small>${escapeHtml(helpCopy[1])}</small><em>${escapeHtml(helpCopy[2])} →</em></div></button>
+      <div class="sectionHead"><div><h2>${escapeHtml(helpCopy[3])}</h2><p>${escapeHtml(menu.chooseSub)}</p></div></div>
+      <section class="quickGrid academyGrid academyPathGrid">
+        ${menu.categories.map(([id, icon, title, description]) => `<button class="quickCard academyCategoryCard" data-academy-category="${escapeHtml(id)}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></button>`).join("")}
+      </section>`;
+    document.getElementById("openHelpCenter").onclick = () => window.EduCashProHelp?.render?.();
+    content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
+      if (button.dataset.academyCategory === "tools") return renderTools();
+      if (button.dataset.academyCategory === "technical_analysis") return void openMarkets();
+      return openAcademyCategory(button.dataset.academyCategory);
+    });
+  }
+
+  async function openMarkets() {
+    syncExternalSession();
+    try {
+      const access = await window.EduCashProAccess?.refresh?.();
+      if (access?.known === true) {
+        const active = access.active === true;
+        state.profile = normalizeProfile({
+          ...(state.profile || {}),
+          active,
+          isActive: active,
+          activeUntil: access.activeUntil || state.profile?.activeUntil || null,
+        }, state.profile);
+        const currentSession = window.__EDUCASHPRO_SESSION__ || {};
+        window.__EDUCASHPRO_SESSION__ = { ...currentSession, profile: state.profile };
+      }
+    } catch {}
+    state.view = "learn";
+    rememberRoute("learn", "technical_analysis");
+    updateNav();
     await window.EduCashProResources?.loadMarkets?.();
     const active = window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true;
     return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
