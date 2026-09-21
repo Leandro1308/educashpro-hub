@@ -3,7 +3,7 @@
   let deferredPrompt=null;
 
   const COPY={
-    pt:{title:"Tenha o EduCashPro no seu celular",subtitle:"Acesse mais rápido, como um aplicativo, direto pela tela inicial.",install:"Adicionar à tela inicial",close:"Agora não",installed:"O EduCashPro já está na sua tela inicial.",iosTitle:"Adicionar no iPhone ou iPad",iosBody:"No navegador, toque em Compartilhar e escolha “Adicionar à Tela de Início”. Depois confirme em “Adicionar”.",iosHint:"Se essa opção não aparecer, abra o EduCashPro no Safari e repita o processo.",manualTitle:"Adicionar o EduCashPro",manualBody:"Abra o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.",success:"EduCashPro instalado com sucesso."},
+    pt:{title:"Tenha o EduCashPro no seu celular",subtitle:"Acesse mais rápido, como um aplicativo, direto pela tela inicial.",install:"Adicionar à tela inicial",share:"Abrir Compartilhar",close:"Agora não",installed:"O EduCashPro já está na sua tela inicial.",iosTitle:"Adicionar no iPhone ou iPad",iosBody:"Use o botão Compartilhar do navegador e escolha “Adicionar à Tela de Início”.",iosHint:"Se a opção não aparecer, veja as instruções específicas abaixo.",safariBody:"Safari: toque em Compartilhar ⬆️ (ou Menu da Página → Compartilhar), role até “Adicionar à Tela de Início”, ative “Abrir como App da Web” e toque em “Adicionar”.",safariHint:"Se “Adicionar à Tela de Início” não aparecer, role até o fim da lista, toque em “Editar Ações” e habilite essa opção.",chromeBody:"Chrome: toque no ícone Compartilhar ⬆️ à direita da barra de endereço, role a lista e toque em “Adicionar à tela inicial”. Depois toque em “Adicionar”.",chromeHint:"Se o menu aberto pelo botão abaixo não mostrar essa opção, use o ícone Compartilhar do próprio Chrome, ao lado da barra de endereço.",manualTitle:"Adicionar o EduCashPro",manualBody:"Abra o menu do navegador e escolha “Instalar app” ou “Adicionar à tela inicial”.",success:"EduCashPro instalado com sucesso."},
     en:{title:"Keep EduCashPro on your phone",subtitle:"Open it faster, like an app, directly from your Home Screen.",install:"Add to Home Screen",close:"Not now",installed:"EduCashPro is already on your Home Screen.",iosTitle:"Add on iPhone or iPad",iosBody:"In your browser, tap Share and choose “Add to Home Screen”. Then confirm by tapping “Add”.",iosHint:"If you do not see that option, open EduCashPro in Safari and try again.",manualTitle:"Add EduCashPro",manualBody:"Open your browser menu and choose “Install app” or “Add to Home Screen”.",success:"EduCashPro installed successfully."},
     es:{title:"Ten EduCashPro en tu celular",subtitle:"Accede más rápido, como una app, directamente desde la pantalla de inicio.",install:"Añadir a la pantalla de inicio",close:"Ahora no",installed:"EduCashPro ya está en tu pantalla de inicio.",iosTitle:"Añadir en iPhone o iPad",iosBody:"En el navegador, toca Compartir y elige “Añadir a pantalla de inicio”. Después confirma en “Añadir”.",iosHint:"Si no aparece esa opción, abre EduCashPro en Safari e inténtalo de nuevo.",manualTitle:"Añadir EduCashPro",manualBody:"Abre el menú del navegador y elige “Instalar app” o “Añadir a la pantalla de inicio”.",success:"EduCashPro se instaló correctamente."},
     ru:{title:"Добавьте EduCashPro на телефон",subtitle:"Открывайте сервис быстрее — как приложение с главного экрана.",install:"Добавить на главный экран",close:"Не сейчас",installed:"EduCashPro уже добавлен на главный экран.",iosTitle:"Добавить на iPhone или iPad",iosBody:"В браузере нажмите «Поделиться» и выберите «На экран Домой», затем подтвердите добавление.",iosHint:"Если пункта нет, откройте EduCashPro в Safari и повторите.",manualTitle:"Добавить EduCashPro",manualBody:"Откройте меню браузера и выберите «Установить приложение» или «Добавить на главный экран».",success:"EduCashPro успешно установлен."}
@@ -24,6 +24,14 @@
   function isIOS(){
     return /iphone|ipad|ipod/i.test(navigator.userAgent)||
       (navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+  }
+  function iosBrowser(){
+    const ua=String(navigator.userAgent||"");
+    if(/CriOS/i.test(ua))return "chrome";
+    if(/FxiOS/i.test(ua))return "firefox";
+    if(/EdgiOS/i.test(ua))return "edge";
+    if(/Safari/i.test(ua))return "safari";
+    return "other";
   }
   function toast(message){
     const el=document.getElementById("toast");
@@ -51,7 +59,7 @@
     `;
     document.head.appendChild(style);
   }
-  function modal({title,body,hint,primary=false}){
+  function modal({title,body,hint,primary=false,sharePrimary=false}){
     ensureStyles();
     document.querySelector(".educashPwaLayer")?.remove();
     const c=copy();
@@ -64,6 +72,7 @@
       ${hint?`<p class="educashPwaHint">${hint}</p>`:""}
       <div class="educashPwaActions">
         ${primary?`<button class="educashPwaPrimary" type="button" data-pwa-primary>${c.install}</button>`:""}
+        ${sharePrimary?`<button class="educashPwaPrimary" type="button" data-pwa-share>${c.share||c.install}</button>`:""}
         <button class="educashPwaSecondary" type="button" data-pwa-close>${c.close}</button>
       </div>
     </section>`;
@@ -73,6 +82,31 @@
     layer.querySelector("[data-pwa-close]").onclick=close;
     layer.onclick=e=>{if(e.target===layer)close()};
     if(primary)layer.querySelector("[data-pwa-primary]").onclick=async()=>{close();await promptInstall()};
+    if(sharePrimary)layer.querySelector("[data-pwa-share]").onclick=async()=>{
+      try{
+        if(navigator.share){
+          await navigator.share({title:"EduCashPro",url:location.origin+location.pathname});
+          return;
+        }
+      }catch(error){
+        if(error?.name==="AbortError")return;
+      }
+      close();
+      showIOSInstructions();
+    };
+  }
+  function showIOSInstructions(){
+    const c=copy();
+    const browser=iosBrowser();
+    if(browser==="chrome"){
+      modal({title:c.iosTitle,body:c.chromeBody||c.iosBody,hint:c.chromeHint||c.iosHint,sharePrimary:true});
+      return;
+    }
+    if(browser==="safari"){
+      modal({title:c.iosTitle,body:c.safariBody||c.iosBody,hint:c.safariHint||c.iosHint,sharePrimary:true});
+      return;
+    }
+    modal({title:c.iosTitle,body:c.iosBody,hint:c.iosHint,sharePrimary:true});
   }
   async function promptInstall(){
     const c=copy();
@@ -84,14 +118,14 @@
       try{await prompt.userChoice}catch(_){}
       return;
     }
-    if(isIOS()){modal({title:c.iosTitle,body:c.iosBody,hint:c.iosHint});return}
+    if(isIOS()){showIOSInstructions();return}
     modal({title:c.manualTitle,body:c.manualBody});
   }
   async function install(){
     const c=copy();
     if(isInstalled()){toast(c.installed);return}
     if(deferredPrompt){await promptInstall();return}
-    if(isIOS()){modal({title:c.iosTitle,body:c.iosBody,hint:c.iosHint});return}
+    if(isIOS()){showIOSInstructions();return}
     modal({title:c.manualTitle,body:c.manualBody});
   }
 
