@@ -714,15 +714,25 @@
       es: ["Perfil Profesional", "Página, servicios, agenda y tarjeta digital"],
       ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
     }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
+    const gamesLabels = {
+      pt: ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"],
+      en: ["Games and challenges", "Play, create tournaments and organize raffles"],
+      es: ["Juegos y desafíos", "Juega, crea torneos y organiza sorteos"],
+      ru: ["Игры и задания", "Играйте, создавайте турниры и розыгрыши"],
+    }[state.language] || ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"];
     const activeCards = `
       ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1])}
       ${quickCard("learn", "🎓", t("continueLearning"), t("coursesSub"))}
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
       ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
+      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1])}
       ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}`;
     const inactiveCards = `
       ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
+      ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
       ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
+      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1])}
+      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
       ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}`;
     content.innerHTML = `
@@ -744,7 +754,7 @@
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
       else if (target === "professional") window.EduCashProProfessional?.render?.();
-      else if (target === "tools") renderTools(); else if (target === "agenda") openAgenda(); else if (target === "support") location.assign("./support.html"); else setView(target);
+      else if (target === "tools") renderTools(); else if (target === "games") { window.EduCashProResources?.loadGames?.().then(() => window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language })).catch(handleError); } else if (target === "agenda") openAgenda(); else if (target === "support") location.assign("./support.html"); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
