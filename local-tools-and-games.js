@@ -125,6 +125,7 @@
   function gameText(value) { return value?.[language()] || value?.pt || value || ""; }
 
   async function renderGames(category = "") {
+    window.EduCashProApp?.rememberRoute?.("tools", "games");
     await window.EduCashProResources?.loadGames?.();
     if (window.EduCashProMentalGames?.renderCatalog) {
       return window.EduCashProMentalGames.renderCatalog({ back: renderToolsHub, lang: language() });
@@ -215,6 +216,7 @@
   }
 
   function renderToolsHub() {
+    window.EduCashProApp?.rememberRoute?.("tools");
     const active = session?.profile?.active === true;
     content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid">${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
     const gamesButton = document.createElement("button");

@@ -601,14 +601,17 @@
   }
 
   const LAST_ROUTE_KEY = "educashpro:last-route:v1";
-  const RESTORABLE_VIEWS = new Set(["home", "learn", "explore", "benefits", "area", "tools", "course"]);
+  const RESTORABLE_VIEWS = new Set(["home", "learn", "explore", "benefits", "area", "tools", "course", "presentation"]);
+  let currentRouteDetail = "";
+  let routeScrollTimer = null;
 
   function readRememberedRoute() {
     try {
       const route = JSON.parse(localStorage.getItem(LAST_ROUTE_KEY) || "null");
       const view = String(route?.view || "");
       const detail = String(route?.detail || "").slice(0, 160);
-      return RESTORABLE_VIEWS.has(view) ? { view, detail } : null;
+      const scrollY = Math.max(0, Number(route?.scrollY || 0) || 0);
+      return RESTORABLE_VIEWS.has(view) ? { view, detail, scrollY } : null;
     } catch {
       return null;
     }
@@ -616,8 +619,9 @@
 
   function rememberRoute(view, detail = "") {
     try {
+      currentRouteDetail = String(detail || "").slice(0, 160);
       if (RESTORABLE_VIEWS.has(view)) {
-        localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ view, detail: String(detail || "").slice(0, 160) }));
+        localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ view, detail: currentRouteDetail, scrollY: 0 }));
       }
       const url = new URL(window.location.href);
       if (view && view !== "home") url.searchParams.set("view", view);
@@ -632,33 +636,72 @@
     } catch {}
   }
 
+  function rememberCurrentScroll() {
+    if (!RESTORABLE_VIEWS.has(state.view)) return;
+    window.clearTimeout(routeScrollTimer);
+    routeScrollTimer = window.setTimeout(() => {
+      try {
+        localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({
+          view: state.view,
+          detail: currentRouteDetail,
+          scrollY: Math.max(0, Math.round(window.scrollY || 0)),
+        }));
+      } catch {}
+    }, 180);
+  }
+
+  function restoreRememberedScroll(route) {
+    const y = Math.max(0, Number(route?.scrollY || 0) || 0);
+    if (!y) return;
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.scrollTo({ top: y, behavior: "auto" })));
+  }
+
   async function restoreRoute(route) {
     if (!route || !RESTORABLE_VIEWS.has(route.view)) return false;
     if (route.view === "course" && route.detail) {
       await openCourse(route.detail);
+      restoreRememberedScroll(route);
       return true;
     }
     if (route.view === "learn" && route.detail === "technical_analysis") {
       await openMarkets();
+      restoreRememberedScroll(route);
       return true;
     }
     if (route.view === "learn" && ["network_marketing", "financial_education", "telegram"].includes(route.detail)) {
       await openAcademyCategory(route.detail);
+      restoreRememberedScroll(route);
       return true;
     }
     if (route.view === "benefits" && route.detail === "exclusive-benefits") {
       await renderExclusiveBenefits();
+      restoreRememberedScroll(route);
       return true;
     }
     if (route.view === "benefits" && route.detail === "partner-stores") {
       await renderPartnerStores();
+      restoreRememberedScroll(route);
+      return true;
+    }
+    if (route.view === "presentation") {
+      renderPresentation();
+      restoreRememberedScroll(route);
+      return true;
+    }
+    if (route.view === "tools" && route.detail === "games") {
+      renderTools();
+      await window.EduCashProResources?.loadGames?.();
+      window.EduCashProMentalGames?.renderCatalog?.({ back: window.EduCashProLocal?.renderToolsHub, lang: state.language });
+      restoreRememberedScroll(route);
       return true;
     }
     if (route.view === "tools") {
       renderTools();
+      restoreRememberedScroll(route);
       return true;
     }
     await Promise.resolve(setView(route.view));
+    restoreRememberedScroll(route);
     return true;
   }
 
@@ -817,6 +860,7 @@
     const goals = presentationCopy("goals");
     const contractRules = currentContractRules();
     state.view = "presentation";
+    rememberRoute("presentation");
     updateNav();
     window.scrollTo({ top: 0, behavior: "smooth" });
     content.innerHTML = `
@@ -2000,10 +2044,13 @@
       else if (requestedView === "benefits" && requestedSection === "partner-stores") location.assign("./marketplace.html");
       else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
       else if (requestedView === "tools") renderTools();
+      else if (requestedView === "presentation") renderPresentation();
       else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
-      // Ao abrir pelo Telegram, a entrada deve ser sempre a Home. A última tela
-      // visitada (por exemplo, Minha área) não pode substituir a página inicial.
-      else renderHome();
+      else {
+        const rememberedRoute = readRememberedRoute();
+        if (rememberedRoute) await restoreRoute(rememberedRoute);
+        else renderHome();
+      }
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();
     } catch (error) {
@@ -2020,11 +2067,10 @@
     void openAcademyCategory(category);
   }, true);
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") checkForUpdates();
-  });
-  window.addEventListener("focus", checkForUpdates);
+  // Atualizações são verificadas na inicialização, sem trocar a tela atual
+  // quando o usuário volta ao app, muda de aba ou desbloqueia o aparelho.
+  window.addEventListener("scroll", rememberCurrentScroll, { passive: true });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory, rememberRoute };
 })();
