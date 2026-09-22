@@ -393,6 +393,7 @@
       .accountField{width:100%;box-sizing:border-box;min-height:44px;padding:0 12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#081827;color:#fff}
       .accountLangGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.accountLangGrid button{min-height:45px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:#12243b;color:#fff;font-weight:800;cursor:pointer}
       .accountNote{color:#9db0c6;line-height:1.45;font-size:13px}.accountStatus{min-height:18px;margin-top:8px;color:#30e6a6;font-size:13px}
+      .accountIconPreview{width:132px;height:132px;margin:14px auto;border-radius:28px;overflow:hidden;background:#081827;border:1px solid rgba(255,255,255,.1);display:grid;place-items:center}.accountIconPreview img{width:100%;height:100%;object-fit:cover}.accountFile{padding:10px;height:auto}.accountDanger{width:100%;min-height:44px;margin-top:8px;border:1px solid rgba(255,102,120,.35);border-radius:13px;background:rgba(255,102,120,.08);color:#ffb1bc;font-weight:800;cursor:pointer}
       .accountSwitchRow{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:12px;border-radius:13px;background:#081827}.accountSwitchRow b{display:block}.accountSwitchRow small{display:block;color:#9db0c6;margin-top:4px;line-height:1.35}
       @media(max-width:430px){.accountCenterGrid{grid-template-columns:1fr 1fr}.accountCenterSheet{max-height:92vh;padding:16px}.accountAction{min-height:82px}}
     `;
@@ -710,6 +711,238 @@
     }
   }
 
+  function adminIconCopy() {
+    const copy = {
+      pt: {
+        title: "Ícone da Tela de Início",
+        help: "Altere a imagem usada quando o EduCashPro é adicionado à Tela de Início do celular.",
+        choose: "Escolher nova imagem",
+        save: "Salvar novo ícone",
+        reset: "Restaurar ícone padrão",
+        back: "Voltar ao Admin",
+        ready: "Imagem pronta para salvar.",
+        select: "Escolha uma imagem primeiro.",
+        saving: "Preparando e enviando o novo ícone…",
+        saved: "Novo ícone salvo. Novas instalações passarão a usar esta imagem.",
+        restored: "Ícone padrão restaurado.",
+        error: "Não foi possível salvar a imagem.",
+        note: "Em iPhones que já tenham o EduCashPro instalado, pode ser necessário remover o atalho e adicioná-lo novamente para o novo ícone aparecer."
+      },
+      en: {
+        title: "Home Screen Icon",
+        help: "Change the image used when EduCashPro is added to the phone Home Screen.",
+        choose: "Choose new image",
+        save: "Save new icon",
+        reset: "Restore default icon",
+        back: "Back to Admin",
+        ready: "Image ready to save.",
+        select: "Choose an image first.",
+        saving: "Preparing and uploading the new icon…",
+        saved: "New icon saved. New installations will use this image.",
+        restored: "Default icon restored.",
+        error: "Could not save the image.",
+        note: "On iPhones where EduCashPro is already installed, you may need to remove it and add it to the Home Screen again."
+      },
+      es: {
+        title: "Icono de la pantalla de inicio",
+        help: "Cambia la imagen usada cuando EduCashPro se añade a la pantalla de inicio del teléfono.",
+        choose: "Elegir nueva imagen",
+        save: "Guardar nuevo icono",
+        reset: "Restaurar icono predeterminado",
+        back: "Volver a Admin",
+        ready: "Imagen lista para guardar.",
+        select: "Elige una imagen primero.",
+        saving: "Preparando y subiendo el nuevo icono…",
+        saved: "Nuevo icono guardado. Las nuevas instalaciones usarán esta imagen.",
+        restored: "Icono predeterminado restaurado.",
+        error: "No fue posible guardar la imagen.",
+        note: "En iPhone donde EduCashPro ya esté instalado, puede ser necesario eliminarlo y añadirlo nuevamente."
+      },
+      ru: {
+        title: "Значок на главном экране",
+        help: "Измените изображение, которое используется при добавлении EduCashPro на главный экран.",
+        choose: "Выбрать новое изображение",
+        save: "Сохранить новый значок",
+        reset: "Вернуть стандартный значок",
+        back: "Назад в Admin",
+        ready: "Изображение готово к сохранению.",
+        select: "Сначала выберите изображение.",
+        saving: "Подготовка и загрузка нового значка…",
+        saved: "Новый значок сохранён. Новые установки будут использовать его.",
+        restored: "Стандартный значок восстановлен.",
+        error: "Не удалось сохранить изображение.",
+        note: "На iPhone, где EduCashPro уже установлен, может потребоваться удалить его и добавить на главный экран снова."
+      }
+    };
+    return copy[lang()] || copy.pt;
+  }
+
+  function imageSquareBlob(file) {
+    return new Promise((resolve, reject) => {
+      const source = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const width = image.naturalWidth || image.width;
+          const height = image.naturalHeight || image.height;
+          const side = Math.min(width, height);
+          const sx = Math.max(0, (width - side) / 2);
+          const sy = Math.max(0, (height - side) / 2);
+          const canvas = document.createElement("canvas");
+          canvas.width = 512;
+          canvas.height = 512;
+          const ctx = canvas.getContext("2d", { alpha: false });
+          if (!ctx) throw new Error("canvas_unavailable");
+          ctx.fillStyle = "#07111f";
+          ctx.fillRect(0, 0, 512, 512);
+          ctx.drawImage(image, sx, sy, side, side, 0, 0, 512, 512);
+          canvas.toBlob((blob) => {
+            URL.revokeObjectURL(source);
+            if (blob) resolve(blob);
+            else reject(new Error("image_encode_failed"));
+          }, "image/png", 0.95);
+        } catch (error) {
+          URL.revokeObjectURL(source);
+          reject(error);
+        }
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(source);
+        reject(new Error("invalid_image"));
+      };
+      image.src = source;
+    });
+  }
+
+  async function openAdminIcon() {
+    const labels = adminIconCopy();
+    const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
+    try {
+      const data = await loadOverview(true);
+      if (!data.permissions?.admin) {
+        body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
+        return;
+      }
+
+      let currentIcon = "https://go.educashpro.vip/assets/icons/educashpro-ios-180.png?v=20260921.2";
+      try {
+        const response = await fetch(`${API_BASE}/api/platform-public/branding`, { cache: "no-store" });
+        const branding = await response.json().catch(() => ({}));
+        if (branding?.appIconUrl) currentIcon = String(branding.appIconUrl);
+      } catch {}
+
+      body.innerHTML = `
+        <div class="accountPanel">
+          <h3>🖼️ ${esc(labels.title)}</h3>
+          <p class="accountNote">${esc(labels.help)}</p>
+          <div class="accountIconPreview"><img id="accountAdminIconPreview" src="${esc(currentIcon)}" alt=""></div>
+          <label class="accountNote" for="accountAdminIconFile"><b>${esc(labels.choose)}</b></label>
+          <input id="accountAdminIconFile" class="accountField accountFile" type="file" accept="image/*">
+          <button id="accountAdminIconSave" class="accountPrimary" type="button" style="margin-top:10px">${esc(labels.save)}</button>
+          <button id="accountAdminIconReset" class="accountDanger" type="button">${esc(labels.reset)}</button>
+          <button id="accountAdminIconBack" class="accountSecondary" type="button">← ${esc(labels.back)}</button>
+          <div id="accountAdminIconStatus" class="accountStatus" role="status" aria-live="polite"></div>
+          <p class="accountNote">${esc(labels.note)}</p>
+        </div>`;
+
+      const input = body.querySelector("#accountAdminIconFile");
+      const preview = body.querySelector("#accountAdminIconPreview");
+      const save = body.querySelector("#accountAdminIconSave");
+      const reset = body.querySelector("#accountAdminIconReset");
+      const status = body.querySelector("#accountAdminIconStatus");
+      let previewUrl = "";
+
+      const setBusy = (value) => {
+        if (input) input.disabled = value;
+        if (save) save.disabled = value;
+        if (reset) reset.disabled = value;
+      };
+
+      input?.addEventListener("change", () => {
+        const file = input.files?.[0];
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+          previewUrl = "";
+        }
+        if (!file) return;
+        if (!/^image\//i.test(file.type) || file.size > 20 * 1024 * 1024) {
+          input.value = "";
+          if (status) status.textContent = labels.error;
+          return;
+        }
+        previewUrl = URL.createObjectURL(file);
+        if (preview) preview.src = previewUrl;
+        if (status) status.textContent = labels.ready;
+      });
+
+      save?.addEventListener("click", async () => {
+        const file = input?.files?.[0];
+        if (!file) {
+          if (status) status.textContent = labels.select;
+          return;
+        }
+        setBusy(true);
+        if (status) status.textContent = labels.saving;
+        try {
+          const blob = await imageSquareBlob(file);
+          const sign = await api("/api/admin/branding/icon-signature");
+          const form = new FormData();
+          form.append("file", blob, "educashpro-icon.png");
+          form.append("api_key", sign.apiKey);
+          form.append("timestamp", String(sign.timestamp));
+          form.append("folder", sign.folder);
+          form.append("signature", sign.signature);
+
+          const upload = await fetch(
+            `https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`,
+            { method: "POST", body: form }
+          );
+          const media = await upload.json().catch(() => ({}));
+          if (!upload.ok || !media.secure_url || !media.public_id) {
+            throw new Error(media?.error?.message || "upload_failed");
+          }
+
+          const saved = await api("/api/admin/branding/icon", {
+            iconUrl: media.secure_url,
+            publicId: media.public_id,
+          });
+          if (preview) preview.src = saved.appIconUrl || media.secure_url;
+          if (input) input.value = "";
+          if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = "";
+          }
+          if (status) status.textContent = "✅ " + labels.saved;
+        } catch (error) {
+          if (status) status.textContent = labels.error;
+          console.error("[EduCashPro] Falha ao salvar ícone:", error);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      reset?.addEventListener("click", async () => {
+        if (!window.confirm(labels.reset + "?")) return;
+        setBusy(true);
+        try {
+          const restored = await api("/api/admin/branding/icon/reset");
+          if (preview) preview.src = restored.appIconUrl || currentIcon;
+          if (input) input.value = "";
+          if (status) status.textContent = "✅ " + labels.restored;
+        } catch (error) {
+          if (status) status.textContent = labels.error;
+          console.error("[EduCashPro] Falha ao restaurar ícone:", error);
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      body.querySelector("#accountAdminIconBack")?.addEventListener("click", () => openAdmin());
+    } catch {
+      body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
+    }
+  }
+
   async function openAdmin() {
     const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
     try {
@@ -728,9 +961,11 @@
             <div class="accountMetric"><small>${esc(t("inactiveUsers"))}</small><b>${Number(stats.inactive || 0)}</b></div>
           </div>
           <button id="accountAdminMessages" class="accountSecondary" type="button">📨 ${esc(t("userMessages"))}</button>
+          <button id="accountAdminIcon" class="accountSecondary" type="button">🖼️ ${esc(adminIconCopy().title)}</button>
           <p class="accountNote">${esc(t("readOnly"))}</p>
         </div>`;
       body.querySelector("#accountAdminMessages")?.addEventListener("click", () => page("./support.html"));
+      body.querySelector("#accountAdminIcon")?.addEventListener("click", () => openAdminIcon());
     } catch {
       body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
     }
@@ -829,6 +1064,7 @@
   window.EduCashProAccountCenter = {
     open,
     openAdmin,
+    openAdminIcon,
     openNetwork,
     openSubscription,
     openDevicePairing,
