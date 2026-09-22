@@ -67,7 +67,7 @@
     layer.className="educashPwaLayer";
     layer.innerHTML=`<section class="educashPwaCard" role="dialog" aria-modal="true" aria-labelledby="educashPwaTitle">
       <button class="educashPwaX" type="button" aria-label="${c.close}">✕</button>
-      <div class="educashPwaTop"><img class="educashPwaIcon" src="/assets/icons/educashpro-ios-180.png?v=20260921.2" alt="EduCashPro"><h2 id="educashPwaTitle">${title}</h2></div>
+      <div class="educashPwaTop"><img class="educashPwaIcon" src="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=180" alt="EduCashPro"><h2 id="educashPwaTitle">${title}</h2></div>
       <p>${body}</p>
       ${hint?`<p class="educashPwaHint">${hint}</p>`:""}
       <div class="educashPwaActions">
