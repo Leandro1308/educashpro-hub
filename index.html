@@ -9,9 +9,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="EduCashPro" />
   <link rel="manifest" href="./manifest.webmanifest?v=20260921.1" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/educashpro-192.png?v=20260921.1" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20260921.2" />
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20260921.2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=192" />
+  <link rel="apple-touch-icon" sizes="180x180" href="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=180" />
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=180" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -34,9 +34,30 @@
   <script>
     window.__EDUCASHPRO_BOOT__={startedAt:Date.now(),telegramReady:false,scriptErrors:[]};
     window.addEventListener("error",function(event){var source=event&&event.target&&event.target.src;if(!source)return;window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);console.error("[EduCashPro] Falha ao carregar recurso:",source)},true);
-    try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand();window.__EDUCASHPRO_BOOT__.telegramReady=true}var initData=String(window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.initData||"");document.documentElement.classList.add(initData?"educashproTelegram":"educashproWeb")}catch(error){document.documentElement.classList.add("educashproWeb");console.error("[EduCashPro] Falha ao sinalizar inicialização ao Telegram:",error)}
+    try{
+      var root=document.documentElement;
+      var ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+      var standalone=window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches===true||window.navigator.standalone===true;
+      if(ios)root.classList.add("educashproIOS");
+      if(standalone)root.classList.add("educashproStandalone");
+      if(window.Telegram&&window.Telegram.WebApp){
+        var webApp=window.Telegram.WebApp;
+        webApp.ready();webApp.expand();window.__EDUCASHPRO_BOOT__.telegramReady=true;
+        var syncTelegramSafeArea=function(){
+          var safeTop=Number(webApp.contentSafeAreaInset&&webApp.contentSafeAreaInset.top||webApp.safeAreaInset&&webApp.safeAreaInset.top||0);
+          if(Number.isFinite(safeTop)&&safeTop>=0)root.style.setProperty("--ecp-telegram-safe-top",safeTop+"px");
+          root.classList.toggle("educashproTelegramFullscreen",webApp.isFullscreen===true);
+        };
+        syncTelegramSafeArea();
+        try{webApp.onEvent&&webApp.onEvent("safeAreaChanged",syncTelegramSafeArea)}catch(_){}
+        try{webApp.onEvent&&webApp.onEvent("contentSafeAreaChanged",syncTelegramSafeArea)}catch(_){}
+        try{webApp.onEvent&&webApp.onEvent("fullscreenChanged",syncTelegramSafeArea)}catch(_){}
+      }
+      var initData=String(window.Telegram&&window.Telegram.WebApp&&window.Telegram.WebApp.initData||"");
+      root.classList.add(initData?"educashproTelegram":"educashproWeb");
+    }catch(error){document.documentElement.classList.add("educashproWeb");console.error("[EduCashPro] Falha ao sinalizar inicialização ao Telegram:",error)}
   </script>
-  <link rel="stylesheet" href="./style.css?v=20260921.1" />
+  <link rel="stylesheet" href="./style.css?v=20260921.2" />
   <link rel="stylesheet" href="./experience-v2.css?v=20260911.3" />
   <link rel="stylesheet" href="./growth-entry-v10.css?v=20260911.3" />
   <link rel="stylesheet" href="./flow-lite.css?v=20260911.3" />
