@@ -1,6 +1,6 @@
-/* Correção visual exclusiva do EduCash Empire dentro do Telegram Mini App.
+/* Correção visual do EduCash Empire no site e no Telegram Mini App.
    Não altera regras, estado, pontuação, progressão ou interação do jogo. */
-html.educashproTelegram .empirePage{
+.empirePage{
   width:100%!important;
   max-width:100%!important;
   min-width:0!important;
@@ -10,37 +10,37 @@ html.educashproTelegram .empirePage{
   overflow-x:clip;
 }
 
-html.educashproTelegram .empirePage .empireHero,
-html.educashproTelegram .empirePage .empireMission,
-html.educashproTelegram .empirePage .empireWorld,
-html.educashproTelegram .empirePage .empireBoardWrap,
-html.educashproTelegram .empirePage .empireTray,
-html.educashproTelegram .empirePage .empireActions{
+.empirePage .empireHero,
+.empirePage .empireMission,
+.empirePage .empireWorld,
+.empirePage .empireBoardWrap,
+.empirePage .empireTray,
+.empirePage .empireActions{
   width:100%;
   max-width:100%;
   min-width:0;
   box-sizing:border-box;
 }
 
-html.educashproTelegram .empirePage .empireLogo,
-html.educashproTelegram .empirePage .empireLogo>div,
-html.educashproTelegram .empirePage .empireProgress,
-html.educashproTelegram .empirePage .empireOverview,
-html.educashproTelegram .empirePage .empireOverview>span,
-html.educashproTelegram .empirePage .empireWorldHead,
-html.educashproTelegram .empirePage .empireAssets{
+.empirePage .empireLogo,
+.empirePage .empireLogo>div,
+.empirePage .empireProgress,
+.empirePage .empireOverview,
+.empirePage .empireOverview>span,
+.empirePage .empireWorldHead,
+.empirePage .empireAssets{
   min-width:0;
 }
 
-html.educashproTelegram .empirePage .empireOverview{
+.empirePage .empireOverview{
   grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
-html.educashproTelegram .empirePage .empireOverview>span{
+.empirePage .empireOverview>span{
   overflow:hidden;
 }
 
-html.educashproTelegram .empirePage .empireStart{
+.empirePage .empireStart{
   width:100%!important;
   max-width:100%!important;
   min-width:0!important;
@@ -48,28 +48,28 @@ html.educashproTelegram .empirePage .empireStart{
   overflow-wrap:anywhere;
 }
 
-html.educashproTelegram .empirePage .empireHero h1,
-html.educashproTelegram .empirePage .empireHero p{
+.empirePage .empireHero h1,
+.empirePage .empireHero p{
   max-width:100%;
   min-width:0;
   overflow-wrap:anywhere;
 }
 
-html.educashproTelegram .empirePage .empireAssets{
+.empirePage .empireAssets{
   width:100%;
   max-width:100%;
   overscroll-behavior-x:contain;
 }
 
 @media(max-width:430px){
-  html.educashproTelegram .empirePage{
+  .empirePage{
     padding-left:10px!important;
     padding-right:10px!important;
   }
-  html.educashproTelegram .empirePage .empireHero{
+  .empirePage .empireHero{
     padding:17px!important;
   }
-  html.educashproTelegram .empirePage .empireHero h1{
+  .empirePage .empireHero h1{
     font-size:clamp(27px,8vw,34px)!important;
     line-height:1.02;
   }
