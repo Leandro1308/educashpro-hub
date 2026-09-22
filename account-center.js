@@ -885,28 +885,22 @@
         if (status) status.textContent = labels.saving;
         try {
           const blob = await imageSquareBlob(file);
-          const sign = await api("/api/admin/branding/icon-signature");
-          const form = new FormData();
-          form.append("file", blob, "educashpro-icon.png");
-          form.append("api_key", sign.apiKey);
-          form.append("timestamp", String(sign.timestamp));
-          form.append("folder", sign.folder);
-          form.append("signature", sign.signature);
-
-          const upload = await fetch(
-            `https://api.cloudinary.com/v1_1/${encodeURIComponent(sign.cloudName)}/image/upload`,
-            { method: "POST", body: form }
-          );
-          const media = await upload.json().catch(() => ({}));
-          if (!upload.ok || !media.secure_url || !media.public_id) {
-            throw new Error(media?.error?.message || "upload_failed");
-          }
-
-          const saved = await api("/api/admin/branding/icon", {
-            iconUrl: media.secure_url,
-            publicId: media.public_id,
+          const token = session()?.token;
+          if (!token) throw new Error("session_missing");
+          const upload = await fetch(`${API_BASE}/api/admin/branding/icon-file`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "image/png",
+              Authorization: `Bearer ${token}`,
+            },
+            body: blob,
+            cache: "no-store",
           });
-          if (preview) preview.src = saved.appIconUrl || media.secure_url;
+          const saved = await upload.json().catch(() => ({}));
+          if (!upload.ok || saved?.ok !== true) {
+            throw new Error(saved?.reason || `HTTP_${upload.status}`);
+          }
+          if (preview) preview.src = `${API_BASE}${saved.appIconUrl}?v=${Date.now()}`;
           if (input) input.value = "";
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
@@ -914,7 +908,7 @@
           }
           if (status) status.textContent = "✅ " + labels.saved;
         } catch (error) {
-          if (status) status.textContent = labels.error;
+          if (status) status.textContent = labels.error + " (" + String(error?.message || error) + ")";
           console.error("[EduCashPro] Falha ao salvar ícone:", error);
         } finally {
           setBusy(false);
