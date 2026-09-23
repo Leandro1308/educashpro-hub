@@ -13,15 +13,25 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style]=await Promise.all([
+const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style,serviceWorker,pwaInstall,versionFile]=await Promise.all([
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
-  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css")
+  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
 ]);
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
 const localTools=await read("local-tools-and-games.js");
 const affiliatePage=await read("affiliate.js");
+const publishedBuild=String(JSON.parse(versionFile)?.build||"").trim();
+const assetBuild=publishedBuild.replace(/\./g,"");
+assert(publishedBuild,"Published build is missing");
+assert(app.includes(`APP_RUNTIME_BUILD = "${publishedBuild}"`),"App runtime build is not synchronized with version.json");
+assert(index.includes(`__EDUCASHPRO_PAGE_BUILD__="${publishedBuild}"`),"HTML bootstrap build is not synchronized with version.json");
+assert(loader.includes(`const VERSION="${assetBuild}"`),"Lazy asset version is not synchronized with version.json");
+const localAssetVersions=[...index.matchAll(/\.\/[^"'?]+\.(?:js|css|webmanifest)\?v=([^"'&<>\s]+)/g)].map(match=>match[1]);
+assert(localAssetVersions.length>0&&localAssetVersions.every(version=>version===assetBuild),"Index contains mixed local asset versions");
+assert(serviceWorker.includes(`BUILD="${publishedBuild}"`)&&serviceWorker.includes("client.navigate")&&serviceWorker.includes('cache:"no-store"'),"Service worker does not force fresh clients and core assets");
+assert(pwaInstall.includes('updateViaCache:"none"')&&pwaInstall.includes("registration.update()"),"PWA registration does not explicitly refresh the service worker");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
