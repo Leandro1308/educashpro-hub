@@ -414,6 +414,8 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
+  const APP_RUNTIME_BUILD = "2026.09.23.3";
+  const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -436,12 +438,22 @@
         const data = await response.json();
         const publishedBuild = String(data?.build || "").trim();
         if (!publishedBuild) return false;
-        const currentBuild = String(localStorage.getItem(APP_BUILD_KEY) || "");
         localStorage.setItem(APP_BUILD_KEY, publishedBuild);
-        if (!currentBuild || currentBuild === publishedBuild) return false;
+        if (publishedBuild === APP_RUNTIME_BUILD) {
+          sessionStorage.removeItem(APP_RELOAD_GUARD_KEY);
+          return false;
+        }
         clearPublishedContentCache();
-        window.dispatchEvent(new CustomEvent("educashpro:update-ready", { detail: { build: publishedBuild } }));
-        return false;
+        window.dispatchEvent(new CustomEvent("educashpro:update-ready", { detail: { build: publishedBuild, runtime: APP_RUNTIME_BUILD } }));
+        const guard = JSON.parse(sessionStorage.getItem(APP_RELOAD_GUARD_KEY) || "null");
+        const attempts = guard?.target === publishedBuild ? Number(guard.attempts || 0) : 0;
+        if (attempts >= 2) return false;
+        sessionStorage.setItem(APP_RELOAD_GUARD_KEY, JSON.stringify({ target: publishedBuild, attempts: attempts + 1 }));
+        const url = new URL(window.location.href);
+        url.searchParams.set("release", publishedBuild);
+        url.searchParams.set("refresh", String(attempts + 1));
+        window.location.replace(url.toString());
+        return true;
       } catch {
         return false;
       } finally {
@@ -2005,9 +2017,16 @@
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
     document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
-    bottomNav.querySelectorAll("button[data-view]").forEach((button) => {
-      button.addEventListener("click", () => navigateFromFooter(button));
-    });
+    if (bottomNav.dataset.navigationBound !== "1") {
+      bottomNav.dataset.navigationBound = "1";
+      bottomNav.addEventListener("click", (event) => {
+        const button = event.target?.closest?.("button[data-view]");
+        if (!button || !bottomNav.contains(button)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        navigateFromFooter(button);
+      }, true);
+    }
 
     if (!tg?.initData) {
       renderPublicLanding();
