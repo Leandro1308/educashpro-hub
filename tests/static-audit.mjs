@@ -62,7 +62,7 @@ for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(lan
 assert(index.includes("account-center.js"),"Web account center is not loaded");
 assert(accountCenter.includes("/api/platform-account/overview")&&accountCenter.includes("/api/platform-account/network"),"Account overview or network parity is missing");
 assert(accountCenter.includes("/api/platform-account/preferences")&&accountCenter.includes("openPreferences"),"Bot notification preferences are not available on the Web account");
-assert(accountCenter.includes('data-action="explore"')&&accountCenter.includes('data-action="benefits"')&&accountCenter.includes('data-action="documents"'),"Bot menu parity shortcuts are incomplete");
+assert(accountCenter.includes('data-action="subscription"')&&accountCenter.includes('data-action="pair-device"')&&accountCenter.includes('data-action="documents"')&&webSiteMenu.includes('action==="benefits"')&&webSiteMenu.includes('action==="explore"'),"Account and site menu parity shortcuts are incomplete");
 assert(!accountCenter.includes("/api/ton/build-tx")&&!accountCenter.includes("sendTransaction("),"Account center must not initiate subscription payments");
 for(const language of ["pt:","en:","es:","ru:"])assert(accountCenter.includes(language),`Missing account center translation: ${language}`);
 
