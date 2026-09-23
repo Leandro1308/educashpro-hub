@@ -732,16 +732,14 @@
     if (view === "area") return renderArea();
   }
 
-  let navigationBusy = false;
   function navigateFromFooter(button) {
-    if (!button || navigationBusy) return;
-    navigationBusy = true;
+    if (!button) return;
+    // A navegação inferior nunca pode ficar presa a uma requisição anterior.
+    hideGlobalLoading(true);
     try {
       Promise.resolve(setView(button.dataset.view)).catch((error) => handleError(error));
     } catch (error) {
       handleError(error);
-    } finally {
-      window.setTimeout(() => { navigationBusy = false; }, 180);
     }
   }
 
@@ -955,7 +953,7 @@
         chooseSub: "Conteúdos separados por assunto para você encontrar o que precisa.",
         categories: [
           ["network_marketing", "🤝", "Marketing, Relacionamento e Afiliados", "Produto, comunicação, indicação, profissão afiliado e desenvolvimento de rede."],
-          ["technical_analysis", "📈", "Mercados, Análise e Formação", "Gráficos e dados atuais, Price Action, cursos gratuitos, ferramentas e ambiente de prática."],
+          ["technical_analysis", "📈", "Bolsa de Valores, Análise Técnica e Price Action", "Ações e índices, gráfico avançado, resumo técnico, mapa de calor, calendário econômico, tendências, Fibonacci e curso completo de Price Action."],
           ["financial_education", "💰", "Educação Financeira e Negócios", "Renda, organização financeira, negócios digitais e construção de novas fontes de renda."],
           ["telegram", "✈️", "Telegram Profissional", "Grupos, canais, bots, segurança, crescimento e monetização responsável."],
           ["tools", "🧮", "Ferramentas", "Calculadoras, simuladores e recursos educativos."],
@@ -966,7 +964,7 @@
         chooseSub: "Content separated by topic so you can quickly find what you need.",
         categories: [
           ["network_marketing", "🤝", "Marketing, Relationships and Affiliates", "Product, communication, referrals, affiliate work and network development."],
-          ["technical_analysis", "📈", "Markets, Analysis and Training", "Current charts and data, Price Action, free courses, tools and a practice environment."],
+          ["technical_analysis", "📈", "Stocks, Technical Analysis and Price Action", "Stocks and indices, advanced charts, technical summary, heatmap, economic calendar, trends, Fibonacci and the full Price Action course."],
           ["financial_education", "💰", "Financial Education and Business", "Income, financial organization, digital business and new income sources."],
           ["telegram", "✈️", "Professional Telegram", "Groups, channels, bots, safety, growth and responsible monetization."],
           ["tools", "🧮", "Tools", "Calculators, simulators and educational resources."],
@@ -977,7 +975,7 @@
         chooseSub: "Contenidos separados por tema para encontrar rápidamente lo que necesitas.",
         categories: [
           ["network_marketing", "🤝", "Marketing, Relaciones y Afiliados", "Producto, comunicación, indicación, profesión afiliado y desarrollo de red."],
-          ["technical_analysis", "📈", "Mercados, Análisis y Formación", "Gráficos y datos actuales, Price Action, cursos gratuitos, herramientas y práctica."],
+          ["technical_analysis", "📈", "Bolsa, Análisis Técnico y Price Action", "Acciones e índices, gráfico avanzado, resumen técnico, mapa de calor, calendario económico, tendencias, Fibonacci y curso completo de Price Action."],
           ["financial_education", "💰", "Educación Financiera y Negocios", "Ingresos, organización financiera, negocios digitales y nuevas fuentes de ingresos."],
           ["telegram", "✈️", "Telegram Profesional", "Grupos, canales, bots, seguridad, crecimiento y monetización responsable."],
           ["tools", "🧮", "Herramientas", "Calculadoras, simuladores y recursos educativos."],
@@ -988,7 +986,7 @@
         chooseSub: "Материалы разделены по темам, чтобы быстро найти нужное.",
         categories: [
           ["network_marketing", "🤝", "Маркетинг, отношения и партнёрство", "Продукт, коммуникация, рекомендации, работа партнёра и развитие сети."],
-          ["technical_analysis", "📈", "Рынки, анализ и обучение", "Актуальные графики, Price Action, бесплатные курсы, инструменты и практика."],
+          ["technical_analysis", "📈", "Акции, технический анализ и Price Action", "Акции и индексы, расширенный график, техническая сводка, тепловая карта, экономический календарь, тренды, Фибоначчи и полный курс Price Action."],
           ["financial_education", "💰", "Финансовая грамотность и бизнес", "Доход, финансовая организация, цифровой бизнес и новые источники дохода."],
           ["telegram", "✈️", "Профессиональный Telegram", "Группы, каналы, боты, безопасность, рост и ответственная монетизация."],
           ["tools", "🧮", "Инструменты", "Калькуляторы, симуляторы и образовательные ресурсы."],
@@ -1415,7 +1413,10 @@
     } catch (error) { handleError(error, partnerContainer); }
   }
 
-  async function renderArea() {
+  function renderArea() {
+    state.view = "area";
+    rememberRoute("area");
+    updateNav();
     syncExternalSession();
     const p = normalizeProfile(state.profile || window.__EDUCASHPRO_SESSION__?.profile || {});
     state.profile = p;
@@ -1458,13 +1459,21 @@
     document.getElementById("reactivate")?.addEventListener("click", openSubscription);
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
     const container = document.getElementById("projectList");
+    void loadAreaProjects(container);
+  }
+
+  async function loadAreaProjects(container) {
+    if (!container) return;
     try {
       const data = state.projects || await api("/api/hub/projects", { token: state.token }, { blocking: false });
       state.projects = data;
+      if (!container.isConnected) return;
       container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${typeIcon(item.type)}</div><div><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(item.status)}</span></div></div></div><div class="cardActions">${item.url ? `<button class="secondaryButton" data-project-url="${escapeHtml(item.url)}">${escapeHtml(t("access"))}</button>` : ""}<button class="secondaryButton" data-delete-kind="${escapeHtml(item.kind || "project")}" data-delete-id="${escapeHtml(item.id)}">🗑️ ${escapeHtml(fc("remove"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noProjects"))}</div>`;
       container.querySelectorAll("[data-project-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.projectUrl));
       container.querySelectorAll("[data-delete-id]").forEach((button) => button.onclick = () => removeOwnItem(button.dataset.deleteKind, button.dataset.deleteId));
-    } catch (error) { handleError(error, container); }
+    } catch (error) {
+      if (container.isConnected) handleError(error, container);
+    }
   }
 
   function renderTools() {

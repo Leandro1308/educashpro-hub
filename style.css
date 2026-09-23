@@ -391,6 +391,8 @@ body::before {
 .bottomNav button.active { color: var(--green); }
 .bottomNav button.active span { filter: none; transform: translateY(-1px); }
 .bottomNav button[data-view="area"] span { filter: none; }
+.bottomNav button[data-view="area"] .areaHeart { color:#ff6478!important; filter:none!important; -webkit-filter:none!important; font-size:25px; line-height:1; text-shadow:0 0 10px rgba(255,100,120,.22); }
+.bottomNav button[data-view="area"].active .areaHeart { color:#ff6478!important; transform:translateY(-1px) scale(1.04); }
 .hidden { display: none !important; }
 
 .toast {
