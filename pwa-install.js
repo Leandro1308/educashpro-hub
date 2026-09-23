@@ -133,7 +133,14 @@
     window.dispatchEvent(new CustomEvent("educashpro:pwa-installed"));
   });
   if("serviceWorker" in navigator&&location.protocol==="https:"){
-    window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(error=>console.warn("[EduCashPro] Service Worker:",error)),{once:true});
+    window.addEventListener("load",async()=>{
+      try{
+        const registration=await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
+        await registration.update();
+      }catch(error){
+        console.warn("[EduCashPro] Service Worker:",error);
+      }
+    },{once:true});
   }
   window.EduCashProPWA={install,isInstalled,canPrompt:()=>Boolean(deferredPrompt)};
 })();
