@@ -9,7 +9,7 @@
   const BINANCE_24H_DATA = "https://data-api.binance.vision/api/v3/ticker/24hr";
   const DIRECTION_CACHE_MS = 45000;
   const MARKET_STATE_KEY = "educashpro:market-selection:v1";
-  const RESTRICTED = new Set(["chart", "technical", "pairs"]);
+  const RESTRICTED = new Set(["chart", "technical"]);
   const TIMEFRAMES = [
     { id: "1m", label: "1m", chart: "1", technical: "1m", market: "1m", aggregate: 1 },
     { id: "2m", label: "2m", chart: "2", technical: "2m", market: "1m", aggregate: 2 },
@@ -41,13 +41,16 @@
 
   const COPY = {
     pt: {
-      title: "Mercados, Análise e Formação",
-      intro: "Gráfico e resumo técnico com todos os períodos disponíveis, além da seleção de tendências em 1 hora.",
+      title: "Bolsa de Valores, Análise Técnica e Price Action",
+      intro: "Ações, índices, Forex, ouro e cripto em uma central de análise com gráfico, indicadores, calendário, visão de mercados e formação em Price Action.",
       tools: "Análise de mercado",
-      toolsSub: "O filtro de ativos usa 1H e oculta os laterais. No gráfico e no resumo, escolha livremente entre todos os minutos e períodos disponíveis.",
+      toolsSub: "Use as ferramentas de Bolsa e análise técnica. No gráfico e no resumo, escolha livremente o ativo e o período; as demais abas ampliam a leitura do mercado.",
       chart: "Gráfico",
       technical: "Resumo técnico",
       pairs: "Pares Binance",
+      overview: "Bolsa e índices",
+      heatmap: "Mapa de calor Forex",
+      calendar: "Calendário econômico",
       pairsTitle: "Tendências dos principais pares USDT",
       pairsHelp: "Classificação calculada no período selecionado. Toque em um par para abri-lo no gráfico e no resumo.",
       sideways: "Lateralidade",
@@ -100,10 +103,10 @@
       alignedDown: "Alinhada ↓",
       mixed: "Mista",
       lateralNote: "Filtro 1H: candle atual + alinhamento e inclinação das EMA 9/21. Laterais não aparecem.",
-      source: "Gráfico e resumo: TradingView. Seleção direcional de criptoativos: dados públicos da Binance.",
+      source: "Gráficos, resumo técnico, Bolsa, índices, mapa de calor e calendário: TradingView. Seleção direcional de criptoativos: dados públicos da Binance.",
       education: "Formação gratuita",
       educationSub: "Cursos e conteúdos selecionados pelo EduCashPro.",
-      ownCourse: "Curso EduCashPro de Price Action",
+      ownCourse: "Curso EduCashPro — Análise Técnica e Price Action",
       ownCourseText: "Estrutura, tendências, ranges, rompimentos, reversões, XAUUSD e gestão de risco.",
       openCourse: "Abrir curso",
       video: "Curso em vídeo",
@@ -123,13 +126,13 @@
       back: "Voltar à Academy"
     },
     en: {
-      title: "Markets, Analysis and Training",
-      intro: "Chart and technical summary with all available timeframes, plus one-hour trend selection.",
+      title: "Stocks, Technical Analysis and Price Action",
+      intro: "Stocks, indices, Forex, gold and crypto in one analysis center with charts, indicators, calendar, market overview and Price Action training.",
       tools: "Market analysis",
-      toolsSub: "The asset filter uses 1H and hides sideways markets. In the chart and summary, freely choose any available minute or timeframe.",
+      toolsSub: "Use the stock-market and technical-analysis tools. Choose any asset and timeframe in the chart and summary; the other tabs broaden the market view.",
       chart: "Chart",
       technical: "Technical summary",
-      pairs: "Binance pairs", pairsTitle: "Trends for leading USDT pairs", pairsHelp: "Classification calculated for the selected timeframe. Tap a pair to open it in the chart and summary.", sideways: "Sideways", noSideways: "No sideways pair in this timeframe.", pairsLoading: "Loading leading pairs by volume and calculating trends…",
+      pairs: "Binance pairs", overview: "Stocks & indices", heatmap: "Forex heatmap", calendar: "Economic calendar", pairsTitle: "Trends for leading USDT pairs", pairsHelp: "Classification calculated for the selected timeframe. Tap a pair to open it in the chart and summary.", sideways: "Sideways", noSideways: "No sideways pair in this timeframe.", pairsLoading: "Loading leading pairs by volume and calculating trends…",
       timeframe: "Analysis timeframe",
       daily: "Daily",
       searchAsset: "Open any asset",
@@ -164,10 +167,10 @@
       alignedDown: "Aligned ↓",
       mixed: "Mixed",
       lateralNote: "1H filter: current candle + EMA 9/21 alignment and slope. Sideways assets are hidden.",
-      source: "Chart and summary: TradingView. Crypto directional selection: Binance public data.",
+      source: "Charts, technical summary, stocks, indices, heatmap and calendar: TradingView. Crypto directional selection: Binance public data.",
       education: "Free training",
       educationSub: "Courses and content selected by EduCashPro.",
-      ownCourse: "EduCashPro Price Action Course",
+      ownCourse: "EduCashPro — Technical Analysis and Price Action",
       ownCourseText: "Structure, trends, ranges, breakouts, reversals, XAUUSD and risk management.",
       openCourse: "Open course",
       video: "Video course",
@@ -187,13 +190,13 @@
       back: "Back to Academy"
     },
     es: {
-      title: "Mercados, Análisis y Formación",
-      intro: "Gráfico y resumen técnico con todos los períodos disponibles, además de selección de tendencias en una hora.",
+      title: "Bolsa, Análisis Técnico y Price Action",
+      intro: "Acciones, índices, Forex, oro y cripto en un centro de análisis con gráficos, indicadores, calendario, visión de mercados y formación en Price Action.",
       tools: "Análisis de mercado",
-      toolsSub: "El filtro de activos usa 1H y oculta los laterales. En el gráfico y el resumen, elige libremente todos los minutos y períodos disponibles.",
+      toolsSub: "Usa las herramientas de Bolsa y análisis técnico. En el gráfico y el resumen, elige libremente el activo y el período; las demás pestañas amplían la lectura del mercado.",
       chart: "Gráfico",
       technical: "Resumen técnico",
-      pairs: "Pares Binance", pairsTitle: "Tendencias de los principales pares USDT", pairsHelp: "Clasificación calculada en el período seleccionado. Toca un par para abrirlo en el gráfico y el resumen.", sideways: "Lateralidad", noSideways: "No hay pares laterales en este período.", pairsLoading: "Cargando los principales pares por volumen y calculando tendencias…",
+      pairs: "Pares Binance", overview: "Bolsa e índices", heatmap: "Mapa de calor Forex", calendar: "Calendario económico", pairsTitle: "Tendencias de los principales pares USDT", pairsHelp: "Clasificación calculada en el período seleccionado. Toca un par para abrirlo en el gráfico y el resumen.", sideways: "Lateralidad", noSideways: "No hay pares laterales en este período.", pairsLoading: "Cargando los principales pares por volumen y calculando tendencias…",
       timeframe: "Período del análisis",
       daily: "Diario",
       searchAsset: "Abrir cualquier activo",
@@ -228,10 +231,10 @@
       alignedDown: "Alineada ↓",
       mixed: "Mixta",
       lateralNote: "Filtro 1H: vela actual + alineación e inclinación de EMA 9/21. Los laterales se ocultan.",
-      source: "Gráfico y resumen: TradingView. Selección direccional de criptoactivos: datos públicos de Binance.",
+      source: "Gráficos, resumen técnico, Bolsa, índices, mapa de calor y calendario: TradingView. Selección direccional de criptoactivos: datos públicos de Binance.",
       education: "Formación gratuita",
       educationSub: "Cursos y contenidos seleccionados por EduCashPro.",
-      ownCourse: "Curso EduCashPro de Price Action",
+      ownCourse: "Curso EduCashPro — Análisis Técnico y Price Action",
       ownCourseText: "Estructura, tendencias, rangos, rompimientos, reversiones, XAUUSD y gestión de riesgo.",
       openCourse: "Abrir curso",
       video: "Curso en video",
@@ -251,13 +254,13 @@
       back: "Volver a Academy"
     },
     ru: {
-      title: "Рынки, анализ и обучение",
-      intro: "График и техническая сводка со всеми доступными периодами, а также часовой отбор трендов.",
+      title: "Акции, технический анализ и Price Action",
+      intro: "Акции, индексы, Forex, золото и крипто в одном центре анализа с графиками, индикаторами, календарём, обзором рынков и обучением Price Action.",
       tools: "Анализ рынка",
-      toolsSub: "Фильтр активов использует 1H и скрывает боковой рынок. На графике и в сводке доступны все поддерживаемые минуты и периоды.",
+      toolsSub: "Используйте инструменты фондового рынка и технического анализа. На графике и в сводке можно выбрать актив и период; остальные вкладки расширяют обзор рынка.",
       chart: "График",
       technical: "Техническая сводка",
-      pairs: "Пары Binance", pairsTitle: "Тренды ведущих пар USDT", pairsHelp: "Классификация рассчитана для выбранного периода. Нажмите пару, чтобы открыть её на графике и в сводке.", sideways: "Боковой рынок", noSideways: "На этом периоде боковых пар нет.", pairsLoading: "Загрузка ведущих пар по объёму и расчёт трендов…",
+      pairs: "Пары Binance", overview: "Акции и индексы", heatmap: "Тепловая карта Forex", calendar: "Экономический календарь", pairsTitle: "Тренды ведущих пар USDT", pairsHelp: "Классификация рассчитана для выбранного периода. Нажмите пару, чтобы открыть её на графике и в сводке.", sideways: "Боковой рынок", noSideways: "На этом периоде боковых пар нет.", pairsLoading: "Загрузка ведущих пар по объёму и расчёт трендов…",
       timeframe: "Период анализа",
       daily: "День",
       searchAsset: "Открыть любой актив",
@@ -292,10 +295,10 @@
       alignedDown: "Вниз ↓",
       mixed: "Смешано",
       lateralNote: "Фильтр 1H: текущая свеча + расположение и наклон EMA 9/21. Боковые активы скрыты.",
-      source: "График и сводка: TradingView. Направленный отбор криптоактивов: публичные данные Binance.",
+      source: "Графики, техническая сводка, акции, индексы, тепловая карта и календарь: TradingView. Направленный отбор криптоактивов: публичные данные Binance.",
       education: "Бесплатное обучение",
       educationSub: "Курсы и материалы, отобранные EduCashPro.",
-      ownCourse: "Курс EduCashPro по Price Action",
+      ownCourse: "EduCashPro — технический анализ и Price Action",
       ownCourseText: "Структура, тренды, диапазоны, пробои, развороты, XAUUSD и управление риском.",
       openCourse: "Открыть курс",
       video: "Видеокурс",
@@ -355,6 +358,28 @@
         displayMode: "single",
         colorTheme: "dark"
       }
+    },
+    heatmap: {
+      src: "https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js",
+      height: 620,
+      config: { width: "100%", height: "100%", currencies: ["EUR", "USD", "JPY", "GBP", "CHF", "AUD", "CAD", "NZD", "CNY"], isTransparent: true, colorTheme: "dark" }
+    },
+    calendar: {
+      src: "https://s3.tradingview.com/external-embedding/embed-widget-events.js",
+      height: 560,
+      config: { colorTheme: "dark", isTransparent: true, width: "100%", height: "100%", importanceFilter: "0,1", countryFilter: "us,br,eu,gb,jp" }
+    },
+    overview: {
+      src: "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js",
+      height: 640,
+      config: {
+        colorTheme: "dark", dateRange: "1D", showChart: true, width: "100%", height: "100%", isTransparent: true, showSymbolLogo: true,
+        tabs: [
+          { title: "Índices", symbols: [{ s: "FOREXCOM:SPXUSD", d: "S&P 500" }, { s: "NASDAQ:NDX", d: "Nasdaq 100" }, { s: "TVC:DJI", d: "Dow Jones" }, { s: "BMFBOVESPA:IBOV", d: "Ibovespa" }] },
+          { title: "Ações", symbols: [{ s: "NASDAQ:AAPL", d: "Apple" }, { s: "NASDAQ:MSFT", d: "Microsoft" }, { s: "NASDAQ:NVDA", d: "NVIDIA" }, { s: "NASDAQ:AMZN", d: "Amazon" }, { s: "NASDAQ:META", d: "Meta" }] },
+          { title: "Brasil e outros", symbols: [{ s: "BMFBOVESPA:PETR4", d: "Petrobras PN" }, { s: "BMFBOVESPA:VALE3", d: "Vale ON" }, { s: "BMFBOVESPA:ITUB4", d: "Itaú PN" }, { s: "OANDA:XAUUSD", d: "Ouro" }, { s: "BITSTAMP:BTCUSD", d: "Bitcoin" }] }
+        ]
+      }
     }
   };
 
@@ -389,12 +414,12 @@
       .marketDirectionEmpty{margin:0;color:#9db0c6;font-size:11px;line-height:1.45}
       .marketInstantMeter{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.marketInstantMeter article{min-width:0;padding:9px 7px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:#071322;text-align:center}
       .marketInstantMeter small{display:block;color:#9db0c6;font-size:9px}.marketInstantMeter b{display:block;overflow:hidden;margin-top:3px;text-overflow:ellipsis;font-size:11px;white-space:nowrap}.marketInstantMeter .positive{color:#30e6a6}.marketInstantMeter .negative{color:#ff7d89}
-      .marketDirectionFoot{color:#9db0c6;font-size:10px;line-height:1.45}.marketChartFrame{height:720px;overflow:hidden;border-radius:15px}.marketTechnicalFrame{height:560px;overflow:hidden;border-radius:15px}
+      .marketDirectionFoot{color:#9db0c6;font-size:10px;line-height:1.45}.marketChartFrame{height:720px;overflow:hidden;border-radius:15px}.marketTechnicalFrame{height:560px;overflow:hidden;border-radius:15px}.marketGenericFrame{height:620px;overflow:hidden;border-radius:15px}
       .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
       .marketSymbolPicker{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0a1728}.marketSymbolPicker>strong{font-size:12px;color:#f7fbff}.marketSymbolForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.marketSymbolForm input{min-width:0;height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#f7fbff;background:#071322;font:700 13px inherit;text-transform:uppercase}.marketSymbolForm button{min-height:42px;padding:8px 14px;border:0;border-radius:10px;color:#071322;background:#30e6a6;font-size:12px;font-weight:950}.marketSymbolPicker small{color:#9db0c6;font-size:10px;line-height:1.45}
       .marketFibPanel{display:grid;gap:10px;margin:0 0 12px;padding:13px;border:1px solid rgba(255,200,92,.24);border-radius:15px;background:linear-gradient(145deg,#0a1728,#0b1421)}.marketFibHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.marketFibHead strong{color:#ffc85c;font-size:14px}.marketFibHead span{color:#9db0c6;font-size:10px}.marketFibStatus{color:#b8c8da;font-size:11px;line-height:1.5}.marketFibMetrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.marketFibMetrics article,.marketFibLevels article{padding:8px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#071322}.marketFibMetrics small,.marketFibLevels small{display:block;color:#9db0c6;font-size:9px}.marketFibMetrics b,.marketFibLevels b{display:block;margin-top:3px;color:#f7fbff;font-size:11px}.marketFibLevels{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.marketFibPanel.positive .marketFibHead strong{color:#30e6a6}.marketFibPanel.negative .marketFibHead strong{color:#ff7d89}.marketFibFoot{color:#7f93aa;font-size:9px;line-height:1.4}
       .marketPairsIntro{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0a1728}.marketPairsIntro strong{display:block;font-size:14px}.marketPairsIntro small{display:block;margin-top:5px;color:#9db0c6;font-size:10px;line-height:1.45}.marketPairsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.marketPairGroup{min-width:0;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:#0d1b2d}.marketPairGroup h3{display:flex;justify-content:space-between;gap:8px;margin:0 0 9px;font-size:12px}.marketPairGroup.up h3{color:#30e6a6}.marketPairGroup.down h3{color:#ff7d89}.marketPairGroup.sideways h3{color:#ffc85c}.marketPairList{display:grid;gap:6px}.marketPairList button{min-height:36px;padding:7px 8px;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#f7fbff;background:#071322;font-size:10px;font-weight:850;text-align:left}.marketPairList button small{float:right;color:#9db0c6}.marketPairEmpty{color:#9db0c6;font-size:10px;line-height:1.4}
-      .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame{height:calc(100dvh - 190px);min-height:430px}
+      .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame,.marketAnalysisSection.expanded .marketGenericFrame{height:calc(100dvh - 190px);min-height:430px}
       @media(max-width:560px){.marketDirectionColumns,.marketPairsGrid{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
     `;
     document.head.appendChild(style);
@@ -578,6 +603,32 @@
     script.onerror = () => {
       frame.innerHTML = `<div class="marketWidgetError">${esc(copy.error)}</div>`;
     };
+    container.appendChild(script);
+    frame.appendChild(container);
+    return frame;
+  }
+
+  function genericTradingViewContainer(item) {
+    const copy = COPY[options.language] || COPY.pt;
+    const frame = document.createElement("div");
+    frame.className = "marketGenericFrame";
+    frame.style.height = `${Number(item?.height || 620)}px`;
+    const container = document.createElement("div");
+    container.className = "tradingview-widget-container";
+    container.style.height = "100%";
+    const inner = document.createElement("div");
+    inner.className = "tradingview-widget-container__widget";
+    inner.style.height = "calc(100% - 24px)";
+    container.appendChild(inner);
+    const source = document.createElement("div");
+    source.className = "marketWidgetSource";
+    source.textContent = copy.source;
+    container.appendChild(source);
+    const script = document.createElement("script");
+    script.src = item.src;
+    script.async = true;
+    script.textContent = JSON.stringify({ ...item.config, locale: LOCALE[options.language] || "en" });
+    script.onerror = () => { frame.innerHTML = `<div class="marketWidgetError">${esc(copy.error)}</div>`; };
     container.appendChild(script);
     frame.appendChild(container);
     return frame;
@@ -881,6 +932,15 @@
     loadFibonacci(host);
   }
 
+  function loadGenericWidget(kind) {
+    const host = document.getElementById("marketWidget");
+    const item = WIDGETS[kind];
+    if (!host || !item) return;
+    document.getElementById("marketExpand").hidden = false;
+    host.style.height = "auto";
+    host.replaceChildren(genericTradingViewContainer(item));
+  }
+
   function loadWidget(kind) {
     const host = document.getElementById("marketWidget");
     if (!host) return;
@@ -889,6 +949,7 @@
     if (RESTRICTED.has(kind) && !options.active) return lockedView(kind);
     if (kind === "technical") return loadTechnical();
     if (kind === "pairs") return loadPairs(false);
+    if (kind === "overview" || kind === "heatmap" || kind === "calendar") return loadGenericWidget(kind);
     return loadChart(false);
   }
 
@@ -912,7 +973,7 @@
       subscribe: args.subscribe
     };
     ensureStyles();
-    currentWidget = "chart";
+    currentWidget = options.active ? "chart" : "overview";
     selectedAsset = null;
     selectedTimeframe = "1h";
     restoreMarketState();
@@ -928,6 +989,9 @@
         <div class="marketTabs">
           <button data-market-widget="chart">${options.active ? "" : "🔒 "}${esc(copy.chart)}</button>
           <button data-market-widget="technical">${options.active ? "" : "🔒 "}${esc(copy.technical)}</button>
+          <button data-market-widget="overview">${esc(copy.overview)}</button>
+          <button data-market-widget="heatmap">${esc(copy.heatmap)}</button>
+          <button data-market-widget="calendar">${esc(copy.calendar)}</button>
           <button data-market-widget="pairs">${options.active ? "" : "🔒 "}${esc(copy.pairs)}</button>
         </div>
         <div id="marketWidget" class="marketWidget"></div>
@@ -966,7 +1030,7 @@
       options.openCourse?.("analise_tecnica_completa");
     };
 
-    loadWidget("chart");
+    loadWidget(options.active ? "chart" : "overview");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
