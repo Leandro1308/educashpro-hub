@@ -46,7 +46,7 @@ assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js")&&marketCenter.includes("embed-widget-market-overview.js"),"TradingView widgets are incomplete");
 assert(app.includes("Bolsa de Valores, Análise Técnica e Price Action")&&marketCenter.includes("Bolsa de Valores, Análise Técnica e Price Action"),"Stock market, technical analysis and Price Action entry is missing");
 assert(technicalCourse.includes('title: "Análise Técnica e Price Action"'),"Technical Analysis and Price Action course is missing");
-assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("active:state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
+assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
 assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
 assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");
 assert(financeControl.includes("editExpense")&&financeControl.includes("removeExpense")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
