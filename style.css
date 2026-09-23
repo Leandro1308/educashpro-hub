@@ -390,6 +390,7 @@ body::before {
 .bottomNav button small { display: block; font-size: 10px; margin-top: 2px; }
 .bottomNav button.active { color: var(--green); }
 .bottomNav button.active span { filter: none; transform: translateY(-1px); }
+.bottomNav button[data-view="area"] span { filter: none; }
 .hidden { display: none !important; }
 
 .toast {
