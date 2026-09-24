@@ -809,3 +809,4 @@ html.educashproIOS.educashproTelegramFullscreen .topbar{
   .areaActionCard{grid-template-columns:42px minmax(0,1fr) 16px;padding:12px}
   .areaActionIcon{width:42px;height:42px}
 }
+.areaFullAction{width:100%;margin-top:10px}
