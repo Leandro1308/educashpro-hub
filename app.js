@@ -2178,13 +2178,11 @@
     document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
     if (bottomNav.dataset.navigationBound !== "1") {
       bottomNav.dataset.navigationBound = "1";
-      bottomNav.addEventListener("click", (event) => {
-        const button = event.target?.closest?.("button[data-view]");
-        if (!button || !bottomNav.contains(button)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        navigateFromFooter(button);
+      bottomNav.querySelectorAll("button[data-view]").forEach((button) => {
+        button.onclick = (event) => {
+          event?.preventDefault?.();
+          navigateFromFooter(button);
+        };
       });
     }
 
