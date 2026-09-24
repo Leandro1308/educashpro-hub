@@ -154,7 +154,7 @@
     const toolEmoji=target.querySelector?.(".emoji")?.textContent||"";
     const insideTools=!!document.getElementById("toolsHubBack");
 
-    if(target.id==="linkPageTool"||target.id==="smartLinkTool"||target.id==="areaLinkPage"||target.id==="areaSmartLink"){
+    if(target.id==="linkPageTool"||target.id==="smartLinkTool"){
       loader=()=>resources.loadLinks?.();
       ready=()=>!!window.EduCashProLinks;
     }else if(target.id==="financeTool"){
@@ -166,7 +166,7 @@
     }else if(target.id==="openHelpCenter"){
       loader=()=>resources.loadHelp?.();
       ready=()=>!!window.EduCashProHelp;
-    }else if(target.dataset?.target==="professional"){
+    }else if(target.dataset?.target==="professional" && !target.closest?.("#content")?.querySelector?.(".areaProfileCard")){
       loader=()=>resources.loadProfessional?.();
       ready=()=>!!window.EduCashProProfessional;
     }else if(target.dataset?.academyCategory==="technical_analysis"){
