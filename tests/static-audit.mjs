@@ -17,6 +17,7 @@ const [index,app,agenda,support,links,games,professional,loader,help,courses,acc
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
   read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
 ]);
+const runtimeStability=await read("runtime-stability-v11.js");
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
