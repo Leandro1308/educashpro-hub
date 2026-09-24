@@ -18,6 +18,7 @@ const [index,app,agenda,support,links,games,professional,loader,help,courses,acc
   read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
 ]);
 const runtimeStability=await read("runtime-stability-v11.js");
+const experienceV2=await read("experience-v2.css");
 const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
@@ -143,8 +144,11 @@ assert(app.includes("content.querySelectorAll(\".presentationSubscribe\")")&&app
 assert(index.includes('class="areaHeart"')&&style.includes(".areaHeart"),"My Area heart must use a stable colored icon");
 assert(!app.includes("navigationBusy"),"Footer navigation still contains a blocking path");
 assert(app.includes('id="loadAreaProjects"')&&app.includes('void loadAreaProjects(container)')&&!app.includes('const container = document.getElementById("projectList");\n    void loadAreaProjects(container);'),"My Area must not start a network request when the footer button opens");
-assert(app.includes("event.stopImmediatePropagation();")&&app.includes("navigateFromFooter(button);"),"Footer navigation must own the tap without competing document interceptors");
+assert(app.includes('bottomNav.querySelectorAll("button[data-view]")')&&app.includes("navigateFromFooter(button);"),"Footer buttons must own their navigation directly");
 assert(!runtimeStability.includes('target.id==="areaLinkPage"')&&!runtimeStability.includes('target.id==="areaSmartLink"'),"My Area buttons must not be intercepted by the generic lazy replay");
 assert(app.includes('actionCard("areaProfessional"')&&app.includes('actionCard("editProfilePhoto"')&&app.includes('actionCard("areaLinkPage"')&&app.includes('actionCard("areaAgenda"'),"My Area must expose the complete editable profile hub");
 assert(app.includes('actionCard("areaAccountSettings"')&&app.includes('actionCard("areaLanguage"')&&app.includes('actionCard("areaPreferences"')&&app.includes('actionCard("areaNetwork"')&&app.includes('actionCard("areaSubscription"'),"My Area account controls are incomplete");
 assert(loader.includes("await loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
+
+assert(!experienceV2.includes(".bottomNav{display:none!important}"),"Production theme must never hide the primary footer navigation");
+assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&&loader.includes("Promise.allSettled"),"Games catalog must load independently from optional enhancements");
