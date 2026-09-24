@@ -57,14 +57,24 @@
   let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
+    if(window.EduCashProMentalGames?.renderCatalog) return Promise.resolve(true);
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
-      await parallelStyles([
-        "./game-polish-v3.css","./game-experience-v4.css","./extra-games-v5.css","./extra-games-fix-v6.css","./falling-blocks-v7.css","./color-lines-v8.css","./game-promo-v9.css","./educash-empire-v12.css"
+      // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
+      await Promise.allSettled([
+        style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
+        style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
+        style("./game-promo-v9.css"),style("./educash-empire-v12.css")
       ]);
-      await series([
-        "./mental-games.js","./game-suite.js","./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js","./game-promo-v9.js","./game-interaction-fix-v10.js","./educash-empire-v12.js"
-      ]);
+      await series(["./mental-games.js","./game-suite.js"]);
+      const optional=[
+        "./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js",
+        "./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js",
+        "./game-promo-v9.js","./game-interaction-fix-v10.js","./educash-empire-v12.js"
+      ];
+      for(const file of optional){
+        try{await script(file)}catch(error){console.warn("[EduCashPro] complemento de jogo ignorado:",file,error?.message||error)}
+      }
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
@@ -77,7 +87,7 @@
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadFinance(){return financePromise||(financePromise=script("./monthly-finance-control.js").catch(error=>{financePromise=null;throw error}))}
-  function loadLinks(){return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
+  function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
     return professionalPromise||(professionalPromise=(async()=>{
       await loadLinks();
@@ -87,7 +97,7 @@
       return true;
     })().catch(error=>{professionalPromise=null;throw error}));
   }
-  function loadHelp(){return helpPromise||(helpPromise=script("./help-center.js").catch(error=>{helpPromise=null;throw error}))}
+  function loadHelp(){if(window.EduCashProHelp)return Promise.resolve(true);return helpPromise||(helpPromise=script("./help-center.js").catch(error=>{helpPromise=null;throw error}))}
   function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js").catch(error=>{marketPromise=null;throw error}))}
   function loadQr(){return qrPromise||(qrPromise=script("https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",{external:true}).catch(error=>{qrPromise=null;throw error}))}
   function loadQrScanner(){return qrScannerPromise||(qrScannerPromise=script("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js",{external:true}).catch(error=>{qrScannerPromise=null;throw error}))}
