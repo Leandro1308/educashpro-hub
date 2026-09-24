@@ -510,6 +510,7 @@
     const effectiveSession = { ...externalSession, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
     window.__EDUCASHPRO_SESSION__ = effectiveSession;
     window.EduCashProProfessional?.setSession?.(effectiveSession);
+    window.EduCashProLinks?.setSession?.(effectiveSession);
     window.EduCashProHelp?.setSession?.(effectiveSession);
     return effectiveSession;
   }
@@ -812,7 +813,7 @@
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "professional") window.EduCashProProfessional?.render?.();
+      else if (target === "professional") window.EduCashProProfessional?.render?.({ back: renderHome });
       else if (target === "tools") renderTools(); else if (target === "games") { window.EduCashProResources?.loadGames?.().then(() => window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language })).catch(handleError); } else if (target === "agenda") openAgenda(); else if (target === "support") location.assign("./support.html"); else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
@@ -1425,6 +1426,27 @@
     } catch (error) { handleError(error, partnerContainer); }
   }
 
+  async function openAreaLinks(kind = "page") {
+    try {
+      await window.EduCashProResources?.loadLinks?.();
+      const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
+      window.EduCashProLinks?.setSession?.(effectiveSession);
+      const action = kind === "short" ? window.EduCashProLinks?.renderShortener : window.EduCashProLinks?.renderPageEditor;
+      if (typeof action !== "function") throw new Error("links_unavailable");
+      action({ back: renderArea });
+    } catch (error) { handleError(error); }
+  }
+
+  async function openAreaProfessional() {
+    try {
+      await window.EduCashProResources?.loadProfessional?.();
+      const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
+      window.EduCashProProfessional?.setSession?.(effectiveSession);
+      if (typeof window.EduCashProProfessional?.render !== "function") throw new Error("professional_unavailable");
+      window.EduCashProProfessional.render({ back: renderArea });
+    } catch (error) { handleError(error); }
+  }
+
   function renderArea() {
     state.view = "area";
     rememberRoute("area");
@@ -1436,38 +1458,166 @@
     const profileAvatar = profileImageUrl
       ? `<img src="${escapeHtml(profileImageUrl)}" alt="${escapeHtml(p.firstName || t("member"))}">`
       : escapeHtml((p.firstName || "E").slice(0, 1).toUpperCase());
-    const areaLabels = ({
-      pt: ["Minha assinatura", "Status, validade e divulgação", "Minhas ferramentas", "Recursos gratuitos para sua presença digital", "Comunidade e suporte", "Meus cadastros", "Projetos enviados para avaliação"],
-      en: ["My subscription", "Status, validity and promotion", "My tools", "Free resources for your digital presence", "Community and support", "My submissions", "Projects submitted for review"],
-      es: ["Mi suscripción", "Estado, vigencia y divulgación", "Mis herramientas", "Recursos gratuitos para tu presencia digital", "Comunidad y soporte", "Mis registros", "Proyectos enviados para evaluación"],
-      ru: ["Моя подписка", "Статус, срок и продвижение", "Мои инструменты", "Бесплатные ресурсы для цифрового присутствия", "Сообщество и поддержка", "Мои заявки", "Проекты, отправленные на проверку"],
-    })[state.language] || ["Minha assinatura", "Status, validade e divulgação", "Minhas ferramentas", "Recursos gratuitos para sua presença digital", "Comunidade e suporte", "Meus cadastros", "Projetos enviados para avaliação"];
-    const linkPageTitle = window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links";
-    const linkPageSubtitle = window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página personalizada";
-    const smartLinkTitle = window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente";
-    const smartLinkSubtitle = window.EduCashProLinks?.text?.("shortCardSub") || "Crie um endereço curto com sua chamada";
-    content.innerHTML = `<section class="profileCard"><div class="avatar">${profileAvatar}</div><button id="editProfilePhoto" class="textButton profilePhotoEdit">📷 ${escapeHtml({pt:"Editar foto",en:"Edit photo",es:"Editar foto",ru:"Изменить фото"}[state.language] || "Editar foto")}</button><h2>${escapeHtml(p.firstName || t("member"))}</h2><p>${escapeHtml(t("member"))}</p><span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${formatDate(p.activeUntil)}` : ""}</span>${state.affiliateLink ? `<div class="affiliateBox">${escapeHtml(state.affiliateLink)}</div><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div>` : ""}<button id="membershipProof" class="wideButton" style="margin-top:10px">✅ ${escapeHtml(featureCopy("activeProof"))}</button></section><div class="sectionHead"><div><h2>${escapeHtml(t("tools"))}</h2><p>${escapeHtml(t("toolsSub"))}</p></div></div><section class="quickGrid"><button id="areaLinkPage" class="quickCard"><span class="emoji">🔗</span><strong>${escapeHtml(linkPageTitle)}</strong><small>${escapeHtml(linkPageSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button><button id="areaSmartLink" class="quickCard"><span class="emoji">✂️</span><strong>${escapeHtml(smartLinkTitle)}</strong><small>${escapeHtml(smartLinkSubtitle)}</small><span class="freeAccessBadge">${escapeHtml(window.EduCashProLinks?.text?.("free") || "ACESSO LIVRE")}</span></button></section><div class="sectionHead"><div><h2>${escapeHtml(t("officialCommunity"))}</h2><p>${escapeHtml(t("officialCommunitySub"))}</p></div></div><div class="cardList"><article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article><article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article></div><div class="sectionHead"><div><h2>${escapeHtml(t("myProjects"))}</h2></div><button id="manageProjects" class="textButton">${escapeHtml(t("openBot"))}</button></div><div id="projectList" class="cardList">${loadingCard()}</div>${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}`;
-    const profileHeading = document.createElement("div");
-    profileHeading.className = "sectionHead areaFirstHead";
-    profileHeading.innerHTML = `<div><h2>${escapeHtml(areaLabels[0])}</h2><p>${escapeHtml(areaLabels[1])}</p></div>`;
-    content.prepend(profileHeading);
-    const sectionHeads = content.querySelectorAll(".sectionHead");
-    if (sectionHeads[1]) sectionHeads[1].innerHTML = `<div><h2>${escapeHtml(areaLabels[2])}</h2><p>${escapeHtml(areaLabels[3])}</p></div>`;
-    if (sectionHeads[2]) sectionHeads[2].querySelector("h2").textContent = areaLabels[4];
-    if (sectionHeads[3]) {
-      sectionHeads[3].querySelector("h2").textContent = areaLabels[5];
-      const detail = document.createElement("p");
-      detail.textContent = areaLabels[6];
-      sectionHeads[3].querySelector("div")?.appendChild(detail);
-    }
+    const username = String(p?.username || "").replace(/^@/, "");
+    const copy = ({
+      pt: {
+        eyebrow:"MINHA ÁREA", profileTitle:"Meu perfil", profileSub:"Edite suas informações, foto e presença digital em um só lugar.",
+        professional:"Informações do perfil", professionalSub:"Nome, apresentação, contatos, serviços e cartão digital.",
+        photo:"Foto do perfil", photoSub:"Atualize ou remova sua foto principal.",
+        links:"Página de links", linksSub:"Edite nome, descrição, endereço, foto e seus links.",
+        agenda:"Agenda profissional", agendaSub:"Gerencie serviços, horários, clientes e compromissos.",
+        accountTitle:"Conta e assinatura", accountSub:"Preferências, idioma, credencial, rede e assinatura.",
+        settings:"Conta e configurações", settingsSub:"Veja os dados da conta e conexões.",
+        language:"Idioma", languageSub:"Escolha o idioma da sua experiência.",
+        preferences:"Notificações", preferencesSub:"Gerencie suas preferências de comunicação.",
+        credential:"Credencial e QR Code", credentialSub:"Consulte status, validade e comprovante.",
+        network:"Minha rede", networkSub:"Acompanhe diretos, níveis e qualificação.",
+        subscription:"Assinatura", subscriptionSub:"Consulte o status e as opções da assinatura.",
+        toolsTitle:"Divulgação e ferramentas", toolsSub:"Links e recursos para sua presença digital.",
+        smart:"Link Inteligente", smartSub:"Crie um endereço curto com sua chamada.",
+        affiliate:"Meu link de afiliado", affiliateSub:"Copie ou gere o QR Code do seu link.",
+        helpTitle:"Ajuda e comunidade", helpSub:"Suporte, documentos e canais oficiais.",
+        support:"Falar com o administrador", supportSub:"Relate problemas, falhas ou envie sugestões.",
+        documents:"Sobre e Política de Uso", documentsSub:"Consulte informações e regras do EduCashPro.",
+        submissions:"Meus cadastros", submissionsSub:"Projetos enviados para avaliação."
+      },
+      en: {
+        eyebrow:"MY AREA", profileTitle:"My profile", profileSub:"Edit your information, photo and digital presence in one place.",
+        professional:"Profile information", professionalSub:"Name, presentation, contacts, services and digital card.",
+        photo:"Profile photo", photoSub:"Update or remove your main photo.",
+        links:"Link page", linksSub:"Edit name, description, address, photo and links.",
+        agenda:"Professional schedule", agendaSub:"Manage services, hours, clients and appointments.",
+        accountTitle:"Account and subscription", accountSub:"Preferences, language, credential, network and subscription.",
+        settings:"Account settings", settingsSub:"View account data and connections.",
+        language:"Language", languageSub:"Choose your experience language.",
+        preferences:"Notifications", preferencesSub:"Manage communication preferences.",
+        credential:"Credential and QR Code", credentialSub:"Check status, validity and proof.",
+        network:"My network", networkSub:"Track directs, levels and qualification.",
+        subscription:"Subscription", subscriptionSub:"Check status and subscription options.",
+        toolsTitle:"Promotion and tools", toolsSub:"Links and resources for your digital presence.",
+        smart:"Smart Link", smartSub:"Create a short address with your call to action.",
+        affiliate:"My affiliate link", affiliateSub:"Copy or generate the QR Code for your link.",
+        helpTitle:"Help and community", helpSub:"Support, documents and official channels.",
+        support:"Contact administrator", supportSub:"Report problems, failures or send suggestions.",
+        documents:"About and Usage Policy", documentsSub:"Review EduCashPro information and rules.",
+        submissions:"My submissions", submissionsSub:"Projects submitted for review."
+      },
+      es: {
+        eyebrow:"MI ÁREA", profileTitle:"Mi perfil", profileSub:"Edita tus datos, foto y presencia digital en un solo lugar.",
+        professional:"Información del perfil", professionalSub:"Nombre, presentación, contactos, servicios y tarjeta digital.",
+        photo:"Foto del perfil", photoSub:"Actualiza o elimina tu foto principal.",
+        links:"Página de enlaces", linksSub:"Edita nombre, descripción, dirección, foto y enlaces.",
+        agenda:"Agenda profesional", agendaSub:"Administra servicios, horarios, clientes y citas.",
+        accountTitle:"Cuenta y suscripción", accountSub:"Preferencias, idioma, credencial, red y suscripción.",
+        settings:"Cuenta y configuración", settingsSub:"Consulta los datos y conexiones de la cuenta.",
+        language:"Idioma", languageSub:"Elige el idioma de tu experiencia.",
+        preferences:"Notificaciones", preferencesSub:"Administra tus preferencias de comunicación.",
+        credential:"Credencial y QR", credentialSub:"Consulta estado, validez y comprobante.",
+        network:"Mi red", networkSub:"Sigue directos, niveles y calificación.",
+        subscription:"Suscripción", subscriptionSub:"Consulta el estado y las opciones de la suscripción.",
+        toolsTitle:"Divulgación y herramientas", toolsSub:"Enlaces y recursos para tu presencia digital.",
+        smart:"Enlace Inteligente", smartSub:"Crea una dirección corta con tu llamada.",
+        affiliate:"Mi enlace de afiliado", affiliateSub:"Copia o genera el QR de tu enlace.",
+        helpTitle:"Ayuda y comunidad", helpSub:"Soporte, documentos y canales oficiales.",
+        support:"Hablar con el administrador", supportSub:"Informa problemas, fallas o envía sugerencias.",
+        documents:"Acerca de y Política de Uso", documentsSub:"Consulta información y reglas de EduCashPro.",
+        submissions:"Mis registros", submissionsSub:"Proyectos enviados para evaluación."
+      },
+      ru: {
+        eyebrow:"МОЙ РАЗДЕЛ", profileTitle:"Мой профиль", profileSub:"Редактируйте данные, фото и цифровое присутствие в одном месте.",
+        professional:"Информация профиля", professionalSub:"Имя, описание, контакты, услуги и цифровая визитка.",
+        photo:"Фото профиля", photoSub:"Обновите или удалите основное фото.",
+        links:"Страница ссылок", linksSub:"Изменяйте имя, описание, адрес, фото и ссылки.",
+        agenda:"Профессиональный календарь", agendaSub:"Управляйте услугами, временем, клиентами и записями.",
+        accountTitle:"Аккаунт и подписка", accountSub:"Настройки, язык, QR, сеть и подписка.",
+        settings:"Настройки аккаунта", settingsSub:"Данные аккаунта и подключения.",
+        language:"Язык", languageSub:"Выберите язык интерфейса.",
+        preferences:"Уведомления", preferencesSub:"Настройте параметры сообщений.",
+        credential:"Карта и QR-код", credentialSub:"Статус, срок действия и подтверждение.",
+        network:"Моя сеть", networkSub:"Прямые участники, уровни и квалификация.",
+        subscription:"Подписка", subscriptionSub:"Статус и параметры подписки.",
+        toolsTitle:"Продвижение и инструменты", toolsSub:"Ссылки и ресурсы для цифрового присутствия.",
+        smart:"Умная ссылка", smartSub:"Создайте короткий адрес с призывом.",
+        affiliate:"Моя партнёрская ссылка", affiliateSub:"Скопируйте ссылку или создайте QR-код.",
+        helpTitle:"Помощь и сообщество", helpSub:"Поддержка, документы и официальные каналы.",
+        support:"Связаться с администратором", supportSub:"Сообщить о проблеме, ошибке или предложении.",
+        documents:"О сервисе и правила", documentsSub:"Информация и правила EduCashPro.",
+        submissions:"Мои заявки", submissionsSub:"Проекты, отправленные на проверку."
+      }
+    })[state.language] || null;
+    const c = copy || {};
+    const actionCard = (id, icon, title, subtitle, extra = "") => `<button id="${id}" class="areaActionCard" type="button" ${extra}><span class="areaActionIcon">${icon}</span><span class="areaActionText"><strong>${escapeHtml(title)}</strong><small>${escapeHtml(subtitle)}</small></span><span class="areaActionArrow">›</span></button>`;
+
+    content.innerHTML = `
+      <section class="profileCard areaProfileCard">
+        <div class="areaProfileIdentity">
+          <div class="avatar">${profileAvatar}</div>
+          <div class="areaProfileIdentityText">
+            <span class="eyebrow">${escapeHtml(c.eyebrow || t("areaTitle"))}</span>
+            <h1>${escapeHtml(p.firstName || t("member"))}</h1>
+            <p>${username ? `@${escapeHtml(username)} · ` : ""}${escapeHtml(t("member"))}</p>
+          </div>
+        </div>
+        <span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${escapeHtml(formatDate(p.activeUntil))}` : ""}</span>
+      </section>
+
+      <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.profileTitle)}</h2><p>${escapeHtml(c.profileSub)}</p></div></div>
+      <section class="areaActionGrid">
+        ${actionCard("areaProfessional","👤",c.professional,c.professionalSub,'data-target="professional"')}
+        ${actionCard("editProfilePhoto","📷",c.photo,c.photoSub)}
+        ${actionCard("areaLinkPage","🔗",c.links,c.linksSub)}
+        ${actionCard("areaAgenda","📅",c.agenda,c.agendaSub)}
+      </section>
+
+      <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.accountTitle)}</h2><p>${escapeHtml(c.accountSub)}</p></div></div>
+      <section class="areaActionGrid">
+        ${actionCard("areaAccountSettings","⚙️",c.settings,c.settingsSub)}
+        ${actionCard("areaLanguage","🌐",c.language,c.languageSub)}
+        ${actionCard("areaPreferences","🔔",c.preferences,c.preferencesSub)}
+        ${actionCard("membershipProof","🔳",c.credential,c.credentialSub)}
+        ${actionCard("areaNetwork","📊",c.network,c.networkSub)}
+        ${actionCard("areaSubscription","💳",c.subscription,c.subscriptionSub)}
+      </section>
+
+      <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.toolsTitle)}</h2><p>${escapeHtml(c.toolsSub)}</p></div></div>
+      <section class="areaActionGrid">
+        ${actionCard("areaSmartLink","✂️",c.smart,c.smartSub)}
+        ${state.affiliateLink ? actionCard("areaAffiliate","🔗",c.affiliate,c.affiliateSub) : ""}
+      </section>
+      ${state.affiliateLink ? `<section class="affiliateBox areaAffiliateBox"><span>${escapeHtml(state.affiliateLink)}</span><div class="cardActions"><button id="copyLink" class="secondaryButton">${escapeHtml(t("copy"))}</button><button id="affiliateQr" class="secondaryButton">🔳 ${escapeHtml(featureCopy("affiliateQr"))}</button></div></section>` : ""}
+
+      <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.helpTitle)}</h2><p>${escapeHtml(c.helpSub)}</p></div></div>
+      <section class="areaActionGrid">
+        ${actionCard("areaSupport","💬",c.support,c.supportSub)}
+        ${actionCard("areaDocuments","📄",c.documents,c.documentsSub)}
+      </section>
+      <div class="cardList areaCommunityList">
+        <article class="itemCard"><div class="itemTop"><div class="itemIcon">📢</div><div><h3>${escapeHtml(t("officialChannel"))}</h3><p>${escapeHtml(t("officialChannelSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_CHANNEL_URL}">${escapeHtml(t("openTelegram"))}</button></div></article>
+        <article class="itemCard"><div class="itemTop"><div class="itemIcon">👥</div><div><h3>${escapeHtml(t("officialGroup"))}</h3><p>${escapeHtml(t("officialGroupSub"))}</p></div></div><div class="cardActions" style="grid-template-columns:1fr"><button class="primaryButton" data-official-url="${OFFICIAL_GROUP_URL}">${escapeHtml(t("openTelegram"))}</button></div></article>
+      </div>
+
+      <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.submissions)}</h2><p>${escapeHtml(c.submissionsSub)}</p></div><button id="manageProjects" class="textButton">${escapeHtml(fc("project"))}</button></div>
+      <div id="projectList" class="cardList">${loadingCard()}</div>
+      ${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}
+    `;
+
+    document.getElementById("areaProfessional")?.addEventListener("click", () => void openAreaProfessional());
+    document.getElementById("editProfilePhoto")?.addEventListener("click", () => renderProfilePhotoEditor(renderArea));
+    document.getElementById("areaLinkPage")?.addEventListener("click", () => void openAreaLinks("page"));
+    document.getElementById("areaAgenda")?.addEventListener("click", () => openAgenda("", "settings"));
+    document.getElementById("areaAccountSettings")?.addEventListener("click", () => window.EduCashProAccountCenter?.openSettings?.());
+    document.getElementById("areaLanguage")?.addEventListener("click", () => window.EduCashProAccountCenter?.openLanguage?.());
+    document.getElementById("areaPreferences")?.addEventListener("click", () => window.EduCashProAccountCenter?.openPreferences?.());
+    document.getElementById("membershipProof")?.addEventListener("click", () => void renderMembershipProof(renderArea));
+    document.getElementById("areaNetwork")?.addEventListener("click", () => window.EduCashProAccountCenter?.openNetwork?.());
+    document.getElementById("areaSubscription")?.addEventListener("click", () => window.EduCashProAccountCenter?.openSubscription?.());
+    document.getElementById("areaSmartLink")?.addEventListener("click", () => void openAreaLinks("short"));
+    document.getElementById("areaAffiliate")?.addEventListener("click", () => document.querySelector(".areaAffiliateBox")?.scrollIntoView({ behavior: "smooth", block: "center" }));
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
-    document.getElementById("editProfilePhoto")?.addEventListener("click", renderProfilePhotoEditor);
     document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
-    document.getElementById("membershipProof")?.addEventListener("click", () => void renderMembershipProof());
-    document.getElementById("areaLinkPage")?.addEventListener("click", () => window.EduCashProLinks?.renderPageEditor?.());
-    document.getElementById("areaSmartLink")?.addEventListener("click", () => window.EduCashProLinks?.renderShortener?.());
-    document.getElementById("manageProjects").textContent = fc("project");
-    document.getElementById("manageProjects").onclick = () => renderSubmissionForm("project");
+    document.getElementById("areaSupport")?.addEventListener("click", () => window.location.assign("./support.html"));
+    document.getElementById("areaDocuments")?.addEventListener("click", () => window.EduCashProAccountCenter?.openDocuments?.());
+    document.getElementById("manageProjects")?.addEventListener("click", () => renderSubmissionForm("project"));
     document.getElementById("reactivate")?.addEventListener("click", openSubscription);
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
     const container = document.getElementById("projectList");
