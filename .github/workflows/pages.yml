@@ -25,10 +25,21 @@ jobs:
         uses: actions/checkout@v4
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
+      - name: Preparar ambiente de produção
+        run: |
+          mkdir -p _site
+          rsync -a ./ _site/ \
+            --exclude '.git/' \
+            --exclude '.github/' \
+            --exclude 'tests/' \
+            --exclude 'preview-dual-mode/' \
+            --exclude 'README.md' \
+            --exclude 'LINKS_API_CONTRACT.md' \
+            --exclude '_site/'
       - name: Preparar arquivos
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
