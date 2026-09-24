@@ -414,7 +414,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.09.23.4";
+  const APP_RUNTIME_BUILD = "2026.09.23.5";
   const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
