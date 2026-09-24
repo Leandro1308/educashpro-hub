@@ -140,7 +140,10 @@ assert(app.includes('url.searchParams.set("start", referral ? `ref_${referral}` 
 assert(app.includes("window.location.assign(url)")&&!app.includes('window.open(url, "_blank", "noopener")'),"Website subscription must use a direct navigation that is not blocked as a popup");
 assert(app.includes("content.querySelectorAll(\".presentationSubscribe\")")&&app.includes("button.onclick = subscribeNow"),"Every presentation subscription button must be wired");
 assert(index.includes('class="areaHeart"')&&style.includes(".areaHeart"),"My Area heart must use a stable colored icon");
-assert(!app.includes("navigationBusy")&&app.includes("void loadAreaProjects(container)"),"Footer navigation or My Area still contains a blocking path");
+assert(!app.includes("navigationBusy"),"Footer navigation still contains a blocking path");
+assert(app.includes('id="loadAreaProjects"')&&app.includes('void loadAreaProjects(container)')&&!app.includes('const container = document.getElementById("projectList");\n    void loadAreaProjects(container);'),"My Area must not start a network request when the footer button opens");
+assert(app.includes("event.stopImmediatePropagation();")&&app.includes("navigateFromFooter(button);"),"Footer navigation must own the tap without competing document interceptors");
+assert(!runtimeStability.includes('target.id==="areaLinkPage"')&&!runtimeStability.includes('target.id==="areaSmartLink"'),"My Area buttons must not be intercepted by the generic lazy replay");
 assert(app.includes('actionCard("areaProfessional"')&&app.includes('actionCard("editProfilePhoto"')&&app.includes('actionCard("areaLinkPage"')&&app.includes('actionCard("areaAgenda"'),"My Area must expose the complete editable profile hub");
 assert(app.includes('actionCard("areaAccountSettings"')&&app.includes('actionCard("areaLanguage"')&&app.includes('actionCard("areaPreferences"')&&app.includes('actionCard("areaNetwork"')&&app.includes('actionCard("areaSubscription"'),"My Area account controls are incomplete");
 assert(loader.includes("await loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
