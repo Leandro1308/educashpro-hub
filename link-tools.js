@@ -7,6 +7,7 @@
   const API_BASE = DEFAULT_API_BASE;
   const originalFetch = window.fetch.bind(window);
   let session = null;
+  let returnTo = null;
 
   const COPY = {
     pt: {
@@ -67,6 +68,12 @@
   function content() { return document.getElementById("content"); }
   function active() { return session?.profile?.active === true; }
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
+  function backToOrigin() {
+    const action = returnTo;
+    returnTo = null;
+    if (typeof action === "function") return action();
+    home();
+  }
   function validUrl(value) { try { const url = new URL(String(value)); return url.protocol === "https:"; } catch { return false; } }
   function slugify(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
   function pageSlug(value, pageName) {
@@ -169,9 +176,10 @@
     modal.classList.remove("hidden");
   }
 
-  async function renderPageEditor() {
+  async function renderPageEditor(options = {}) {
+    returnTo = typeof options?.back === "function" ? options.back : null;
     content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><div class="empty">${esc(text("loading"))}</div>`;
-    document.getElementById("linkBack").onclick = home;
+    document.getElementById("linkBack").onclick = backToOrigin;
     try {
       const [data,agendaData] = await Promise.all([
         api("/api/hub/link-page", { token: session?.token }),
@@ -195,7 +203,7 @@
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
     content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${esc(text("referralTitle"))}</h2><p>${esc(text("referralText"))}</p></div></section><article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="160" inputmode="url" autocomplete="off" spellcheck="false"')}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
-    document.getElementById("linkBack").onclick = home;
+    document.getElementById("linkBack").onclick = backToOrigin;
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); };
     bindRowButtons();
     bindImagePickers();
@@ -237,9 +245,10 @@
   function bindImagePickers(root = document) { root.querySelectorAll(".imagePicker").forEach((picker) => { if (picker.dataset.bound) return; picker.dataset.bound = "1"; const input = picker.querySelector("[data-image-input]"), preview = picker.querySelector(".imagePreview"); input.onchange = () => { const file = input.files?.[0]; if (!file) return; if (!/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) { input.value = ""; return toast(text("imageError")); } input.selectedFile = file; preview.innerHTML = `<img src="${esc(URL.createObjectURL(file))}" alt="">`; }; picker.querySelector(".imageRemove").onclick = () => { input.value = ""; input.selectedFile = null; picker.dataset.imageUrl = ""; picker.dataset.imagePublicId = ""; preview.innerHTML = "<div>📷</div>"; }; }); }
   function bindRowButtons() { document.querySelectorAll(".linkRemove").forEach((button) => button.onclick = () => button.closest(".linkRow")?.remove()); bindImagePickers(document.getElementById("linkRows")); }
 
-  async function renderShortener() {
+  async function renderShortener(options = {}) {
+    returnTo = typeof options?.back === "function" ? options.back : null;
     content().innerHTML = `<button id="shortBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>✂️ ${esc(text("shortTitle"))}</h1><p>${esc(text("shortLead"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${esc(text("referralTitle"))}</h2><p>${esc(text("referralText"))}</p></div></section><article class="toolCard linkEditor">${field(text("destination"), "shortDestination", "", 'type="url" inputmode="url" placeholder="https://"')}${field(text("buttonLabel"), "shortLabel", "", 'maxlength="60"')}${responsibility()}<button id="createShort" class="wideButton">${esc(text("create"))}</button></article><section class="sectionHead"><div><h2>${esc(text("myLinks"))}</h2></div></section><div id="shortList" class="cardList"><div class="empty">${esc(text("loading"))}</div></div>`;
-    document.getElementById("shortBack").onclick = home;
+    document.getElementById("shortBack").onclick = backToOrigin;
     document.getElementById("createShort").onclick = createShort;
     loadShorts();
   }
