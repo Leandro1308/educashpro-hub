@@ -11,8 +11,8 @@
 .topbar .brandcopy strong{font-size:15px!important}
 .topbar .brandcopy span{font-size:11px!important}
 .topbar .iconButton{width:38px!important;height:38px!important}
-.bottomNav{display:none!important}
-.content{padding-bottom:32px!important}
+.bottomNav{display:grid!important}
+.content{padding-bottom:110px!important}
 
 .membershipQuickAccess{width:100%;display:flex;align-items:center;gap:13px;margin-top:12px;padding:14px;border:1px solid rgba(48,230,166,.34);border-radius:18px;color:var(--text);text-align:left;background:linear-gradient(135deg,rgba(48,230,166,.14),rgba(74,140,255,.11))}
 .membershipQuickAccess>span:first-child{display:grid;place-items:center;width:46px;height:46px;flex:0 0 46px;border-radius:14px;background:rgba(255,255,255,.07);font-size:24px}
