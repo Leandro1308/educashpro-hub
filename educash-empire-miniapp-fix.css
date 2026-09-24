@@ -74,3 +74,32 @@
     line-height:1.02;
   }
 }
+
+/* Header must participate in document scroll */
+html,
+body{
+  height:auto!important;
+  max-height:none!important;
+}
+
+#app{
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+
+.topbar{
+  position:static!important;
+  inset:auto!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:auto!important;
+  transform:none!important;
+}
+
+.content{
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
