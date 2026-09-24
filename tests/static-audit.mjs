@@ -141,3 +141,6 @@ assert(app.includes("window.location.assign(url)")&&!app.includes('window.open(u
 assert(app.includes("content.querySelectorAll(\".presentationSubscribe\")")&&app.includes("button.onclick = subscribeNow"),"Every presentation subscription button must be wired");
 assert(index.includes('class="areaHeart"')&&style.includes(".areaHeart"),"My Area heart must use a stable colored icon");
 assert(!app.includes("navigationBusy")&&app.includes("void loadAreaProjects(container)"),"Footer navigation or My Area still contains a blocking path");
+assert(app.includes('id="areaProfessional"')&&app.includes('id="editProfilePhoto"')&&app.includes('id="areaLinkPage"')&&app.includes('id="areaAgenda"'),"My Area must expose the complete editable profile hub");
+assert(app.includes('id="areaAccountSettings"')&&app.includes('id="areaLanguage"')&&app.includes('id="areaPreferences"')&&app.includes('id="areaNetwork"')&&app.includes('id="areaSubscription"'),"My Area account controls are incomplete");
+assert(loader.includes("await loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
