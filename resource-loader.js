@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260924.2";
+  const VERSION="20260924.3";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
