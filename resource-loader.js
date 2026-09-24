@@ -77,11 +77,15 @@
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadFinance(){return financePromise||(financePromise=script("./monthly-finance-control.js").catch(error=>{financePromise=null;throw error}))}
-  function loadLinks(){return linksPromise||(linksPromise=script("./link-tools.js").catch(error=>{linksPromise=null;throw error}))}
+  function loadLinks(){return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
-    return professionalPromise||(professionalPromise=script("./professional-profile.js")
-      .then(()=>{const value=currentSession();if(value)window.EduCashProProfessional?.setSession?.(value);return true})
-      .catch(error=>{professionalPromise=null;throw error}));
+    return professionalPromise||(professionalPromise=(async()=>{
+      await loadLinks();
+      await script("./professional-profile.js");
+      const value=currentSession();
+      if(value)window.EduCashProProfessional?.setSession?.(value);
+      return true;
+    })().catch(error=>{professionalPromise=null;throw error}));
   }
   function loadHelp(){return helpPromise||(helpPromise=script("./help-center.js").catch(error=>{helpPromise=null;throw error}))}
   function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js").catch(error=>{marketPromise=null;throw error}))}
