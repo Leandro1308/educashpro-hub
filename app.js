@@ -1449,9 +1449,10 @@
 
   function renderArea() {
     state.view = "area";
-    rememberRoute("area");
-    updateNav();
-    syncExternalSession();
+    hideGlobalLoading(true);
+    try { rememberRoute("area"); } catch {}
+    try { updateNav(); } catch {}
+    try { syncExternalSession(); } catch (error) { console.warn("[EduCashPro] My Area session sync:", error?.message || error); }
     const p = normalizeProfile(state.profile || window.__EDUCASHPRO_SESSION__?.profile || {});
     state.profile = p;
     const profileImageUrl = String(p?.profileImage?.url || "");
@@ -1479,7 +1480,7 @@
         helpTitle:"Ajuda e comunidade", helpSub:"Suporte, documentos e canais oficiais.",
         support:"Falar com o administrador", supportSub:"Relate problemas, falhas ou envie sugestões.",
         documents:"Sobre e Política de Uso", documentsSub:"Consulte informações e regras do EduCashPro.",
-        submissions:"Meus cadastros", submissionsSub:"Projetos enviados para avaliação."
+        submissions:"Meus cadastros", submissionsSub:"Projetos enviados para avaliação.", submissionsOpen:"Abrir meus cadastros"
       },
       en: {
         eyebrow:"MY AREA", profileTitle:"My profile", profileSub:"Edit your information, photo and digital presence in one place.",
@@ -1500,7 +1501,7 @@
         helpTitle:"Help and community", helpSub:"Support, documents and official channels.",
         support:"Contact administrator", supportSub:"Report problems, failures or send suggestions.",
         documents:"About and Usage Policy", documentsSub:"Review EduCashPro information and rules.",
-        submissions:"My submissions", submissionsSub:"Projects submitted for review."
+        submissions:"My submissions", submissionsSub:"Projects submitted for review.", submissionsOpen:"Open my submissions"
       },
       es: {
         eyebrow:"MI ÁREA", profileTitle:"Mi perfil", profileSub:"Edita tus datos, foto y presencia digital en un solo lugar.",
@@ -1521,7 +1522,7 @@
         helpTitle:"Ayuda y comunidad", helpSub:"Soporte, documentos y canales oficiales.",
         support:"Hablar con el administrador", supportSub:"Informa problemas, fallas o envía sugerencias.",
         documents:"Acerca de y Política de Uso", documentsSub:"Consulta información y reglas de EduCashPro.",
-        submissions:"Mis registros", submissionsSub:"Proyectos enviados para evaluación."
+        submissions:"Mis registros", submissionsSub:"Proyectos enviados para evaluación.", submissionsOpen:"Abrir mis registros"
       },
       ru: {
         eyebrow:"МОЙ РАЗДЕЛ", profileTitle:"Мой профиль", profileSub:"Редактируйте данные, фото и цифровое присутствие в одном месте.",
@@ -1542,7 +1543,7 @@
         helpTitle:"Помощь и сообщество", helpSub:"Поддержка, документы и официальные каналы.",
         support:"Связаться с администратором", supportSub:"Сообщить о проблеме, ошибке или предложении.",
         documents:"О сервисе и правила", documentsSub:"Информация и правила EduCashPro.",
-        submissions:"Мои заявки", submissionsSub:"Проекты, отправленные на проверку."
+        submissions:"Мои заявки", submissionsSub:"Проекты, отправленные на проверку.", submissionsOpen:"Открыть мои заявки"
       }
     })[state.language] || null;
     const c = copy || {};
@@ -1597,7 +1598,8 @@
       </div>
 
       <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.submissions)}</h2><p>${escapeHtml(c.submissionsSub)}</p></div><button id="manageProjects" class="textButton">${escapeHtml(fc("project"))}</button></div>
-      <div id="projectList" class="cardList">${loadingCard()}</div>
+      <button id="loadAreaProjects" class="areaActionCard areaFullAction" type="button"><span class="areaActionIcon">📂</span><span class="areaActionText"><strong>${escapeHtml(c.submissionsOpen || c.submissions)}</strong><small>${escapeHtml(c.submissionsSub)}</small></span><span class="areaActionArrow">›</span></button>
+      <div id="projectList" class="cardList hidden"></div>
       ${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}
     `;
 
@@ -1618,10 +1620,17 @@
     document.getElementById("areaSupport")?.addEventListener("click", () => window.location.assign("./support.html"));
     document.getElementById("areaDocuments")?.addEventListener("click", () => window.EduCashProAccountCenter?.openDocuments?.());
     document.getElementById("manageProjects")?.addEventListener("click", () => renderSubmissionForm("project"));
+    document.getElementById("loadAreaProjects")?.addEventListener("click", () => {
+      const container = document.getElementById("projectList");
+      const trigger = document.getElementById("loadAreaProjects");
+      if (!container) return;
+      container.classList.remove("hidden");
+      container.innerHTML = loadingCard();
+      if (trigger) trigger.classList.add("hidden");
+      void loadAreaProjects(container);
+    });
     document.getElementById("reactivate")?.addEventListener("click", openSubscription);
     content.querySelectorAll("[data-official-url]").forEach((button) => button.onclick = () => openUrl(button.dataset.officialUrl));
-    const container = document.getElementById("projectList");
-    void loadAreaProjects(container);
   }
 
   async function loadAreaProjects(container) {
@@ -2174,8 +2183,9 @@
         if (!button || !bottomNav.contains(button)) return;
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
         navigateFromFooter(button);
-      }, true);
+      });
     }
 
     if (!tg?.initData) {
