@@ -45,8 +45,7 @@ body::before {
 #app { position: relative; min-height: 100vh; max-width: 720px; margin: 0 auto; }
 
 .topbar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 20;
   display: flex;
   align-items: center;
