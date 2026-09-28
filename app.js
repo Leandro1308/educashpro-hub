@@ -821,21 +821,60 @@
       es: ["Juegos y desafíos", "Juega, crea torneos y organiza sorteos"],
       ru: ["Игры и задания", "Играйте, создавайте турниры и розыгрыши"],
     }[state.language] || ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"];
-    const activeCards = `
-      ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1])}
-      ${quickCard("learn", "🎓", t("continueLearning"), t("coursesSub"))}
-      ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
-      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
-      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1])}
-      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}`;
-    const inactiveCards = `
-      ${quickCard("learn", "🎓", t("courses"), t("coursesSub"))}
-      ${quickCard("explore", "🔎", t("explore"), t("exploreSub"))}
-      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"))}
-      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1])}
-      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"))}
-      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"))}
-      ${quickCard("support", "💬", supportLabel[0], supportLabel[1])}`;
+    const groups = ({
+      pt: {
+        learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
+        tools:["Ferramentas e jogos","Recursos práticos para aprender, organizar e interagir."],
+        presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
+        discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
+        account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
+      },
+      en: {
+        learn:["Learn","Courses and content organized by topic."],
+        tools:["Tools and games","Practical resources to learn, organize and interact."],
+        presence:["Build your presence","Professional profile, schedule and digital presence in one place."],
+        discover:["Explore and benefit","Discover projects, businesses and ecosystem benefits."],
+        account:["Your account","Access support and continue managing your account in My Area."]
+      },
+      es: {
+        learn:["Aprende","Cursos y contenidos organizados por tema."],
+        tools:["Herramientas y juegos","Recursos prácticos para aprender, organizar e interactuar."],
+        presence:["Construye tu presencia","Perfil profesional, agenda y presencia digital en un solo lugar."],
+        discover:["Explora y aprovecha","Descubre proyectos, empresas y beneficios del ecosistema."],
+        account:["Tu cuenta","Accede al soporte y continúa gestionando tu cuenta en Mi Área."]
+      },
+      ru: {
+        learn:["Обучение","Курсы и материалы по темам."],
+        tools:["Инструменты и игры","Практические ресурсы для обучения, организации и взаимодействия."],
+        presence:["Профессиональное присутствие","Профиль, запись и цифровое присутствие в одном месте."],
+        discover:["Каталог и преимущества","Проекты, компании и преимущества экосистемы."],
+        account:["Ваш аккаунт","Поддержка и управление аккаунтом в разделе «Мой раздел»."]
+      }
+    })[state.language] || null;
+    const g = groups || {
+      learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
+      tools:["Ferramentas e jogos","Recursos práticos para aprender, organizar e interagir."],
+      presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
+      discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
+      account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
+    };
+
+    const learnCards = `
+      ${quickCard("learn", "🎓", p.active ? t("continueLearning") : t("courses"), t("coursesSub"), "academy")}
+      ${quickCard("course:analise_tecnica_completa", "📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Bolsa, Análise Técnica e Price Action", t("learnDesc"), "technical")}`;
+    const toolCards = `
+      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"), "tools")}
+      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1], "games")}`;
+    const presenceCards = `
+      ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1], "professional")}
+      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"), "agenda")}`;
+    const discoverCards = `
+      ${quickCard("explore", "🔎", t("explore"), t("exploreSub"), "explore")}
+      ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"), "benefits")}`;
+    const accountCards = `
+      ${quickCard("area", "♥", t("navArea"), t("yourSpaceSub"), "credential")}
+      ${quickCard("support", "💬", supportLabel[0], supportLabel[1], "support")}`;
+
     content.innerHTML = `
       <section class="hero">
         <span class="eyebrow">${escapeHtml(t("welcome"))}</span>
@@ -845,17 +884,26 @@
       </section>
       <button id="openPresentation" class="visitorIntro"><span class="visitorIntroIcon">✨</span><span><strong>${escapeHtml(presentationCopy("homeTitle"))}</strong><small>${escapeHtml(presentationCopy("homeText"))}</small><b>${escapeHtml(presentationCopy("homeButton"))} →</b></span></button>
       <div class="sectionHead"><div><h2>${escapeHtml(t("yourSpace"))}</h2><p>${escapeHtml(t("yourSpaceSub"))}</p></div></div>
-      <section class="quickGrid">
-        ${p.active ? activeCards : inactiveCards}
-      </section>
+      <section class="homeFeatureGroup"><div class="homeFeatureHead"><span>🎓</span><div><h3>${escapeHtml(g.learn[0])}</h3><p>${escapeHtml(g.learn[1])}</p></div></div><div class="quickGrid">${learnCards}</div></section>
+      <section class="homeFeatureGroup"><div class="homeFeatureHead"><span>🧰</span><div><h3>${escapeHtml(g.tools[0])}</h3><p>${escapeHtml(g.tools[1])}</p></div></div><div class="quickGrid">${toolCards}</div></section>
+      <section class="homeFeatureGroup"><div class="homeFeatureHead"><span>💼</span><div><h3>${escapeHtml(g.presence[0])}</h3><p>${escapeHtml(g.presence[1])}</p></div></div><div class="quickGrid">${presenceCards}</div></section>
+      <section class="homeFeatureGroup"><div class="homeFeatureHead"><span>🔎</span><div><h3>${escapeHtml(g.discover[0])}</h3><p>${escapeHtml(g.discover[1])}</p></div></div><div class="quickGrid">${discoverCards}</div></section>
+      <section class="homeFeatureGroup compact"><div class="homeFeatureHead"><span>👤</span><div><h3>${escapeHtml(g.account[0])}</h3><p>${escapeHtml(g.account[1])}</p></div></div><div class="quickGrid">${accountCards}</div></section>
       ${p.active ? "" : renderMembershipUpsell()}`;
     document.getElementById("openPresentation")?.addEventListener("click", renderPresentation);
     document.getElementById("homeSubscribe")?.addEventListener("click", renderPresentation);
     content.querySelectorAll("[data-target]").forEach((el) => el.onclick = () => {
       const target = el.dataset.target;
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
-      else if (target === "professional") window.EduCashProProfessional?.render?.({ back: renderHome });
-      else if (target === "tools") renderTools(); else if (target === "games") { window.EduCashProResources?.loadGames?.().then(() => window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language })).catch(handleError); } else if (target === "agenda") openAgenda(); else if (target === "support") location.assign("./support.html"); else setView(target);
+      else if (target === "professional") openAreaProfessional();
+      else if (target === "tools") renderTools();
+      else if (target === "games") {
+        rememberRoute("tools", "games");
+        window.EduCashProResources?.loadGames?.().then(() => window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language })).catch(handleError);
+      }
+      else if (target === "agenda") openAgenda();
+      else if (target === "support") location.assign("./support.html");
+      else setView(target);
     });
     content.querySelectorAll("[data-locked-experience]").forEach((button) => button.onclick = () => showLockedInfo(lockedExperience(button.dataset.lockedExperience)));
   }
@@ -981,8 +1029,10 @@
     content.querySelectorAll(".presentationSubscribe").forEach((button) => button.onclick = subscribeNow);
   }
 
-  function quickCard(target, icon, title, sub) {
-    return `<button class="quickCard" data-target="${target}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(sub)}</small></button>`;
+  function quickCard(target, icon, title, sub, featureId = "") {
+    const feature = featureId ? window.EduCashProFeatures?.get?.(featureId) : null;
+    const badge = feature ? window.EduCashProFeatures?.badge?.(feature, state.language) : "";
+    return `<button class="quickCard" data-target="${target}"><span class="emoji">${icon}</span>${badge ? `<span class="accessPill access-${escapeHtml(feature.access)}">${escapeHtml(badge)}</span>` : ""}<strong>${escapeHtml(title)}</strong><small>${escapeHtml(sub)}</small></button>`;
   }
 
   function lockedExperienceCard(id, icon, title, sub) {
