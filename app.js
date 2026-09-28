@@ -523,7 +523,6 @@
       await openMarkets();
       return true;
     }
-    if (document.querySelector(".publicWelcome")) renderPublicLanding();
     return true;
   }
 
@@ -657,18 +656,23 @@
     } catch {}
   }
 
+  function flushRememberedRoute() {
+    if (!RESTORABLE_VIEWS.has(state.view)) return;
+    window.clearTimeout(routeScrollTimer);
+    try {
+      localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({
+        view: state.view,
+        detail: currentRouteDetail,
+        scrollY: Math.max(0, Math.round(window.scrollY || 0)),
+      }));
+    } catch {}
+    window.EduCashProNavigationState?.write?.();
+  }
+
   function rememberCurrentScroll() {
     if (!RESTORABLE_VIEWS.has(state.view)) return;
     window.clearTimeout(routeScrollTimer);
-    routeScrollTimer = window.setTimeout(() => {
-      try {
-        localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({
-          view: state.view,
-          detail: currentRouteDetail,
-          scrollY: Math.max(0, Math.round(window.scrollY || 0)),
-        }));
-      } catch {}
-    }, 180);
+    routeScrollTimer = window.setTimeout(flushRememberedRoute, 180);
   }
 
   function restoreRememberedScroll(route) {
@@ -709,6 +713,13 @@
       restoreRememberedScroll(route);
       return true;
     }
+    if (route.view === "area" && ["professional", "links", "smart-link"].includes(route.detail)) {
+      renderArea();
+      if (route.detail === "professional") await openAreaProfessional();
+      else await openAreaLinks(route.detail === "smart-link" ? "short" : "page");
+      restoreRememberedScroll(route);
+      return true;
+    }
     if (route.view === "tools" && route.detail === "games") {
       renderTools();
       await window.EduCashProResources?.loadGames?.();
@@ -723,6 +734,36 @@
     }
     await Promise.resolve(setView(route.view));
     restoreRememberedScroll(route);
+    return true;
+  }
+
+  async function resumeAuthenticatedExperience() {
+    if (!state.profile) return false;
+    document.getElementById("bottomNav")?.classList.remove("hidden");
+    document.querySelector(".growthQuickActions")?.classList.remove("hidden");
+
+    if (window.EduCashProNavigationState?.restoreLastPage?.()) return true;
+
+    const params = new URL(window.location.href).searchParams;
+    const requestedCourse = String(params.get("course") || "");
+    const requestedAcademy = String(params.get("academy") || "");
+    const requestedView = String(params.get("view") || "");
+    const requestedSection = String(params.get("section") || "");
+
+    if (requestedCourse) await openCourse(requestedCourse);
+    else if (requestedAcademy === "technical_analysis") await openMarkets();
+    else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
+    else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
+    else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
+    else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
+    else if (requestedView === "tools") renderTools();
+    else if (requestedView === "presentation") renderPresentation();
+    else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
+    else {
+      const rememberedRoute = readRememberedRoute();
+      if (rememberedRoute) await restoreRoute(rememberedRoute);
+      else renderHome();
+    }
     return true;
   }
 
@@ -1428,6 +1469,7 @@
 
   async function openAreaLinks(kind = "page") {
     try {
+      rememberRoute("area", kind === "short" ? "smart-link" : "links");
       await window.EduCashProResources?.loadLinks?.();
       const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
       window.EduCashProLinks?.setSession?.(effectiveSession);
@@ -1439,6 +1481,7 @@
 
   async function openAreaProfessional() {
     try {
+      rememberRoute("area", "professional");
       await window.EduCashProResources?.loadProfessional?.();
       const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
       window.EduCashProProfessional?.setSession?.(effectiveSession);
@@ -2224,6 +2267,7 @@
       await loadCourseCatalog();
       applyLanguage();
       bottomNav.classList.remove("hidden");
+      if (window.EduCashProNavigationState?.restoreLastPage?.()) return;
       const requestedCourse = String(publicParams.get("course") || "");
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
@@ -2262,7 +2306,12 @@
   // Atualizações são verificadas na inicialização, sem trocar a tela atual
   // quando o usuário volta ao app, muda de aba ou desbloqueia o aparelho.
   window.addEventListener("scroll", rememberCurrentScroll, { passive: true });
+  window.addEventListener("pagehide", flushRememberedRoute);
+  window.addEventListener("beforeunload", flushRememberedRoute);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushRememberedRoute();
+  });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory, rememberRoute };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
 })();
