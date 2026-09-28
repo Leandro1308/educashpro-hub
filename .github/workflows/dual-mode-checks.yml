@@ -27,6 +27,10 @@ jobs:
           node --check platform-web-auth.js
           node --check web-auth-entry.js
           node --check account-center.js
+          node --check admin-center.js
+          node --check navigation-state.js
+          node --check feature-registry.js
+          node --check app.js
           node --check tests/dual-mode-audit.mjs
           node --check tests/static-audit.mjs
       - name: Run dual-mode audit
