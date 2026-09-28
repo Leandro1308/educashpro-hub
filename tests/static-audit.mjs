@@ -172,3 +172,12 @@ assert(speedRace.includes("30000")&&speedRace.includes("raceMinus")&&speedRace.i
 assert(airDefense.includes("30000")&&airDefense.includes("airMinus")&&airDefense.includes("airPlus")&&airDefense.includes("airHow"),"Air Defense progression, controls or how-to card is incomplete");
 assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
 assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
+
+const localCatalogBridge=await read("local-game-catalog-bridge.js");
+assert(loader.includes('script("./local-game-catalog-bridge.js")'),"Runtime local-game catalog bridge is not loaded after game patches");
+assert(loader.includes("EduCashProLocalCatalogBridge?.ready"),"Game loader can return before local-game catalog bridge is ready");
+for(const gameId of ["car-rush","air-defense","math-academy"]){
+  assert(localCatalogBridge.includes(gameId),`Catalog bridge does not guarantee card visibility: ${gameId}`);
+}
+assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.includes("insertAdjacentHTML"),"Catalog bridge does not self-heal a stale rendered catalog");
+assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
