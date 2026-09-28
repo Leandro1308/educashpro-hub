@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260928.2";
+  const VERSION="20260928.3";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -57,7 +57,7 @@
   let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch) return Promise.resolve(true);
+    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
       // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
@@ -76,6 +76,8 @@
       for(const file of optional){
         try{await script(file)}catch(error){console.warn("[EduCashPro] complemento de jogo ignorado:",file,error?.message||error)}
       }
+      await script("./local-game-catalog-bridge.js");
+      window.EduCashProLocalCatalogBridge?.ensure?.();
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
