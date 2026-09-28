@@ -938,6 +938,10 @@
   }
 
   async function openAdmin() {
+    if (window.EduCashProAdminCenter?.open) {
+      close();
+      return window.EduCashProAdminCenter.open();
+    }
     const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
     try {
       const data = await loadOverview(true);
@@ -1030,9 +1034,41 @@
     });
   }
 
+  let adminShortcutCheck = null;
+
+  async function mountAdminShortcut() {
+    const target = document.getElementById("areaAdminShortcut");
+    if (!target || target.dataset.checked === "1") return;
+    target.dataset.checked = "1";
+    if (adminShortcutCheck) {
+      await adminShortcutCheck.catch(() => {});
+      return;
+    }
+    adminShortcutCheck = (async () => {
+      try {
+        const data = await loadOverview();
+        if (!data?.permissions?.admin || !target.isConnected) return;
+        target.classList.remove("hidden");
+        target.innerHTML = `
+          <button id="areaAdminEntry" class="areaAdminEntry" type="button">
+            <span>🛠️</span>
+            <span><strong>${esc(t("adminTitle"))}</strong><small>${esc(t("subtitle"))}</small></span>
+            <b>›</b>
+          </button>`;
+        target.querySelector("#areaAdminEntry")?.addEventListener("click", () => openAdmin());
+      } catch {
+        if (target.isConnected) target.classList.add("hidden");
+      } finally {
+        adminShortcutCheck = null;
+      }
+    })();
+    await adminShortcutCheck;
+  }
+
   function install() {
     if (!session()?.token) return;
     styles();
+    void mountAdminShortcut();
     const topbar = document.querySelector(".topbar");
     if (!topbar || document.getElementById("accountCenterButton")) return;
     const button = document.createElement("button");
@@ -1066,5 +1102,6 @@
     openLanguage,
     openPreferences,
     openDocuments,
+    mountAdminShortcut,
   };
 })();

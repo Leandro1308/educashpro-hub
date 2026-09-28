@@ -133,6 +133,24 @@ body::before {
 .quickCard .emoji { display: block; font-size: 28px; margin-bottom: 18px; }
 .quickCard strong { display: block; font-size: 15px; }
 .quickCard small { display: block; margin-top: 5px; color: #afc0d3; font-size: 12px; line-height: 1.42; }
+.homeFeatureGroup{margin-top:14px;padding:16px;border:1px solid rgba(255,255,255,.07);border-radius:22px;background:rgba(8,24,39,.48)}
+.homeFeatureGroup+.homeFeatureGroup{margin-top:12px}
+.homeFeatureHead{display:flex;gap:11px;align-items:flex-start;margin-bottom:12px}
+.homeFeatureHead>span{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:rgba(48,230,166,.09);font-size:19px}
+.homeFeatureHead h3{margin:1px 0 3px;font-size:16px}
+.homeFeatureHead p{margin:0;color:var(--muted);font-size:11px;line-height:1.4}
+.homeFeatureGroup .quickCard{position:relative;min-height:126px}
+.accessPill{display:inline-flex;align-items:center;width:max-content;max-width:100%;margin:0 0 8px;padding:4px 7px;border-radius:999px;background:rgba(48,230,166,.09);color:var(--green);font-size:9px;font-weight:900;letter-spacing:.04em}
+.accessPill.access-subscriber,.accessPill.access-active{background:rgba(255,200,92,.10);color:#ffd37a}
+.accessPill.access-admin{background:rgba(126,157,255,.12);color:#b5c5ff}
+.areaAdminShortcut{margin-top:14px}
+.areaAdminShortcut .areaAdminEntry{width:100%;display:grid;grid-template-columns:48px minmax(0,1fr) 22px;gap:12px;align-items:center;padding:15px;border:1px solid rgba(126,157,255,.28);border-radius:19px;background:linear-gradient(135deg,rgba(76,105,196,.16),rgba(13,27,45,.96));color:var(--text);text-align:left}
+.areaAdminShortcut .areaAdminEntry>span:first-child{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:rgba(126,157,255,.13);font-size:24px}
+.areaAdminShortcut .areaAdminEntry strong,.areaAdminShortcut .areaAdminEntry small{display:block}
+.areaAdminShortcut .areaAdminEntry small{margin-top:4px;color:#b5c3d5;line-height:1.4}
+.areaAdminShortcut .areaAdminEntry>b{color:#b5c5ff;font-size:24px;text-align:right}
+@media(max-width:520px){.homeFeatureGroup{padding:14px}.homeFeatureGroup .quickGrid{grid-template-columns:1fr 1fr}.homeFeatureGroup .quickCard{min-height:118px;padding:14px}}
+@media(max-width:360px){.homeFeatureGroup .quickGrid{grid-template-columns:1fr}.homeFeatureGroup .quickCard{min-height:96px}}
 .membershipUpsell { display:grid; gap:14px; margin-top:18px; padding:20px; border:1px solid rgba(255,200,92,.3); border-radius:22px; background:linear-gradient(145deg,rgba(255,200,92,.12),rgba(13,27,45,.96)); box-shadow:var(--shadow); }
 .membershipUpsellIcon { font-size:31px; }
 .membershipUpsell h2 { margin:7px 0; font-size:21px; }
