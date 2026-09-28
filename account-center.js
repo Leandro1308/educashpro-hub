@@ -938,6 +938,10 @@
   }
 
   async function openAdmin() {
+    if (window.EduCashProAdminCenter?.open) {
+      close();
+      return window.EduCashProAdminCenter.open();
+    }
     const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
     try {
       const data = await loadOverview(true);
