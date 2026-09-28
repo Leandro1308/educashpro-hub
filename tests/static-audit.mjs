@@ -181,3 +181,13 @@ for(const gameId of ["car-rush","air-defense","math-academy"]){
 }
 assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.includes("insertAdjacentHTML"),"Catalog bridge does not self-heal a stale rendered catalog");
 assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
+
+const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
+assert(index.includes('local-games-bootstrap-v13.js?v=20260928.4'),"Direct local-games bootstrap is not loaded by index.html");
+assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
+for(const gameId of ["car-rush","air-defense","math-academy"]){
+  assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);
+}
+assert(directLocalBootstrap.includes('loadScript("./local-arcade-core.js")')&&directLocalBootstrap.includes('loadScript("./speed-race-game.js")')&&directLocalBootstrap.includes('loadScript("./air-defense-game.js")')&&directLocalBootstrap.includes('loadScript("./math-learning-game.js")'),"Direct bootstrap cannot recover missing local game modules");
+assert(directLocalBootstrap.includes("MutationObserver")&&directLocalBootstrap.includes("setInterval"),"Direct bootstrap does not survive a stale/rebuilt lazy catalog");
+assert(localArcade.includes('has:(id)=>typeof games[id]==="function"'),"Local arcade does not expose game-registration state to bootstrap");
