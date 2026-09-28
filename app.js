@@ -1572,7 +1572,7 @@
         affiliate:"Meu link de afiliado", affiliateSub:"Copie ou gere o QR Code do seu link.",
         helpTitle:"Ajuda e comunidade", helpSub:"Suporte, documentos e canais oficiais.",
         support:"Falar com o administrador", supportSub:"Relate problemas, falhas ou envie sugestões.",
-        documents:"Sobre e Política de Uso", documentsSub:"Consulte informações e regras do EduCashPro.",
+        documents:"Manual, Sobre e Política de Uso", documentsSub:"Consulte informações e regras do EduCashPro.",
         submissions:"Meus cadastros", submissionsSub:"Projetos enviados para avaliação.", submissionsOpen:"Abrir meus cadastros"
       },
       en: {
@@ -1593,7 +1593,7 @@
         affiliate:"My affiliate link", affiliateSub:"Copy or generate the QR Code for your link.",
         helpTitle:"Help and community", helpSub:"Support, documents and official channels.",
         support:"Contact administrator", supportSub:"Report problems, failures or send suggestions.",
-        documents:"About and Usage Policy", documentsSub:"Review EduCashPro information and rules.",
+        documents:"Manual, About and Usage Policy", documentsSub:"Review EduCashPro information and rules.",
         submissions:"My submissions", submissionsSub:"Projects submitted for review.", submissionsOpen:"Open my submissions"
       },
       es: {
@@ -1614,7 +1614,7 @@
         affiliate:"Mi enlace de afiliado", affiliateSub:"Copia o genera el QR de tu enlace.",
         helpTitle:"Ayuda y comunidad", helpSub:"Soporte, documentos y canales oficiales.",
         support:"Hablar con el administrador", supportSub:"Informa problemas, fallas o envía sugerencias.",
-        documents:"Acerca de y Política de Uso", documentsSub:"Consulta información y reglas de EduCashPro.",
+        documents:"Manual, Acerca de y Política de Uso", documentsSub:"Consulta información y reglas de EduCashPro.",
         submissions:"Mis registros", submissionsSub:"Proyectos enviados para evaluación.", submissionsOpen:"Abrir mis registros"
       },
       ru: {
@@ -1635,7 +1635,7 @@
         affiliate:"Моя партнёрская ссылка", affiliateSub:"Скопируйте ссылку или создайте QR-код.",
         helpTitle:"Помощь и сообщество", helpSub:"Поддержка, документы и официальные каналы.",
         support:"Связаться с администратором", supportSub:"Сообщить о проблеме, ошибке или предложении.",
-        documents:"О сервисе и правила", documentsSub:"Информация и правила EduCashPro.",
+        documents:"Руководство, о сервисе и правила", documentsSub:"Информация и правила EduCashPro.",
         submissions:"Мои заявки", submissionsSub:"Проекты, отправленные на проверку.", submissionsOpen:"Открыть мои заявки"
       }
     })[state.language] || null;
@@ -1654,6 +1654,8 @@
         </div>
         <span class="statusPill ${p.active ? "" : "inactive"}">${escapeHtml(p.active ? t("active") : t("inactive"))}${p.activeUntil ? ` · ${escapeHtml(t("validUntil"))} ${escapeHtml(formatDate(p.activeUntil))}` : ""}</span>
       </section>
+
+      <section id="areaAdminShortcut" class="areaAdminShortcut hidden" aria-live="polite"></section>
 
       <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.profileTitle)}</h2><p>${escapeHtml(c.profileSub)}</p></div></div>
       <section class="areaActionGrid">
