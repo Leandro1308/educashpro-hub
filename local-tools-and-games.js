@@ -6,7 +6,7 @@
       games: "Jogos e entretenimento", gamesSub: "Jogos organizados por categoria", open: "Abrir jogo",
       gamesTitle: "Catálogo de jogos", gamesDesc: "Escolha uma categoria e abra o jogo na plataforma do responsável.",
       all: "Todos", empty: "Nenhum jogo disponível nesta categoria.", external: "Conteúdo operado por terceiros.",
-      tools: "Ferramentas", toolsSub: "Simulador de afiliados e sorteadores locais", free: "ACESSO LIVRE",
+      tools: "Ferramentas", toolsSub: "Simulador de afiliados e sorteadores locais", free: "ACESSO LIVRE", limited: "LIMITADO",
       drawTitle: "Sorteadores locais", drawDesc: "Os dados ficam somente neste aparelho e não são enviados ao EduCashPro.",
       raffleTitle: "Criar rifa / sorteio", raffleSub: "Crie uma rifa por números, compartilhe o link e acompanhe as inscrições.", subscriber: "ASSINANTE",
       names: "Sortear nomes", numbers: "Sortear número", teams: "Formar equipes", listLabel: "Um nome por linha",
@@ -25,7 +25,7 @@
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
       gamesTitle: "Game catalog", gamesDesc: "Choose a category and open the game on its provider's platform.",
       all: "All", empty: "No games available in this category.", external: "Third-party content.",
-      tools: "Tools", toolsSub: "Affiliate simulator and local randomizers", free: "FREE ACCESS",
+      tools: "Tools", toolsSub: "Affiliate simulator and local randomizers", free: "FREE ACCESS", limited: "LIMITED",
       drawTitle: "Local randomizers", drawDesc: "Data stays on this device and is not sent to EduCashPro.",
       raffleTitle: "Create raffle / draw", raffleSub: "Create a number raffle, share its link and track entries.", subscriber: "SUBSCRIBER",
       names: "Draw names", numbers: "Draw number", teams: "Create teams", listLabel: "One name per line",
@@ -44,7 +44,7 @@
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
       gamesTitle: "Catálogo de juegos", gamesDesc: "Elige una categoría y abre el juego en la plataforma del responsable.",
       all: "Todos", empty: "No hay juegos disponibles en esta categoría.", external: "Contenido operado por terceros.",
-      tools: "Herramientas", toolsSub: "Simulador de afiliados y sorteadores locales", free: "ACCESO LIBRE",
+      tools: "Herramientas", toolsSub: "Simulador de afiliados y sorteadores locales", free: "ACCESO LIBRE", limited: "LIMITADO",
       drawTitle: "Sorteadores locales", drawDesc: "Los datos quedan en este dispositivo y no se envían a EduCashPro.",
       raffleTitle: "Crear rifa / sorteo", raffleSub: "Crea una rifa por números, comparte el enlace y controla las inscripciones.", subscriber: "SUSCRIPTOR",
       names: "Sortear nombres", numbers: "Sortear número", teams: "Formar equipos", listLabel: "Un nombre por línea",
@@ -63,7 +63,7 @@
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
       gamesTitle: "Каталог игр", gamesDesc: "Выберите категорию и откройте игру на платформе владельца.",
       all: "Все", empty: "В этой категории пока нет игр.", external: "Контент стороннего поставщика.",
-      tools: "Инструменты", toolsSub: "Партнёрский симулятор и локальная жеребьёвка", free: "СВОБОДНЫЙ ДОСТУП",
+      tools: "Инструменты", toolsSub: "Партнёрский симулятор и локальная жеребьёвка", free: "СВОБОДНЫЙ ДОСТУП", limited: "ОГРАНИЧЕНО",
       drawTitle: "Локальная жеребьёвка", drawDesc: "Данные остаются на устройстве и не отправляются в EduCashPro.",
       raffleTitle: "Создать розыгрыш", raffleSub: "Создайте розыгрыш по номерам, поделитесь ссылкой и следите за заявками.", subscriber: "ПОДПИСКА",
       names: "Выбрать имена", numbers: "Случайное число", teams: "Создать команды", listLabel: "Одно имя в строке",
@@ -228,8 +228,8 @@
 
   function renderToolsHub() {
     window.EduCashProApp?.rememberRoute?.("tools");
-    const active = session?.profile?.active === true;
-    content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid"><button class="quickCard" id="financialTools"><span class="emoji">💼</span><strong>${esc(tr("financialTools"))}</strong><small>${esc(tr("financialToolsSub"))}</small><span class="freeAccessBadge">${esc(active ? tr("subscriber") : tr("free"))}</span></button>${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
+    const active = window.EduCashProAccess?.isActive?.() === true || session?.profile?.active === true;
+    content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid"><button class="quickCard" id="financialTools"><span class="emoji">💼</span><strong>${esc(tr("financialTools"))}</strong><small>${esc(tr("financialToolsSub"))}</small><span class="freeAccessBadge">${esc(active ? tr("subscriber") : tr("limited"))}</span></button>${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
     const gamesButton = document.createElement("button");
     gamesButton.className = "quickCard";
     gamesButton.innerHTML = `<span class="emoji">🎮</span><strong>${esc(tr("games"))}</strong><small>${esc(tr("gamesSub"))}</small>`;
