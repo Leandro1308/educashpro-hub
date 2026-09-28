@@ -152,3 +152,23 @@ assert(loader.includes("await loadLinks()")&&links.includes("setSession(value)")
 
 assert(!experienceV2.includes(".bottomNav{display:none!important}"),"Production theme must never hide the primary footer navigation");
 assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&&loader.includes("Promise.allSettled"),"Games catalog must load independently from optional enhancements");
+
+const localArcade=await read("local-arcade-core.js");
+const speedRace=await read("speed-race-game.js");
+const airDefense=await read("air-defense-game.js");
+const mathLearning=await read("math-learning-game.js");
+for(const file of ["local-arcade-core.js","speed-race-game.js","air-defense-game.js","math-learning-game.js"]){
+  assert(loader.includes(file),`Local game module is not lazy-loaded: ${file}`);
+}
+for(const gameId of ["car-rush","air-defense","math-academy"]){
+  assert(games.includes(`"${gameId}"`),`New game is missing from catalog: ${gameId}`);
+}
+assert(games.includes("TOURNAMENT_GAMES")&&!games.includes('TOURNAMENT_GAMES = new Set(["math-space","peg-solitaire","sliding-puzzle","word-search","math-cross","car-rush"'),"Local arcade games must not use tournament/server synchronization");
+for(const source of [speedRace,airDefense,mathLearning]){
+  assert(!source.includes("fetch("),"Local games must not call backend during gameplay");
+}
+assert(localArcade.includes("localStorage")&&localArcade.includes("educashpro:local-arcade:v1"),"Local arcade progress storage is missing");
+assert(speedRace.includes("30000")&&speedRace.includes("raceMinus")&&speedRace.includes("racePlus")&&speedRace.includes("carHow"),"Speed Race progression, controls or how-to card is incomplete");
+assert(airDefense.includes("30000")&&airDefense.includes("airMinus")&&airDefense.includes("airPlus")&&airDefense.includes("airHow"),"Air Defense progression, controls or how-to card is incomplete");
+assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
+assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
