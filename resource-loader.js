@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260928.1";
+  const VERSION="20260928.2";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -54,7 +54,7 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
+  let gamesPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
     if(window.EduCashProMentalGames?.renderCatalog) return Promise.resolve(true);
@@ -87,6 +87,7 @@
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadFinance(){return financePromise||(financePromise=script("./monthly-finance-control.js").catch(error=>{financePromise=null;throw error}))}
+  function loadFinancialTools(){if(window.EduCashProFinancialTools)return Promise.resolve(true);return financialToolsPromise||(financialToolsPromise=(async()=>{await style("./financial-tools-suite.css");await script("./financial-tools-suite.js");return true})().catch(error=>{financialToolsPromise=null;throw error}))}
   function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
     return professionalPromise||(professionalPromise=(async()=>{
@@ -108,5 +109,5 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,loadGames,loadCourses,loadFinance,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,loadGames,loadFinance,loadFinancialTools,loadCourses,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
