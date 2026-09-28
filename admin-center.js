@@ -30,7 +30,7 @@
   function t(key){return TEXT[language()]?.[key] || TEXT.pt[key] || key}
   function esc(value){return String(value ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
   function clearPoll(){if(pollTimer){clearTimeout(pollTimer);pollTimer=0}}
-  function close(){clearPoll();try{tonUi?.disconnect?.()}catch{}tonUi=null;document.querySelector(".adminCenterLayer")?.remove()}
+  function close(){clearPoll();tonUi=null;document.querySelector(".adminCenterLayer")?.remove()}
 
   async function api(path, body = {}) {
     const token = session()?.token;
