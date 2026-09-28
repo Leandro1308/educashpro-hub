@@ -30,6 +30,11 @@ jobs:
           node --check admin-center.js
           node --check navigation-state.js
           node --check feature-registry.js
+          node --check local-games-bootstrap-v13.js
+          node --check local-arcade-core.js
+          node --check speed-race-game.js
+          node --check air-defense-game.js
+          node --check math-learning-game.js
           node --check app.js
           node --check tests/dual-mode-audit.mjs
           node --check tests/static-audit.mjs
