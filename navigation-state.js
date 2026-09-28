@@ -13,6 +13,7 @@
 
   let scrollTimer = 0;
   let restoring = false;
+  let leavingForEntry = false;
 
   function normalizedPath(value) {
     try {
@@ -67,7 +68,7 @@
   }
 
   function write({ scrollY = window.scrollY || 0 } = {}) {
-    if (restoring || !isSafePath(location.pathname)) return;
+    if (restoring || leavingForEntry || !isSafePath(location.pathname)) return;
     try {
       localStorage.setItem(KEY, JSON.stringify({
         path: normalizedPath(location.pathname),
@@ -126,11 +127,13 @@
 
   function markEntry() {
     restoring = false;
+    leavingForEntry = true;
     try {
+      const entry = new URL("./index.html", location.href);
       localStorage.setItem(KEY, JSON.stringify({
-        path: normalizedPath(location.pathname),
-        search: String(location.search || "").slice(0, 1000),
-        hash: String(location.hash || "").slice(0, 500),
+        path: normalizedPath(entry.pathname),
+        search: "",
+        hash: "",
         scrollY: 0,
         savedAt: Date.now(),
       }));
@@ -153,6 +156,19 @@
       return result;
     };
   }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target?.closest?.("a[href], #back, .back, .backButton, [data-educash-home]");
+    if (!target) return;
+    if (target.matches("#back, .back, .backButton, [data-educash-home]")) {
+      markEntry();
+      return;
+    }
+    try {
+      const url = new URL(target.getAttribute("href"), location.href);
+      if (url.origin === location.origin && isEntryPath(url.pathname)) markEntry();
+    } catch {}
+  }, true);
 
   window.addEventListener("scroll", schedule, { passive: true });
   window.addEventListener("pagehide", flush);
