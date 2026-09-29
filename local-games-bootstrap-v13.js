@@ -146,6 +146,8 @@
     registerMeta();
     const grid=document.querySelector(".gameCatalogV2");
     if(!grid)return false;
+    const legacyAir=grid.querySelector('[data-play="air-defense"]');
+    legacyAir?.closest?.("article")?.remove?.();
     for(const id of IDS){
       if(!grid.querySelector('[data-play="'+id+'"]'))grid.insertAdjacentHTML("beforeend",card(id));
     }
