@@ -71,7 +71,7 @@
     if(localLoads[file])return localLoads[file];
     localLoads[file]=new Promise((resolve,reject)=>{
       const node=document.createElement("script");
-      node.src="./"+file+"?v=20260929.7";
+      node.src="./"+file+"?v=20260929.8";
       node.async=true;
       node.onload=()=>resolve(node);
       node.onerror=()=>{delete localLoads[file];reject(new Error("asset_failed:"+file))};
