@@ -213,7 +213,7 @@
     const id=button?.dataset?.play;
     if(!IDS.includes(id))return;
     const limiter=window.EduCashProGameUsageLimit;
-    if(limiter&&!limiter.start(id,"default",lang())){
+    if(limiter&&limiter.isModeGame?.(id)!==true&&!limiter.start(id,"default",lang())){
       event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return;
     }
     event.preventDefault();
