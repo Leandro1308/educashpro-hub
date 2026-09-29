@@ -1,5 +1,5 @@
-const BUILD="2026.09.29.6";
-const CACHE_VERSION="educashpro-pwa-20260929.6";
+const BUILD="2026.09.29.7";
+const CACHE_VERSION="educashpro-pwa-20260929.7";
 
 self.addEventListener("install",()=>self.skipWaiting());
 
