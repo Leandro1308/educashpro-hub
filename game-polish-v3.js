@@ -92,11 +92,10 @@
   function mathLevelSelector(requested){
     const l=lang(requested),levels=["basic","medium","advanced","nerd"];
     bridge.currentGame="math-space";
-    content().innerHTML=`<main class="gamePage"><button class="textButton gameBackLocal" type="button">←</button><section class="hero"><span class="eyebrow">${esc(st("math",l))}</span><h1>${esc(st("chooseLevel",l))}</h1><p>${esc(st("mathSub",l))}</p></section><section class="levelGrid">${levels.map((level,i)=>{const locked=i>1&&!active();return`<button class="levelCard ${locked?"locked":""}" data-v3-math-level="${level}">${locked?'<span class="lock">🔒</span>':""}<strong>${esc(st(level,l))}</strong><small>${esc(i<2?st("free",l):st("premium",l))}</small></button>`}).join("")}</section></main>`;
+    content().innerHTML=`<main class="gamePage"><button class="textButton gameBackLocal" type="button">←</button><section class="hero"><span class="eyebrow">${esc(st("math",l))}</span><h1>${esc(st("chooseLevel",l))}</h1><p>${esc(st("mathSub",l))}</p></section><section class="levelGrid">${levels.map((level,i)=>{const locked=false;return`<button class="levelCard ${locked?"locked":""}" data-v3-math-level="${level}">${locked?'<span class="lock">🔒</span>':""}<strong>${esc(st(level,l))}</strong><small>${esc(st("free",l))}</small></button>`}).join("")}</section></main>`;
     $(".gameBackLocal").onclick=()=>suite.renderCatalog?.(bridge.catalogContext||{});
     document.querySelectorAll("[data-v3-math-level]").forEach(btn=>btn.onclick=()=>{
       const level=btn.dataset.v3MathLevel;
-      if(["advanced","nerd"].includes(level)&&!active())return suite.paywall?.(level,l);
       renderMath(level,l,null);
     });
     window.scrollTo({top:0,behavior:"auto"});
