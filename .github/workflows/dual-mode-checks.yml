@@ -35,6 +35,7 @@ jobs:
           node --check speed-race-game.js
           node --check air-defense-game.js
           node --check math-learning-game.js
+          node --check educash-empire-v12.js
           node --check app.js
           node --check tests/dual-mode-audit.mjs
           node --check tests/static-audit.mjs
