@@ -12,7 +12,7 @@
     "air-defense":{
       icon:"✈️",
       title:{pt:"Defesa Aérea",en:"Air Defense",es:"Defensa Aérea",ru:"Воздушная оборона"},
-      sub:{pt:"Atire nas bolinhas coloridas antes que atravessem a defesa.",en:"Shoot colored balls before they cross the defense line.",es:"Dispara a las bolas antes de que crucen la defensa.",ru:"Сбивайте цветные шары до линии защиты."},
+      sub:{pt:"Escolha Nível 1 ou Nível 2.",en:"Choose Level 1 or Level 2.",es:"Elige Nivel 1 o Nivel 2.",ru:"Выберите Уровень 1 или Уровень 2."},
       badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
     },
     "math-academy":{
@@ -69,6 +69,7 @@
     if(!grid)return false;
     let changed=false;
     for(const id of IDS){
+      if(id==="air-defense"&&grid.querySelector("[data-air-defense-card]"))continue;
       if(grid.querySelector('[data-play="'+id+'"]'))continue;
       grid.insertAdjacentHTML("beforeend",card(id));
       changed=true;
