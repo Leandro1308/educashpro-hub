@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const IDS=["car-rush","air-defense","math-academy"];
+  const IDS=["car-rush","air-defense","air-defense-2","math-academy"];
   const META={
     "car-rush":{
       icon:"🏎️",
@@ -12,7 +12,13 @@
     "air-defense":{
       icon:"✈️",
       title:{pt:"Defesa Aérea",en:"Air Defense",es:"Defensa Aérea",ru:"Воздушная оборона"},
-      sub:{pt:"Escolha Nível 1 (defesa clássica) ou Nível 2 (combate aéreo).",en:"Choose Level 1 (classic defense) or Level 2 (air combat).",es:"Elige Nivel 1 (defensa clásica) o Nivel 2 (combate aéreo).",ru:"Выберите Уровень 1 (классическая защита) или Уровень 2 (воздушный бой)."},
+      sub:{pt:"Defesa clássica: destrua as bolinhas antes que atravessem a base.",en:"Classic defense: destroy the balls before they cross the base.",es:"Defensa clásica: destruye las bolas antes de que crucen la base.",ru:"Классическая защита: уничтожайте шары до линии базы."},
+      badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
+    },
+    "air-defense-2":{
+      icon:"🛩️",
+      title:{pt:"Defesa Aérea 2",en:"Air Defense 2",es:"Defensa Aérea 2",ru:"Воздушная оборона 2"},
+      sub:{pt:"Combate aéreo: desvie dos tiros e abata aviões inimigos.",en:"Air combat: dodge fire and destroy enemy aircraft.",es:"Combate aéreo: esquiva disparos y derriba aviones enemigos.",ru:"Воздушный бой: уклоняйтесь и сбивайте самолёты."},
       badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
     },
     "math-academy":{
@@ -43,10 +49,6 @@
 
   function card(id){
     const item=META[id],l=lang();
-    if(id==="air-defense"){
-      const level1=l==="en"?"Level 1":l==="es"?"Nivel 1":l==="ru"?"Уровень 1":"Nível 1",level2=l==="en"?"Level 2":l==="es"?"Nivel 2":l==="ru"?"Уровень 2":"Nível 2";
-      return '<article class="gameCardV2 localCatalogBridgeCard" data-local-game-card="'+id+'" data-air-defense-card="1"><div class="gameCardArt">'+item.icon+'</div><h3>'+esc(label(item.title))+'</h3><p>'+esc(label(item.sub))+'</p><div class="gameBadges"><span class="gameBadge">'+(l==="en"?"FREE":l==="es"?"LIBRE":l==="ru"?"СВОБОДНО":"LIVRE")+'</span><span class="gameBadge premium">'+esc(label(item.badge))+'</span></div><div class="gameCardActions"><button class="gamePlayBtn" type="button" data-air-mode="level-1" data-air-direct="air-defense-level-1">✈️ '+esc(level1)+'</button><button class="gamePlayBtn" type="button" data-air-mode="level-2" data-air-direct="air-defense-level-2">🛩️ '+esc(level2)+'</button></div></article>';
-    }
     return '<article class="gameCardV2 localCatalogBridgeCard" data-local-game-card="'+id+'">'+
       '<div class="gameCardArt">'+item.icon+'</div>'+
       '<h3>'+esc(label(item.title))+'</h3>'+
@@ -64,6 +66,7 @@
     suite.GAME_META=suite.GAME_META||{};
     if(!suite.GAME_META["car-rush"])suite.GAME_META["car-rush"]=["🏎️","carRush","carRushSub"];
     if(!suite.GAME_META["air-defense"])suite.GAME_META["air-defense"]=["✈️","airDefense","airDefenseSub"];
+    if(!suite.GAME_META["air-defense-2"])suite.GAME_META["air-defense-2"]=["🛩️","airDefense2","airDefense2Sub"];
     if(!suite.GAME_META["math-academy"])suite.GAME_META["math-academy"]=["🧠","mathAcademy","mathAcademySub"];
   }
 
@@ -73,7 +76,6 @@
     if(!grid)return false;
     let changed=false;
     for(const id of IDS){
-      if(id==="air-defense"&&grid.querySelector("[data-air-defense-card]"))continue;
       if(grid.querySelector('[data-play="'+id+'"]'))continue;
       grid.insertAdjacentHTML("beforeend",card(id));
       changed=true;
@@ -91,14 +93,10 @@
   document.addEventListener("click",event=>{
     const button=event.target?.closest?.("[data-play]");
     if(!button||!IDS.includes(button.dataset.play))return;
+    const limiter=window.EduCashProGameUsageLimit;
+    if(limiter&&!limiter.start(button.dataset.play,"default",lang())){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return}
     event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();open(button.dataset.play);
   },true);
-  document.addEventListener("click",event=>{
-    const button=event.target?.closest?.(".localCatalogBridgeCard [data-air-direct]");
-    if(!button)return;
-    event.preventDefault();
-    window.EduCashProAdvancedGames?.launch?.(button.dataset.airDirect,{lang:lang()});
-  });
 
   const observer=new MutationObserver(()=>queueMicrotask(ensure));
   observer.observe(document.documentElement,{childList:true,subtree:true});
