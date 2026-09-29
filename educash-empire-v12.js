@@ -48,15 +48,104 @@
   }
   function showKnowledge(l,level,next){const lesson=LESSONS[(Math.max(1,level)-1)%LESSONS.length];content().innerHTML=`<main class="gamePage empirePage"><section class="empireKnowledge"><span class="cardRarity">${esc(t("knowledge",l))} · #${level}</span><h2>🧠 ${esc(lesson[0])}</h2><p>${esc(lesson[1])}</p><button id="emKnowledgeNext" class="wideButton">${esc(t("understood",l))}</button></section></main>`;$("#emKnowledgeNext").onclick=next}
   function showPro(l){content().innerHTML=`<main class="gamePage empirePage"><button class="textButton empireBack">←</button><section class="empireProGate"><span class="eyebrow">🔐 ${esc(t("pro",l))}</span><h2>${esc(t("proTitle",l))}</h2><p>${esc(t("proText",l))}</p><button id="emSubscribe" class="wideButton">🚀 ${esc(t("subscribe",l))}</button><button id="emClassic" class="secondaryButton">${esc(t("classic",l))}</button></section></main>`;$(".empireBack").onclick=()=>showHub(l);$("#emClassic").onclick=()=>showHub(l);$("#emSubscribe").onclick=()=>{const url=bridge.session?.subscribeUrl||bridge.session?.botUrl;if(url)window.Telegram?.WebApp?.openLink?window.Telegram.WebApp.openLink(url):window.open(url,"_blank","noopener");else suite.paywall?.("advanced",l)}}
-  const oldText=suite.text?.bind(suite);suite.text=function(k,l){if(k==="empire")return t("title",l);if(k==="empireSub")return t("sub",l);return oldText?oldText(k,l):k};suite.GAME_META["educash-empire"]=["💎","empire","empireSub"];
-  const oldLaunch=suite.launchGame.bind(suite);suite.launchGame=function(id,o={}){if(id==="educash-empire"){bridge.currentGame=id;const l=lang(o.lang),s=state();if(s.level>=13&&!active())return showPro(l);return showHub(l)}return oldLaunch(id,o)};
+  const LOCAL_IDS=["car-rush","air-defense","math-academy"];
+  const LOCAL_META={
+    "car-rush":["🏎️","carRush","carRushSub"],
+    "air-defense":["✈️","airDefense","airDefenseSub"],
+    "math-academy":["🧠","mathAcademy","mathAcademySub"]
+  };
+  const LOCAL_COPY={
+    pt:{carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta a cada 30 segundos.",airDefense:"Defesa Aérea",airDefenseSub:"Atire nas bolinhas coloridas antes que atravessem a defesa.",mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"},
+    en:{carRush:"Speed Race",carRushSub:"Dodge obstacles while speed increases every 30 seconds.",airDefense:"Air Defense",airDefenseSub:"Shoot colored balls before they cross the defense line.",mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"},
+    es:{carRush:"Carrera de Velocidad",carRushSub:"Esquiva obstáculos mientras aumenta la velocidad cada 30 segundos.",airDefense:"Defensa Aérea",airDefenseSub:"Dispara a las bolas antes de que crucen la defensa.",mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"},
+    ru:{carRush:"Скоростная гонка",carRushSub:"Объезжайте препятствия: каждые 30 секунд скорость растёт.",airDefense:"Воздушная оборона",airDefenseSub:"Сбивайте цветные шары до линии защиты.",mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"}
+  };
+  const localText=(k,l)=>LOCAL_COPY[lang(l)]?.[k]||LOCAL_COPY.pt[k]||k;
+  function registerLocalMeta(){
+    suite.GAME_META=suite.GAME_META||{};
+    suite.GAME_META["educash-empire"]=["💎","empire","empireSub"];
+    for(const id of LOCAL_IDS)suite.GAME_META[id]=LOCAL_META[id];
+  }
+  const localLoads=window.__EDUCASHPRO_LOCAL_GAME_LOADS__=window.__EDUCASHPRO_LOCAL_GAME_LOADS__||{};
+  function loadLocalScript(file){
+    if(localLoads[file])return localLoads[file];
+    localLoads[file]=new Promise((resolve,reject)=>{
+      const node=document.createElement("script");
+      node.src="./"+file+"?v=20260928.5";
+      node.async=true;
+      node.onload=()=>resolve(node);
+      node.onerror=()=>{delete localLoads[file];reject(new Error("asset_failed:"+file))};
+      document.head.appendChild(node);
+    });
+    return localLoads[file];
+  }
+  async function ensureLocalModules(){
+    let arcade=window.EduCashProLocalArcade;
+    if(!arcade?.has)await loadLocalScript("local-arcade-core.js");
+    arcade=window.EduCashProLocalArcade;
+    if(!arcade?.has?.("car-rush"))await loadLocalScript("speed-race-game.js");
+    if(!arcade?.has?.("air-defense"))await loadLocalScript("air-defense-game.js");
+    if(!arcade?.has?.("math-academy"))await loadLocalScript("math-learning-game.js");
+    return Boolean(window.EduCashProAdvancedGames?.launch);
+  }
+  function directCard(id){
+    const [icon,titleKey,subKey]=LOCAL_META[id],badge=id==="math-academy"?localText("learning"):localText("local");
+    return `<article class="gameCardV2 empireLocalGameCard" data-empire-local-card="${id}"><div class="gameCardArt">${icon}</div><h3>${esc(localText(titleKey))}</h3><p>${esc(localText(subKey))}</p><div class="gameBadges"><span class="gameBadge">${esc(localText("free"))}</span><span class="gameBadge premium">${esc(badge)}</span></div><div class="gameCardActions single"><button class="gamePlayBtn" type="button" data-play="${id}">${esc(localText("play"))}</button></div></article>`;
+  }
+  function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value}
+  function patchCatalog(){
+    registerLocalMeta();
+    const grid=document.querySelector(".gameCatalogV2");
+    if(!grid)return false;
+    const empireButton=grid.querySelector('[data-play="educash-empire"]');
+    if(empireButton){
+      const card=empireButton.closest(".gameCardV2");
+      setTextIfChanged(card?.querySelector("h3"),t("title",lang()));
+      setTextIfChanged(card?.querySelector("p"),t("sub",lang()));
+    }
+    for(const id of LOCAL_IDS){
+      if(!grid.querySelector('[data-play="'+id+'"]'))grid.insertAdjacentHTML("beforeend",directCard(id));
+      const button=grid.querySelector('[data-play="'+id+'"]'),card=button?.closest(".gameCardV2"),meta=LOCAL_META[id];
+      if(card){
+        setTextIfChanged(card.querySelector("h3"),localText(meta[1]));
+        setTextIfChanged(card.querySelector("p"),localText(meta[2]));
+        card.querySelectorAll("[data-tournament]").forEach(node=>node.remove());
+        card.querySelector(".gameCardActions")?.classList.add("single");
+      }
+    }
+    grid.dataset.empireLocalGames="1";
+    return true;
+  }
+  let patchQueued=false;
+  function queuePatch(){if(patchQueued)return;patchQueued=true;queueMicrotask(()=>{patchQueued=false;patchCatalog()})}
+  registerLocalMeta();
+  const oldText=suite.text?.bind(suite);suite.text=function(k,l){
+    if(k==="empire")return t("title",l);
+    if(k==="empireSub")return t("sub",l);
+    if(["carRush","carRushSub","airDefense","airDefenseSub","mathAcademy","mathAcademySub"].includes(k))return localText(k,l);
+    return oldText?oldText(k,l):k;
+  };
+  const oldLaunch=suite.launchGame.bind(suite);suite.launchGame=function(id,o={}){
+    if(id==="educash-empire"){bridge.currentGame=id;const l=lang(o.lang),s=state();if(s.level>=13&&!active())return showPro(l);return showHub(l)}
+    if(LOCAL_IDS.includes(id))return ensureLocalModules().then(ok=>ok?window.EduCashProAdvancedGames.launch(id,{lang:lang(o.lang)}):undefined);
+    return oldLaunch(id,o)
+  };
+  if(base?.renderCatalog&&!base.__empireLocalCatalogV12){
+    base.__empireLocalCatalogV12=true;
+    const oldRender=base.renderCatalog.bind(base);
+    base.renderCatalog=function(options){registerLocalMeta();const result=oldRender(options);queuePatch();requestAnimationFrame(queuePatch);return result};
+  }
+  const catalogObserver=new MutationObserver(queuePatch);
+  catalogObserver.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});
   document.addEventListener("click",event=>{
-    const button=event.target.closest?.('[data-play="educash-empire"]');
-    if(!button)return;
+    const button=event.target.closest?.("[data-play]");
+    const id=button?.dataset?.play;
+    if(id!=="educash-empire"&&!LOCAL_IDS.includes(id))return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    suite.launchGame("educash-empire",{lang:lang()});
+    suite.launchGame(id,{lang:lang()});
   },true);
-  if(base?.bootPublic){const oldBoot=base.bootPublic.bind(base);base.bootPublic=async function(params){if(String(params?.get?.("game")||"")==="educash-empire"){suite.launchGame("educash-empire",{lang:params.get("lang")});return true}return oldBoot(params)}}
-  window.EduCashEmpire={open:showHub,start:startRound};
+  if(base?.bootPublic){const oldBoot=base.bootPublic.bind(base);base.bootPublic=async function(params){const game=String(params?.get?.("game")||"");if(game==="educash-empire"||LOCAL_IDS.includes(game)){suite.launchGame(game,{lang:params.get("lang")});return true}return oldBoot(params)}}
+  queuePatch();
+  window.EduCashEmpire={open:showHub,start:startRound,patchCatalog,ensureLocalModules};
 })();
