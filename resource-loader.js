@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260928.5";
+  const VERSION="20260929.1";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -78,6 +78,7 @@
       }
       await script("./local-game-catalog-bridge.js");
       window.EduCashProLocalCatalogBridge?.ensure?.();
+      await script("./game-usage-limit-v14.js");
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
