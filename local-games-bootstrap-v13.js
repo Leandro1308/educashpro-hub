@@ -1,38 +1,37 @@
 (function(){
   "use strict";
 
-  const VERSION="20260929.2";
-  const IDS=["car-rush","air-defense-level-1","air-defense-level-2","math-academy"];
+  const VERSION="20260929.4";
+  const IDS=["car-rush","air-defense","math-academy"];
   const COPY={
     pt:{
       carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta.",
-      airDefense1:"Defesa Aérea — Nível 1",airDefense1Sub:"Defesa clássica: mova o avião e destrua as bolinhas antes que atravessem a base.",airDefense2:"Defesa Aérea — Nível 2",airDefense2Sub:"Combate aéreo: mova-se em várias direções, desvie dos tiros e abata aviões inimigos.",
+      airDefense:"Defesa Aérea",airDefenseSub:"Escolha entre Nível 1 (defesa clássica) e Nível 2 (combate aéreo).",
       mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",
       play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"
     },
     en:{
       carRush:"Speed Race",carRushSub:"Dodge obstacles while speed keeps increasing.",
-      airDefense1:"Air Defense — Level 1",airDefense1Sub:"Classic defense: move the aircraft and destroy the balls before they cross the base.",airDefense2:"Air Defense — Level 2",airDefense2Sub:"Air combat: move in several directions, dodge shots and destroy enemy aircraft.",
+      airDefense:"Air Defense",airDefenseSub:"Choose Level 1 (classic defense) or Level 2 (air combat).",
       mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",
       play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"
     },
     es:{
       carRush:"Carrera de Velocidad",carRushSub:"Esquiva obstáculos mientras aumenta la velocidad.",
-      airDefense1:"Defensa Aérea — Nivel 1",airDefense1Sub:"Defensa clásica: mueve el avión y destruye las bolas antes de que crucen la base.",airDefense2:"Defensa Aérea — Nivel 2",airDefense2Sub:"Combate aéreo: muévete en varias direcciones, esquiva disparos y derriba aviones enemigos.",
+      airDefense:"Defensa Aérea",airDefenseSub:"Elige Nivel 1 (defensa clásica) o Nivel 2 (combate aéreo).",
       mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",
       play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"
     },
     ru:{
       carRush:"Скоростная гонка",carRushSub:"Объезжайте препятствия при растущей скорости.",
-      airDefense1:"Воздушная оборона — Уровень 1",airDefense1Sub:"Классическая защита: двигайте самолёт и уничтожайте шары до линии базы.",airDefense2:"Воздушная оборона — Уровень 2",airDefense2Sub:"Воздушный бой: двигайтесь во всех направлениях, уклоняйтесь и сбивайте самолёты.",
+      airDefense:"Воздушная оборона",airDefenseSub:"Выберите Уровень 1 (классическая защита) или Уровень 2 (воздушный бой).",
       mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",
       play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"
     }
   };
   const META={
     "car-rush":["🏎️","carRush","carRushSub"],
-    "air-defense-level-1":["✈️","airDefense1","airDefense1Sub"],
-    "air-defense-level-2":["🛩️","airDefense2","airDefense2Sub"],
+    "air-defense":["✈️","airDefense","airDefenseSub"],
     "math-academy":["🧠","mathAcademy","mathAcademySub"]
   };
 
@@ -82,7 +81,7 @@
           if(
             (normalized==="local-arcade-core.js"&&arcade) ||
             (normalized==="speed-race-game.js"&&arcade?.has?.("car-rush")) ||
-            (normalized==="air-defense-game.js"&&arcade?.has?.("air-defense-level-2")) ||
+            (normalized==="air-defense-game.js"&&arcade?.has?.("air-defense")) ||
             (normalized==="math-learning-game.js"&&arcade?.has?.("math-academy"))
           ) done();
         },80);
@@ -146,8 +145,6 @@
     registerMeta();
     const grid=document.querySelector(".gameCatalogV2");
     if(!grid)return false;
-    const legacyAir=grid.querySelector('[data-play="air-defense"]');
-    legacyAir?.closest?.("article")?.remove?.();
     for(const id of IDS){
       if(!grid.querySelector('[data-play="'+id+'"]'))grid.insertAdjacentHTML("beforeend",card(id));
     }
@@ -164,7 +161,7 @@
     if(!arcade)throw new Error("local_arcade_not_ready");
 
     if(!arcade.has?.("car-rush"))await loadScript("./speed-race-game.js");
-    if(!arcade.has?.("air-defense-level-2"))await loadScript("./air-defense-game.js");
+    if(!arcade.has?.("air-defense"))await loadScript("./air-defense-game.js");
     if(!arcade.has?.("math-academy"))await loadScript("./math-learning-game.js");
 
     if(!window.EduCashProAdvancedGames?.launch)throw new Error("advanced_games_not_ready");
