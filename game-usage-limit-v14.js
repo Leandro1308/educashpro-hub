@@ -6,7 +6,7 @@
   const COOLDOWN_MS=8*60*60*1000;
   const PREFIX="ecp:game-usage:v1";
   const bridge=window.EduCashProGameBridge||(window.EduCashProGameBridge={session:null,catalogContext:{},currentGame:null});
-  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","math-cross","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines","air-defense"]);
+  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","math-cross","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines"]);
   let current=null,timer=0;
 
   const COPY={
@@ -115,6 +115,7 @@
   function start(game,mode="default",l){
     game=String(game||bridge.currentGame||"game");
     mode=String(mode||"default");
+    if(current&&current.game===game&&current.mode===mode)return true;
     if(active()){stop();return true}
     const state=read(game,mode);
     if(state.lockedUntil>Date.now()){showBlocked(game,mode,l);return false}
@@ -136,7 +137,7 @@
     if(button.matches("[data-extra-level]"))return{game:bridge.currentGame,mode:button.dataset.extraLevel};
     if(button.matches("[data-falling-level]"))return{game:"falling-blocks",mode:button.dataset.fallingLevel};
     if(button.matches("[data-color-level]"))return{game:"color-lines",mode:button.dataset.colorLevel};
-    if(button.matches("[data-air-mode]"))return{game:"air-defense",mode:button.dataset.airMode};
+    if(button.matches("[data-air-mode]"))return button.dataset.airMode==="level-2"?{game:"air-defense-2",mode:"default"}:{game:"air-defense",mode:"default"};
     return null;
   }
 
