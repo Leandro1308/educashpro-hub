@@ -183,7 +183,7 @@ assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.inclu
 assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
 
 const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
-assert(index.includes('local-games-bootstrap-v13.js?v=20260928.4'),"Direct local-games bootstrap is not loaded by index.html");
+assert(index.includes('local-games-bootstrap-v13.js?v=20260928.5'),"Direct local-games bootstrap is not loaded by index.html");
 assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
 for(const gameId of ["car-rush","air-defense","math-academy"]){
   assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);
@@ -191,4 +191,12 @@ for(const gameId of ["car-rush","air-defense","math-academy"]){
 assert(directLocalBootstrap.includes('loadScript("./local-arcade-core.js")')&&directLocalBootstrap.includes('loadScript("./speed-race-game.js")')&&directLocalBootstrap.includes('loadScript("./air-defense-game.js")')&&directLocalBootstrap.includes('loadScript("./math-learning-game.js")'),"Direct bootstrap cannot recover missing local game modules");
 assert(directLocalBootstrap.includes("MutationObserver")&&directLocalBootstrap.includes("setInterval"),"Direct bootstrap does not survive a stale/rebuilt lazy catalog");
 assert(localArcade.includes('has:(id)=>typeof games[id]==="function"'),"Local arcade does not expose game-registration state to bootstrap");
-\nconst empireRegistrar=await read("educash-empire-v12.js");\nfor(const gameId of ["car-rush","air-defense","math-academy"]){\n  assert(empireRegistrar.includes(`"${gameId}"`),`Empire registrar is missing ${gameId}`);\n}\nassert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch local games");\nassert(empireRegistrar.includes('node.src="./"+file+"?v=20260928.5"'),"Empire local-game recovery does not bypass stale lazy-loader cache");\nassert(empireRegistrar.includes("MutationObserver")&&empireRegistrar.includes("base.renderCatalog"),"Empire extension does not repair every catalog render");\nassert(empireRegistrar.includes('if(k==="empire")return t("title",l)')&&empireRegistrar.includes("setTextIfChanged"),"Empire title/subtitle repair is missing");\n
+
+const empireRegistrar=await read("educash-empire-v12.js");
+for(const gameId of ["car-rush","air-defense","math-academy"]){
+  assert(empireRegistrar.includes(`"${gameId}"`),`Empire registrar is missing ${gameId}`);
+}
+assert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch local games");
+assert(empireRegistrar.includes('node.src="./"+file+"?v=20260928.5"'),"Empire local-game recovery does not bypass stale lazy-loader cache");
+assert(empireRegistrar.includes("MutationObserver")&&empireRegistrar.includes("base.renderCatalog"),"Empire extension does not repair every catalog render");
+assert(empireRegistrar.includes('if(k==="empire")return t("title",l)')&&empireRegistrar.includes("setTextIfChanged"),"Empire title/subtitle repair is missing");
