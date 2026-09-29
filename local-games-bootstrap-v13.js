@@ -1,30 +1,30 @@
 (function(){
   "use strict";
 
-  const VERSION="20260928.4";
+  const VERSION="20260929.1";
   const IDS=["car-rush","air-defense","math-academy"];
   const COPY={
     pt:{
       carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta.",
-      airDefense:"Defesa Aérea",airDefenseSub:"Atire nas bolinhas coloridas antes que atravessem a defesa.",
+      airDefense:"Defesa Aérea",airDefenseSub:"Escolha entre defesa clássica e combate aéreo contra aviões inimigos.",
       mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",
       play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"
     },
     en:{
       carRush:"Speed Race",carRushSub:"Dodge obstacles while speed keeps increasing.",
-      airDefense:"Air Defense",airDefenseSub:"Shoot colored balls before they cross the defense line.",
+      airDefense:"Air Defense",airDefenseSub:"Choose classic defense or air combat against enemy aircraft.",
       mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",
       play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"
     },
     es:{
       carRush:"Carrera de Velocidad",carRushSub:"Esquiva obstáculos mientras aumenta la velocidad.",
-      airDefense:"Defensa Aérea",airDefenseSub:"Dispara a las bolas antes de que crucen la defensa.",
+      airDefense:"Defensa Aérea",airDefenseSub:"Elige defensa clásica o combate aéreo contra aviones enemigos.",
       mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",
       play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"
     },
     ru:{
       carRush:"Скоростная гонка",carRushSub:"Объезжайте препятствия при растущей скорости.",
-      airDefense:"Воздушная оборона",airDefenseSub:"Сбивайте цветные шары до линии защиты.",
+      airDefense:"Воздушная оборона",airDefenseSub:"Выберите классическую оборону или воздушный бой с самолётами.",
       mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",
       play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"
     }

@@ -64,11 +64,11 @@
   function selector(l,tournament){
     bridge.currentGame="block-grid";
     const levels=["easy","medium","hard","nerd"];
-    content().innerHTML=`<main class="gamePage fallingGamePage"><button class="textButton fallingBack" type="button">←</button><section class="hero"><span class="eyebrow">${esc(t("title",l))}</span><h1>${esc(t("choose",l))}</h1><p>${esc(t("sub",l))}</p></section><section class="levelGrid">${levels.map(level=>{const locked=level==="nerd"&&!active()&&!tournament;return`<button class="levelCard ${locked?"locked":""}" data-falling-level="${level}" type="button">${locked?'<span class="lock">🔒</span>':""}<strong>${esc(t(level,l))}</strong><small>${esc(level==="nerd"?t("subscriber",l):t("free",l))}</small></button>`}).join("")}</section></main>`;
+    content().innerHTML=`<main class="gamePage fallingGamePage"><button class="textButton fallingBack" type="button">←</button><section class="hero"><span class="eyebrow">${esc(t("title",l))}</span><h1>${esc(t("choose",l))}</h1><p>${esc(t("sub",l))}</p></section><section class="levelGrid">${levels.map(level=>{const locked=false;return`<button class="levelCard ${locked?"locked":""}" data-falling-level="${level}" type="button">${locked?'<span class="lock">🔒</span>':""}<strong>${esc(t(level,l))}</strong><small>${esc(t("free",l))}</small></button>`}).join("")}</section></main>`;
     $(".fallingBack")?.addEventListener("click",backCatalog);
     document.querySelectorAll("[data-falling-level]").forEach(btn=>btn.addEventListener("click",()=>{
       const level=btn.dataset.fallingLevel;
-      if(level==="nerd"&&!active()&&!tournament)return showPaywall(l);
+      
       renderGame(level,l,tournament);
     }));
     window.scrollTo({top:0,behavior:"auto"});
@@ -165,7 +165,7 @@
     if(gameId==="block-grid"){
       const l=lang(options.lang),tournament=options.tournament||null,raw=tournament?.difficulty||options.level;
       const level=normalizeLevel(raw);
-      if(level==="nerd"&&!active()&&!tournament)return showPaywall(l);
+      
       return raw?renderGame(level,l,tournament):selector(l,tournament);
     }
     return previousLaunch?previousLaunch(gameId,options):undefined;

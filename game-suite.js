@@ -186,11 +186,10 @@
 
   function levelSelector(gameId,requested,onPick,options={}) {
     const levels=["basic","medium","advanced","nerd"];
-    content().innerHTML = `<main class="gamePage">${backButton()}<section class="hero"><span class="eyebrow">${esc(text(GAME_META[gameId][1],requested))}</span><h1>${esc(text("chooseLevel",requested))}</h1><p>${esc(text(GAME_META[gameId][2],requested))}</p></section><section class="levelGrid">${levels.map((level,index)=>{const locked=index>1&&!active()&&!options.tournament;return `<button class="levelCard ${locked?"locked":""}" data-level="${level}">${locked?`<span class="lock">🔒</span>`:""}<strong>${esc(text(level,requested))}</strong><small>${esc(index<2?text("free",requested):text("premium",requested))}</small></button>`}).join("")}</section></main>`;
+    content().innerHTML = `<main class="gamePage">${backButton()}<section class="hero"><span class="eyebrow">${esc(text(GAME_META[gameId][1],requested))}</span><h1>${esc(text("chooseLevel",requested))}</h1><p>${esc(text(GAME_META[gameId][2],requested))}</p></section><section class="levelGrid">${levels.map((level,index)=>{const locked=false;return `<button class="levelCard ${locked?"locked":""}" data-level="${level}">${locked?`<span class="lock">🔒</span>`:""}<strong>${esc(text(level,requested))}</strong><small>${esc(text("free",requested))}</small></button>`}).join("")}</section></main>`;
     bindBack(()=>renderCatalog(bridge.catalogContext));
     document.querySelectorAll("[data-level]").forEach(button=>button.onclick=()=>{
       const index=levels.indexOf(button.dataset.level);
-      if(index>1&&!active()&&!options.tournament)return paywall(button.dataset.level,requested);
       onPick(button.dataset.level);
     });
     top();
@@ -374,11 +373,10 @@
   }
 
   function renderPegMenu(requested,tournament){
-    content().innerHTML=`<main class="gamePage">${backButton()}<section class="hero"><span class="eyebrow">${esc(text("peg",requested))}</span><h1>🔵 ${esc(text("peg",requested))}</h1><p>${esc(text("howPeg",requested))}</p></section><section class="pegVariantGrid">${PEG_VARIANTS.map(variant=>`<button class="pegVariant" data-peg="${variant.id}" style="border-color:${variant.color}55"><span style="color:${variant.color};font-size:25px">●</span><strong>${esc(text(variant.key,requested))}${!variant.free&&!active()&&!tournament?" 🔒":""}</strong><small>${esc(variant.free?text("free",requested):text("premium",requested))}</small></button>`).join("")}</section></main>`;
+    content().innerHTML=`<main class="gamePage">${backButton()}<section class="hero"><span class="eyebrow">${esc(text("peg",requested))}</span><h1>🔵 ${esc(text("peg",requested))}</h1><p>${esc(text("howPeg",requested))}</p></section><section class="pegVariantGrid">${PEG_VARIANTS.map(variant=>`<button class="pegVariant" data-peg="${variant.id}" style="border-color:${variant.color}55"><span style="color:${variant.color};font-size:25px">●</span><strong>${esc(text(variant.key,requested))}</strong><small>${esc(text("free",requested))}</small></button>`).join("")}</section></main>`;
     bindBack(()=>renderCatalog(bridge.catalogContext));
     document.querySelectorAll("[data-peg]").forEach(button=>button.onclick=()=>{
       const variant=PEG_VARIANTS.find(row=>row.id===button.dataset.peg);
-      if(!variant.free&&!active()&&!tournament)return paywall("advanced",requested);
       renderPeg(variant.id,requested,tournament);
     });
     top();
