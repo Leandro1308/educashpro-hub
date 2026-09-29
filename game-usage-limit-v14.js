@@ -6,7 +6,7 @@
   const COOLDOWN_MS=8*60*60*1000;
   const PREFIX="ecp:game-usage:v1";
   const bridge=window.EduCashProGameBridge||(window.EduCashProGameBridge={session:null,catalogContext:{},currentGame:null});
-  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","math-cross","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines"]);
+  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","math-cross","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines","math-academy"]);
   let current=null,timer=0;
 
   const COPY={
@@ -137,6 +137,7 @@
     if(button.matches("[data-extra-level]"))return{game:bridge.currentGame,mode:button.dataset.extraLevel};
     if(button.matches("[data-falling-level]"))return{game:"falling-blocks",mode:button.dataset.fallingLevel};
     if(button.matches("[data-color-level]"))return{game:"color-lines",mode:button.dataset.colorLevel};
+    if(button.matches(".maMode[data-mode]"))return{game:"math-academy",mode:button.dataset.mode};
     if(button.matches("[data-air-mode]"))return button.dataset.airMode==="level-2"?{game:"air-defense-2",mode:"default"}:{game:"air-defense",mode:"default"};
     return null;
   }
@@ -144,7 +145,7 @@
   document.addEventListener("click",event=>{
     const back=event.target?.closest?.(".gameBackLocal,.extraBack,.fallingBack,.colorLinesBack,.airBack,.empireBack,.gameCatalogBack");
     if(back){stop();return}
-    const button=event.target?.closest?.("[data-level],[data-v3-math-level],[data-peg],[data-extra-level],[data-falling-level],[data-color-level],[data-air-mode]");
+    const button=event.target?.closest?.("[data-level],[data-v3-math-level],[data-peg],[data-extra-level],[data-falling-level],[data-color-level],.maMode[data-mode],[data-air-mode]");
     if(button){
       const info=modeFromButton(button);
       if(info?.game&&!start(info.game,info.mode,lang())){
@@ -189,5 +190,5 @@
 
   window.addEventListener("pagehide",stop);
   document.addEventListener("visibilitychange",()=>{if(current)current.last=Date.now()});
-  window.EduCashProGameUsageLimit={start,stop,read,showBlocked,playMs:PLAY_MS,cooldownMs:COOLDOWN_MS};
+  window.EduCashProGameUsageLimit={start,stop,read,showBlocked,isModeGame:(id)=>MODE_GAMES.has(String(id||"")),playMs:PLAY_MS,cooldownMs:COOLDOWN_MS};
 })();
