@@ -12,7 +12,7 @@
     "air-defense":{
       icon:"✈️",
       title:{pt:"Defesa Aérea",en:"Air Defense",es:"Defensa Aérea",ru:"Воздушная оборона"},
-      sub:{pt:"Escolha Nível 1 ou Nível 2.",en:"Choose Level 1 or Level 2.",es:"Elige Nivel 1 o Nivel 2.",ru:"Выберите Уровень 1 или Уровень 2."},
+      sub:{pt:"Escolha Nível 1 (defesa clássica) ou Nível 2 (combate aéreo).",en:"Choose Level 1 (classic defense) or Level 2 (air combat).",es:"Elige Nivel 1 (defensa clásica) o Nivel 2 (combate aéreo).",ru:"Выберите Уровень 1 (классическая защита) или Уровень 2 (воздушный бой)."},
       badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
     },
     "math-academy":{
@@ -42,15 +42,19 @@
   function label(map){const l=lang();return map?.[l]||map?.pt||""}
 
   function card(id){
-    const item=META[id];
+    const item=META[id],l=lang();
+    if(id==="air-defense"){
+      const level1=l==="en"?"Level 1":l==="es"?"Nivel 1":l==="ru"?"Уровень 1":"Nível 1",level2=l==="en"?"Level 2":l==="es"?"Nivel 2":l==="ru"?"Уровень 2":"Nível 2";
+      return '<article class="gameCardV2 localCatalogBridgeCard" data-local-game-card="'+id+'" data-air-defense-card="1"><div class="gameCardArt">'+item.icon+'</div><h3>'+esc(label(item.title))+'</h3><p>'+esc(label(item.sub))+'</p><div class="gameBadges"><span class="gameBadge">'+(l==="en"?"FREE":l==="es"?"LIBRE":l==="ru"?"СВОБОДНО":"LIVRE")+'</span><span class="gameBadge premium">'+esc(label(item.badge))+'</span></div><div class="gameCardActions"><button class="gamePlayBtn" type="button" data-air-mode="level-1" data-air-direct="air-defense-level-1">✈️ '+esc(level1)+'</button><button class="gamePlayBtn" type="button" data-air-mode="level-2" data-air-direct="air-defense-level-2">🛩️ '+esc(level2)+'</button></div></article>';
+    }
     return '<article class="gameCardV2 localCatalogBridgeCard" data-local-game-card="'+id+'">'+
       '<div class="gameCardArt">'+item.icon+'</div>'+
       '<h3>'+esc(label(item.title))+'</h3>'+
       '<p>'+esc(label(item.sub))+'</p>'+
-      '<div class="gameBadges"><span class="gameBadge">'+(lang()==="en"?"FREE":lang()==="es"?"LIBRE":lang()==="ru"?"СВОБОДНО":"LIVRE")+'</span>'+
+      '<div class="gameBadges"><span class="gameBadge">'+(l==="en"?"FREE":l==="es"?"LIBRE":l==="ru"?"СВОБОДНО":"LIVRE")+'</span>'+
       '<span class="gameBadge premium">'+esc(label(item.badge))+'</span></div>'+
       '<div class="gameCardActions single"><button class="gamePlayBtn" type="button" data-play="'+id+'">'+
-      (lang()==="en"?"Play":lang()==="es"?"Jugar":lang()==="ru"?"Играть":"Jogar")+
+      (l==="en"?"Play":l==="es"?"Jugar":l==="ru"?"Играть":"Jogar")+
       '</button></div></article>';
   }
 
@@ -87,11 +91,14 @@
   document.addEventListener("click",event=>{
     const button=event.target?.closest?.("[data-play]");
     if(!button||!IDS.includes(button.dataset.play))return;
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation?.();
-    open(button.dataset.play);
+    event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();open(button.dataset.play);
   },true);
+  document.addEventListener("click",event=>{
+    const button=event.target?.closest?.(".localCatalogBridgeCard [data-air-direct]");
+    if(!button)return;
+    event.preventDefault();
+    window.EduCashProAdvancedGames?.launch?.(button.dataset.airDirect,{lang:lang()});
+  });
 
   const observer=new MutationObserver(()=>queueMicrotask(ensure));
   observer.observe(document.documentElement,{childList:true,subtree:true});
