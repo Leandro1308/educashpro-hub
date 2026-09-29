@@ -183,7 +183,7 @@ assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.inclu
 assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
 
 const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
-assert(index.includes('local-games-bootstrap-v13.js?v=20260929.6'),"Direct local-games bootstrap is not loaded by index.html");
+assert(index.includes('local-games-bootstrap-v13.js?v=20260929.7'),"Direct local-games bootstrap is not loaded by index.html");
 assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
 for(const gameId of ["car-rush","air-defense","math-academy"]){
   assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);
@@ -197,6 +197,6 @@ for(const gameId of ["car-rush","air-defense","math-academy"]){
   assert(empireRegistrar.includes(`"${gameId}"`),`Empire registrar is missing ${gameId}`);
 }
 assert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch local games");
-assert(empireRegistrar.includes('node.src="./"+file+"?v=20260929.6"'),"Empire local-game recovery does not bypass stale lazy-loader cache");
+assert(empireRegistrar.includes('node.src="./"+file+"?v=20260929.7"'),"Empire local-game recovery does not bypass stale lazy-loader cache");
 assert(empireRegistrar.includes("MutationObserver")&&empireRegistrar.includes("base.renderCatalog"),"Empire extension does not repair every catalog render");
 assert(empireRegistrar.includes('if(k==="empire")return t("title",l)')&&empireRegistrar.includes("setTextIfChanged"),"Empire title/subtitle repair is missing");
