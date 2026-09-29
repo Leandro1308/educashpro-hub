@@ -155,6 +155,12 @@
   function gameCard(gameId, requested) {
     const [icon,nameKey,subKey] = GAME_META[gameId];
     const tournamentAction = TOURNAMENT_GAMES.has(gameId) ? `<button class="gameTournamentBtn" data-tournament="${gameId}">🏆 ${esc(text("tournament",requested))}</button>` : "";
+    if(gameId==="air-defense"){
+      const l=language(requested);
+      const level1=l==="en"?"Level 1":l==="es"?"Nivel 1":l==="ru"?"Уровень 1":"Nível 1";
+      const level2=l==="en"?"Level 2":l==="es"?"Nivel 2":l==="ru"?"Уровень 2":"Nível 2";
+      return `<article class="gameCardV2" data-air-defense-card="1"><div class="gameCardArt">${icon}</div><h3>${esc(text(nameKey,requested))}</h3><p>${esc(text(subKey,requested))}</p><div class="gameBadges"><span class="gameBadge">${esc(text("free",requested))}</span><span class="gameBadge premium">${esc(text("local",requested))}</span></div><div class="gameCardActions"><button class="gamePlayBtn" data-air-mode="level-1" data-air-direct="air-defense-level-1">✈️ ${esc(level1)}</button><button class="gamePlayBtn" data-air-mode="level-2" data-air-direct="air-defense-level-2">🛩️ ${esc(level2)}</button></div></article>`;
+    }
     return `<article class="gameCardV2"><div class="gameCardArt">${icon}</div><h3>${esc(text(nameKey,requested))}</h3><p>${esc(text(subKey,requested))}</p><div class="gameBadges"><span class="gameBadge">${esc(text("free",requested))}</span><span class="gameBadge premium">${gameId==="math-academy"?"📚 EDUCATIVO":esc(text("local",requested))}</span></div><div class="gameCardActions ${tournamentAction?"":"single"}"><button class="gamePlayBtn" data-play="${gameId}">${esc(text("play",requested))}</button>${tournamentAction}</div></article>`;
   }
 
@@ -167,6 +173,7 @@
     content().innerHTML = `<main class="gameSuite"><div class="gameSuiteHeader"><div><span class="eyebrow">EDUCASHPRO PLAY</span><h1>🎮 ${esc(text("title",requested))}</h1><p>${esc(text("sub",requested))}</p></div>${bridge.catalogContext.back?`<button class="textButton gameCatalogBack">← ${esc(text("back",requested))}</button>`:""}</div><section class="gameCatalogV2">${Object.keys(GAME_META).map(id=>gameCard(id,requested)).join("")}</section><section class="socialActions"><button id="gameHistory" class="secondaryButton">☁️ ${esc(text("history",requested))}</button></section><p class="notice">📱 ${esc(text("local",requested))}. ${esc(text("syncNote",requested))}</p></main>`;
     $(".gameCatalogBack")?.addEventListener("click",()=>bridge.catalogContext.back?.());
     document.querySelectorAll("[data-play]").forEach(button=>button.addEventListener("click",()=>launchGame(button.dataset.play,{lang:requested})));
+    document.querySelectorAll("[data-air-direct]").forEach(button=>button.addEventListener("click",()=>window.EduCashProAdvancedGames?.launch?.(button.dataset.airDirect,{lang:requested})));
     document.querySelectorAll("[data-tournament]").forEach(button=>button.addEventListener("click",()=>window.EduCashProSocial?.openTournament?.(button.dataset.tournament,{lang:requested})));
     $("#gameHistory")?.addEventListener("click",()=>active()?renderHistory(requested):paywall("advanced",requested));
     top();
