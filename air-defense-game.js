@@ -115,4 +115,6 @@ A.setStop(()=>{ended=true;if(frameId)cancelAnimationFrame(frameId);window.remove
 maintain();hud();frameId=requestAnimationFrame(frame);A.top()
 }
 A.register("air-defense",menu);
+A.register("air-defense-level-1",(l)=>classic(l));
+A.register("air-defense-level-2",(l)=>combat(l));
 })();
