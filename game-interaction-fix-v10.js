@@ -6,10 +6,13 @@
     if(!button)return;
     const suite=window.EduCashProGameSuite;
     if(!suite?.launchGame)return;
+    const l=suite.lang?.()||"pt";
+    const limiter=window.EduCashProGameUsageLimit;
+    if(limiter&&limiter.isModeGame?.("color-lines")!==true&&!limiter.start("color-lines","default",l)){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return}
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation?.();
-    suite.launchGame("color-lines",{lang:suite.lang?.()||"pt"});
+    suite.launchGame("color-lines",{lang:l});
   }
 
   document.addEventListener("click",openColorLines,true);

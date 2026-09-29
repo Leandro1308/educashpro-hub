@@ -41,7 +41,7 @@ const durationMs=now-start,recordMs=Math.max(oldRecordMs,durationMs),bestDestroy
 A.save("air",{recordMs,bestDestroyed,lastDestroyed:destroyed,bestTier:Math.max(Number(old.bestTier||0),baseTier)});
 const over=document.getElementById("airOver");over.className="laOver";
 over.innerHTML='<div><span class="laEye">'+A.esc(A.t("gameOver",l))+'</span><h2>✈️ '+destroyed+'</h2><p>'+A.esc(A.t("destroyed",l))+': <b>'+destroyed+'</b> · '+A.esc(A.t("record",l))+': <b>'+bestDestroyed+'</b> · '+A.fmt(durationMs)+'</p><div class="laActions"><button id="airAgain" class="laPrimary">'+A.esc(A.t("again",l))+'</button><button id="airExit" class="laSecondary">'+A.esc(A.t("exit",l))+'</button></div></div>';
-document.getElementById("airAgain").onclick=()=>classic(l);document.getElementById("airExit").onclick=()=>menu(l)
+document.getElementById("airAgain").onclick=()=>classic(l);document.getElementById("airExit").onclick=A.catalog
 }
 function frame(now){
 frameId=0;if(ended)return;const dt=Math.min(.035,(now-last)/1000||0);last=now;
@@ -61,7 +61,7 @@ plane(ctx,player.x,player.y);hud();frameId=requestAnimationFrame(frame)
 function move(clientX){const rect=canvas.getBoundingClientRect();player.x=A.clamp((clientX-rect.left)/rect.width*W,38,W-38)}
 const pointerDown=e=>{e.preventDefault();move(e.clientX);canvas.setPointerCapture?.(e.pointerId)},pointerMove=e=>{if(e.buttons||e.pointerType==="touch")move(e.clientX)},keyDown=e=>{if(e.key==="ArrowLeft")keys.left=true;if(e.key==="ArrowRight")keys.right=true},keyUp=e=>{if(e.key==="ArrowLeft")keys.left=false;if(e.key==="ArrowRight")keys.right=false};
 canvas.addEventListener("pointerdown",pointerDown);canvas.addEventListener("pointermove",pointerMove);window.addEventListener("keydown",keyDown);window.addEventListener("keyup",keyUp);
-document.querySelector(".airBack").onclick=()=>menu(l);
+document.querySelector(".airBack").onclick=A.catalog;
 const left=document.getElementById("airLeft"),right=document.getElementById("airRight");
 left.onpointerdown=()=>keys.left=true;left.onpointerup=left.onpointercancel=()=>keys.left=false;right.onpointerdown=()=>keys.right=true;right.onpointerup=right.onpointercancel=()=>keys.right=false;
 document.getElementById("airMinus").onclick=()=>{adjust=A.clamp(adjust-1,-2,3);hud()};document.getElementById("airPlus").onclick=()=>{adjust=A.clamp(adjust+1,-2,3);hud()};
@@ -87,7 +87,7 @@ const durationMs=now-start,bestDestroyed=Math.max(oldBest,destroyed),recordMs=Ma
 A.save("air-combat",{bestDestroyed,recordMs,lastDestroyed:destroyed});
 const over=document.getElementById("air2Over");over.className="laOver";
 over.innerHTML='<div><span class="laEye">'+A.esc(A.t("gameOver",l))+'</span><h2>✈️ '+destroyed+'</h2><p>'+A.esc(c("hits",l))+': <b>'+destroyed+'</b> · '+A.esc(A.t("record",l))+': <b>'+bestDestroyed+'</b> · '+A.fmt(durationMs)+'</p><div class="laActions"><button id="air2Again" class="laPrimary">'+A.esc(A.t("again",l))+'</button><button id="air2Exit" class="laSecondary">'+A.esc(A.t("exit",l))+'</button></div></div>';
-document.getElementById("air2Again").onclick=()=>combat(l);document.getElementById("air2Exit").onclick=()=>menu(l)
+document.getElementById("air2Again").onclick=()=>combat(l);document.getElementById("air2Exit").onclick=A.catalog
 }
 function frame(now){
 frameId=0;if(ended)return;const dt=Math.min(.035,(now-last)/1000||0);last=now;
@@ -109,12 +109,15 @@ function hold(id,key){const el=document.getElementById(id),on=()=>keys[key]=true
 const keyDown=e=>{const k=e.key.toLowerCase();if(e.key==="ArrowLeft"||k==="a")keys.left=true;if(e.key==="ArrowRight"||k==="d")keys.right=true;if(e.key==="ArrowUp"||k==="w")keys.up=true;if(e.key==="ArrowDown"||k==="s")keys.down=true;if(e.code==="Space"){e.preventDefault();fire()}};
 const keyUp=e=>{const k=e.key.toLowerCase();if(e.key==="ArrowLeft"||k==="a")keys.left=false;if(e.key==="ArrowRight"||k==="d")keys.right=false;if(e.key==="ArrowUp"||k==="w")keys.up=false;if(e.key==="ArrowDown"||k==="s")keys.down=false};
 hold("air2Left","left");hold("air2Right","right");hold("air2Up","up");hold("air2Down","down");
-document.getElementById("air2Fire").onclick=fire;document.querySelector(".airBack").onclick=()=>menu(l);
+document.getElementById("air2Fire").onclick=fire;document.querySelector(".airBack").onclick=A.catalog;
 window.addEventListener("keydown",keyDown);window.addEventListener("keyup",keyUp);
 A.setStop(()=>{ended=true;if(frameId)cancelAnimationFrame(frameId);window.removeEventListener("keydown",keyDown);window.removeEventListener("keyup",keyUp)});
 maintain();hud();frameId=requestAnimationFrame(frame);A.top()
 }
-A.register("air-defense",menu);
+A.register("air-defense",(l)=>classic(l));
+A.register("air-defense-2",(l)=>combat(l));
+// Aliases kept for old links/bookmarks.
+A.register("air-defense-menu",menu);
 A.register("air-defense-level-1",(l)=>classic(l));
 A.register("air-defense-level-2",(l)=>combat(l));
 })();

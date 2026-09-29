@@ -23,6 +23,8 @@
     if(!button)return;
     const gameId=button.dataset.play||button.dataset.extraPlay;
     if(!EXTRA_IDS.has(gameId))return;
+    const limiter=window.EduCashProGameUsageLimit;
+    if(limiter&&limiter.isModeGame?.(gameId)!==true&&!limiter.start(gameId,"default",currentLang())){event.preventDefault();event.stopImmediatePropagation();return}
     event.preventDefault();
     event.stopImmediatePropagation();
     suite.launchGame?.(gameId,{lang:currentLang()});
