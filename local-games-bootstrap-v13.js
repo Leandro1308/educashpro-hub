@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260929.7";
+  const VERSION="20260929.8";
   const IDS=["car-rush","air-defense","math-academy"];
   const COPY={
     pt:{
