@@ -1,30 +1,30 @@
 (function(){
   "use strict";
 
-  const VERSION="20260929.8";
-  const IDS=["car-rush","air-defense","math-academy"];
+  const VERSION="20260929.9";
+  const IDS=["car-rush","air-defense","air-defense-2","math-academy"];
   const COPY={
     pt:{
       carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta.",
-      airDefense:"Defesa Aérea",airDefenseSub:"Escolha entre Nível 1 (defesa clássica) e Nível 2 (combate aéreo).",
+      airDefense:"Defesa Aérea",airDefenseSub:"Defesa clássica: destrua as bolinhas antes que atravessem a base.",airDefense2:"Defesa Aérea 2",airDefense2Sub:"Combate aéreo: desvie dos tiros e abata aviões inimigos.",
       mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",
       play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"
     },
     en:{
       carRush:"Speed Race",carRushSub:"Dodge obstacles while speed keeps increasing.",
-      airDefense:"Air Defense",airDefenseSub:"Choose Level 1 (classic defense) or Level 2 (air combat).",
+      airDefense:"Air Defense",airDefenseSub:"Classic defense: destroy the balls before they cross the base.",airDefense2:"Air Defense 2",airDefense2Sub:"Air combat: dodge fire and destroy enemy aircraft.",
       mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",
       play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"
     },
     es:{
       carRush:"Carrera de Velocidad",carRushSub:"Esquiva obstáculos mientras aumenta la velocidad.",
-      airDefense:"Defensa Aérea",airDefenseSub:"Elige Nivel 1 (defensa clásica) o Nivel 2 (combate aéreo).",
+      airDefense:"Defensa Aérea",airDefenseSub:"Defensa clásica: destruye las bolas antes de que crucen la base.",airDefense2:"Defensa Aérea 2",airDefense2Sub:"Combate aéreo: esquiva disparos y derriba aviones enemigos.",
       mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",
       play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"
     },
     ru:{
       carRush:"Скоростная гонка",carRushSub:"Объезжайте препятствия при растущей скорости.",
-      airDefense:"Воздушная оборона",airDefenseSub:"Выберите Уровень 1 (классическая защита) или Уровень 2 (воздушный бой).",
+      airDefense:"Воздушная оборона",airDefenseSub:"Классическая защита: уничтожайте шары до линии базы.",airDefense2:"Воздушная оборона 2",airDefense2Sub:"Воздушный бой: уклоняйтесь и сбивайте самолёты.",
       mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",
       play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"
     }
@@ -32,6 +32,7 @@
   const META={
     "car-rush":["🏎️","carRush","carRushSub"],
     "air-defense":["✈️","airDefense","airDefenseSub"],
+    "air-defense-2":["🛩️","airDefense2","airDefense2Sub"],
     "math-academy":["🧠","mathAcademy","mathAcademySub"]
   };
 
@@ -81,7 +82,7 @@
           if(
             (normalized==="local-arcade-core.js"&&arcade) ||
             (normalized==="speed-race-game.js"&&arcade?.has?.("car-rush")) ||
-            (normalized==="air-defense-game.js"&&arcade?.has?.("air-defense")) ||
+            (normalized==="air-defense-game.js"&&arcade?.has?.("air-defense")&&arcade?.has?.("air-defense-2")) ||
             (normalized==="math-learning-game.js"&&arcade?.has?.("math-academy"))
           ) done();
         },80);
@@ -161,7 +162,7 @@
     if(!arcade)throw new Error("local_arcade_not_ready");
 
     if(!arcade.has?.("car-rush"))await loadScript("./speed-race-game.js");
-    if(!arcade.has?.("air-defense"))await loadScript("./air-defense-game.js");
+    if(!arcade.has?.("air-defense")||!arcade.has?.("air-defense-2"))await loadScript("./air-defense-game.js");
     if(!arcade.has?.("math-academy"))await loadScript("./math-learning-game.js");
 
     if(!window.EduCashProAdvancedGames?.launch)throw new Error("advanced_games_not_ready");
@@ -211,6 +212,10 @@
     const button=event.target?.closest?.("[data-play]");
     const id=button?.dataset?.play;
     if(!IDS.includes(id))return;
+    const limiter=window.EduCashProGameUsageLimit;
+    if(limiter&&!limiter.start(id,"default",lang())){
+      event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return;
+    }
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation?.();
