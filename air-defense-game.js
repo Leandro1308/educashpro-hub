@@ -109,7 +109,7 @@ function hold(id,key){const el=document.getElementById(id),on=()=>keys[key]=true
 const keyDown=e=>{const k=e.key.toLowerCase();if(e.key==="ArrowLeft"||k==="a")keys.left=true;if(e.key==="ArrowRight"||k==="d")keys.right=true;if(e.key==="ArrowUp"||k==="w")keys.up=true;if(e.key==="ArrowDown"||k==="s")keys.down=true;if(e.code==="Space"){e.preventDefault();fire()}};
 const keyUp=e=>{const k=e.key.toLowerCase();if(e.key==="ArrowLeft"||k==="a")keys.left=false;if(e.key==="ArrowRight"||k==="d")keys.right=false;if(e.key==="ArrowUp"||k==="w")keys.up=false;if(e.key==="ArrowDown"||k==="s")keys.down=false};
 hold("air2Left","left");hold("air2Right","right");hold("air2Up","up");hold("air2Down","down");
-document.getElementById("air2Fire").onclick=fire;document.querySelector(".airBack").onclick=()=>menu(l);
+document.getElementById("air2Fire").onclick=fire;document.querySelector(".airBack").onclick=A.catalog;
 window.addEventListener("keydown",keyDown);window.addEventListener("keyup",keyUp);
 A.setStop(()=>{ended=true;if(frameId)cancelAnimationFrame(frameId);window.removeEventListener("keydown",keyDown);window.removeEventListener("keyup",keyUp)});
 maintain();hud();frameId=requestAnimationFrame(frame);A.top()
