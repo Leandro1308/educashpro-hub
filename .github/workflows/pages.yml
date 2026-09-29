@@ -43,3 +43,35 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verificar domínio publicado
+        shell: bash
+        run: |
+          set -euo pipefail
+          ok=0
+          for attempt in $(seq 1 12); do
+            stamp="${GITHUB_SHA}-${attempt}-$(date +%s)"
+            version="$(curl -fsSL --retry 2 --connect-timeout 10 "https://go.educashpro.vip/version.json?probe=${stamp}" || true)"
+            games="$(curl -fsSL --retry 2 --connect-timeout 10 "https://go.educashpro.vip/game-suite.js?probe=${stamp}" || true)"
+            empire="$(curl -fsSL --retry 2 --connect-timeout 10 "https://go.educashpro.vip/educash-empire-v12.js?probe=${stamp}" || true)"
+            echo "Attempt ${attempt}: version=${version}"
+            if [[ "${version}" == *'"build":"2026.09.28.5"'* ]] \
+              && grep -q '"car-rush"' <<<"${games}" \
+              && grep -q '"air-defense"' <<<"${games}" \
+              && grep -q '"math-academy"' <<<"${games}" \
+              && grep -q 'patchCatalog' <<<"${empire}" \
+              && grep -q '20260928.5' <<<"${empire}"; then
+              ok=1
+              break
+            fi
+            sleep 5
+          done
+          if [[ "${ok}" != "1" ]]; then
+            echo "::error::O domínio go.educashpro.vip não está servindo o build esperado ou os novos jogos."
+            echo "VERSION_RESPONSE=${version}"
+            echo "GAME_SUITE_HAS_CAR=$(grep -c '"car-rush"' <<<"${games}" || true)"
+            echo "GAME_SUITE_HAS_AIR=$(grep -c '"air-defense"' <<<"${games}" || true)"
+            echo "GAME_SUITE_HAS_MATH=$(grep -c '"math-academy"' <<<"${games}" || true)"
+            echo "EMPIRE_HAS_PATCH=$(grep -c 'patchCatalog' <<<"${empire}" || true)"
+            exit 1
+          fi
+          echo "Domínio público validado com os três novos jogos."
