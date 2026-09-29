@@ -144,7 +144,7 @@
     const id=button?.dataset?.play;
     if(id!=="educash-empire"&&!LOCAL_IDS.includes(id))return;
     const limiter=window.EduCashProGameUsageLimit;
-    if(limiter&&!limiter.start(id,"default",lang())){event.preventDefault();event.stopImmediatePropagation();return}
+    if(limiter&&limiter.isModeGame?.(id)!==true&&!limiter.start(id,"default",lang())){event.preventDefault();event.stopImmediatePropagation();return}
     event.preventDefault();
     event.stopImmediatePropagation();
     suite.launchGame(id,{lang:lang()});
