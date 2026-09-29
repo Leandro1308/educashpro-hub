@@ -94,7 +94,7 @@
     const button=event.target?.closest?.("[data-play]");
     if(!button||!IDS.includes(button.dataset.play))return;
     const limiter=window.EduCashProGameUsageLimit;
-    if(limiter&&!limiter.start(button.dataset.play,"default",lang())){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return}
+    if(limiter&&limiter.isModeGame?.(button.dataset.play)!==true&&!limiter.start(button.dataset.play,"default",lang())){event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();return}
     event.preventDefault();event.stopPropagation();event.stopImmediatePropagation?.();open(button.dataset.play);
   },true);
 
