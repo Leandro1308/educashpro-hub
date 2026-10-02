@@ -10,10 +10,10 @@
   let current=null,timer=0;
 
   const COPY={
-    pt:{title:"Tempo gratuito concluído",body:"Você completou 1 hora de uso gratuito desta modalidade. Assinantes têm acesso ilimitado aos jogos.",monthly:"Assinar mensal",lifetime:"Assinar vitalício",small:"Você pode voltar a jogar esta modalidade depois de 8 horas.",remaining:"Tempo restante para liberar novamente"},
-    en:{title:"Free play time completed",body:"You completed 1 hour of free use for this game mode. Subscribers have unlimited access to games.",monthly:"Monthly subscription",lifetime:"Lifetime subscription",small:"You can play this mode again after 8 hours.",remaining:"Time until this mode is available again"},
-    es:{title:"Tiempo gratuito completado",body:"Completaste 1 hora de uso gratuito de esta modalidad. Los suscriptores tienen acceso ilimitado a los juegos.",monthly:"Suscripción mensual",lifetime:"Suscripción vitalicia",small:"Puedes volver a jugar esta modalidad después de 8 horas.",remaining:"Tiempo restante para volver a jugar"},
-    ru:{title:"Бесплатное время завершено",body:"Вы использовали 1 час бесплатной игры в этом режиме. Подписчики получают неограниченный доступ к играм.",monthly:"Месячная подписка",lifetime:"Пожизненная подписка",small:"Вы сможете снова играть в этот режим через 8 часов.",remaining:"До повторного доступа осталось"}
+    pt:{title:"Tempo gratuito concluído",body:"Você concluiu o período de uso gratuito desta modalidade.",small:"Você pode voltar a jogar esta modalidade depois de 8 horas.",remaining:"Tempo restante para liberar novamente",back:"Voltar aos jogos"},
+    en:{title:"Free play time completed",body:"You completed the free-use period for this game mode.",small:"You can play this mode again after 8 hours.",remaining:"Time until this mode is available again",back:"Back to games"},
+    es:{title:"Tiempo gratuito completado",body:"Completaste el período de uso gratuito de esta modalidad.",small:"Puedes volver a jugar esta modalidad después de 8 horas.",remaining:"Tiempo restante para volver a jugar",back:"Volver a juegos"},
+    ru:{title:"Бесплатное время завершено",body:"Бесплатный период для этого режима завершён.",small:"Вы сможете снова играть в этот режим через 8 часов.",remaining:"До повторного доступа осталось",back:"Назад к играм"}
   };
 
   function lang(requested){
@@ -82,9 +82,7 @@
     const state=read(game,mode),remaining=Math.max(0,state.lockedUntil-Date.now());
     const target=document.getElementById("content");
     if(!target)return;
-    target.innerHTML='<main class="gamePage ecpGameLimitPage"><section style="max-width:620px;margin:24px auto;padding:28px;border-radius:24px;background:#0d1b2d;border:1px solid rgba(48,230,166,.22);box-shadow:0 18px 45px rgba(0,0,0,.25);text-align:center"><div style="font-size:46px;margin-bottom:8px">⏱️</div><span class="eyebrow">EDUCASHPRO PLAY</span><h2 style="margin:8px 0 10px">'+esc(c("title",l))+'</h2><p style="color:#c7d4e4;line-height:1.55">'+esc(c("body",l))+'</p>'+(remaining?'<p style="font-weight:800">⌛ '+esc(c("remaining",l))+': '+esc(format(remaining))+'</p>':'')+'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px"><button id="ecpLimitMonthly" class="wideButton" type="button">⚡ '+esc(c("monthly",l))+'</button><button id="ecpLimitLifetime" class="secondaryButton" type="button">♾️ '+esc(c("lifetime",l))+'</button></div><small style="display:block;margin-top:12px;color:#91a4b9;line-height:1.45">'+esc(c("small",l))+'</small><button id="ecpLimitBack" class="textButton" type="button" style="margin-top:18px">←</button></section></main>';
-    document.getElementById("ecpLimitMonthly").onclick=()=>openPlan("monthly");
-    document.getElementById("ecpLimitLifetime").onclick=()=>openPlan("lifetime");
+    target.innerHTML='<main class="gamePage ecpGameLimitPage"><section style="max-width:620px;margin:24px auto;padding:28px;border-radius:24px;background:#0d1b2d;border:1px solid rgba(48,230,166,.22);box-shadow:0 18px 45px rgba(0,0,0,.25);text-align:center"><div style="font-size:46px;margin-bottom:8px">⏱️</div><span class="eyebrow">EDUCASHPRO PLAY</span><h2 style="margin:8px 0 10px">'+esc(c("title",l))+'</h2><p style="color:#c7d4e4;line-height:1.55">'+esc(c("body",l))+'</p>'+(remaining?'<p style="font-weight:800">⌛ '+esc(c("remaining",l))+': '+esc(format(remaining))+'</p>':'')+'<small style="display:block;margin-top:12px;color:#91a4b9;line-height:1.45">'+esc(c("small",l))+'</small><button id="ecpLimitBack" class="secondaryButton" type="button" style="width:100%;margin-top:18px">← '+esc(c("back",l))+'</button></section></main>';
     document.getElementById("ecpLimitBack").onclick=()=>window.EduCashProGameSuite?.renderCatalog?.(bridge.catalogContext||{});
     window.scrollTo({top:0,behavior:"smooth"});
   }

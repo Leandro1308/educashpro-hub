@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.01.1",
+  "version": "2026.10.02.1",
   "architecture": {
     "freeLimit": 15,
     "delivery": "on-demand",
@@ -12,7 +12,8 @@
       "es",
       "ru"
     ],
-    "note": "Only entries with status=ready should be rendered. Planned entries define the first curated 100-game library without loading game packages into the main EduCashPro bundle."
+    "note": "Only entries with status=ready should be rendered. Planned entries define the first curated 100-game library without loading game packages into the main EduCashPro bundle.",
+    "readyFreeCount": 9
   },
   "games": [
     {
@@ -20,33 +21,62 @@
       "title": "Snake",
       "category": "arcade",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/snake.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Snake clássico com modos e recorde local.",
+        "en": "Classic Snake with modes and local high score.",
+        "es": "Snake clásico con modos y récord local.",
+        "ru": "Классическая змейка с режимами и локальным рекордом."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "block-drop",
       "title": "Block Drop",
       "category": "puzzle",
       "access": "free",
-      "status": "planned",
+      "status": "existing",
       "offline": true,
       "localProgress": true,
       "entry": null,
-      "packageVersion": null
+      "packageVersion": null,
+      "existingGameId": "block-grid",
+      "description": {
+        "pt": "Blocos em Queda já disponível no catálogo atual.",
+        "en": "Falling Blocks already available in the current catalog.",
+        "es": "Bloques en Caída ya disponible en el catálogo actual.",
+        "ru": "Падающие блоки уже доступны в текущем каталоге."
+      }
     },
     {
       "id": "2048",
       "title": "2048",
       "category": "puzzle",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/2048.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Junte números e alcance 2048.",
+        "en": "Merge numbers and reach 2048.",
+        "es": "Combina números y alcanza 2048.",
+        "ru": "Объединяйте числа и достигните 2048."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "sudoku",
@@ -64,44 +94,88 @@
       "title": "Minesweeper",
       "category": "puzzle",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/minesweeper.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Encontre as casas seguras sem tocar nas minas.",
+        "en": "Find safe cells without hitting mines.",
+        "es": "Encuentra casillas seguras sin tocar minas.",
+        "ru": "Открывайте безопасные клетки, избегая мин."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "memory-match",
       "title": "Memory Match",
       "category": "brain",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/memory.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Encontre os pares e treine a memória.",
+        "en": "Find matching pairs and train memory.",
+        "es": "Encuentra las parejas y entrena la memoria.",
+        "ru": "Находите пары и тренируйте память."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "breakout",
       "title": "Breakout",
       "category": "arcade",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/breakout.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Quebre os blocos sem deixar a bola escapar.",
+        "en": "Break the blocks without losing the ball.",
+        "es": "Rompe los bloques sin perder la pelota.",
+        "ru": "Разбивайте блоки, не упуская мяч."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "flappy",
       "title": "Flappy",
       "category": "arcade",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/flappy.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Passe pelos obstáculos e aumente seu recorde.",
+        "en": "Pass the obstacles and improve your record.",
+        "es": "Supera los obstáculos y mejora tu récord.",
+        "ru": "Проходите препятствия и улучшайте рекорд."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "tic-tac-toe",
@@ -152,11 +226,18 @@
       "title": "Word Search",
       "category": "word",
       "access": "free",
-      "status": "planned",
+      "status": "existing",
       "offline": true,
       "localProgress": true,
       "entry": null,
-      "packageVersion": null
+      "packageVersion": null,
+      "existingGameId": "word-search",
+      "description": {
+        "pt": "Caça-Palavras já disponível no catálogo atual.",
+        "en": "Word Search already available in the current catalog.",
+        "es": "Sopa de Letras ya disponible en el catálogo actual.",
+        "ru": "Поиск слов уже доступен в текущем каталоге."
+      }
     },
     {
       "id": "merge-drop",
@@ -174,11 +255,22 @@
       "title": "Whack-a-Mole",
       "category": "reflex",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/whack-a-mole.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Teste seus reflexos acertando os alvos a tempo.",
+        "en": "Test your reflexes by hitting targets in time.",
+        "es": "Pon a prueba tus reflejos golpeando los objetivos a tiempo.",
+        "ru": "Проверьте реакцию, попадая по целям вовремя."
+      },
+      "source": {
+        "project": "90s-games",
+        "license": "MIT",
+        "repository": "prateek121/90s-games"
+      }
     },
     {
       "id": "solitaire",

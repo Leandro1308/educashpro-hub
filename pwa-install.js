@@ -115,7 +115,7 @@
     if(isInstalled()){toast(c.installed);return}
     if(deferredPrompt){await promptInstall();return}
     if(isIOS()){
-      location.assign("/install.html");
+      location.assign(new URL("./install.html",location.href).toString());
       return;
     }
     modal({title:c.manualTitle,body:c.manualBody});
