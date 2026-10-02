@@ -52,14 +52,14 @@
     @media(max-width:560px){.webSiteMenuButton{padding:0 11px}.webSiteMenuSheet{width:100%;padding:16px}.webSiteMenuHead{top:-16px;padding-top:16px}.webSiteMenuGrid{grid-template-columns:1fr}html.educashproWeb #accountCenterButton{width:44px;padding:0 6px}html.educashproWeb #accountCenterButton .accountHeaderLabel{display:none}}
   `;document.head.appendChild(style)}
   function open(){
-    styles();close();const c=copy(),groups=c.groups.map(([title,items])=>[title,items.filter(([action])=>action!=="install"||!window.EduCashProPWA?.isInstalled?.())]);
+    styles();close();const c=copy(),groups=c.groups.map(([title,items])=>[title,items.slice()]);
     if(session()?.permissions?.admin===true)groups.push([lang()==="en"?"Administration":lang()==="es"?"Administración":lang()==="ru"?"Администрирование":"Administração",[["admin","🛠️",lang()==="en"?"Admin panel":lang()==="es"?"Panel administrativo":lang()==="ru"?"Панель администратора":"Painel administrativo"]]]);
     const layer=document.createElement("div");layer.className="webSiteMenuLayer";layer.innerHTML=`<aside class="webSiteMenuSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><header class="webSiteMenuHead"><div><h2>☰ ${esc(c.title)}</h2><p>${esc(c.subtitle)}</p></div><button class="webSiteMenuClose" aria-label="${esc(c.close)}">✕</button></header>${groups.map(([title,items])=>`<section class="webSiteMenuGroup"><h3>${esc(title)}</h3><div class="webSiteMenuGrid">${items.map(([action,icon,label])=>`<button class="webSiteMenuItem" type="button" data-menu-action="${esc(action)}"><span>${icon}</span><b>${esc(label)}</b></button>`).join("")}</div></section>`).join("")}</aside>`;document.body.appendChild(layer);document.body.classList.add("webSiteMenuOpen");layer.querySelector(".webSiteMenuClose").onclick=close;layer.onclick=e=>{if(e.target===layer)close()};layer.querySelectorAll("[data-menu-action]").forEach(button=>button.onclick=()=>run(button.dataset.menuAction));layer.querySelector(".webSiteMenuClose")?.focus()}
   async function run(action){
     const app=window.EduCashProApp,account=window.EduCashProAccountCenter;
     if(action==="home"){close();app?.renderPublicLanding?.();return}
     if(action==="presentation"){close();app?.renderPresentation?.(app.renderPublicLanding);return}
-    if(action==="install"){close();return window.EduCashProPWA?.install?.()}
+    if(action==="install"){close();if(window.EduCashProPWA?.install)return window.EduCashProPWA.install();location.assign(new URL("./install.html",location.href).toString());return}
     if(action==="marketplace"){location.assign(internal("./marketplace.html"));return}
     if(action==="games"){close();await window.EduCashProResources?.loadGames?.();window.EduCashProMentalGames?.renderCatalog?.({public:true,lang:lang(),back:app?.renderPublicLanding});return}
     if(action==="tools"){close();app?.renderTools?.();return}
