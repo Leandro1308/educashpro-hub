@@ -26,9 +26,8 @@
       result:"Treino concluído",again:"Jogar novamente",catalog:"Voltar ao catálogo",
       exEyebrow:"PRATIQUE TAMBÉM NO MERCADO",
       exTitle:"Continue praticando na Exness",
-      exBody:"Você pode começar em uma conta demonstrativa ou, se decidir operar com capital real, abrir uma conta real e praticar com gestão de risco.",
+      exBody:"Você pode começar em uma conta demonstrativa ou abrir uma conta real para continuar praticando na Exness.",
       exCta:"CADASTRE-SE NA EXNESS",exContinue:"CONTINUAR JOGO",
-      exDisclosure:"Operações com instrumentos financeiros envolvem risco de perdas.",
       doji:"Doji",hammer:"Martelo",shootingStar:"Estrela cadente",bullishEngulfing:"Engolfo de alta",bearishEngulfing:"Engolfo de baixa",insideBar:"Inside Bar",
       uptrend:"Tendência de alta",downtrend:"Tendência de baixa",range:"Lateralidade",breakout:"Rompimento",supportRejection:"Rejeição no suporte",resistanceRejection:"Rejeição na resistência",pullback:"Pullback / reteste",falseBreakout:"Falso rompimento",
       tipDoji:"Abertura e fechamento ficam muito próximos, mostrando equilíbrio temporário entre compradores e vendedores.",
@@ -56,9 +55,8 @@
       correct:"Correct",wrong:"Review this reading",yourAnswer:"Your answer",rightAnswer:"Expected answer",
       result:"Training complete",again:"Play again",catalog:"Back to catalog",
       exEyebrow:"PRACTICE IN THE MARKET TOO",exTitle:"Keep practicing with Exness",
-      exBody:"You can start with a Demo account or, if you decide to trade with real capital, open a real account and practice with risk management.",
+      exBody:"You can start with a Demo account or open a real account to keep practicing with Exness.",
       exCta:"SIGN UP WITH EXNESS",exContinue:"CONTINUE GAME",
-      exDisclosure:"Trading financial instruments involves risk of loss.",
       doji:"Doji",hammer:"Hammer",shootingStar:"Shooting Star",bullishEngulfing:"Bullish Engulfing",bearishEngulfing:"Bearish Engulfing",insideBar:"Inside Bar",
       uptrend:"Uptrend",downtrend:"Downtrend",range:"Trading range",breakout:"Breakout",supportRejection:"Support rejection",resistanceRejection:"Resistance rejection",pullback:"Pullback / retest",falseBreakout:"False breakout",
       tipDoji:"Open and close are very close, showing temporary balance between buyers and sellers.",
@@ -86,9 +84,8 @@
       correct:"Correcto",wrong:"Revisa esta lectura",yourAnswer:"Tu respuesta",rightAnswer:"Respuesta esperada",
       result:"Entrenamiento completado",again:"Jugar de nuevo",catalog:"Volver al catálogo",
       exEyebrow:"PRACTICA TAMBIÉN EN EL MERCADO",exTitle:"Sigue practicando en Exness",
-      exBody:"Puedes comenzar con una cuenta Demo o, si decides operar con capital real, abrir una cuenta real y practicar con gestión de riesgo.",
+      exBody:"Puedes comenzar con una cuenta Demo o abrir una cuenta real para seguir practicando en Exness.",
       exCta:"REGÍSTRATE EN EXNESS",exContinue:"CONTINUAR JUEGO",
-      exDisclosure:"Operar instrumentos financieros implica riesgo de pérdidas.",
       doji:"Doji",hammer:"Martillo",shootingStar:"Estrella fugaz",bullishEngulfing:"Envolvente alcista",bearishEngulfing:"Envolvente bajista",insideBar:"Inside Bar",
       uptrend:"Tendencia alcista",downtrend:"Tendencia bajista",range:"Lateralidad",breakout:"Rompimiento",supportRejection:"Rechazo en soporte",resistanceRejection:"Rechazo en resistencia",pullback:"Pullback / retesteo",falseBreakout:"Falso rompimiento",
       tipDoji:"Apertura y cierre quedan muy próximos, mostrando equilibrio temporal entre compradores y vendedores.",
@@ -116,9 +113,8 @@
       correct:"Верно",wrong:"Пересмотрите чтение",yourAnswer:"Ваш ответ",rightAnswer:"Ожидаемый ответ",
       result:"Тренировка завершена",again:"Играть снова",catalog:"Назад в каталог",
       exEyebrow:"ПРАКТИКА НА РЫНКЕ",exTitle:"Продолжайте практику с Exness",
-      exBody:"Можно начать с демо-счёта или, если вы решите использовать реальный капитал, открыть реальный счёт и соблюдать управление риском.",
+      exBody:"Можно начать с демо-счёта или открыть реальный счёт, чтобы продолжить практику в Exness.",
       exCta:"ЗАРЕГИСТРИРОВАТЬСЯ В EXNESS",exContinue:"ПРОДОЛЖИТЬ ИГРУ",
-      exDisclosure:"Торговля финансовыми инструментами связана с риском убытков.",
       doji:"Доджи",hammer:"Молот",shootingStar:"Падающая звезда",bullishEngulfing:"Бычье поглощение",bearishEngulfing:"Медвежье поглощение",insideBar:"Внутренний бар",
       uptrend:"Восходящий тренд",downtrend:"Нисходящий тренд",range:"Боковой диапазон",breakout:"Пробой",supportRejection:"Отбой от поддержки",resistanceRejection:"Отбой от сопротивления",pullback:"Откат / ретест",falseBreakout:"Ложный пробой",
       tipDoji:"Открытие и закрытие находятся рядом, показывая временный баланс покупателей и продавцов.",
@@ -352,7 +348,7 @@
     overlay.innerHTML='<section class="exnessTrainingCard"><div class="exnessTrainingBody">'+
       '<span class="exnessTrainingEyebrow">'+esc(t("exEyebrow"))+'</span><h2>'+esc(t("exTitle"))+'</h2><p>'+esc(t("exBody"))+'</p>'+
       '<div class="exnessTrainingActions"><button type="button" class="exnessTrainingCta">'+esc(t("exCta"))+'</button><button type="button" class="exnessTrainingContinue">'+esc(t("exContinue"))+'</button></div>'+
-      '<small class="exnessTrainingDisclosure">'+esc(t("exDisclosure"))+'</small></div></section>';
+      '</div></section>';
     document.body.appendChild(overlay);
     overlay.querySelector(".exnessTrainingCta").onclick=function(){openUrl(EXNESS_URL)};
     overlay.querySelector(".exnessTrainingContinue").onclick=function(){overlay.remove();next()};
@@ -385,5 +381,5 @@
   },200);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureCards,{once:true});else ensureCards();
 
-  window.EduCashProMarketTrainingGames={ensureCards:intro?ensureCards:ensureCards,open:intro,version:"2026.10.01.3"};
+  window.EduCashProMarketTrainingGames={ensureCards:intro?ensureCards:ensureCards,open:intro,version:"2026.10.01.4"};
 })();
