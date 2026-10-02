@@ -47,6 +47,34 @@
     return session;
   }
 
+  async function requestEmailCode(email,{apiBase=DEFAULT_API_BASE,language}={}){
+    return jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/email/request`,{
+      method:"POST",
+      body:JSON.stringify({
+        email:String(email||"").trim().toLowerCase(),
+        language:String(language||navigator.language||"pt").slice(0,8),
+      }),
+    });
+  }
+
+  async function verifyEmailCode(email,code,{apiBase=DEFAULT_API_BASE,language,referralCode}={}){
+    const ref=String(referralCode||platform?.pendingReferral?.()||"").trim();
+    const existing=platform?.readWebSession?.();
+    const headers=existing?.token?{Authorization:`Bearer ${existing.token}`}:{};
+    const result=await jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/email/verify`,{
+      method:"POST",
+      headers,
+      body:JSON.stringify({
+        email:String(email||"").trim().toLowerCase(),
+        code:String(code||"").replace(/\D/g,"").slice(0,6),
+        referralCode:ref,
+        language:String(language||navigator.language||"pt").slice(0,8),
+      }),
+    });
+    saveSession(result);
+    return result;
+  }
+
   async function requestChallenge({apiBase=DEFAULT_API_BASE,referralCode}={}){
     const ref=String(referralCode||platform?.pendingReferral?.()||"").trim();
     return jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/challenge`,{
@@ -59,8 +87,11 @@
     const tonProof=wallet?.connectItems?.tonProof;
     if(!wallet?.account)throw new Error("wallet_account_missing");
     if(!tonProof||!("proof" in tonProof))throw new Error("ton_proof_not_supported");
+    const existing=platform?.readWebSession?.();
+    const headers=existing?.token?{Authorization:`Bearer ${existing.token}`}:{};
     const result=await jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/verify`,{
       method:"POST",
+      headers,
       body:JSON.stringify({
         challengeId,
         account:wallet.account,
@@ -183,6 +214,8 @@
     prepareWalletAuthentication,
     watchWalletAuthentication,
     verifyWalletProof,
+    requestEmailCode,
+    verifyEmailCode,
     authenticateFromTelegram,
     linkTelegramToStoredSession,
     validateStoredSession,

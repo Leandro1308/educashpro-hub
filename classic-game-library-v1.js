@@ -3,6 +3,7 @@
   if(window.EduCashProClassicGamesV1)return;
 
   const suite=window.EduCashProGameSuite;
+  const base=window.EduCashProMentalGames;
   const bridge=window.EduCashProGameBridge||(window.EduCashProGameBridge={session:null,catalogContext:{},currentGame:null});
   if(!suite)return;
 
@@ -70,7 +71,17 @@
   function back(){bridge.currentGame=null;suite.renderCatalog?.(bridge.catalogContext||{})}
 
   const previous=suite.renderCatalog?.bind(suite);
-  if(previous)suite.renderCatalog=function(options={}){const out=previous(options);queueMicrotask(decorate);setTimeout(decorate,50);return out};
+  if(previous){
+    const renderCatalogWithClassic=function(options={}){
+      const out=previous(options);
+      queueMicrotask(decorate);
+      setTimeout(decorate,50);
+      return out;
+    };
+    suite.renderCatalog=renderCatalogWithClassic;
+    if(base)base.renderCatalog=renderCatalogWithClassic;
+  }
+  queueMicrotask(decorate);
 
   document.addEventListener("click",e=>{const b=e.target?.closest?.("[data-classic-play]");if(!b)return;e.preventDefault();e.stopPropagation();open(b.dataset.classicPlay)},true);
   window.addEventListener("message",e=>{if(e.origin===location.origin&&e.data?.type==="educashpro:classic-back")back()});

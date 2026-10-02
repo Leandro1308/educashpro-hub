@@ -18,6 +18,49 @@
       accountBadge:"АККАУНТ EDUCASHPRO",walletLogin:"Войти через TON-кошелёк",walletLoginText:"Кошелёк используется только для подтверждения владения. При входе не запрашиваются платежи или переводы.",connectWallet:"Подключить кошелёк",phoneLogin:"Войти с уже подключённого телефона",phoneLoginText:"Используйте телефон, где вход уже выполнен, чтобы разрешить доступ на этом компьютере без повторного подключения кошелька.",startPair:"Создать код подключения",pairTitle:"Войти на этом компьютере",pairInstructions:"На телефоне, где EduCashPro уже открыт, выберите ‘Подключить другое устройство’ и введите этот код:",waiting:"Ожидание подтверждения на телефоне…",expires:"Срок действия недоступен.",expiresCountdown:"Код истекает через {time}.",expired:"Срок действия кода истёк. Создайте новый код.",welcome:"Мой аккаунт EduCashPro",welcomeText:"Один аккаунт работает на телефоне, компьютере и в Telegram после привязки. Создавать отдельный аккаунт для каждого устройства не нужно.",accountTitle:"Мой аккаунт",referralCode:"Реферальный код",wallet:"TON-кошелёк",connected:"Подключён",notConnected:"Не подключён",telegram:"Telegram",linked:"Привязан",notLinked:"Ещё не привязан",subscription:"Подписка",active:"Активна",inactive:"Не активна",subscriptionHint:"Статус подписки принадлежит вашему аккаунту EduCashPro и доступен на связанных устройствах.",referralTitle:"Ваша реферальная ссылка",copy:"Копировать",copied:"Скопировано",devicesTitle:"Ваши устройства",devicesText:"Чтобы открыть тот же аккаунт на другом устройстве, создайте код на новом устройстве и подтвердите его здесь.",pairInput:"Введите 6-значный код",approve:"Разрешить устройство",approved:"Устройство разрешено. Вернитесь на другое устройство.",invalidCode:"Код недействителен или истёк.",resources:"Доступные возможности",presentation:"О EduCashPro",presentationSub:"Обзор и презентация платформы.",games:"Бесплатные игры",gamesSub:"Локальные игры на внимание и логику.",marketplace:"Маркетплейс",marketplaceSub:"Компании и публичные страницы.",telegramTitle:"Telegram",telegramSub:"Открыть интеграцию с Telegram.",technical:"Техническая информация",accountId:"Внутренний ID аккаунта",logout:"Выйти",close:"Закрыть",authError:"Не удалось подтвердить кошелёк.",webUnavailable:"Веб-аутентификация недоступна.",deviceConnected:"Это устройство подключено к вашему аккаунту.",pairSuccess:"Аккаунт подключён на этом устройстве.",pairFailed:"Не удалось связать устройства."}
   };
 
+  const EMAIL_COPY={
+    pt:{
+      login:"Entrar com e-mail",title:"Acesse o EduCashPro com seu e-mail",
+      text:"Use seu e-mail para entrar e acessar o menu e os recursos disponíveis. Não é necessário conectar carteira para entrar.",
+      email:"Seu e-mail",send:"ENVIAR CÓDIGO",code:"Código de 6 dígitos",confirm:"CONFIRMAR E ENTRAR",
+      sent:"Enviamos um código para {email}.\n📬 Se não encontrar na caixa de entrada, verifique Spam/Lixo eletrônico e também a Lixeira.",
+      resend:"Enviar novo código",invalidEmail:"Digite um e-mail válido.",invalidCode:"Código inválido. Confira os 6 dígitos e tente novamente.",
+      expired:"O código expirou. Solicite um novo.",cooldown:"Aguarde um momento antes de solicitar outro código.",
+      delivery:"Não foi possível enviar o código agora. Tente novamente.",conflict:"Este e-mail já pertence a outra identidade com dados vinculados.",
+      privacy:"O e-mail identifica sua conta e permite acessar o EduCashPro em outros aparelhos."
+    },
+    en:{
+      login:"Sign in with email",title:"Access EduCashPro with your email",
+      text:"Use your email to sign in and access the menu and available resources. A wallet is not required to enter.",
+      email:"Your email",send:"SEND CODE",code:"6-digit code",confirm:"CONFIRM AND ENTER",
+      sent:"We sent a code to {email}.\n📬 If you do not see it in your inbox, check Spam/Junk and also Trash.",
+      resend:"Send a new code",invalidEmail:"Enter a valid email address.",invalidCode:"Invalid code. Check the 6 digits and try again.",
+      expired:"The code expired. Request a new one.",cooldown:"Wait a moment before requesting another code.",
+      delivery:"We could not send the code right now. Try again.",conflict:"This email already belongs to another identity with linked data.",
+      privacy:"Your email identifies your account and lets you access EduCashPro on other devices."
+    },
+    es:{
+      login:"Entrar con correo",title:"Accede a EduCashPro con tu correo",
+      text:"Usa tu correo para entrar y acceder al menú y a los recursos disponibles. No necesitas conectar una billetera para entrar.",
+      email:"Tu correo electrónico",send:"ENVIAR CÓDIGO",code:"Código de 6 dígitos",confirm:"CONFIRMAR Y ENTRAR",
+      sent:"Enviamos un código a {email}.\n📬 Si no aparece en la bandeja de entrada, revisa Spam/Correo no deseado y también la Papelera.",
+      resend:"Enviar un nuevo código",invalidEmail:"Introduce un correo válido.",invalidCode:"Código inválido. Verifica los 6 dígitos e inténtalo de nuevo.",
+      expired:"El código venció. Solicita uno nuevo.",cooldown:"Espera un momento antes de solicitar otro código.",
+      delivery:"No fue posible enviar el código ahora. Inténtalo de nuevo.",conflict:"Este correo ya pertenece a otra identidad con datos vinculados.",
+      privacy:"El correo identifica tu cuenta y permite acceder a EduCashPro desde otros dispositivos."
+    },
+    ru:{
+      login:"Войти по e-mail",title:"Войдите в EduCashPro по e-mail",
+      text:"Используйте e-mail для входа и доступа к меню и доступным функциям. Кошелёк для входа не требуется.",
+      email:"Ваш e-mail",send:"ОТПРАВИТЬ КОД",code:"6-значный код",confirm:"ПОДТВЕРДИТЬ И ВОЙТИ",
+      sent:"Код отправлен на {email}.\n📬 Если его нет во входящих, проверьте папку «Спам/Нежелательная почта» и также «Корзину».",
+      resend:"Отправить новый код",invalidEmail:"Введите корректный e-mail.",invalidCode:"Неверный код. Проверьте 6 цифр и повторите попытку.",
+      expired:"Срок действия кода истёк. Запросите новый.",cooldown:"Подождите немного перед повторным запросом.",
+      delivery:"Сейчас не удалось отправить код. Попробуйте ещё раз.",conflict:"Этот e-mail уже связан с другой учётной записью с данными.",
+      privacy:"E-mail используется для идентификации аккаунта и входа с других устройств."
+    }
+  };
+  function emailCopy(){return EMAIL_COPY[locale()]||EMAIL_COPY.pt}
 
   function locale(){const canonical=window.EduCashProLocale?.resolve?.({language:profile()?.language});if(canonical)return canonical;const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
   function t(key){return I18N[locale()]?.[key]||I18N.pt[key]||key}
@@ -38,7 +81,71 @@
 
   async function finishWallet(wallet){if(state.busy||!state.challenge?.challengeId)return;state.busy=true;setError("");try{const result=await auth.verifyWalletProof({challengeId:state.challenge.challengeId,wallet});state.session=platform.readWebSession?.();await window.EduCashProApp?.setSession?.(state.session);closeLayer();renderAuthenticated();window.dispatchEvent(new CustomEvent("educashpro:web-session-ready",{detail:result}))}catch(error){setError(error?.message||t("authError"))}finally{state.busy=false}}
 
-  async function openLogin(){injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("walletLogin"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;layer.querySelector("#webPairInstead").onclick=openPairLogin;
+  async function openLogin(){
+    injectStyles();closeLayer();
+    const labels=emailCopy();
+    const layer=document.createElement("div");
+    layer.className="webAuthLayer";
+    layer.innerHTML=`<section class="webAuthSheet">
+      <button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button>
+      <span class="webMemberBadge">${esc(t("accountBadge"))}</span>
+      <h2>${esc(labels.title)}</h2>
+      <p>${esc(labels.text)}</p>
+      <form id="webEmailForm">
+        <input id="webEmailInput" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="${esc(labels.email)}" style="width:100%;min-height:48px;padding:0 12px;border:1px solid rgba(255,255,255,.12);border-radius:13px;background:#081827;color:#fff;box-sizing:border-box">
+        <button id="webEmailSend" class="webAuthButton" type="submit">✉️ ${esc(labels.send)}</button>
+      </form>
+      <form id="webEmailCodeForm" class="hidden" style="margin-top:12px">
+        <input id="webEmailCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="${esc(labels.code)}" style="width:100%;min-height:48px;padding:0 12px;border:1px solid rgba(255,255,255,.12);border-radius:13px;background:#081827;color:#fff;box-sizing:border-box">
+        <button id="webEmailConfirm" class="webAuthButton" type="submit">✓ ${esc(labels.confirm)}</button>
+        <button id="webEmailResend" class="webAuthSecondary webAuthGhost" type="button">${esc(labels.resend)}</button>
+      </form>
+      <div id="webEmailStatus" class="webPairStatus" style="white-space:pre-line"></div>
+      <p style="font-size:12px;margin-top:8px">${esc(labels.privacy)}</p>
+      <button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button>
+    </section>`;
+    document.body.appendChild(layer);
+    layer.querySelector(".webAuthClose").onclick=closeLayer;
+    layer.querySelector("#webPairInstead").onclick=openPairLogin;
+    const email=layer.querySelector("#webEmailInput"),form=layer.querySelector("#webEmailForm"),codeForm=layer.querySelector("#webEmailCodeForm"),code=layer.querySelector("#webEmailCode"),status=layer.querySelector("#webEmailStatus");
+    let verifiedEmail="";
+    try{email.value=localStorage.getItem("educashpro:last-email")||""}catch{}
+    const setStatus=(message,error=false)=>{status.textContent=String(message||"");status.style.color=error?"#ff8c98":"#9db0c6"};
+    async function requestCode(){
+      const value=String(email.value||"").trim().toLowerCase();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value)){setStatus(labels.invalidEmail,true);return}
+      const button=layer.querySelector("#webEmailSend");button.disabled=true;setStatus("");
+      try{
+        const result=await auth.requestEmailCode(value,{language:locale()});
+        verifiedEmail=value;try{localStorage.setItem("educashpro:last-email",value)}catch{}
+        codeForm.classList.remove("hidden");setStatus(labels.sent.replace("{email}",result?.email||value));code.focus();
+      }catch(error){
+        const reason=String(error?.data?.reason||error?.message||"");
+        setStatus(reason==="invalid_email"?labels.invalidEmail:reason==="email_code_cooldown"?labels.cooldown:labels.delivery,true);
+      }finally{button.disabled=false}
+    }
+    form.onsubmit=async event=>{event.preventDefault();await requestCode()};
+    layer.querySelector("#webEmailResend").onclick=requestCode;
+    codeForm.onsubmit=async event=>{
+      event.preventDefault();
+      const value=String(code.value||"").replace(/\D/g,"").slice(0,6);
+      if(!verifiedEmail||value.length!==6){setStatus(labels.invalidCode,true);return}
+      const button=layer.querySelector("#webEmailConfirm");button.disabled=true;setStatus("");
+      try{
+        const result=await auth.verifyEmailCode(verifiedEmail,value,{language:locale(),referralCode:platform?.pendingReferral?.()||""});
+        state.session=platform.readWebSession?.();
+        await window.EduCashProApp?.setSession?.(state.session);
+        closeLayer();
+        await renderAuthenticated();
+        window.dispatchEvent(new CustomEvent("educashpro:web-session-ready",{detail:result}));
+      }catch(error){
+        const reason=String(error?.data?.reason||error?.message||"");
+        setStatus(reason==="code_expired"?labels.expired:reason==="email_identity_conflict"?labels.conflict:reason==="invalid_code"||reason==="too_many_attempts"?labels.invalidCode:labels.delivery,true);
+      }finally{button.disabled=false}
+    };
+  }
+
+  async function openWallet(){if(!state.session?.profile?.userId||state.session?.profile?.active!==true)return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;layer.querySelector("#webPairInstead").onclick=openPairLogin;
     try{if(!window.TON_CONNECT_UI?.TonConnectUI)throw new Error("TON Connect");state.unsubscribe?.();state.ui=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"webAuthTonConnect"});state.unsubscribeModal?.();state.unsubscribeModal=state.ui.onModalStateChange?.(syncWalletPickerLayer)||null;state.challenge=await auth.prepareWalletAuthentication(state.ui);state.unsubscribe=auth.watchWalletAuthentication(state.ui,{getChallenge:()=>state.challenge});window.addEventListener("educashpro:web-authenticated",()=>{state.session=platform.readWebSession?.();closeLayer();renderAuthenticated()},{once:true});window.addEventListener("educashpro:web-auth-error",event=>setError(event.detail?.message||t("authError")),{once:true});if(state.ui.wallet)await finishWallet(state.ui.wallet)}catch(error){setError(error?.message||t("webUnavailable"))}
   }
 
@@ -66,8 +173,8 @@
     return true;
   }
 
-  function enhancePublic(){if(state.session?.profile?.userId){if(window.__EDUCASHPRO_WEB_HUB__?.active)return;const member=document.querySelector(".webMember");const authenticatedLanding=document.querySelector(".publicWelcome");if(authenticatedLanding&&!member)renderAuthenticated();return}const landing=document.querySelector(".publicWelcome");if(!landing||document.getElementById("webLoginButton"))return;const wallet=document.createElement("button");wallet.id="webLoginButton";wallet.className="webAuthButton";wallet.type="button";wallet.textContent=`💎 ${t("walletLogin")}`;wallet.onclick=openLogin;const phone=document.createElement("button");phone.id="webPhoneLoginButton";phone.className="webAuthSecondary webAuthGhost";phone.type="button";phone.textContent=`📱 ${t("phoneLogin")}`;phone.onclick=openPairLogin;const hint=landing.querySelector(".publicWelcomeHint");landing.insertBefore(wallet,hint||null);landing.insertBefore(phone,hint||null)}
+  function enhancePublic(){if(state.session?.profile?.userId){if(window.__EDUCASHPRO_WEB_HUB__?.active)return;const member=document.querySelector(".webMember");const authenticatedLanding=document.querySelector(".publicWelcome");if(authenticatedLanding&&!member)renderAuthenticated();return}const landing=document.querySelector(".publicWelcome");if(!landing||document.getElementById("webLoginButton"))return;const email=document.createElement("button");email.id="webLoginButton";email.className="webAuthButton";email.type="button";email.textContent=`✉️ ${emailCopy().login}`;email.onclick=openLogin;const phone=document.createElement("button");phone.id="webPhoneLoginButton";phone.className="webAuthSecondary webAuthGhost";phone.type="button";phone.textContent=`📱 ${t("phoneLogin")}`;phone.onclick=openPairLogin;const hint=landing.querySelector(".publicWelcomeHint");landing.insertBefore(email,hint||null);landing.insertBefore(phone,hint||null)}
 
-  async function boot(){injectStyles();state.session=await auth.validateStoredSession().catch(()=>null);if(state.session)await window.EduCashProApp?.setSession?.(state.session);state.checking=false;enhancePublic();const observer=new MutationObserver(enhancePublic);observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});window.EduCashProWebEntry={open:openLogin,pair:openPairLogin,renderAuthenticated,logout,getSession:()=>state.session}}
+  async function boot(){injectStyles();state.session=await auth.validateStoredSession().catch(()=>null);if(state.session)await window.EduCashProApp?.setSession?.(state.session);state.checking=false;enhancePublic();const observer=new MutationObserver(enhancePublic);observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});window.EduCashProWebEntry={open:openLogin,pair:openPairLogin,wallet:openWallet,renderAuthenticated,logout,getSession:()=>state.session}}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
