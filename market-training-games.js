@@ -17,6 +17,7 @@
   var COPY={
     pt:{
       play:"Jogar",free:"LIVRE",local:"100% LOCAL",training:"TREINO",
+      hubTitle:"Price Action Game",hubSub:"Treine leitura de gráficos, candles e estrutura de mercado em jogos educativos que rodam no seu aparelho.",
       chartDojo:"Chart Dojo",chartDojoSub:"Reconheça candles e formações em desafios rápidos de Price Action.",
       candleEdge:"CandleEdge",candleEdgeSub:"Treine estrutura de mercado, suportes, resistências e rompimentos.",
       tradingGame:"The Trading Game",tradingGameSub:"Leia o contexto do gráfico e revele os candles seguintes para conferir sua análise.",
@@ -47,6 +48,7 @@
     },
     en:{
       play:"Play",free:"FREE",local:"100% LOCAL",training:"TRAINING",
+      hubTitle:"Price Action Game",hubSub:"Train chart reading, candles and market structure through educational games that run on your device.",
       chartDojo:"Chart Dojo",chartDojoSub:"Recognize candles and formations through quick Price Action challenges.",
       candleEdge:"CandleEdge",candleEdgeSub:"Practice market structure, support, resistance and breakouts.",
       tradingGame:"The Trading Game",tradingGameSub:"Read chart context and reveal the next candles to check your analysis.",
@@ -76,6 +78,7 @@
     },
     es:{
       play:"Jugar",free:"LIBRE",local:"100% LOCAL",training:"ENTRENAMIENTO",
+      hubTitle:"Price Action Game",hubSub:"Entrena lectura de gráficos, velas y estructura de mercado con juegos educativos que funcionan en tu dispositivo.",
       chartDojo:"Chart Dojo",chartDojoSub:"Reconoce velas y formaciones con desafíos rápidos de Price Action.",
       candleEdge:"CandleEdge",candleEdgeSub:"Practica estructura de mercado, soportes, resistencias y rompimientos.",
       tradingGame:"The Trading Game",tradingGameSub:"Lee el contexto del gráfico y revela las velas siguientes para comprobar tu análisis.",
@@ -105,6 +108,7 @@
     },
     ru:{
       play:"Играть",free:"СВОБОДНО",local:"100% ЛОКАЛЬНО",training:"ТРЕНИРОВКА",
+      hubTitle:"Price Action Game",hubSub:"Тренируйте чтение графиков, свечи и структуру рынка в обучающих играх, работающих на вашем устройстве.",
       chartDojo:"Chart Dojo",chartDojoSub:"Распознавайте свечи и фигуры в коротких заданиях по Price Action.",
       candleEdge:"CandleEdge",candleEdgeSub:"Тренируйте структуру рынка, поддержку, сопротивление и пробои.",
       tradingGame:"The Trading Game",tradingGameSub:"Читайте контекст графика и открывайте следующие свечи, чтобы проверить анализ.",
@@ -238,26 +242,31 @@
     '</article>';
   }
 
-  function ensureCards(){
-    var grid=document.querySelector(".gameCatalogV2");
-    if(!grid)return false;
-    var ids=["chart-dojo","candle-edge","trading-game"],missing=[];
-    for(var i=0;i<ids.length;i++)if(!grid.querySelector('[data-market-training-card="'+ids[i]+'"]'))missing.push(ids[i]);
-    if(!missing.length)return true;
-    var holder=document.createElement("div");
-    holder.innerHTML=missing.map(cardHtml).join("");
-    var frag=document.createDocumentFragment();
-    while(holder.firstChild)frag.appendChild(holder.firstChild);
-    grid.insertBefore(frag,grid.firstChild);
-    return true;
+  var hubBack=null;
+
+  function renderHub(options){
+    options=options||{};
+    if(typeof options.back==="function")hubBack=options.back;
+    current={game:null,phase:0,score:0,answered:false};
+    bridge.currentGame=null;
+    var target=content();
+    if(!target)return;
+    document.getElementById("bottomNav")&&document.getElementById("bottomNav").classList.add("hidden");
+    var ids=["chart-dojo","candle-edge","trading-game"];
+    target.innerHTML='<main class="marketTrainer marketTrainingHub">'+
+      '<div class="marketTrainerTop"><button type="button" class="marketTrainerBack" data-market-hub-back>← '+esc(t("back"))+'</button><span class="marketTrainerProgress">'+esc(t("free"))+' · '+esc(t("local"))+'</span></div>'+
+      '<section class="marketTrainerHero"><span class="eyebrow">EDUCASHPRO</span><h1>📈 '+esc(t("hubTitle"))+'</h1><p>'+esc(t("hubSub"))+'</p></section>'+
+      '<section class="gameCatalogV2">'+ids.map(cardHtml).join("")+'</section>'+
+      '</main>';
+    target.querySelector("[data-market-hub-back]").onclick=function(){
+      if(typeof hubBack==="function")return hubBack();
+      document.querySelector('#bottomNav button[data-view="home"]')&&document.querySelector('#bottomNav button[data-view="home"]').click();
+    };
+    window.scrollTo(0,0);
   }
 
   function catalog(){
-    current={game:null,phase:0,score:0,answered:false};
-    bridge.currentGame=null;
-    var suite=window.EduCashProGameSuite;
-    if(suite&&suite.renderCatalog)return suite.renderCatalog(bridge.catalogContext||{});
-    document.querySelector('#bottomNav button[data-view="home"]')&&document.querySelector('#bottomNav button[data-view="home"]').click();
+    renderHub({back:hubBack});
   }
 
   function intro(id){
@@ -372,14 +381,5 @@
     intro(button.getAttribute("data-market-training-play"));
   },true);
 
-  var observer=new MutationObserver(function(){queueMicrotask(ensureCards)});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  var tries=0,timer=setInterval(function(){
-    tries+=1;
-    ensureCards();
-    if(tries>100)clearInterval(timer);
-  },200);
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureCards,{once:true});else ensureCards();
-
-  window.EduCashProMarketTrainingGames={ensureCards:intro?ensureCards:ensureCards,open:intro,version:"2026.10.01.4"};
+  window.EduCashProMarketTrainingGames={renderHub:renderHub,open:intro,version:"2026.10.01.5"};
 })();
