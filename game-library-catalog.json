@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.02.1",
+  "version": "2026.10.02.2",
   "architecture": {
     "freeLimit": 15,
     "delivery": "on-demand",
@@ -13,7 +13,7 @@
       "ru"
     ],
     "note": "Only entries with status=ready should be rendered. Planned entries define the first curated 100-game library without loading game packages into the main EduCashPro bundle.",
-    "readyFreeCount": 9
+    "readyFreeCount": 15
   },
   "games": [
     {
@@ -83,11 +83,21 @@
       "title": "Sudoku",
       "category": "puzzle",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/sudoku.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Complete a grade 9×9 usando lógica.",
+        "en": "Complete a 9×9 grid using logic.",
+        "es": "Completa una cuadrícula 9×9 con lógica.",
+        "ru": "Заполните сетку 9×9 с помощью логики."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "minesweeper",
@@ -182,44 +192,84 @@
       "title": "Tic-Tac-Toe",
       "category": "strategy",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/tic-tac-toe.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Jogue contra o computador.",
+        "en": "Play against the computer.",
+        "es": "Juega contra la computadora.",
+        "ru": "Играйте против компьютера."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "connect-four",
       "title": "Connect Four",
       "category": "strategy",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/connect-four.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Forme quatro peças em linha antes do computador.",
+        "en": "Connect four before the computer does.",
+        "es": "Forma cuatro fichas antes que la computadora.",
+        "ru": "Соберите четыре раньше компьютера."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "maze-muncher",
       "title": "Maze Muncher",
       "category": "arcade",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/maze-muncher.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Colete os pontos e encontre a saída do labirinto.",
+        "en": "Collect the dots and find the maze exit.",
+        "es": "Recoge los puntos y encuentra la salida.",
+        "ru": "Соберите точки и найдите выход."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "dino-run",
       "title": "Dino Run",
       "category": "arcade",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/dino-run.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Corra, pule obstáculos e bata seu recorde.",
+        "en": "Run, jump obstacles and beat your record.",
+        "es": "Corre, salta obstáculos y supera tu récord.",
+        "ru": "Бегите, прыгайте и улучшайте рекорд."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "word-search",
@@ -244,11 +294,21 @@
       "title": "Merge Drop",
       "category": "puzzle",
       "access": "free",
-      "status": "planned",
+      "status": "ready",
       "offline": true,
       "localProgress": true,
-      "entry": null,
-      "packageVersion": null
+      "entry": "./classic-games/merge-drop.html",
+      "packageVersion": "1",
+      "description": {
+        "pt": "Solte e combine números iguais.",
+        "en": "Drop and merge equal numbers.",
+        "es": "Suelta y combina números iguales.",
+        "ru": "Бросайте и объединяйте одинаковые числа."
+      },
+      "source": {
+        "project": "EduCashPro local game",
+        "license": "original implementation"
+      }
     },
     {
       "id": "whack-a-mole",
