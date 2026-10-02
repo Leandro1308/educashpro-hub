@@ -64,14 +64,14 @@
       await Promise.allSettled([
         style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
         style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
-        style("./game-promo-v9.css"),style("./educash-empire-v12.css")
+        style("./educash-empire-v12.css")
       ]);
       await series(["./mental-games.js","./game-suite.js"]);
       await series(["./local-arcade-core.js","./speed-race-game.js","./air-defense-game.js","./math-learning-game.js"]);
       const optional=[
         "./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js",
         "./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js",
-        "./game-promo-v9.js","./game-interaction-fix-v10.js","./educash-empire-v12.js"
+        "./game-interaction-fix-v10.js","./educash-empire-v12.js"
       ];
       for(const file of optional){
         try{await script(file)}catch(error){console.warn("[EduCashPro] complemento de jogo ignorado:",file,error?.message||error)}
