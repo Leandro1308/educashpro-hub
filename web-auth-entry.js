@@ -3,9 +3,11 @@
   const auth=window.EduCashProWebAuth;
   if(!platform?.isWeb?.()||!auth)return;
 
-  const state={session:null,checking:true,ui:null,challenge:null,unsubscribe:null,unsubscribeModal:null,busy:false,pair:null,pairTimer:null,pairCountdownTimer:null,pairExpiresAt:0};
+  const state={session:null,checking:true,reauthRequired:false,reauthMode:"",ui:null,challenge:null,unsubscribe:null,unsubscribeModal:null,busy:false,pair:null,pairTimer:null,pairCountdownTimer:null,pairExpiresAt:0};
   const MANIFEST_URL="https://go.educashpro.vip/tonconnect-manifest.json";
   const BOT_URL="https://t.me/EduCashProBot";
+  const SESSION_IDLE_MS=24*60*60*1000;
+  const SILENT_REFRESH_MS=7*24*60*60*1000;
 
   const I18N={
     pt:{
@@ -62,6 +64,52 @@
   };
   function emailCopy(){return EMAIL_COPY[locale()]||EMAIL_COPY.pt}
 
+  function profileIsActive(value=profile()){
+    const subscription=value?.subscription||{};
+    const lifetime=value?.lifetime===true||value?.pendingLifetime===true||subscription?.lifetime===true||subscription?.pendingLifetime===true;
+    const flagged=value?.active===true||subscription?.active===true||lifetime;
+    const untilRaw=Number(value?.activeUntil||subscription?.activeUntil||0);
+    if(!flagged)return false;
+    if(lifetime||!untilRaw)return true;
+    const untilMs=untilRaw<100000000000?untilRaw*1000:untilRaw;
+    return untilMs>Date.now();
+  }
+  function localSessionLastAccess(value){return Number(value?.lastAccessAt||value?.storedAt||0)||0}
+  function localSessionValidatedAt(value){return Number(value?.validatedAt||value?.storedAt||0)||0}
+  function withinIdleWindow(value){const last=localSessionLastAccess(value);return Boolean(value?.token&&value?.profile?.userId&&last&&Date.now()-last<SESSION_IDLE_MS)}
+  function touchLocalSession(value){
+    if(!value?.token||!value?.profile?.userId)return value||null;
+    const next={...value,lastAccessAt:Date.now()};
+    platform?.writeWebSession?.(next);
+    return next;
+  }
+  function requiredReauthMode(value){return profileIsActive(value?.profile)?"wallet":"email"}
+
+  let tonConnectLoadPromise=null;
+  async function ensureTonConnectUi(){
+    if(window.TON_CONNECT_UI?.TonConnectUI)return true;
+    if(tonConnectLoadPromise)return tonConnectLoadPromise;
+    tonConnectLoadPromise=(async()=>{
+      const resources=window.EduCashProResources;
+      if(resources?.script){
+        await resources.script("https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js",{external:true});
+        try{await resources.script("./ton-connect-session-recovery.js")}catch(_){}
+      }else{
+        await new Promise((resolve,reject)=>{
+          const node=document.createElement("script");
+          node.src="https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js";
+          node.async=true;
+          node.onload=resolve;
+          node.onerror=()=>reject(new Error("ton_connect_ui_load_failed"));
+          document.head.appendChild(node);
+        });
+      }
+      if(!window.TON_CONNECT_UI?.TonConnectUI)throw new Error("TON Connect");
+      return true;
+    })().catch(error=>{tonConnectLoadPromise=null;throw error});
+    return tonConnectLoadPromise;
+  }
+
   function locale(){const canonical=window.EduCashProLocale?.resolve?.({language:profile()?.language});if(canonical)return canonical;const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
   function t(key){return I18N[locale()]?.[key]||I18N.pt[key]||key}
   function esc(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
@@ -79,7 +127,7 @@
   function setError(message){const el=document.getElementById("webAuthError");if(el)el.textContent=String(message||"")}
   function syncWalletPickerLayer(modalState){const layer=document.querySelector(".webAuthLayer");if(!layer)return;layer.classList.toggle("walletPickerOpen",modalState?.status==="opened")}
 
-  async function finishWallet(wallet){if(state.busy||!state.challenge?.challengeId)return;state.busy=true;setError("");try{const result=await auth.verifyWalletProof({challengeId:state.challenge.challengeId,wallet});state.session=platform.readWebSession?.();await window.EduCashProApp?.setSession?.(state.session);closeLayer();renderAuthenticated();window.dispatchEvent(new CustomEvent("educashpro:web-session-ready",{detail:result}))}catch(error){setError(error?.message||t("authError"))}finally{state.busy=false}}
+  async function finishWallet(wallet){if(state.busy||!state.challenge?.challengeId)return;state.busy=true;setError("");try{const result=await auth.verifyWalletProof({challengeId:state.challenge.challengeId,wallet});state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());await window.EduCashProApp?.setSession?.(state.session);closeLayer();renderAuthenticated();window.dispatchEvent(new CustomEvent("educashpro:web-session-ready",{detail:result}))}catch(error){setError(error?.message||t("authError"))}finally{state.busy=false}}
 
   async function openLogin(){
     injectStyles();closeLayer();
@@ -106,7 +154,8 @@
     </section>`;
     document.body.appendChild(layer);
     layer.querySelector(".webAuthClose").onclick=closeLayer;
-    layer.querySelector("#webPairInstead").onclick=openPairLogin;
+    if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();
+    else layer.querySelector("#webPairInstead").onclick=openPairLogin;
     const email=layer.querySelector("#webEmailInput"),form=layer.querySelector("#webEmailForm"),codeForm=layer.querySelector("#webEmailCodeForm"),code=layer.querySelector("#webEmailCode"),status=layer.querySelector("#webEmailStatus");
     let verifiedEmail="";
     try{email.value=localStorage.getItem("educashpro:last-email")||""}catch{}
@@ -133,7 +182,9 @@
       const button=layer.querySelector("#webEmailConfirm");button.disabled=true;setStatus("");
       try{
         const result=await auth.verifyEmailCode(verifiedEmail,value,{language:locale(),referralCode:platform?.pendingReferral?.()||""});
-        state.session=platform.readWebSession?.();
+        state.reauthRequired=false;
+        state.reauthMode="";
+        state.session=touchLocalSession(platform.readWebSession?.());
         await window.EduCashProApp?.setSession?.(state.session);
         closeLayer();
         await renderAuthenticated();
@@ -145,12 +196,12 @@
     };
   }
 
-  async function openWallet(){if(!state.session?.profile?.userId||state.session?.profile?.active!==true)return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;layer.querySelector("#webPairInstead").onclick=openPairLogin;
-    try{if(!window.TON_CONNECT_UI?.TonConnectUI)throw new Error("TON Connect");state.unsubscribe?.();state.ui=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"webAuthTonConnect"});state.unsubscribeModal?.();state.unsubscribeModal=state.ui.onModalStateChange?.(syncWalletPickerLayer)||null;state.challenge=await auth.prepareWalletAuthentication(state.ui);state.unsubscribe=auth.watchWalletAuthentication(state.ui,{getChallenge:()=>state.challenge});window.addEventListener("educashpro:web-authenticated",()=>{state.session=platform.readWebSession?.();closeLayer();renderAuthenticated()},{once:true});window.addEventListener("educashpro:web-auth-error",event=>setError(event.detail?.message||t("authError")),{once:true});if(state.ui.wallet)await finishWallet(state.ui.wallet)}catch(error){setError(error?.message||t("webUnavailable"))}
+  async function openWallet(){if(!state.session?.profile?.userId||!profileIsActive(state.session?.profile))return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();else layer.querySelector("#webPairInstead").onclick=openPairLogin;
+    try{await ensureTonConnectUi();state.unsubscribe?.();state.ui=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"webAuthTonConnect"});state.unsubscribeModal?.();state.unsubscribeModal=state.ui.onModalStateChange?.(syncWalletPickerLayer)||null;state.challenge=await auth.prepareWalletAuthentication(state.ui);state.unsubscribe=auth.watchWalletAuthentication(state.ui,{getChallenge:()=>state.challenge});window.addEventListener("educashpro:web-authenticated",()=>{state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()},{once:true});window.addEventListener("educashpro:web-auth-error",event=>setError(event.detail?.message||t("authError")),{once:true});if(state.ui.wallet)await finishWallet(state.ui.wallet)}catch(error){setError(error?.message||t("webUnavailable"))}
   }
 
   async function openPairLogin(){injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("phoneLoginText"))}</p><div id="webPairLoading" class="webPairStatus">${esc(t("waiting"))}</div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;
-    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.session=platform.readWebSession?.();closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
+    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
   }
 
 
@@ -167,14 +218,100 @@
     await window.EduCashProApp?.setSession?.(state.session);
     if(window.EduCashProApp?.resumeAuthenticatedExperience){
       await window.EduCashProApp.resumeAuthenticatedExperience();
+      window.__EDUCASHPRO_FAST_RENDERED__=true;
       return true;
     }
     window.EduCashProApp?.renderHome?.();
+    window.__EDUCASHPRO_FAST_RENDERED__=true;
     return true;
   }
 
-  function enhancePublic(){if(state.session?.profile?.userId){if(window.__EDUCASHPRO_WEB_HUB__?.active)return;const member=document.querySelector(".webMember");const authenticatedLanding=document.querySelector(".publicWelcome");if(authenticatedLanding&&!member)renderAuthenticated();return}const landing=document.querySelector(".publicWelcome");if(!landing||document.getElementById("webLoginButton"))return;const email=document.createElement("button");email.id="webLoginButton";email.className="webAuthButton";email.type="button";email.textContent=`✉️ ${emailCopy().login}`;email.onclick=openLogin;const phone=document.createElement("button");phone.id="webPhoneLoginButton";phone.className="webAuthSecondary webAuthGhost";phone.type="button";phone.textContent=`📱 ${t("phoneLogin")}`;phone.onclick=openPairLogin;const hint=landing.querySelector(".publicWelcomeHint");landing.insertBefore(email,hint||null);landing.insertBefore(phone,hint||null)}
-
-  async function boot(){injectStyles();state.session=await auth.validateStoredSession().catch(()=>null);if(state.session)await window.EduCashProApp?.setSession?.(state.session);state.checking=false;enhancePublic();const observer=new MutationObserver(enhancePublic);observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});window.EduCashProWebEntry={open:openLogin,pair:openPairLogin,wallet:openWallet,renderAuthenticated,logout,getSession:()=>state.session}}
+  function enhancePublic(){
+    if(state.session?.profile?.userId&&!state.reauthRequired){
+      const member=document.querySelector(".webMember");
+      const authenticatedLanding=document.querySelector(".publicWelcome");
+      const splash=document.querySelector(".splash");
+      if((authenticatedLanding&&!member)||splash)void renderAuthenticated();
+      return;
+    }
+    const landing=document.querySelector(".publicWelcome");
+    if(!landing)return;
+    landing.querySelector("#webLoginButton")?.remove();
+    landing.querySelector("#webPhoneLoginButton")?.remove();
+    const primary=document.createElement("button");
+    primary.id="webLoginButton";
+    primary.className="webAuthButton";
+    primary.type="button";
+    const walletRequired=state.reauthRequired&&state.reauthMode==="wallet";
+    primary.textContent=walletRequired?("👛 "+t("walletLogin")):("✉️ "+emailCopy().login);
+    primary.onclick=walletRequired?openWallet:openLogin;
+    const hint=landing.querySelector(".publicWelcomeHint");
+    landing.insertBefore(primary,hint||null);
+    if(!state.reauthRequired){
+      const phone=document.createElement("button");
+      phone.id="webPhoneLoginButton";
+      phone.className="webAuthSecondary webAuthGhost";
+      phone.type="button";
+      phone.textContent="📱 "+t("phoneLogin");
+      phone.onclick=openPairLogin;
+      landing.insertBefore(phone,hint||null);
+    }
+  }
+  async function boot(){
+    injectStyles();
+    const stored=platform.readWebSession?.();
+    if(stored?.token&&stored?.profile?.userId){
+      state.session=stored;
+      if(withinIdleWindow(stored)){
+        state.session=touchLocalSession(stored);
+        const needsSilentRefresh=Date.now()-localSessionValidatedAt(stored)>=SILENT_REFRESH_MS;
+        if(needsSilentRefresh){
+          const refreshed=await auth.validateStoredSession({preserveOnNetworkError:true}).catch(()=>null);
+          const current=platform.readWebSession?.();
+          if(refreshed)state.session=touchLocalSession(refreshed);
+          else if(!current?.token){
+            state.session=stored;
+            state.reauthRequired=true;
+            state.reauthMode=requiredReauthMode(stored);
+          }
+        }
+        if(!state.reauthRequired)await window.EduCashProApp?.setSession?.(state.session);
+      }else{
+        state.reauthRequired=true;
+        state.reauthMode=requiredReauthMode(stored);
+      }
+    }
+    state.checking=false;
+    enhancePublic();
+    const observer=new MutationObserver(enhancePublic);
+    observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});
+    document.addEventListener("visibilitychange",()=>{
+      if(!state.session?.profile?.userId||state.reauthRequired)return;
+      if(document.visibilityState==="hidden"){
+        state.session=touchLocalSession(state.session);
+        return;
+      }
+      if(document.visibilityState!=="visible")return;
+      const current=platform.readWebSession?.()||state.session;
+      if(!withinIdleWindow(current)){
+        state.session=current;
+        state.reauthRequired=true;
+        state.reauthMode=requiredReauthMode(current);
+        location.reload();
+        return;
+      }
+      state.session=touchLocalSession(current);
+    });
+    window.EduCashProWebEntry={
+      open:()=>state.reauthRequired&&state.reauthMode==="wallet"?openWallet():openLogin(),
+      pair:openPairLogin,
+      wallet:openWallet,
+      renderAuthenticated,
+      logout,
+      getSession:()=>state.reauthRequired?null:state.session,
+      requiresReauth:()=>state.reauthRequired,
+      reauthMode:()=>state.reauthMode
+    };
+  }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();

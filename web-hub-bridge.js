@@ -2,6 +2,7 @@
   const SESSION_KEY = "educashpro:web-session";
   const API_BASE = "https://educashpro-all.onrender.com";
   const WEB_SENTINEL = "__EDUCASHPRO_PLATFORM_WEB_SESSION_V1__";
+  const SESSION_IDLE_MS = 24*60*60*1000;
   const nativeFetch = window.fetch.bind(window);
   const platform = window.EduCashProPlatform || null;
 
@@ -30,7 +31,9 @@
     const payload = tokenPayload(session.token);
     if (!payload?.sub || !String(payload.sub).startsWith("usr_")) return false;
     const exp = Number(payload.exp || 0);
-    return Number.isFinite(exp) && exp > Math.floor(Date.now() / 1000) + 15;
+    const lastAccessAt = Number(session?.lastAccessAt || session?.storedAt || 0);
+    const withinIdleWindow = lastAccessAt > 0 && Date.now() - lastAccessAt < SESSION_IDLE_MS;
+    return withinIdleWindow && Number.isFinite(exp) && exp > Math.floor(Date.now() / 1000) + 15;
   }
 
   function exposeWebInitData() {

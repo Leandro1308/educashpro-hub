@@ -1,5 +1,5 @@
-const BUILD="2026.10.02.4";
-const CACHE_VERSION="educashpro-pwa-20261002.4";
+const BUILD="2026.10.02.7";
+const CACHE_VERSION="educashpro-pwa-20261002.7";
 
 self.addEventListener("install",()=>self.skipWaiting());
 
@@ -23,28 +23,42 @@ self.addEventListener("activate",event=>{
   })());
 });
 
+async function fetchAndCache(request,cache){
+  const response=await fetch(request,{cache:"no-store"});
+  if(response.ok)await cache.put(request,response.clone());
+  return response;
+}
+
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin)return;
 
   const pathname=url.pathname.toLowerCase();
+  if(pathname.endsWith("/version.json")||pathname.endsWith("version.json")){
+    event.respondWith(fetch(event.request,{cache:"no-store"}));
+    return;
+  }
+
   const isCoreAsset=
     event.request.mode==="navigate"||
-    ["script","style","document","worker"].includes(event.request.destination)||
-    /\.(?:js|css|json|html|webmanifest)$/.test(pathname);
+    ["script","style","document","worker","image","font"].includes(event.request.destination)||
+    /\.(?:js|css|json|html|webmanifest|png|jpg|jpeg|webp|svg|woff2?)$/.test(pathname);
 
   if(!isCoreAsset)return;
 
   event.respondWith((async()=>{
     const cache=await caches.open(CACHE_VERSION);
+    const cached=await cache.match(event.request);
+    if(cached){
+      event.waitUntil(fetchAndCache(event.request,cache).catch(()=>{}));
+      return cached;
+    }
     try{
-      const response=await fetch(event.request,{cache:"no-store"});
-      if(response.ok)await cache.put(event.request,response.clone());
-      return response;
+      return await fetchAndCache(event.request,cache);
     }catch(_){
-      const cached=await cache.match(event.request,{ignoreSearch:true});
-      if(cached)return cached;
+      const fallback=await caches.match(event.request,{ignoreSearch:true});
+      if(fallback)return fallback;
       if(event.request.mode!=="navigate")throw new Error("offline_asset");
       return new Response(
         "<!doctype html><html lang='pt-BR'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>EduCashPro</title><body style='margin:0;background:#07111f;color:#fff;font-family:system-ui;display:grid;place-items:center;min-height:100vh;text-align:center;padding:24px;box-sizing:border-box'><main><h1>EduCashPro</h1><p>Sem conexão no momento. Abra novamente um recurso que já tenha sido carregado neste aparelho.</p></main></body></html>",
