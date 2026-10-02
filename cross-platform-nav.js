@@ -110,7 +110,7 @@
   function render() {
     addStyles();
     decorateInternalLinks();
-    ensureBack();
+    document.querySelector(".educashFallbackBack")?.remove();
     const target = document.querySelector(".topbar, .marketHeader, body > .app > header, body > header");
     if (!target) return;
     const value = destination();

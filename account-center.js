@@ -37,6 +37,7 @@
       validUntil: "Válida até",
       status: "Status",
       wallet: "Carteira",
+      connectWallet: "Conectar carteira",
       telegram: "Telegram",
       linked: "Vinculado",
       notLinked: "Não vinculado",
@@ -115,6 +116,7 @@
       validUntil: "Valid until",
       status: "Status",
       wallet: "Wallet",
+      connectWallet: "Connect wallet",
       telegram: "Telegram",
       linked: "Linked",
       notLinked: "Not linked",
@@ -189,6 +191,7 @@
       validUntil: "Válida hasta",
       status: "Estado",
       wallet: "Cartera",
+      connectWallet: "Conectar cartera",
       telegram: "Telegram",
       linked: "Vinculado",
       notLinked: "No vinculado",
@@ -259,6 +262,7 @@
       validUntil: "Действует до",
       status: "Статус",
       wallet: "Кошелёк",
+      connectWallet: "Подключить кошелёк",
       telegram: "Telegram",
       linked: "Привязан",
       notLinked: "Не привязан",
@@ -655,6 +659,7 @@
             <div class="accountMetric"><small>${esc(t("accountId"))}</small><b>${esc(account.userId || "—")}</b></div>
             <div class="accountMetric"><small>${esc(t("referral"))}</small><b>${esc(account.referralCode || "—")}</b></div>
           </div>
+          ${data?.subscription?.active === true && !account.walletLinked ? `<button id="accountConnectWallet" class="accountSecondary" type="button">💎 ${esc(t("connectWallet"))}</button>` : ""}
           ${!account.telegramLinked ? `<button id="accountLinkTelegram" class="accountSecondary" type="button">✈️ ${esc(t("linkTelegram"))}</button>` : ""}
           <button id="accountEditProfilePhoto" class="accountSecondary" type="button">📷 ${esc(t("profilePhoto"))}</button>
           <button id="accountShowQrCode" class="accountSecondary" type="button">🔳 ${esc(t("myQrCode"))}</button>
@@ -667,6 +672,7 @@
           </div>
         </div>`;
 
+      body.querySelector("#accountConnectWallet")?.addEventListener("click", () => { close(); window.EduCashProWebEntry?.wallet?.(); });
       body.querySelector("#accountLinkTelegram")?.addEventListener("click", linkTelegram);
       body.querySelector("#accountEditProfilePhoto")?.addEventListener("click", () => {
         close();
