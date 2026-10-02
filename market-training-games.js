@@ -13,6 +13,7 @@
   var STORE="educashpro:market-training:v1";
   var bridge=window.EduCashProGameBridge||(window.EduCashProGameBridge={session:null,catalogContext:{},currentGame:null});
   var current={game:null,phase:0,score:0,answered:false};
+  var lastOpenedGame=null;
 
   var COPY={
     pt:{
@@ -269,6 +270,14 @@
     renderHub({back:hubBack});
   }
 
+  function openGame(id){
+    if(!GAMES[id])return;
+    var previous=lastOpenedGame;
+    var proceed=function(){lastOpenedGame=id;intro(id)};
+    if(previous&&previous!==id)return showExness(proceed);
+    proceed();
+  }
+
   function intro(id){
     var g=GAMES[id]; if(!g)return;
     current={game:id,phase:0,score:0,answered:false};
@@ -345,7 +354,7 @@
   }
 
   function transition(next){
-    showExness(next);
+    next();
   }
 
   function showExness(next){
@@ -378,8 +387,8 @@
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation&&event.stopImmediatePropagation();
-    intro(button.getAttribute("data-market-training-play"));
+    openGame(button.getAttribute("data-market-training-play"));
   },true);
 
-  window.EduCashProMarketTrainingGames={renderHub:renderHub,open:intro,version:"2026.10.01.5"};
+  window.EduCashProMarketTrainingGames={renderHub:renderHub,open:openGame,version:"2026.10.02.1"};
 })();
