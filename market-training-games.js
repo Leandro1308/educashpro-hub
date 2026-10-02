@@ -340,7 +340,6 @@
   }
 
   function transition(next){
-    if(active())return next();
     showExness(next);
   }
 
@@ -386,5 +385,5 @@
   },200);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ensureCards,{once:true});else ensureCards();
 
-  window.EduCashProMarketTrainingGames={ensureCards:intro?ensureCards:ensureCards,open:intro,version:"2026.10.01.1"};
+  window.EduCashProMarketTrainingGames={ensureCards:intro?ensureCards:ensureCards,open:intro,version:"2026.10.01.2"};
 })();
