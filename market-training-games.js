@@ -390,5 +390,5 @@
     openGame(button.getAttribute("data-market-training-play"));
   },true);
 
-  window.EduCashProMarketTrainingGames={renderHub:renderHub,open:openGame,version:"2026.10.02.1"};
+  window.EduCashProMarketTrainingGames={renderHub:renderHub,open:openGame,version:"2026.10.02.2"};
 })();

@@ -7,13 +7,13 @@
   if(!suite)return;
 
   const COPY={
-    pt:{play:"Jogar",free:"LIVRE",local:"LOCAL / OFFLINE",back:"Voltar aos jogos",section:"Clássicos offline",sub:"Jogos leves carregados somente quando você abre.",snake:"Snake",g2048:"2048",minesweeper:"Campo Minado",memory:"Jogo da Memória",breakout:"Quebra-Blocos",flappy:"Flappy",whack:"Acerte a Toupeira"},
-    en:{play:"Play",free:"FREE",local:"LOCAL / OFFLINE",back:"Back to games",section:"Offline classics",sub:"Lightweight games loaded only when you open them.",snake:"Snake",g2048:"2048",minesweeper:"Minesweeper",memory:"Memory Match",breakout:"Breakout",flappy:"Flappy",whack:"Whack-a-Mole"},
-    es:{play:"Jugar",free:"LIBRE",local:"LOCAL / OFFLINE",back:"Volver a juegos",section:"Clásicos offline",sub:"Juegos ligeros que se cargan solo al abrirlos.",snake:"Snake",g2048:"2048",minesweeper:"Buscaminas",memory:"Memoria",breakout:"Rompebloques",flappy:"Flappy",whack:"Golpea al Topo"},
-    ru:{play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО / ОФЛАЙН",back:"Назад к играм",section:"Офлайн-классика",sub:"Лёгкие игры загружаются только при открытии.",snake:"Змейка",g2048:"2048",minesweeper:"Сапёр",memory:"Память",breakout:"Арканоид",flappy:"Flappy",whack:"Ударь крота"}
+    pt:{play:"Jogar",free:"LIVRE",local:"LOCAL / OFFLINE",back:"Voltar aos jogos",section:"Clássicos offline",sub:"Jogos leves carregados somente quando você abre.",snake:"Snake",g2048:"2048",sudoku:"Sudoku",minesweeper:"Campo Minado",memory:"Jogo da Memória",breakout:"Quebra-Blocos",flappy:"Flappy",tic:"Jogo da Velha",connect:"Connect Four",maze:"Maze Muncher",dino:"Dino Run",merge:"Merge Drop",whack:"Acerte a Toupeira"},
+    en:{play:"Play",free:"FREE",local:"LOCAL / OFFLINE",back:"Back to games",section:"Offline classics",sub:"Lightweight games loaded only when you open them.",snake:"Snake",g2048:"2048",sudoku:"Sudoku",minesweeper:"Minesweeper",memory:"Memory Match",breakout:"Breakout",flappy:"Flappy",tic:"Tic-Tac-Toe",connect:"Connect Four",maze:"Maze Muncher",dino:"Dino Run",merge:"Merge Drop",whack:"Whack-a-Mole"},
+    es:{play:"Jugar",free:"LIBRE",local:"LOCAL / OFFLINE",back:"Volver a juegos",section:"Clásicos offline",sub:"Juegos ligeros que se cargan solo al abrirlos.",snake:"Snake",g2048:"2048",sudoku:"Sudoku",minesweeper:"Buscaminas",memory:"Memoria",breakout:"Rompebloques",flappy:"Flappy",tic:"Tres en Raya",connect:"Cuatro en Línea",maze:"Maze Muncher",dino:"Dino Run",merge:"Merge Drop",whack:"Golpea al Topo"},
+    ru:{play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО / ОФЛАЙН",back:"Назад к играм",section:"Офлайн-классика",sub:"Лёгкие игры загружаются только при открытии.",snake:"Змейка",g2048:"2048",sudoku:"Судоку",minesweeper:"Сапёр",memory:"Память",breakout:"Арканоид",flappy:"Flappy",tic:"Крестики-нолики",connect:"Четыре в ряд",maze:"Лабиринт",dino:"Dino Run",merge:"Merge Drop",whack:"Ударь крота"}
   };
   const META={
-    snake:["🐍","snake"],"2048":["🔢","g2048"],minesweeper:["💣","minesweeper"],memory:["🃏","memory"],breakout:["🧱","breakout"],flappy:["🐦","flappy"],"whack-a-mole":["🎯","whack"]
+    snake:["🐍","snake"],"2048":["🔢","g2048"],sudoku:["🔢","sudoku"],minesweeper:["💣","minesweeper"],memory:["🃏","memory"],breakout:["🧱","breakout"],flappy:["🐦","flappy"],"tic-tac-toe":["❌⭕","tic"],"connect-four":["🔴🟡","connect"],"maze-muncher":["🟡","maze"],"dino-run":["🦖","dino"],"merge-drop":["🔢","merge"],"whack-a-mole":["🎯","whack"]
   };
 
   const lang=()=>{const raw=String(bridge.session?.profile?.language||window.__EDUCASHPRO_SESSION__?.profile?.language||navigator.language||"pt").slice(0,2).toLowerCase();return COPY[raw]?raw:"pt"};
