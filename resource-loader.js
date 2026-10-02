@@ -57,7 +57,7 @@
   let gamesPromise=null,marketTrainingPromise=null,gameLibraryPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
+    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready && window.EduCashProClassicGamesV1) return Promise.resolve(true);
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
       // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
@@ -79,6 +79,7 @@
       await script("./local-game-catalog-bridge.js");
       window.EduCashProLocalCatalogBridge?.ensure?.();
       await script("./game-usage-limit-v14.js");
+      await script("./classic-game-library-v1.js");
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
