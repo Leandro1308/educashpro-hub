@@ -1,6 +1,5 @@
-const BUILD="2026.10.02.3";
-const CACHE_VERSION="educashpro-pwa-20261002.3";
-const GAME_CACHE="educashpro-games-v1";
+const BUILD="2026.10.02.4";
+const CACHE_VERSION="educashpro-pwa-20261002.4";
 
 self.addEventListener("install",()=>self.skipWaiting());
 
@@ -30,23 +29,6 @@ self.addEventListener("fetch",event=>{
   if(url.origin!==self.location.origin)return;
 
   const pathname=url.pathname.toLowerCase();
-  const isGameAsset=
-    pathname.includes("/classic-games/")||
-    pathname.endsWith("/classic-game-library-v1.js")||
-    pathname.endsWith("/game-library-catalog.json");
-
-  if(isGameAsset){
-    event.respondWith((async()=>{
-      const cache=await caches.open(GAME_CACHE);
-      const cached=await cache.match(event.request);
-      if(cached)return cached;
-      const response=await fetch(event.request,{cache:"no-store"});
-      if(response.ok)await cache.put(event.request,response.clone());
-      return response;
-    })());
-    return;
-  }
-
   const isCoreAsset=
     event.request.mode==="navigate"||
     ["script","style","document","worker"].includes(event.request.destination)||

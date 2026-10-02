@@ -6,7 +6,6 @@
     { id:"telegram", group:"learn", access:"subscriber", icon:"✈️", label:{pt:"Telegram Profissional",en:"Professional Telegram",es:"Telegram Profesional",ru:"Профессиональный Telegram"} },
     { id:"tools", group:"tools", access:"mixed", icon:"🧰", label:{pt:"Ferramentas",en:"Tools",es:"Herramientas",ru:"Инструменты"} },
     { id:"finance-control", group:"tools", access:"subscriber", icon:"📒", label:{pt:"Controle Financeiro Mensal",en:"Monthly Finance Control",es:"Control Financiero Mensual",ru:"Ежемесячный финансовый контроль"} },
-    { id:"price-action-games", group:"play", access:"free", icon:"📈", label:{pt:"Price Action Game",en:"Price Action Game",es:"Price Action Game",ru:"Price Action Game"} },
     { id:"games", group:"play", access:"mixed", icon:"🎮", label:{pt:"Jogos e desafios",en:"Games and challenges",es:"Juegos y desafíos",ru:"Игры и задания"} },
     { id:"explore", group:"discover", access:"mixed", icon:"🔎", label:{pt:"Explorar projetos",en:"Explore projects",es:"Explorar proyectos",ru:"Каталог проектов"} },
     { id:"benefits", group:"benefits", access:"mixed", icon:"🎁", label:{pt:"Benefícios",en:"Benefits",es:"Beneficios",ru:"Преимущества"} },

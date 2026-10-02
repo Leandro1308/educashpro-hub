@@ -3,7 +3,6 @@
 
   const COPY = {
     pt: {
-      priceAction: "Price Action Game", priceActionSub: "Treine candles, estrutura de mercado e leitura de gráficos.",
       games: "Jogos e entretenimento", gamesSub: "Jogos organizados por categoria", open: "Abrir jogo",
       gamesTitle: "Catálogo de jogos", gamesDesc: "Escolha uma categoria e abra o jogo na plataforma do responsável.",
       all: "Todos", empty: "Nenhum jogo disponível nesta categoria.", external: "Conteúdo operado por terceiros.",
@@ -23,7 +22,6 @@
       finance: "Controle Financeiro Mensal", financeSub: "Registre renda e gastos e acompanhe o saldo do mês.",
     },
     en: {
-      priceAction: "Price Action Game", priceActionSub: "Practice candles, market structure and chart reading.",
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
       gamesTitle: "Game catalog", gamesDesc: "Choose a category and open the game on its provider's platform.",
       all: "All", empty: "No games available in this category.", external: "Third-party content.",
@@ -43,7 +41,6 @@
       finance: "Monthly Finance Control", financeSub: "Record income and expenses and track the monthly balance.",
     },
     es: {
-      priceAction: "Price Action Game", priceActionSub: "Entrena velas, estructura de mercado y lectura de gráficos.",
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
       gamesTitle: "Catálogo de juegos", gamesDesc: "Elige una categoría y abre el juego en la plataforma del responsable.",
       all: "Todos", empty: "No hay juegos disponibles en esta categoría.", external: "Contenido operado por terceros.",
@@ -63,7 +60,6 @@
       finance: "Control Financiero Mensual", financeSub: "Registra ingresos y gastos y controla el saldo del mes.",
     },
     ru: {
-      priceAction: "Price Action Game", priceActionSub: "Тренируйте свечи, структуру рынка и чтение графиков.",
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
       gamesTitle: "Каталог игр", gamesDesc: "Выберите категорию и откройте игру на платформе владельца.",
       all: "Все", empty: "В этой категории пока нет игр.", external: "Контент стороннего поставщика.",
@@ -219,25 +215,10 @@
     window.EduCashProFinance?.render?.({ language: language(), session, active: session?.profile?.active === true, back: renderToolsHub });
   }
 
-  async function renderPriceActionGames() {
-    window.EduCashProApp?.rememberRoute?.("tools", "price-action-games");
-    await window.EduCashProResources?.loadMarketTrainingGames?.();
-    window.EduCashProGameBridge=window.EduCashProGameBridge||{session:null,catalogContext:{},currentGame:null};
-    window.EduCashProGameBridge.session=session||window.__EDUCASHPRO_SESSION__||null;
-    window.EduCashProMarketTrainingGames?.renderHub?.({ back: renderToolsHub });
-  }
-
   function renderToolsHub() {
     window.EduCashProApp?.rememberRoute?.("tools");
     const active = session?.profile?.active === true;
     content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid">${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
-    const priceActionButton = document.createElement("button");
-    priceActionButton.className = "quickCard";
-    priceActionButton.id = "priceActionGames";
-    priceActionButton.innerHTML = `<span class="emoji">📈</span><strong>${esc(tr("priceAction"))}</strong><small>${esc(tr("priceActionSub"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span>`;
-    content().querySelector(".quickGrid")?.appendChild(priceActionButton);
-    priceActionButton.onclick = () => void renderPriceActionGames();
-
     const gamesButton = document.createElement("button");
     gamesButton.className = "quickCard";
     gamesButton.innerHTML = `<span class="emoji">🎮</span><strong>${esc(tr("games"))}</strong><small>${esc(tr("gamesSub"))}</small>`;
@@ -266,5 +247,5 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener("DOMContentLoaded", enhanceHome);
 
-  window.EduCashProLocal = { renderGames, renderPriceActionGames, renderRandomizers, renderToolsHub };
+  window.EduCashProLocal = { renderGames, renderRandomizers, renderToolsHub };
 })();
