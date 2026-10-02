@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261001.4";
+  const VERSION="20261001.5";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -54,17 +54,17 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
+  let gamesPromise=null,marketTrainingPromise=null,gameLibraryPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready && window.EduCashProMarketTrainingGames?.ensureCards) return Promise.resolve(true);
+    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
       // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
       await Promise.allSettled([
         style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
         style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
-        style("./game-promo-v9.css"),style("./educash-empire-v12.css"),style("./market-training-games.css")
+        style("./game-promo-v9.css"),style("./educash-empire-v12.css")
       ]);
       await series(["./mental-games.js","./game-suite.js"]);
       await series(["./local-arcade-core.js","./speed-race-game.js","./air-defense-game.js","./math-learning-game.js"]);
@@ -79,8 +79,6 @@
       await script("./local-game-catalog-bridge.js");
       window.EduCashProLocalCatalogBridge?.ensure?.();
       await script("./game-usage-limit-v14.js");
-      await script("./market-training-games.js");
-      window.EduCashProMarketTrainingGames?.ensureCards?.();
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
@@ -89,6 +87,24 @@
       return true;
     })().catch(error=>{gamesPromise=null;throw error});
     return gamesPromise;
+  }
+
+
+  function loadMarketTrainingGames(){
+    if(window.EduCashProMarketTrainingGames?.renderHub) return Promise.resolve(true);
+    return marketTrainingPromise||(marketTrainingPromise=(async()=>{
+      await style("./market-training-games.css");
+      await script("./market-training-games.js");
+      return true;
+    })().catch(error=>{marketTrainingPromise=null;throw error}));
+  }
+
+  function loadGameLibraryCatalog(){
+    if(gameLibraryPromise) return gameLibraryPromise;
+    gameLibraryPromise=fetch(withVersion("./game-library-catalog.json"),{cache:"no-store"})
+      .then(response=>{if(!response.ok)throw new Error("game_library_catalog_failed");return response.json()})
+      .catch(error=>{gameLibraryPromise=null;throw error});
+    return gameLibraryPromise;
   }
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
@@ -114,5 +130,5 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,loadGames,loadCourses,loadFinance,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,loadGames,loadMarketTrainingGames,loadGameLibraryCatalog,loadCourses,loadFinance,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
