@@ -1,5 +1,5 @@
-const BUILD="2026.10.02.1";
-const CACHE_VERSION="educashpro-pwa-20261002.1";
+const BUILD="2026.10.02.2";
+const CACHE_VERSION="educashpro-pwa-20261002.2";
 const GAME_CACHE="educashpro-games-v1";
 
 self.addEventListener("install",()=>self.skipWaiting());
