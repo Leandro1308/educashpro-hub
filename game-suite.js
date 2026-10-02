@@ -134,9 +134,7 @@
 
   function paywall(level, requested) {
     modal("🔒", `${text("subscriber",requested)} — ${text(level,requested)}`, text("subscriberText",requested), [
-      {label:text("presentation",requested),run:()=>window.EduCashProApp?.renderPresentation?.()},
-      {label:text("subscribe",requested),primary:true,run:()=>openUrl(bridge.session?.subscribeUrl || bridge.session?.botUrl)},
-      {label:text("cancel",requested)}
+      {label:text("back",requested)}
     ]);
   }
 
