@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20260929.9";
+  const VERSION="20261001.1";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -57,14 +57,14 @@
   let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
+    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready && window.EduCashProMarketTrainingGames?.ensureCards) return Promise.resolve(true);
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
       // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
       await Promise.allSettled([
         style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
         style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
-        style("./game-promo-v9.css"),style("./educash-empire-v12.css")
+        style("./game-promo-v9.css"),style("./educash-empire-v12.css"),style("./market-training-games.css")
       ]);
       await series(["./mental-games.js","./game-suite.js"]);
       await series(["./local-arcade-core.js","./speed-race-game.js","./air-defense-game.js","./math-learning-game.js"]);
@@ -79,6 +79,8 @@
       await script("./local-game-catalog-bridge.js");
       window.EduCashProLocalCatalogBridge?.ensure?.();
       await script("./game-usage-limit-v14.js");
+      await script("./market-training-games.js");
+      window.EduCashProMarketTrainingGames?.ensureCards?.();
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
