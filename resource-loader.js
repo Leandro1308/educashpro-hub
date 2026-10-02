@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261002.4";
+  const VERSION="20261002.7";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -54,7 +54,7 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,coursesPromise=null,financePromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
+  let gamesPromise=null,toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   function loadGames(){
     if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
@@ -68,6 +68,7 @@
       ]);
       await series(["./mental-games.js","./game-suite.js"]);
       await series(["./local-arcade-core.js","./speed-race-game.js","./air-defense-game.js","./math-learning-game.js"]);
+      await script("./local-games-bootstrap-v13.js");
       const optional=[
         "./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js",
         "./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js",
@@ -91,7 +92,35 @@
 
 
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
-  function loadFinance(){return financePromise||(financePromise=script("./monthly-finance-control.js").catch(error=>{financePromise=null;throw error}))}
+  function loadToolsHub(){
+    if(window.EduCashProLocal?.renderToolsHub)return Promise.resolve(true);
+    return toolsHubPromise||(toolsHubPromise=script("./local-tools-and-games.js").then(()=>true).catch(error=>{toolsHubPromise=null;throw error}));
+  }
+  function loadAccountCenter(){
+    if(window.EduCashProAccountCenter)return Promise.resolve(true);
+    return accountCenterPromise||(accountCenterPromise=(async()=>{
+      await script("./account-center.js");
+      try{await script("./account-center-extras.js")}catch(_){}
+      return true;
+    })().catch(error=>{accountCenterPromise=null;throw error}));
+  }
+  function loadFinance(){
+    if(window.EduCashProFinance&&window.EduCashProFinanceShare)return Promise.resolve(true);
+    return financePromise||(financePromise=(async()=>{
+      await Promise.allSettled([style("./monthly-finance-control.css"),style("./tools-hub-v2.css")]);
+      await script("./monthly-finance-sharing.js");
+      await script("./monthly-finance-control.js");
+      return true;
+    })().catch(error=>{financePromise=null;throw error}));
+  }
+  function loadFinancialTools(){
+    if(window.EduCashProFinancialTools)return Promise.resolve(true);
+    return financialToolsPromise||(financialToolsPromise=(async()=>{
+      await Promise.allSettled([style("./financial-tools-suite.css"),style("./tools-hub-v2.css")]);
+      await script("./financial-tools-suite.js");
+      return true;
+    })().catch(error=>{financialToolsPromise=null;throw error}));
+  }
   function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
     return professionalPromise||(professionalPromise=(async()=>{
@@ -113,5 +142,5 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,loadGames,loadCourses,loadFinance,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();

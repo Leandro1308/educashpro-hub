@@ -414,7 +414,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.02.4";
+  const APP_RUNTIME_BUILD = "2026.10.02.7";
   const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
@@ -464,15 +464,19 @@
     return updateCheckPromise;
   }
 
-  async function loadCourseCatalog() {
-    let cached = null;
+  function hydrateCourseCatalogFromCache() {
     try {
-      cached = JSON.parse(localStorage.getItem(catalogKey()) || "null");
+      const cached = JSON.parse(localStorage.getItem(catalogKey()) || "null");
       if (Array.isArray(cached?.courses)) state.courseCatalog = cached.courses;
     } catch {}
+    return state.courseCatalog;
+  }
+
+  async function loadCourseCatalog() {
+    hydrateCourseCatalogFromCache();
     try {
-      const assetVersion = window.EDUCASHPRO_ASSET_VERSION || Date.now().toString(36);
-      const response = await fetch(`./courses.json?fresh=${assetVersion}`, { cache: "no-store" });
+      const assetVersion = window.EDUCASHPRO_ASSET_VERSION || APP_RUNTIME_BUILD;
+      const response = await fetch(`./courses.json?v=${encodeURIComponent(assetVersion)}`, { cache: "default" });
       if (!response.ok) throw new Error("catalog");
       const data = await response.json();
       state.courseCatalog = Array.isArray(data?.courses) ? data.courses.sort((a, b) => Number(a.order) - Number(b.order)) : [];
@@ -480,6 +484,13 @@
     } catch {
       if (!state.courseCatalog.length) state.courseCatalog = [];
     }
+    return state.courseCatalog;
+  }
+
+  function refreshCourseCatalogLater() {
+    const run = () => void loadCourseCatalog();
+    if (window.EduCashProResources?.idle) window.EduCashProResources.idle(run, 1200);
+    else window.setTimeout(run, 900);
   }
 
   function personalReferralLink(profile, fallback = "") {
@@ -517,8 +528,9 @@
 
   async function setSession(session) {
     if (!syncExternalSession(session)) return false;
-    if (!state.courseCatalog.length) await loadCourseCatalog();
+    if (!state.courseCatalog.length) hydrateCourseCatalogFromCache();
     applyLanguage();
+    refreshCourseCatalogLater();
     if (window.__EDUCASHPRO_MARKETS_OPEN__ === true) {
       await openMarkets();
       return true;
@@ -1540,6 +1552,16 @@
     } catch (error) { handleError(error); }
   }
 
+  async function openAccountCenter(method){
+    try{
+      await window.EduCashProResources?.loadAccountCenter?.();
+      return window.EduCashProAccountCenter?.[method]?.();
+    }catch(error){
+      console.warn("[EduCashPro] account center:",error?.message||error);
+      return undefined;
+    }
+  }
+
   function renderArea() {
     state.view = "area";
     hideGlobalLoading(true);
@@ -1702,18 +1724,18 @@
     document.getElementById("editProfilePhoto")?.addEventListener("click", () => renderProfilePhotoEditor(renderArea));
     document.getElementById("areaLinkPage")?.addEventListener("click", () => void openAreaLinks("page"));
     document.getElementById("areaAgenda")?.addEventListener("click", () => openAgenda("", "settings"));
-    document.getElementById("areaAccountSettings")?.addEventListener("click", () => window.EduCashProAccountCenter?.openSettings?.());
-    document.getElementById("areaLanguage")?.addEventListener("click", () => window.EduCashProAccountCenter?.openLanguage?.());
-    document.getElementById("areaPreferences")?.addEventListener("click", () => window.EduCashProAccountCenter?.openPreferences?.());
+    document.getElementById("areaAccountSettings")?.addEventListener("click", () => void openAccountCenter("openSettings"));
+    document.getElementById("areaLanguage")?.addEventListener("click", () => void openAccountCenter("openLanguage"));
+    document.getElementById("areaPreferences")?.addEventListener("click", () => void openAccountCenter("openPreferences"));
     document.getElementById("membershipProof")?.addEventListener("click", () => void renderMembershipProof(renderArea));
-    document.getElementById("areaNetwork")?.addEventListener("click", () => window.EduCashProAccountCenter?.openNetwork?.());
-    document.getElementById("areaSubscription")?.addEventListener("click", () => window.EduCashProAccountCenter?.openSubscription?.());
+    document.getElementById("areaNetwork")?.addEventListener("click", () => void openAccountCenter("openNetwork"));
+    document.getElementById("areaSubscription")?.addEventListener("click", () => void openAccountCenter("openSubscription"));
     document.getElementById("areaSmartLink")?.addEventListener("click", () => void openAreaLinks("short"));
     document.getElementById("areaAffiliate")?.addEventListener("click", () => document.querySelector(".areaAffiliateBox")?.scrollIntoView({ behavior: "smooth", block: "center" }));
     document.getElementById("copyLink")?.addEventListener("click", copyAffiliate);
     document.getElementById("affiliateQr")?.addEventListener("click", () => renderQrScreen(state.affiliateLink, featureCopy("affiliateQr"), renderArea));
     document.getElementById("areaSupport")?.addEventListener("click", () => window.location.assign("./support.html"));
-    document.getElementById("areaDocuments")?.addEventListener("click", () => window.EduCashProAccountCenter?.openDocuments?.());
+    document.getElementById("areaDocuments")?.addEventListener("click", () => void openAccountCenter("openDocuments"));
     document.getElementById("manageProjects")?.addEventListener("click", () => renderSubmissionForm("project"));
     document.getElementById("loadAreaProjects")?.addEventListener("click", () => {
       const container = document.getElementById("projectList");
@@ -1747,6 +1769,12 @@
     rememberRoute("tools");
     updateNav();
     if (window.EduCashProLocal?.renderToolsHub) return window.EduCashProLocal.renderToolsHub();
+    const load = window.EduCashProResources?.loadToolsHub;
+    if (typeof load === "function") {
+      content.innerHTML = loadingCard();
+      void load().then(() => window.EduCashProLocal?.renderToolsHub?.() || renderNetworkProjection()).catch(() => renderNetworkProjection());
+      return;
+    }
     renderNetworkProjection();
   }
 
@@ -2038,7 +2066,10 @@
     if (credential) return credential;
     if (!tg?.initData) return "";
     try {
-      const session = await api("/api/hub/session", { initData: tg.initData });
+      if (window.__EDUCASHPRO_WEB_HUB__?.active) {
+        await new Promise((resolve) => window.setTimeout(resolve, 450));
+      }
+      const session = await api("/api/hub/session", { initData: tg.initData }, { blocking: window.__EDUCASHPRO_FAST_RENDERED__ !== true });
       syncExternalSession(session);
       credential = currentMembershipCredential();
       if (credential) localStorage.setItem("educashpro:membership-credential", credential);
@@ -2261,7 +2292,9 @@
       console.error("[EduCashPro] Falha ao confirmar inicialização do aplicativo:", error);
     }
     const publicParams = new URL(window.location.href).searchParams;
-    await loadPublicContractConfig();
+    const scheduleContractConfig = () => void loadPublicContractConfig();
+    if (window.EduCashProResources?.idle) window.EduCashProResources.idle(scheduleContractConfig, 1500);
+    else window.setTimeout(scheduleContractConfig, 1100);
     if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
     if (!tg?.initData && (publicParams.get("game") || publicParams.get("raffle"))) {
       await window.EduCashProResources?.loadGames?.();
@@ -2299,6 +2332,14 @@
       window.__EDUCASHPRO_SESSION__ = session;
       window.EduCashProProfessional?.setSession?.(session);
       window.EduCashProHelp?.setSession?.(session);
+      if (window.__EDUCASHPRO_FAST_RENDERED__ === true && window.__EDUCASHPRO_WEB_HUB__?.active) {
+        hydrateCourseCatalogFromCache();
+        applyLanguage();
+        bottomNav.classList.remove("hidden");
+        refreshCourseCatalogLater();
+        window.EduCashProResources?.idle?.(() => checkForUpdates(), 2200);
+        return;
+      }
       if (publicParams.get("game") || publicParams.get("tournament") || publicParams.get("raffle")) {
         await window.EduCashProResources?.loadGames?.();
         window.EduCashProMentalGames?.setSession?.(session);
@@ -2316,9 +2357,10 @@
         openAgenda(startParam.slice(7));
         return;
       }
-      await loadCourseCatalog();
+      hydrateCourseCatalogFromCache();
       applyLanguage();
       bottomNav.classList.remove("hidden");
+      refreshCourseCatalogLater();
       if (window.EduCashProNavigationState?.restoreLastPage?.()) return;
       const requestedCourse = String(publicParams.get("course") || "");
       const requestedAcademy = String(publicParams.get("academy") || "");
