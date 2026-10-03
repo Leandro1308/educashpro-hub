@@ -3,7 +3,6 @@
   const API_BASE = "https://educashpro-all.onrender.com";
   const WEB_SENTINEL = "__EDUCASHPRO_PLATFORM_WEB_SESSION_V1__";
   const SESSION_IDLE_MS = 24*60*60*1000;
-  const nativeFetch = window.fetch.bind(window);
   const platform = window.EduCashProPlatform || null;
 
   async function isConfirmedTelegramLaunch(){
@@ -82,12 +81,13 @@
   }
 
   function installHubSessionExchange(session) {
+    const baseFetch = window.fetch.bind(window);
     window.fetch = async function (input, options = {}) {
       if (!isHubSessionRequest(input, options)) {
-        return nativeFetch(input, options);
+        return baseFetch(input, options);
       }
 
-      const response = await nativeFetch(`${API_BASE}/api/platform-auth/hub-session`, {
+      const response = await baseFetch(`${API_BASE}/api/platform-auth/hub-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
