@@ -21,7 +21,14 @@
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   const copy = () => COPY[options.language] || COPY.pt;
-  const storageKey = () => `educashpro:monthly-finance:${options.session?.profile?.tgId || "local"}`;
+  const premiumCopy = () => ({
+    pt: { title: "Recursos para assinante ativo", text: "Assinantes podem salvar o histórico no sistema por até 12 meses, compartilhar com até 5 pessoas e baixar o relatório em PDF.", share: "COMPARTILHAR", pdf: "BAIXAR PDF" },
+    en: { title: "Active subscriber features", text: "Subscribers can keep up to 12 months of history in the system, share with up to 5 people and download the report as PDF.", share: "SHARE", pdf: "DOWNLOAD PDF" },
+    es: { title: "Funciones para suscriptor activo", text: "Los suscriptores pueden guardar hasta 12 meses de historial en el sistema, compartir con hasta 5 personas y descargar el informe en PDF.", share: "COMPARTIR", pdf: "DESCARGAR PDF" },
+    ru: { title: "Функции активной подписки", text: "Подписчики могут хранить в системе историю за 12 месяцев, делиться доступом с 5 людьми и скачивать PDF-отчёт.", share: "ПОДЕЛИТЬСЯ", pdf: "СКАЧАТЬ PDF" }
+  })[options.language] || ({ title: "Controle compartilhado", text: "Ideal para casal ou família: os dois acompanham o mesmo limite e podem lançar gastos no mesmo controle.", share: "ABRIR / COMPARTILHAR", pdf: "BAIXAR PDF" });
+
+  const storageKey = () => `educashpro:monthly-finance:${options.session?.profile?.userId || options.session?.profile?.tgId || "local"}`;
   const amount = () => Math.round((Number(buffer.replace(",", ".")) || 0) * 100) / 100;
   const format = (value) => new Intl.NumberFormat(options.language === "pt" ? "pt-BR" : options.language, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
   const category = (id) => copy().categories.find((item) => item[0] === id) || copy().categories.at(-1);
@@ -31,7 +38,10 @@
     catch { return {}; }
   }
 
-  function write(data) { localStorage.setItem(storageKey(), JSON.stringify(data)); }
+  function write(data) {
+    localStorage.setItem(storageKey(), JSON.stringify(data));
+    if (options?.active) window.EduCashProFinanceShare?.sync?.(data)?.catch?.(() => {});
+  }
   function monthData(data) { return data[month] || { income: 0, expenses: [] }; }
   function totals(record) { const spent = record.expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0); return { spent, balance: Number(record.income || 0) - spent }; }
 
@@ -95,16 +105,6 @@
     renderPage();
   }
 
-  function exportHistory() {
-    const c = copy();
-    const record = monthData(read());
-    const rows = [[c.month, c.category, c.value], ...record.expenses.map((item) => [month, category(item.category)[2], String(item.amount)])];
-    const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(";")).join("\n");
-    const url = URL.createObjectURL(new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" }));
-    const link = document.createElement("a");
-    link.href = url; link.download = `educashpro-financas-${month}.csv`; link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
 
   function renderLocked() {
     const c = copy();
@@ -120,7 +120,7 @@
     const sum = totals(record);
     const percent = record.income > 0 ? Math.min(100, (sum.spent / record.income) * 100) : 0;
     const history = record.expenses.length ? record.expenses.map((item) => { const cat = category(item.category); return `<article class="financeHistoryItem"><span>${cat[1]}</span><div><strong>${esc(cat[2])}</strong><small>${new Date(item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language)}</small></div><b>${format(item.amount)}</b><button data-finance-edit="${esc(item.id)}" aria-label="${esc(c.edit)}">✎</button><button data-finance-remove="${esc(item.id)}" aria-label="${esc(c.remove)}">×</button></article>`; }).join("") : `<div class="empty">${esc(c.empty)}</div>`;
-    document.getElementById("content").innerHTML = `<main class="financeControl"><button id="financeBack" class="textButton">← ${esc(c.back)}</button><header class="financeHero"><span>💰</span><div><h1>${esc(c.title)}</h1><p>${esc(c.intro)}</p></div></header><label class="financeMonth"><span>${esc(c.month)}</span><input id="financeMonth" type="month" value="${month}"></label><section class="financeSummary"><article><small>${esc(c.income)}</small><strong>${format(record.income)}</strong></article><article><small>${esc(c.spent)}</small><strong>${format(sum.spent)}</strong></article><article class="${sum.balance < 0 ? "negative" : ""}"><small>${esc(c.balance)}</small><strong>${format(sum.balance)}</strong></article></section><div class="financeProgress"><span style="width:${percent}%"></span></div><section id="financeEntry" class="financeEntry"><div class="financeMode"><button data-finance-mode="income">＋ ${esc(c.setIncome)}</button><button class="active" data-finance-mode="expense">− ${esc(c.addExpense)}</button></div><small>${esc(c.value)}</small><output id="financeEntryValue">${format(amount())}</output><div id="financeCategories" class="financeCategories"><b>${esc(c.category)}</b>${c.categories.map((item) => `<button data-finance-category="${item[0]}"><span>${item[1]}</span><small>${esc(item[2])}</small></button>`).join("")}</div><div class="financeKeypad">${["1","2","3","4","5","6","7","8","9","decimal","0","back"].map((key) => `<button data-finance-key="${key}">${key === "decimal" ? c.comma : key === "back" ? "⌫" : key}</button>`).join("")}</div><button id="financeSave" class="wideButton">${esc(c.saveExpense)}</button><p id="financeMessage" class="financeMessage"></p></section><section class="financeHistory"><header><div><h2>${esc(c.history)}</h2><small>${esc(c.local)}</small></div><button id="financeExport">⇩ ${esc(c.export)}</button></header>${history}</section></main>`;
+    document.getElementById("content").innerHTML = `<main class="financeControl"><button id="financeBack" class="textButton">← ${esc(c.back)}</button><header class="financeHero"><span>💰</span><div><h1>${esc(c.title)}</h1><p>${esc(c.intro)}</p></div></header><section class="financePremiumPanel"><div><span>👥</span><div><h2>${esc(premiumCopy().title)}</h2><p>${esc(premiumCopy().text)}</p></div></div><section class="financePremiumActions"><button id="financeShareAction" type="button">👥 ${esc(premiumCopy().share)}</button><button id="financePdfAction" type="button">📄 ${esc(premiumCopy().pdf)}</button></section></section><div id="financeSharedAccess"></div><label class="financeMonth"><span>${esc(c.month)}</span><input id="financeMonth" type="month" value="${month}"></label><section class="financeSummary"><article><small>${esc(c.income)}</small><strong>${format(record.income)}</strong></article><article><small>${esc(c.spent)}</small><strong>${format(sum.spent)}</strong></article><article class="${sum.balance < 0 ? "negative" : ""}"><small>${esc(c.balance)}</small><strong>${format(sum.balance)}</strong></article></section><div class="financeProgress"><span style="width:${percent}%"></span></div><section id="financeEntry" class="financeEntry"><div class="financeMode"><button data-finance-mode="income">＋ ${esc(c.setIncome)}</button><button class="active" data-finance-mode="expense">− ${esc(c.addExpense)}</button></div><small>${esc(c.value)}</small><output id="financeEntryValue">${format(amount())}</output><div id="financeCategories" class="financeCategories"><b>${esc(c.category)}</b>${c.categories.map((item) => `<button data-finance-category="${item[0]}"><span>${item[1]}</span><small>${esc(item[2])}</small></button>`).join("")}</div><div class="financeKeypad">${["1","2","3","4","5","6","7","8","9","decimal","0","back"].map((key) => `<button data-finance-key="${key}">${key === "decimal" ? c.comma : key === "back" ? "⌫" : key}</button>`).join("")}</div><button id="financeSave" class="wideButton">${esc(c.saveExpense)}</button><p id="financeMessage" class="financeMessage"></p></section><section class="financeHistory"><header><div><h2>${esc(c.history)}</h2><small>${esc(c.local)}</small></div></header>${history}</section></main>`;
     document.getElementById("financeBack").onclick = () => options.back?.();
     document.getElementById("financeMonth").onchange = (event) => { month = event.target.value || month; buffer = "0"; selectedCategory = ""; editingId = ""; renderPage(); };
     document.querySelectorAll("[data-finance-mode]").forEach((button) => button.onclick = () => { mode = button.dataset.financeMode; editingId = ""; buffer = mode === "income" && record.income ? String(record.income).replace(".", c.comma) : "0"; selectedCategory = ""; syncEntry(); });
@@ -129,16 +129,35 @@
     document.querySelectorAll("[data-finance-edit]").forEach((button) => button.onclick = () => editExpense(button.dataset.financeEdit));
     document.querySelectorAll("[data-finance-remove]").forEach((button) => button.onclick = () => removeExpense(button.dataset.financeRemove));
     document.getElementById("financeSave").onclick = saveEntry;
-    document.getElementById("financeExport").onclick = exportHistory;
     syncEntry();
+    window.EduCashProFinanceShare?.bind?.({
+      record,
+      month,
+      categories: c.categories,
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function render(args = {}) {
-    options = { language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "pt", session: args.session || {}, active: args.active === true, back: args.back, subscribe: args.subscribe };
-    if (!options.active) return renderLocked();
+    options = {
+      language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "pt",
+      session: args.session || {},
+      active: args.active === true,
+      back: args.back,
+      subscribe: args.subscribe,
+      api: args.api,
+    };
     month = currentMonth(); mode = "expense"; buffer = "0"; selectedCategory = ""; editingId = "";
     renderPage();
+    window.EduCashProFinanceShare?.init?.({
+      language: options.language,
+      active: options.active,
+      session: options.session,
+      api: options.api,
+      subscribe: options.subscribe,
+      read,
+      backToFinance: renderPage,
+    }).catch?.(() => {});
   }
 
   window.EduCashProFinance = { render };
