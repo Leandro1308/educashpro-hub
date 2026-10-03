@@ -40,6 +40,9 @@
   };
   let activeBookScrollHandler = null;
   let webQrScanner = null;
+  let initPromise = null;
+  let lateTelegramRetryBound = false;
+  let hubBootstrapPromise = null;
   async function resolveTelegramRuntime(){
     if(window.__EDUCASHPRO_TELEGRAM_HINT__&&!window.Telegram?.WebApp){
       const sdk=window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__;
@@ -53,6 +56,34 @@
     tg=window.Telegram?.WebApp;
     window.__EDUCASHPRO_SYNC_TELEGRAM__?.();
     return tg;
+  }
+  function markAppReady(source="app"){
+    window.__EDUCASHPRO_APP_STARTED__=true;
+    window.__EDUCASHPRO_APP_READY__=true;
+    if(window.__EDUCASHPRO_BOOT__){
+      window.__EDUCASHPRO_BOOT__.initStarted=true;
+      window.__EDUCASHPRO_BOOT__.appReady=true;
+      window.__EDUCASHPRO_BOOT__.readyAt=Date.now();
+      window.__EDUCASHPRO_BOOT__.readySource=source;
+    }
+    try{window.dispatchEvent(new CustomEvent("educashpro:app-ready",{detail:{source}}))}catch{}
+  }
+  function bindLateTelegramRetry(){
+    if(lateTelegramRetryBound||!window.__EDUCASHPRO_TELEGRAM_HINT__)return;
+    lateTelegramRetryBound=true;
+    window.addEventListener("educashpro:telegram-sdk-ready",()=>{
+      tg=window.Telegram?.WebApp;
+      window.__EDUCASHPRO_SYNC_TELEGRAM__?.();
+      if(!tg?.initData||state.hubSessionReady)return;
+      const pending=initPromise;
+      if(pending){
+        Promise.resolve(pending).finally(()=>{
+          if(!state.hubSessionReady&&window.Telegram?.WebApp?.initData)void init();
+        });
+        return;
+      }
+      void init();
+    });
   }
   function stopBookTracking(){if(activeBookScrollHandler){removeEventListener("scroll",activeBookScrollHandler);activeBookScrollHandler=null}}
 
@@ -428,7 +459,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.02.8";
+  const APP_RUNTIME_BUILD = "2026.10.02.9";
   const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
@@ -540,11 +571,59 @@
     return effectiveSession;
   }
 
+  function acceptHubSession(session) {
+    if (!session?.token || !session?.profile) return null;
+    state.token = session.token;
+    state.hubSessionReady = true;
+    state.profile = normalizeProfile(session.profile, state.profile);
+    state.affiliateLink = personalReferralLink(state.profile, session.affiliateLink || state.affiliateLink);
+    state.subscribeUrl = session.subscribeUrl || session.botUrl || state.subscribeUrl;
+    state.referrerId = String(session.referrerId || state.referrerId || "");
+    state.planPriceUsdt = Number(session.planPriceUsdt || state.planPriceUsdt || 12);
+    state.botUrl = session.botUrl || state.botUrl;
+    state.language = state.profile.language || state.language || "pt";
+    state.membershipCredential = session.membershipCredential || state.membershipCredential || String(localStorage.getItem("educashpro:membership-credential") || "");
+    const effectiveSession = { ...session, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
+    window.__EDUCASHPRO_SESSION__ = effectiveSession;
+    window.EduCashProRuntime?.setSession?.(effectiveSession);
+    window.EduCashProProfessional?.setSession?.(effectiveSession);
+    window.EduCashProLinks?.setSession?.(effectiveSession);
+    window.EduCashProHelp?.setSession?.(effectiveSession);
+    return effectiveSession;
+  }
+
+  function refreshHubSessionInBackground() {
+    if (state.hubSessionReady) return Promise.resolve(window.__EDUCASHPRO_SESSION__ || null);
+    if (hubBootstrapPromise) return hubBootstrapPromise;
+    const initData = String(tg?.initData || "");
+    if (!initData) return Promise.resolve(null);
+    hubBootstrapPromise = api("/api/hub/session", { initData }, { blocking: false, timeoutMs: 6000 })
+      .then((session) => acceptHubSession(session))
+      .catch((error) => {
+        console.warn("[EduCashPro] Hub session em segundo plano:", error?.message || error);
+        return null;
+      })
+      .finally(() => { hubBootstrapPromise = null; });
+    return hubBootstrapPromise;
+  }
+
+  function clearSession() {
+    state.token = "";
+    state.profile = null;
+    state.affiliateLink = "";
+    state.referrerId = "";
+    state.hubSessionReady = false;
+    window.__EDUCASHPRO_SESSION__ = null;
+    bottomNav?.classList.add("hidden");
+    return true;
+  }
+
   async function setSession(session) {
     if (!syncExternalSession(session)) return false;
     if (!state.courseCatalog.length) hydrateCourseCatalogFromCache();
     applyLanguage();
     refreshCourseCatalogLater();
+    if (window.__EDUCASHPRO_WEB_HUB__?.active && !state.hubSessionReady) void refreshHubSessionInBackground();
     if (window.__EDUCASHPRO_MARKETS_OPEN__ === true) {
       await openMarkets();
       return true;
@@ -610,7 +689,8 @@
     const blocking = options.blocking !== false;
     const request = (async () => {
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 30000);
+      const timeoutMs = Math.max(2500, Math.min(30000, Number(options.timeoutMs || (path === "/api/hub/session" ? 6000 : 15000)) || 15000));
+      const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
       if (blocking) {
         activeBlockingApiRequests += 1;
         showGlobalLoading();
@@ -2294,10 +2374,13 @@
       window.EduCashProResources?.loadQr?.().then(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl)).catch(() => createQr(document.getElementById("publicCredentialQr"), credentialUrl));
     }
     bottomNav.classList.add("hidden");
+    markAppReady("public-landing");
   }
 
-  async function init() {
-    window.__EDUCASHPRO_APP_STARTED__ = true;
+  async function runInit() {
+    window.__EDUCASHPRO_INIT_STARTED__ = true;
+    if(window.__EDUCASHPRO_BOOT__)window.__EDUCASHPRO_BOOT__.initStarted=true;
+    bindLateTelegramRetry();
     await resolveTelegramRuntime();
     try {
       tg?.ready?.();
@@ -2307,6 +2390,10 @@
       console.error("[EduCashPro] Falha ao confirmar inicialização do aplicativo:", error);
     }
     const publicParams = new URL(window.location.href).searchParams;
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&!tg?.initData){
+      renderPublicLanding();
+      return;
+    }
     const scheduleContractConfig = () => void loadPublicContractConfig();
     if (window.EduCashProResources?.idle) window.EduCashProResources.idle(scheduleContractConfig, 1500);
     else window.setTimeout(scheduleContractConfig, 1100);
@@ -2335,6 +2422,8 @@
         syncExternalSession(cachedSession);
         window.__EDUCASHPRO_FAST_RENDERED__ = true;
         await resumeAuthenticatedExperience();
+        markAppReady("web-cached-session");
+        void refreshHubSessionInBackground();
         return;
       }
     }
@@ -2344,24 +2433,18 @@
       return;
     }
 
+    // A primeira tela nunca depende do backend. A sessão do Telegram é sincronizada depois.
+    renderPublicLanding();
+
     try {
-      const session = await api("/api/hub/session", { initData: tg.initData });
-      state.token = session.token;
-      state.hubSessionReady = true;
-      state.profile = normalizeProfile(session.profile);
-      state.affiliateLink = personalReferralLink(session.profile, session.affiliateLink);
-      state.subscribeUrl = session.subscribeUrl || session.botUrl;
-      state.referrerId = String(session.referrerId || "");
-      state.planPriceUsdt = Number(session.planPriceUsdt || 12);
-      state.botUrl = session.botUrl;
-      window.__EDUCASHPRO_SESSION__ = session;
-      window.EduCashProProfessional?.setSession?.(session);
-      window.EduCashProHelp?.setSession?.(session);
+      const session = await api("/api/hub/session", { initData: tg.initData }, { blocking: false, timeoutMs: 6000 });
+      acceptHubSession(session);
       if (window.__EDUCASHPRO_FAST_RENDERED__ === true && window.__EDUCASHPRO_WEB_HUB__?.active) {
         hydrateCourseCatalogFromCache();
         applyLanguage();
         bottomNav.classList.remove("hidden");
         refreshCourseCatalogLater();
+        markAppReady("web-hub-session");
         window.EduCashProResources?.idle?.(() => checkForUpdates(), 2200);
         return;
       }
@@ -2406,11 +2489,31 @@
         if (rememberedRoute) await restoreRoute(rememberedRoute);
         else renderHome();
       }
+      markAppReady("authenticated-session");
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       checkForUpdates();
     } catch (error) {
-      content.innerHTML = `<section class="splash"><div class="splashLogo">E</div><h1>EduCashPro</h1><p class="error">${escapeHtml(error?.message === "SESSION" ? COPY.pt.telegramOnly : COPY.pt.error)}</p></section>`;
+      console.error("[EduCashPro] Sessão inicial:", error);
+      if (!window.__EDUCASHPRO_APP_READY__) renderPublicLanding();
+      showToast(error?.message === "SESSION" ? COPY.pt.telegramOnly : t("error"));
     }
+  }
+
+  function init() {
+    if (initPromise) return initPromise;
+    initPromise = runInit()
+      .catch((error) => {
+        console.error("[EduCashPro] Inicialização:", error);
+        if (!window.__EDUCASHPRO_APP_READY__) {
+          try { renderPublicLanding(); }
+          catch {
+            const loadingText = document.getElementById("loadingText");
+            if (loadingText) loadingText.textContent = t("error");
+          }
+        }
+      })
+      .finally(() => { initPromise = null; });
+    return initPromise;
   }
 
   document.addEventListener("click", (event) => {
@@ -2430,7 +2533,7 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") flushRememberedRoute();
   });
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
 })();
