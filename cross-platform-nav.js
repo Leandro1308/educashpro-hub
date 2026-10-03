@@ -138,8 +138,20 @@
     if (close && !isTelegram()) close.hidden = true;
   }
 
-  const observer = new MutationObserver(() => render());
-  function boot() { render(); observer.observe(document.body, { childList: true, subtree: true }); }
+  let renderQueued=false;
+  function scheduleRender(){
+    if(renderQueued)return;
+    renderQueued=true;
+    requestAnimationFrame(()=>{renderQueued=false;render()});
+  }
+  const observer = new MutationObserver(scheduleRender);
+  function boot() {
+    render();
+    const content=document.getElementById("content");
+    if(content)observer.observe(content,{childList:true,subtree:false});
+    window.addEventListener("educashpro:web-session-ready",scheduleRender);
+    window.addEventListener("educashpro:profile-photo-updated",scheduleRender);
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
   else boot();
 })();
