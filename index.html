@@ -8,10 +8,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="EduCashPro" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20261003.1" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/educashpro-192.png?v=20261003.1" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261003.1" />
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261003.1" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20261003.2" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/educashpro-192.png?v=20261003.2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261003.2" />
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261003.2" />
   <script>
     (function(){
       if(location.hostname==="go.educashpro.vip"&&location.protocol!=="https:"){
@@ -20,7 +20,7 @@
     })();
   </script>
   <script>
-    window.__EDUCASHPRO_PAGE_BUILD__="2026.10.03.1";
+    window.__EDUCASHPRO_PAGE_BUILD__="2026.10.03.2";
     // Não recarregue automaticamente a página para trocar build.
     // Os arquivos possuem versão própria; o próximo acesso recebe a publicação nova.
     if("serviceWorker" in navigator){
@@ -42,6 +42,51 @@
     .splash p{color:#9db0c6}.loader{width:180px;height:4px;overflow:hidden;border-radius:9px;background:#12243b}.loader span{display:block;width:40%;height:100%;background:#30e6a6;animation:boot-loading 1.1s infinite ease-in-out}
     @keyframes boot-loading{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
   </style>
+  <script>
+    // Ponte mínima de entrada: já funciona enquanto os módulos maiores ainda estão carregando.
+    (function(){
+      function norm(value){
+        return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+          .replace(/[\s\u00a0]+/g," ").replace(/[🚀◇◆✉️📧🔐🔑]/g,"").trim().toLowerCase();
+      }
+      var emailLabels=new Set(["entrar","acessar o educashpro","acessar educashpro","entrar com e-mail","entrar com email","sign in","access educashpro","sign in with email","acceder a educashpro","entrar con correo","войти","войти по e-mail"]);
+      var telegramLabels=new Set(["entrar pelo telegram","abrir no telegram","abrir app no telegram","open in telegram","open telegram","open app in telegram","entrar por telegram","abrir en telegram","abrir app en telegram","открыть в telegram","войти через telegram"]);
+      function publicContext(target){
+        if(!target||target.closest&&target.closest(".webAuthLayer"))return false;
+        if(target.matches&&target.matches("[data-educash-entry],[data-entry-action]"))return true;
+        return Boolean(target.closest&&target.closest("header,.topbar,.publicWelcome,.landing,.landingHero,.hero,[data-public-landing]"));
+      }
+      function telegramUrl(){
+        var params=new URL(location.href).searchParams;
+        var ref=String(params.get("ref")||params.get("r")||"").trim();
+        var url=new URL("https://t.me/EduCashProBot");
+        url.searchParams.set("startapp",ref?"ref_"+ref:"site");
+        return url.toString();
+      }
+      function request(mode){
+        var api=window.EduCashProWebEntry;
+        if(mode==="telegram"){location.assign(telegramUrl());return}
+        if(api&&typeof api.open==="function"){api.open();return}
+        window.__EDUCASHPRO_ENTRY_PENDING__="account";
+        try{window.dispatchEvent(new CustomEvent("educashpro:entry-request",{detail:{mode:"account"}}))}catch(_){}
+      }
+      document.addEventListener("click",function(event){
+        var target=event.target&&event.target.closest&&event.target.closest("button,a,[role='button']");
+        if(!target||target.closest&&target.closest(".webAuthLayer"))return;
+        var explicit=String(target.dataset&&((target.dataset.educashEntry||target.dataset.entryAction))||"").toLowerCase();
+        var label=norm(target.textContent||target.getAttribute&&target.getAttribute("aria-label")||"");
+        var telegram=explicit==="telegram"||telegramLabels.has(label);
+        if(telegram){
+          var href=String(target.getAttribute&&target.getAttribute("href")||"");
+          if(/^https:\/\/t\.me\//i.test(href))return;
+          event.preventDefault();event.stopImmediatePropagation();request("telegram");return;
+        }
+        var email=explicit==="email"||explicit==="account"||emailLabels.has(label);
+        if(!email||(!explicit&&!publicContext(target)))return;
+        event.preventDefault();event.stopImmediatePropagation();request("account");
+      },true);
+    })();
+  </script>
   <script>
     window.__EDUCASHPRO_BOOT__={startedAt:Date.now(),initStarted:false,appReady:false,telegramReady:false,telegramSdkTimedOut:false,scriptErrors:[]};
     window.addEventListener("error",function(event){var source=event&&event.target&&event.target.src;if(!source)return;window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);console.error("[EduCashPro] Falha ao carregar recurso:",source)},true);
@@ -101,17 +146,17 @@
       }
     })();
   </script>
-  <link rel="preload" as="style" href="./style.css?v=20261003.1" onload="this.onload=null;this.rel='stylesheet';document.documentElement.classList.add('ecpBaseStyleReady')" />
-  <link rel="preload" as="style" href="./experience-v2.css?v=20261003.1" onload="this.onload=null;this.rel='stylesheet'" />
-  <link rel="preload" as="style" href="./growth-entry-v10.css?v=20261003.1" onload="this.onload=null;this.rel='stylesheet'" />
-  <link rel="preload" as="style" href="./flow-lite.css?v=20261003.1" onload="this.onload=null;this.rel='stylesheet'" />
-  <link rel="preload" as="style" href="./educash-empire-miniapp-fix.css?v=20261003.1" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" as="style" href="./style.css?v=20261003.2" onload="this.onload=null;this.rel='stylesheet';document.documentElement.classList.add('ecpBaseStyleReady')" />
+  <link rel="preload" as="style" href="./experience-v2.css?v=20261003.2" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" as="style" href="./growth-entry-v10.css?v=20261003.2" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" as="style" href="./flow-lite.css?v=20261003.2" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" as="style" href="./educash-empire-miniapp-fix.css?v=20261003.2" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript>
-    <link rel="stylesheet" href="./style.css?v=20261003.1" />
-    <link rel="stylesheet" href="./experience-v2.css?v=20261003.1" />
-    <link rel="stylesheet" href="./growth-entry-v10.css?v=20261003.1" />
-    <link rel="stylesheet" href="./flow-lite.css?v=20261003.1" />
-    <link rel="stylesheet" href="./educash-empire-miniapp-fix.css?v=20261003.1" />
+    <link rel="stylesheet" href="./style.css?v=20261003.2" />
+    <link rel="stylesheet" href="./experience-v2.css?v=20261003.2" />
+    <link rel="stylesheet" href="./growth-entry-v10.css?v=20261003.2" />
+    <link rel="stylesheet" href="./flow-lite.css?v=20261003.2" />
+    <link rel="stylesheet" href="./educash-empire-miniapp-fix.css?v=20261003.2" />
   </noscript>
 </head>
 <body>
@@ -133,16 +178,16 @@
   <div id="toast" class="toast" role="status"></div>
   <div id="accessModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalBackdrop" data-close-modal></div><section class="modalSheet"><button class="modalClose" data-close-modal aria-label="Fechar">✕</button><div id="modalIcon" class="modalIcon">🎓</div><h2 id="modalTitle"></h2><p id="modalDescription"></p><ul id="modalLearning"></ul><button id="modalSubscribe" class="wideButton"></button><button class="secondaryButton modalCancel" data-close-modal></button></section></div>
   <!-- Caminho crítico enxuto: somente o necessário para pintar, autenticar e abrir a Home. -->
-  <script defer src="./platform-adapter.js?v=20261003.1"></script>
-  <script defer src="./feature-registry.js?v=20261003.1"></script>
-  <script defer src="./locale-resolver.js?v=20261003.1"></script>
-  <script defer src="./platform-web-auth.js?v=20261003.1"></script>
-  <script defer src="./web-hub-bridge.js?v=20261003.1"></script>
-  <script defer src="./web-auth-entry.js?v=20261003.1"></script>
-  <script defer src="./resource-loader.js?v=20261003.1"></script>
-  <script defer src="./app.js?v=20261003.1"></script>
-  <script defer src="./web-site-menu.js?v=20261003.1"></script>
-  <script defer src="./idle-features-v11.js?v=20261003.1"></script>
+  <script defer src="./platform-adapter.js?v=20261003.2"></script>
+  <script defer src="./feature-registry.js?v=20261003.2"></script>
+  <script defer src="./locale-resolver.js?v=20261003.2"></script>
+  <script defer src="./platform-web-auth.js?v=20261003.2"></script>
+  <script defer src="./web-hub-bridge.js?v=20261003.2"></script>
+  <script defer src="./web-auth-entry.js?v=20261003.2"></script>
+  <script defer src="./resource-loader.js?v=20261003.2"></script>
+  <script defer src="./app.js?v=20261003.2"></script>
+  <script defer src="./web-site-menu.js?v=20261003.2"></script>
+  <script defer src="./idle-features-v11.js?v=20261003.2"></script>
   <script>
     window.setTimeout(function(){
       if(window.__EDUCASHPRO_APP_READY__)return;
