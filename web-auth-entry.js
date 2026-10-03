@@ -349,26 +349,25 @@
     }
     const landing=document.querySelector(".publicWelcome");
     if(!landing)return;
-    landing.querySelector("#webLoginButton")?.remove();
     landing.querySelector("#webPhoneLoginButton")?.remove();
+    const existing=landing.querySelector('[data-educash-entry="account"],#publicEntryButton');
+    const walletRequired=state.reauthRequired&&state.reauthMode==="wallet";
+    if(existing){
+      existing.onclick=walletRequired?openWallet:openLogin;
+      existing.dataset.educashEntry="account";
+      landing.querySelector("#webLoginButton")?.remove();
+      return;
+    }
+    landing.querySelector("#webLoginButton")?.remove();
     const primary=document.createElement("button");
     primary.id="webLoginButton";
+    primary.dataset.educashEntry="account";
     primary.className="webAuthButton";
     primary.type="button";
-    const walletRequired=state.reauthRequired&&state.reauthMode==="wallet";
     primary.textContent=walletRequired?("👛 "+t("walletLogin")):("✉️ "+emailCopy().login);
     primary.onclick=walletRequired?openWallet:openLogin;
     const hint=landing.querySelector(".publicWelcomeHint");
     landing.insertBefore(primary,hint||null);
-    if(!state.reauthRequired){
-      const phone=document.createElement("button");
-      phone.id="webPhoneLoginButton";
-      phone.className="webAuthSecondary webAuthGhost";
-      phone.type="button";
-      phone.textContent="📱 "+t("phoneLogin");
-      phone.onclick=openPairLogin;
-      landing.insertBefore(phone,hint||null);
-    }
   }
   async function boot(){
     if(window.__EDUCASHPRO_TELEGRAM_HINT__){
