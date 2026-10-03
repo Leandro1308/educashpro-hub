@@ -1594,35 +1594,8 @@
     } catch (error) { handleError(error, container); }
   }
 
-  async function renderPartnerStores({ segment = state.partnerSegment, page = state.partnerPage } = {}) {
-    location.assign("./marketplace.html");
-    return;
-    state.view = "benefits";
-    rememberRoute("benefits", "partner-stores");
-    state.partnerSegment = PARTNER_SEGMENTS.includes(segment) ? segment : "";
-    state.partnerPage = Math.max(1, Number(page || 1));
-    updateNav();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    const filters = [["", partnerSegmentLabel("all")], ...partnerSegmentOptions()]
-      .map(([value, label]) => `<button class="filter ${state.partnerSegment === value ? "active" : ""}" data-partner-segment="${escapeHtml(value)}">${escapeHtml(label)}</button>`)
-      .join("");
-    content.innerHTML = `<button id="partnersBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🏪 ${escapeHtml(benefitNavigationCopy("stores"))}</h1><p>${escapeHtml(benefitNavigationCopy("storesSub"))}</p></section><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div class="filters" style="margin-top:14px">${filters}</div><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
-    document.getElementById("partnersBack").onclick = renderBenefits;
-    document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
-    content.querySelectorAll("[data-partner-segment]").forEach((button) => {
-      button.onclick = () => renderPartnerStores({ segment: button.dataset.partnerSegment, page: 1 });
-    });
-    const partnerContainer = document.getElementById("partnerList");
-    try {
-      const data = await api("/api/hub/partners", { token: state.token, segment: state.partnerSegment, page: state.partnerPage }, { blocking:false });
-      state.partners = data;
-      const cards = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(partnerSegmentLabel(item.segment))}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-partner="${escapeHtml(item.destinationUrl)}" data-locked="${item.locked}">📍 ${escapeHtml(item.locked ? t("unlock") : featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
-      const pager = data.page > 1 || data.hasMore ? `<div class="pager"><button id="partnerPrev" ${data.page <= 1 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><span>${escapeHtml(t("page"))} ${data.page}</span><button id="partnerNext" ${!data.hasMore ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div>` : "";
-      partnerContainer.innerHTML = cards + pager;
-      partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.partner));
-      document.getElementById("partnerPrev")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page - 1 }));
-      document.getElementById("partnerNext")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page + 1 }));
-    } catch (error) { handleError(error, partnerContainer); }
+  function renderPartnerStores() {
+    window.location.assign("./marketplace.html");
   }
 
   async function openAreaLinks(kind = "page") {
@@ -2476,7 +2449,6 @@
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
       const requestedSection = String(publicParams.get("section") || "");
-      const hasExplicitRoute = Boolean(requestedCourse || requestedAcademy || requestedView || requestedSection);
       if (requestedCourse) await openCourse(requestedCourse);
       else if (requestedAcademy === "technical_analysis") await openMarkets();
       else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
