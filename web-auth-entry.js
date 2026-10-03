@@ -1,7 +1,7 @@
 (function(){
   const platform=window.EduCashProPlatform;
   const auth=window.EduCashProWebAuth;
-  if(window.__EDUCASHPRO_TELEGRAM_HINT__||!platform?.isWeb?.()||!auth)return;
+  if(!platform||!auth)return;
 
   const state={session:null,checking:true,reauthRequired:false,reauthMode:"",ui:null,challenge:null,unsubscribe:null,unsubscribeModal:null,busy:false,pair:null,pairTimer:null,pairCountdownTimer:null,pairExpiresAt:0};
   const MANIFEST_URL="https://go.educashpro.vip/tonconnect-manifest.json";
@@ -205,7 +205,17 @@
   }
 
 
-  function logout(){platform.writeWebSession?.(null);state.session=null;location.reload()}
+  function transitionToReauth(stored){
+    state.session=stored||state.session;
+    state.reauthRequired=true;
+    state.reauthMode=requiredReauthMode(state.session);
+    window.__EDUCASHPRO_SESSION__=null;
+    window.EduCashProApp?.clearSession?.();
+    window.EduCashProApp?.renderPublicLanding?.();
+    enhancePublic();
+  }
+
+  function logout(){platform.writeWebSession?.(null);state.session=null;window.EduCashProApp?.clearSession?.();location.reload()}
   function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}/?ref=${encodeURIComponent(code)}`}
   async function copyReferral(){const value=referralUrl();if(!value)return;try{await navigator.clipboard.writeText(value)}catch{}const button=document.getElementById("webReferralCopy");if(button){const old=button.textContent;button.textContent=t("copied");setTimeout(()=>button.textContent=old,1200)}}
   async function approvePair(){const input=document.getElementById("webPairApproveCode");const status=document.getElementById("webPairApproveStatus");const code=String(input?.value||"").replace(/\D/g,"").slice(0,6);if(code.length!==6){if(status)status.textContent=t("invalidCode");return}try{await auth.approveDevicePairing(code);if(status)status.textContent=t("approved");if(input)input.value=""}catch{if(status)status.textContent=t("invalidCode")}}
@@ -258,6 +268,11 @@
     }
   }
   async function boot(){
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__){
+      const sdk=window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__;
+      if(sdk)await Promise.resolve(sdk).catch(()=>false);
+    }
+    if(!platform?.isWeb?.())return;
     injectStyles();
     const stored=platform.readWebSession?.();
     if(stored?.token&&stored?.profile?.userId){
@@ -275,11 +290,7 @@
               void window.EduCashProApp?.setSession?.(state.session);
               return;
             }
-            if(!current?.token){
-              state.session=stored;
-              state.reauthRequired=true;
-              state.reauthMode=requiredReauthMode(stored);
-            }
+            if(!current?.token)transitionToReauth(stored);
           },1200);
         }
       }else{
