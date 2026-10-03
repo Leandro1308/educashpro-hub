@@ -64,6 +64,21 @@
   };
   function emailCopy(){return EMAIL_COPY[locale()]||EMAIL_COPY.pt}
 
+  function normalizedEntryText(value){
+    return String(value||"")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/[\s\u00a0]+/g," ")
+      .replace(/[🚀◇◆✉️📧🔐🔑]/g,"")
+      .trim().toLowerCase();
+  }
+
+  function telegramEntryUrl(){
+    const ref=String(platform?.pendingReferral?.()||new URL(location.href).searchParams.get("ref")||"").trim();
+    const url=new URL(BOT_URL);
+    url.searchParams.set("startapp",ref?`ref_${ref}`:"site");
+    return url.toString();
+  }
+
   function profileIsActive(value=profile()){
     const subscription=value?.subscription||{};
     const lifetime=value?.lifetime===true||value?.pendingLifetime===true||subscription?.lifetime===true||subscription?.pendingLifetime===true;
@@ -205,6 +220,91 @@
   }
 
 
+  function openEntry(){
+    return state.reauthRequired&&state.reauthMode==="wallet"?openWallet():openLogin();
+  }
+
+  function isPublicEntryContext(target){
+    if(!target)return false;
+    if(target.closest?.(".webAuthLayer"))return false;
+    if(target.matches?.("[data-educash-entry],[data-entry-action]"))return true;
+    if(target.closest?.("header,.topbar,.publicWelcome,.landing,.landingHero,.hero,[data-public-landing]"))return true;
+    return false;
+  }
+
+  function handleLegacyEntryClick(event){
+    if(!platform?.isWeb?.())return;
+    const target=event.target?.closest?.("button,a,[role='button']");
+    if(!target||target.closest?.(".webAuthLayer"))return;
+    if(state.session?.profile?.userId&&!state.reauthRequired)return;
+
+    const explicit=String(target.dataset?.educashEntry||target.dataset?.entryAction||"").toLowerCase();
+    const label=normalizedEntryText(target.textContent||target.getAttribute?.("aria-label")||"");
+    const telegramLabels=new Set([
+      "entrar pelo telegram","abrir no telegram","abrir app no telegram",
+      "open in telegram","open telegram","open app in telegram",
+      "entrar por telegram","abrir en telegram","abrir app en telegram",
+      "открыть в telegram","войти через telegram"
+    ]);
+    const emailLabels=new Set([
+      "entrar","acessar o educashpro","acessar educashpro","entrar com e-mail","entrar com email",
+      "sign in","access educashpro","sign in with email",
+      "acceder a educashpro","entrar con correo","войти","войти по e-mail"
+    ]);
+
+    const wantsTelegram=explicit==="telegram"||telegramLabels.has(label);
+    if(wantsTelegram){
+      const href=String(target.getAttribute?.("href")||"");
+      if(/^https:\/\/t\.me\//i.test(href))return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      location.assign(telegramEntryUrl());
+      return;
+    }
+
+    const wantsEntry=explicit==="email"||explicit==="account"||emailLabels.has(label);
+    if(!wantsEntry||(!explicit&&!isPublicEntryContext(target)))return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    void openEntry();
+  }
+
+  function bindLegacyEntryBridge(){
+    if(document.documentElement.dataset.educashEntryBridge==="1")return;
+    document.documentElement.dataset.educashEntryBridge="1";
+    document.addEventListener("click",handleLegacyEntryClick,true);
+    window.addEventListener("educashpro:entry-request",event=>{
+      const mode=String(event.detail?.mode||"account").toLowerCase();
+      if(mode==="telegram"){location.assign(telegramEntryUrl());return}
+      void openEntry();
+    });
+    try{
+      const pending=String(window.__EDUCASHPRO_ENTRY_PENDING__||"");
+      if(pending){
+        window.__EDUCASHPRO_ENTRY_PENDING__="";
+        queueMicrotask(()=>pending==="telegram"?location.assign(telegramEntryUrl()):void openEntry());
+      }
+    }catch{}
+  }
+
+  function publishEntryApi(){
+    const api=window.EduCashProWebEntry||{};
+    Object.assign(api,{
+      open:openEntry,
+      email:openLogin,
+      openEmail:openLogin,
+      pair:openPairLogin,
+      wallet:openWallet,
+      renderAuthenticated,
+      logout,
+      getSession:()=>state.reauthRequired?null:state.session,
+      requiresReauth:()=>state.reauthRequired,
+      reauthMode:()=>state.reauthMode
+    });
+    window.EduCashProWebEntry=api;
+    try{window.dispatchEvent(new CustomEvent("educashpro:entry-api-ready"))}catch{}
+  }
+
   function transitionToReauth(stored){
     state.session=stored||state.session;
     state.reauthRequired=true;
@@ -314,24 +414,16 @@
       if(document.visibilityState!=="visible")return;
       const current=platform.readWebSession?.()||state.session;
       if(!withinIdleWindow(current)){
-        state.session=current;
-        state.reauthRequired=true;
-        state.reauthMode=requiredReauthMode(current);
-        location.reload();
+        transitionToReauth(current);
         return;
       }
       state.session=touchLocalSession(current);
     });
-    window.EduCashProWebEntry={
-      open:()=>state.reauthRequired&&state.reauthMode==="wallet"?openWallet():openLogin(),
-      pair:openPairLogin,
-      wallet:openWallet,
-      renderAuthenticated,
-      logout,
-      getSession:()=>state.reauthRequired?null:state.session,
-      requiresReauth:()=>state.reauthRequired,
-      reauthMode:()=>state.reauthMode
-    };
+    publishEntryApi();
   }
+
+  // Exponha o acesso antes do DOMContentLoaded para que a primeira interação nunca fique sem resposta.
+  bindLegacyEntryBridge();
+  publishEntryApi();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
