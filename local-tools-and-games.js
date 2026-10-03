@@ -228,8 +228,12 @@
     document.getElementById("randomizerTool").onclick = renderRandomizers;
     document.getElementById("affiliateTool")?.addEventListener("click", openAffiliateCalculator);
     document.getElementById("financeTool")?.addEventListener("click", openFinanceControl);
-    document.getElementById("linkPageTool").onclick = () => window.EduCashProLinks?.renderPageEditor?.();
-    document.getElementById("smartLinkTool").onclick = () => window.EduCashProLinks?.renderShortener?.();
+    document.getElementById("linkPageTool").onclick = async () => {
+      try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.renderPageEditor?.()}catch(error){console.error("[EduCashPro] links:",error)}
+    };
+    document.getElementById("smartLinkTool").onclick = async () => {
+      try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.renderShortener?.()}catch(error){console.error("[EduCashPro] smart link:",error)}
+    };
   }
 
   function enhanceHome() {

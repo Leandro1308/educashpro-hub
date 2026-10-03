@@ -1,7 +1,17 @@
 (function(){
   const API="https://educashpro-all.onrender.com";
-  const tg=window.Telegram?.WebApp;
-  try{tg?.ready();tg?.expand();}catch{}
+  let tg=window.Telegram?.WebApp;
+  async function resolveTelegramRuntime(){
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__){
+      await Promise.race([
+        Promise.resolve(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__).catch(()=>false),
+        new Promise(resolve=>setTimeout(resolve,3000))
+      ]);
+    }
+    tg=window.Telegram?.WebApp;
+    try{tg?.ready?.();tg?.expand?.()}catch{}
+    return tg;
+  }
   const qs=new URLSearchParams(location.search);
   const lang=window.EduCashProLocale?.resolve?.()||"pt";
   const C={
@@ -23,6 +33,7 @@
   function toast(v){txt("toast",v);$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2200)}
   async function post(path,body){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);try{const r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),cache:"no-store",signal:controller.signal});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.reason||"request_failed");return d}finally{clearTimeout(timeout)}}
   async function boot(){
+    await resolveTelegramRuntime();
     apply();
     setLink("",contextReferral());
     $("copyButton").onclick=copyCurrentLink;

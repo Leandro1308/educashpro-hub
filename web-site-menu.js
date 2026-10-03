@@ -56,7 +56,8 @@
     if(session()?.permissions?.admin===true)groups.push([lang()==="en"?"Administration":lang()==="es"?"Administración":lang()==="ru"?"Администрирование":"Administração",[["admin","🛠️",lang()==="en"?"Admin panel":lang()==="es"?"Panel administrativo":lang()==="ru"?"Панель администратора":"Painel administrativo"]]]);
     const layer=document.createElement("div");layer.className="webSiteMenuLayer";layer.innerHTML=`<aside class="webSiteMenuSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><header class="webSiteMenuHead"><div><h2>☰ ${esc(c.title)}</h2><p>${esc(c.subtitle)}</p></div><button class="webSiteMenuClose" aria-label="${esc(c.close)}">✕</button></header>${groups.map(([title,items])=>`<section class="webSiteMenuGroup"><h3>${esc(title)}</h3><div class="webSiteMenuGrid">${items.map(([action,icon,label])=>`<button class="webSiteMenuItem" type="button" data-menu-action="${esc(action)}"><span>${icon}</span><b>${esc(label)}</b></button>`).join("")}</div></section>`).join("")}</aside>`;document.body.appendChild(layer);document.body.classList.add("webSiteMenuOpen");layer.querySelector(".webSiteMenuClose").onclick=close;layer.onclick=e=>{if(e.target===layer)close()};layer.querySelectorAll("[data-menu-action]").forEach(button=>button.onclick=()=>run(button.dataset.menuAction));layer.querySelector(".webSiteMenuClose")?.focus()}
   async function run(action){
-    const app=window.EduCashProApp,account=window.EduCashProAccountCenter;
+    const app=window.EduCashProApp;
+    let account=window.EduCashProAccountCenter;
     if(action==="home"){close();app?.renderPublicLanding?.();return}
     if(action==="presentation"){close();app?.renderPresentation?.(app.renderPublicLanding);return}
     if(action==="install"){close();if(window.EduCashProPWA?.install)return window.EduCashProPWA.install();location.assign(new URL("./install.html",location.href).toString());return}
@@ -68,6 +69,10 @@
     if(action==="channel"){location.assign("https://t.me/+1mP5ad7vJH5lOGNh");return}
     if(action==="group"){location.assign("https://t.me/EduCashProBot");return}
     if(["learn","marketing","finance","telegram-course","explore","benefits","agenda","link-page","smart-link","publish","projects","account","subscription","credential","pair","affiliate","network","support","language","preferences","documents"].includes(action)&&!needSession())return;
+    if(["account","subscription","pair","network","language","preferences","documents"].includes(action)&&!account){
+      await window.EduCashProResources?.loadAccountCenter?.();
+      account=window.EduCashProAccountCenter;
+    }
     close();
     if(action==="learn")return app?.renderLearn?.();
     if(action==="marketing")return app?.openAcademyCategory?.("network_marketing");
@@ -110,8 +115,18 @@
       const back=document.createElement("button");back.className="webContextBack";back.type="button";back.textContent=`← ${lang()==="en"?"Back":lang()==="es"?"Volver":lang()==="ru"?"Назад":"Voltar"}`;back.onclick=()=>window.EduCashProApp?.renderPublicLanding?.();content.prepend(back);
     }
   }
-  const observer=new MutationObserver(install);observer.observe(document.documentElement,{childList:true,subtree:true});
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});else install();
+  let installQueued=false;
+  function scheduleInstall(){
+    if(installQueued)return;
+    installQueued=true;
+    requestAnimationFrame(()=>{installQueued=false;install()});
+  }
+  function boot(){
+    install();
+    const content=document.getElementById("content");
+    if(content)new MutationObserver(scheduleInstall).observe(content,{childList:true,subtree:false});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
   window.addEventListener("educashpro:web-session-ready",install);
   window.addEventListener("educashpro:subscription-synced",labelAccount);
   window.addEventListener("educashpro:profile-photo-updated",labelAccount);

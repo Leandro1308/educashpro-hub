@@ -5,7 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#07111f">
   <title>Agenda Profissional | EduCashPro</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    (function(){
+      var launchText=String(location.search||"")+" "+String(location.hash||"");
+      var hint=/tgWebApp(?:Data|Version|Platform|ThemeParams)/i.test(launchText);
+      window.__EDUCASHPRO_TELEGRAM_HINT__=hint;
+      if(!hint){window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=Promise.resolve(false);return}
+      window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=new Promise(function(resolve){
+        var script=document.createElement("script"),settled=false;
+        function finish(ok){if(settled)return;settled=true;resolve(Boolean(ok))}
+        script.src="https://telegram.org/js/telegram-web-app.js";
+        script.async=true;
+        script.onload=function(){finish(true)};
+        script.onerror=function(){finish(false)};
+        document.head.appendChild(script);
+        setTimeout(function(){finish(Boolean(window.Telegram&&window.Telegram.WebApp))},3000);
+      });
+    })();
+  </script>
   <link rel="stylesheet" href="./agenda.css?v=7">
   <link rel="stylesheet" href="./common-ui.css?v=1">
 </head>
@@ -15,11 +32,11 @@
     <main id="content"><section class="splash"><div class="logo">📅</div><h1>Agenda Profissional</h1><p id="loading">Carregando…</p></section></main>
   </div>
   <div id="toast" class="toast"></div>
-  <script src="./platform-adapter.js?v=20260913.4"></script>
-  <script src="./locale-resolver.js?v=20260917.3"></script>
-  <script src="./web-hub-bridge.js?v=20260913.1"></script>
-  <script src="./navigation-state.js?v=20260928.1"></script>
-  <script src="./agenda.js?v=20260920.2"></script>
-  <script src="./cross-platform-nav.js?v=20260914.12"></script>
+  <script defer src="./platform-adapter.js?v=20261003.1"></script>
+  <script defer src="./locale-resolver.js?v=20261003.1"></script>
+  <script defer src="./web-hub-bridge.js?v=20261003.1"></script>
+  <script defer src="./navigation-state.js?v=20261003.1"></script>
+  <script defer src="./agenda.js?v=20261003.1"></script>
+  <script defer src="./cross-platform-nav.js?v=20261003.1"></script>
 </body>
 </html>

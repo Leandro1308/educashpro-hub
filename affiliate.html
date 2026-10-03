@@ -6,7 +6,24 @@
   <meta name="theme-color" content="#07111f" />
   <title>Programa de Afiliados • EduCashPro</title>
   <link rel="stylesheet" href="./affiliate.css?v=20260911.1" />
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    (function(){
+      var launchText=String(location.search||"")+" "+String(location.hash||"");
+      var hint=/tgWebApp(?:Data|Version|Platform|ThemeParams)/i.test(launchText);
+      window.__EDUCASHPRO_TELEGRAM_HINT__=hint;
+      if(!hint){window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=Promise.resolve(false);return}
+      window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=new Promise(function(resolve){
+        var script=document.createElement("script"),settled=false;
+        function finish(ok){if(settled)return;settled=true;resolve(Boolean(ok))}
+        script.src="https://telegram.org/js/telegram-web-app.js";
+        script.async=true;
+        script.onload=function(){finish(true)};
+        script.onerror=function(){finish(false)};
+        document.head.appendChild(script);
+        setTimeout(function(){finish(Boolean(window.Telegram&&window.Telegram.WebApp))},3000);
+      });
+    })();
+  </script>
 </head>
 <body>
   <header class="topbar">
@@ -81,11 +98,11 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="./platform-adapter.js?v=20260913.4"></script>
-  <script src="./locale-resolver.js?v=20260917.3"></script>
-  <script src="./web-hub-bridge.js?v=20260913.1"></script>
-  <script src="./navigation-state.js?v=20260928.1"></script>
-  <script src="./affiliate.js?v=20260917.7"></script>
-  <script src="./cross-platform-nav.js?v=20260914.12"></script>
+  <script defer src="./platform-adapter.js?v=20261003.1"></script>
+  <script defer src="./locale-resolver.js?v=20261003.1"></script>
+  <script defer src="./web-hub-bridge.js?v=20261003.1"></script>
+  <script defer src="./navigation-state.js?v=20261003.1"></script>
+  <script defer src="./affiliate.js?v=20261003.1"></script>
+  <script defer src="./cross-platform-nav.js?v=20261003.1"></script>
 </body>
 </html>

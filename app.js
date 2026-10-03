@@ -459,8 +459,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.02.10";
-  const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
+  const APP_RUNTIME_BUILD = "2026.10.03.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -476,7 +475,7 @@
     if (updateCheckPromise) return updateCheckPromise;
     updateCheckPromise = (async () => {
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 3500);
+      const timeout = window.setTimeout(() => controller.abort(), 3000);
       try {
         const response = await fetch(`./version.json?fresh=${Date.now()}`, { cache: "no-store", signal: controller.signal });
         if (!response.ok) return false;
@@ -484,26 +483,16 @@
         const publishedBuild = String(data?.build || "").trim();
         if (!publishedBuild) return false;
         localStorage.setItem(APP_BUILD_KEY, publishedBuild);
-        if (publishedBuild === APP_RUNTIME_BUILD) {
-          sessionStorage.removeItem(APP_RELOAD_GUARD_KEY);
-          return false;
-        }
+        if (publishedBuild === APP_RUNTIME_BUILD) return false;
         clearPublishedContentCache();
         window.dispatchEvent(new CustomEvent("educashpro:update-ready", { detail: { build: publishedBuild, runtime: APP_RUNTIME_BUILD } }));
-        const guard = JSON.parse(sessionStorage.getItem(APP_RELOAD_GUARD_KEY) || "null");
-        const attempts = guard?.target === publishedBuild ? Number(guard.attempts || 0) : 0;
-        if (attempts >= 2) return false;
-        sessionStorage.setItem(APP_RELOAD_GUARD_KEY, JSON.stringify({ target: publishedBuild, attempts: attempts + 1 }));
-        const url = new URL(window.location.href);
-        url.searchParams.set("release", publishedBuild);
-        url.searchParams.set("refresh", String(attempts + 1));
-        window.location.replace(url.toString());
+        // Nunca reinicia a navegação durante o uso. O próximo acesso recebe o novo build.
         return true;
       } catch {
         return false;
       } finally {
         window.clearTimeout(timeout);
-        window.setTimeout(() => { updateCheckPromise = null; }, 1000);
+        window.setTimeout(() => { updateCheckPromise = null; }, 5000);
       }
     })();
     return updateCheckPromise;
@@ -1216,7 +1205,7 @@
     rememberRoute("learn");
     updateNav();
     syncExternalSession();
-    if (!state.courseCatalog.length) await loadCourseCatalog();
+    if (!state.courseCatalog.length) hydrateCourseCatalogFromCache();
     const menu = academyMenuCopy();
     const helpCopy = {
       pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, serviços, agenda, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
@@ -1231,7 +1220,13 @@
       <section class="quickGrid academyGrid academyPathGrid">
         ${menu.categories.map(([id, icon, title, description]) => `<button class="quickCard academyCategoryCard" data-academy-category="${escapeHtml(id)}"><span class="emoji">${icon}</span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></button>`).join("")}
       </section>`;
-    document.getElementById("openHelpCenter").onclick = () => window.EduCashProHelp?.render?.();
+    document.getElementById("openHelpCenter").onclick = async () => {
+      try{
+        await window.EduCashProResources?.loadHelp?.();
+        window.EduCashProHelp?.render?.();
+      }catch(error){handleError(error)}
+    };
+    refreshCourseCatalogLater();
     content.querySelectorAll("[data-academy-category]").forEach((button) => button.onclick = () => {
       if (button.dataset.academyCategory === "tools") return renderTools();
       if (button.dataset.academyCategory === "technical_analysis") return void openMarkets();
@@ -1266,7 +1261,6 @@
   async function openAcademyCategory(category) {
     const supported = new Set(["network_marketing", "financial_education", "telegram"]);
     if (!supported.has(category)) return false;
-    showGlobalLoading();
     try {
       await renderCourseCategory(category);
       return true;
@@ -1274,26 +1268,25 @@
       console.error("[EduCashPro] Falha ao abrir trilha da Academy:", category, error);
       handleError(error);
       return false;
-    } finally {
-      hideGlobalLoading();
     }
   }
 
-  async function renderCourseCategory(category) {
+  async function renderCourseCategory(category, options = {}) {
     syncExternalSession();
     state.view = "learn";
     rememberRoute("learn", category);
     updateNav();
-    if (!state.courseCatalog.length) await loadCourseCatalog();
+    if (!state.courseCatalog.length) hydrateCourseCatalogFromCache();
     const active = state.profile?.active === true;
     const menu = academyMenuCopy();
     const categoryCopy = menu.categories.find(([id]) => id === category);
     const visibleCourses = state.courseCatalog.filter((item) => item.category === category);
+    const loadingCatalog = !state.courseCatalog.length && options.refresh !== false;
     content.innerHTML = `
       <button id="academyBack" class="textButton">← ${escapeHtml(t("back"))}</button>
       <section class="academyCategoryHero"><span>${categoryCopy?.[1] || "🎓"}</span><div><h2>${escapeHtml(categoryCopy?.[2] || t("courses"))}</h2><p>${escapeHtml(categoryCopy?.[3] || t("learnDesc"))}</p></div></section>
       <div class="sectionHead"><div><h2>${escapeHtml(t("courses"))}</h2><p>${escapeHtml(t("continue"))}</p></div></div>
-      <div class="cardList">${visibleCourses.map((item) => courseCard(item, item.access === "subscriber" && !active)).join("") || `<div class="empty">${escapeHtml(t("noItems"))}</div>`}</div>`;
+      <div class="cardList">${visibleCourses.map((item) => courseCard(item, item.access === "subscriber" && !active)).join("") || (loadingCatalog ? loadingCard() : `<div class="empty">${escapeHtml(t("noItems"))}</div>`)}</div>`;
     document.getElementById("academyBack").onclick = renderLearn;
     content.querySelectorAll("[data-course]").forEach((button) => button.onclick = () => {
       const item = state.courseCatalog.find((course) => course.id === button.dataset.course);
@@ -1301,6 +1294,11 @@
       if (item?.link) return openUrl(item.link);
       openCourse(button.dataset.course);
     });
+    if (loadingCatalog) {
+      void loadCourseCatalog().then(() => {
+        if (state.view === "learn" && currentRouteDetail === category) void renderCourseCategory(category, { refresh:false });
+      });
+    }
   }
 
   function courseCard(item, locked) {
@@ -1326,7 +1324,7 @@
         renderCourseIndex();
         return;
       }
-      const data = await api("/api/hub/course", { token: state.token, courseId });
+      const data = await api("/api/hub/course", { token: state.token, courseId }, { blocking:false });
       state.currentCourse = data.course;
       try { localStorage.setItem(courseCacheKey(courseId), JSON.stringify(data.course)); } catch {}
       state.currentLesson = Math.min(getProgress(courseId), Math.max(0, data.course.lessons.length - 1));
@@ -1475,7 +1473,7 @@
     const container = document.getElementById("directoryList");
     container.innerHTML = loadingCard();
     try {
-      const data = await api("/api/hub/directory", { token: state.token, page: state.directoryPage, type: state.directoryType });
+      const data = await api("/api/hub/directory", { token: state.token, page: state.directoryPage, type: state.directoryType }, { blocking:false });
       state.directoryData = data;
       container.innerHTML = `${data.sample ? `<div class="notice">${escapeHtml(t("sample"))}</div>` : ""}<div class="cardList" style="margin-top:12px">${data.items.length ? data.items.map(directoryCard).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`}</div><div class="pager"><button id="prevPage" ${data.page <= 1 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><span>${escapeHtml(t("page"))} ${data.page}</span><button id="nextPage" ${!data.hasMore ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div>`;
       container.querySelectorAll("[data-access]").forEach((button) => button.onclick = () => openUrl(button.dataset.access));
@@ -1538,7 +1536,7 @@
         document.getElementById("companyUnits").insertAdjacentHTML("beforeend", unitMarkup(unitCount++));
       };
       document.getElementById("companyUnits").addEventListener("click", (event) => event.target.closest(".removeUnit")?.closest(".companyUnit")?.remove());
-      api("/api/hub/partners/mine", { token:state.token }).then((data) => {
+      api("/api/hub/partners/mine", { token:state.token }, { blocking:false }).then((data) => {
         const box = document.getElementById("ownedCompanies"); if (!box || !data.items?.length) return;
         box.innerHTML = `<div class="sectionHead"><div><h2>🏪 ${escapeHtml(companyCopy.about)}</h2></div></div>${data.items.map((item)=>`<article class="itemCard"><div class="itemTop"><div class="itemIcon">🏪</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.active ? "Publicado" : item.status)}</p></div></div><div class="cardActions"><button class="secondaryButton" data-edit-company="${escapeHtml(item.id)}">✏️ Editar</button><button class="secondaryButton" data-delete-company="${escapeHtml(item.id)}">🗑️ Excluir</button></div></article>`).join("")}`;
         box.querySelectorAll("[data-edit-company]").forEach((button)=>button.onclick=()=>renderSubmissionForm("partner", data.items.find((item)=>item.id===button.dataset.editCompany)));
@@ -1589,42 +1587,15 @@
     document.getElementById("offerBenefit").onclick = () => renderSubmissionForm("benefit");
     const container = document.getElementById("benefitList");
     try {
-      const data = await api("/api/hub/benefits", { token: state.token });
+      const data = await api("/api/hub/benefits", { token: state.token }, { blocking:false });
       state.benefits = data;
       container.innerHTML = data.items.length ? data.items.map((item) => `<article class="itemCard benefitCard"><div class="itemTop"><div class="itemIcon">🎁</div><div><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip freeChip">✓ ${escapeHtml(featureCopy("freeBenefit"))}</span></div></div></div><div class="providerLine"><span>👤 <b>${escapeHtml(featureCopy("offeredBy"))}:</b> ${escapeHtml(item.offeredBy)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-benefit="${escapeHtml(item.url)}" data-locked="${item.locked}">${escapeHtml(item.locked ? t("unlock") : featureCopy("accessBenefit"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
       container.querySelectorAll("[data-benefit]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.benefit));
     } catch (error) { handleError(error, container); }
   }
 
-  async function renderPartnerStores({ segment = state.partnerSegment, page = state.partnerPage } = {}) {
-    location.assign("./marketplace.html");
-    return;
-    state.view = "benefits";
-    rememberRoute("benefits", "partner-stores");
-    state.partnerSegment = PARTNER_SEGMENTS.includes(segment) ? segment : "";
-    state.partnerPage = Math.max(1, Number(page || 1));
-    updateNav();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    const filters = [["", partnerSegmentLabel("all")], ...partnerSegmentOptions()]
-      .map(([value, label]) => `<button class="filter ${state.partnerSegment === value ? "active" : ""}" data-partner-segment="${escapeHtml(value)}">${escapeHtml(label)}</button>`)
-      .join("");
-    content.innerHTML = `<button id="partnersBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="hero"><span class="eyebrow">CLUB</span><h1>🏪 ${escapeHtml(benefitNavigationCopy("stores"))}</h1><p>${escapeHtml(benefitNavigationCopy("storesSub"))}</p></section><article class="benefitOffer"><div><span>🏪</span><h2>${escapeHtml(featureCopy("registerPartner"))}</h2><p>${escapeHtml(featureCopy("partnersDesc"))}</p></div><button id="registerPartner" class="secondaryButton">${escapeHtml(featureCopy("registerPartner"))}</button></article><div class="filters" style="margin-top:14px">${filters}</div><div id="partnerList" class="cardList" style="margin-top:14px">${loadingCard()}</div>`;
-    document.getElementById("partnersBack").onclick = renderBenefits;
-    document.getElementById("registerPartner").onclick = () => renderSubmissionForm("partner");
-    content.querySelectorAll("[data-partner-segment]").forEach((button) => {
-      button.onclick = () => renderPartnerStores({ segment: button.dataset.partnerSegment, page: 1 });
-    });
-    const partnerContainer = document.getElementById("partnerList");
-    try {
-      const data = await api("/api/hub/partners", { token: state.token, segment: state.partnerSegment, page: state.partnerPage });
-      state.partners = data;
-      const cards = data.items.length ? data.items.map((item) => `<article class="itemCard partnerCard"><div class="itemTop"><div class="itemIcon">🤝</div><div><h3>${escapeHtml(item.companyName)}</h3><p>${escapeHtml(item.description)}</p><div class="meta"><span class="chip">${escapeHtml(partnerSegmentLabel(item.segment))}</span><span class="chip freeChip">🏷️ ${escapeHtml(item.discountRange)}</span></div></div></div><div class="providerLine"><span>📋 <b>${escapeHtml(featureCopy("rules"))}:</b> ${escapeHtml(item.discountRules)}</span><span>👤 ${escapeHtml(featureCopy("offeredBy"))}: ${escapeHtml(item.ownerName)}</span><span>🛡️ ${escapeHtml(featureCopy("reviewed"))}</span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${item.locked ? "secondaryButton lockedButton" : "primaryButton"}" data-partner="${escapeHtml(item.destinationUrl)}" data-locked="${item.locked}">📍 ${escapeHtml(item.locked ? t("unlock") : featureCopy("location"))}</button></div></article>`).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`;
-      const pager = data.page > 1 || data.hasMore ? `<div class="pager"><button id="partnerPrev" ${data.page <= 1 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><span>${escapeHtml(t("page"))} ${data.page}</span><button id="partnerNext" ${!data.hasMore ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div>` : "";
-      partnerContainer.innerHTML = cards + pager;
-      partnerContainer.querySelectorAll("[data-partner]").forEach((button) => button.onclick = () => button.dataset.locked === "true" ? openSubscription() : openUrl(button.dataset.partner));
-      document.getElementById("partnerPrev")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page - 1 }));
-      document.getElementById("partnerNext")?.addEventListener("click", () => renderPartnerStores({ segment: state.partnerSegment, page: data.page + 1 }));
-    } catch (error) { handleError(error, partnerContainer); }
+  function renderPartnerStores() {
+    window.location.assign("./marketplace.html");
   }
 
   async function openAreaLinks(kind = "page") {
@@ -2449,7 +2420,7 @@
         bottomNav.classList.remove("hidden");
         refreshCourseCatalogLater();
         markAppReady("web-hub-session");
-        window.EduCashProResources?.idle?.(() => checkForUpdates(), 2200);
+        window.EduCashProResources?.idle?.(() => void checkForUpdates(), 9000);
         return;
       }
       if (publicParams.get("game") || publicParams.get("tournament") || publicParams.get("raffle")) {
@@ -2478,7 +2449,6 @@
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
       const requestedSection = String(publicParams.get("section") || "");
-      const hasExplicitRoute = Boolean(requestedCourse || requestedAcademy || requestedView || requestedSection);
       if (requestedCourse) await openCourse(requestedCourse);
       else if (requestedAcademy === "technical_analysis") await openMarkets();
       else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
@@ -2495,7 +2465,8 @@
       }
       markAppReady("authenticated-session");
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
-      checkForUpdates();
+      if (window.EduCashProResources?.idle) window.EduCashProResources.idle(() => void checkForUpdates(), 9000);
+      else window.setTimeout(() => void checkForUpdates(), 9000);
     } catch (error) {
       console.error("[EduCashPro] Sessão inicial:", error);
       if (!window.__EDUCASHPRO_APP_READY__) renderPublicLanding();
