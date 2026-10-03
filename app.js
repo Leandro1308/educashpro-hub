@@ -459,7 +459,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.02.9";
+  const APP_RUNTIME_BUILD = "2026.10.02.10";
   const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
@@ -843,12 +843,14 @@
     return true;
   }
 
-  async function resumeAuthenticatedExperience() {
+  async function resumeAuthenticatedExperience(options = {}) {
     if (!state.profile) return false;
     document.getElementById("bottomNav")?.classList.remove("hidden");
     document.querySelector(".growthQuickActions")?.classList.remove("hidden");
 
-    if (window.EduCashProNavigationState?.restoreLastPage?.()) return true;
+    const restoreNavigation = options.restoreNavigation !== false;
+    const restoreRemembered = options.restoreRemembered !== false;
+    if (restoreNavigation && window.EduCashProNavigationState?.restoreLastPage?.()) return true;
 
     const params = new URL(window.location.href).searchParams;
     const requestedCourse = String(params.get("course") || "");
@@ -866,7 +868,7 @@
     else if (requestedView === "presentation") renderPresentation();
     else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
     else {
-      const rememberedRoute = readRememberedRoute();
+      const rememberedRoute = restoreRemembered ? readRememberedRoute() : null;
       if (rememberedRoute) await restoreRoute(rememberedRoute);
       else renderHome();
     }
@@ -2423,7 +2425,6 @@
         window.__EDUCASHPRO_FAST_RENDERED__ = true;
         renderHome();
         markAppReady("web-cached-shell");
-        await resumeAuthenticatedExperience();
         void refreshHubSessionInBackground();
         return;
       }
