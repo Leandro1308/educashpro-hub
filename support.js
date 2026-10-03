@@ -1,5 +1,16 @@
 (function(){
-  const tg=window.Telegram?.WebApp, params=new URL(location.href).searchParams;
+  let tg=window.Telegram?.WebApp;const params=new URL(location.href).searchParams;
+  async function resolveTelegramRuntime(){
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__){
+      await Promise.race([
+        Promise.resolve(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__).catch(()=>false),
+        new Promise(resolve=>setTimeout(resolve,3000))
+      ]);
+    }
+    tg=window.Telegram?.WebApp;
+    try{tg?.ready?.();tg?.expand?.()}catch{}
+    return tg;
+  }
   const API_BASE="https://educashpro-all.onrender.com";
   const content=document.getElementById("content"),toast=document.getElementById("toast");
   let token="",lang=window.EduCashProLocale?.resolve?.()||"pt",isAdmin=false,items=[];
@@ -27,6 +38,6 @@
   async function send(){const message=document.getElementById("message").value.trim(),category=document.getElementById("category").value;if(message.length<10)return show(t("tooShort"));const button=document.getElementById("send");button.disabled=true;try{const d=await api("/api/support/submit",{token,category,message});items.unshift(d.item);render();show(t("sent"))}catch(e){show(e.reason==="rate_limited"?t("rate"):t("error"));button.disabled=false}}
   async function reply(id){const field=document.querySelector(`[data-reply="${id}"]`),value=field.value.trim();if(value.length<2)return;try{await api("/api/support/admin/reply",{token,id,reply:value});await load()}catch{show(t("error"))}}
   async function remove(id){if(!confirm(t("confirmDelete")))return;try{await api("/api/support/admin/delete",{token,id});items=items.filter(x=>x.id!==id);render()}catch{show(t("error"))}}
-  async function init(){tg?.ready?.();tg?.expand?.();document.getElementById("close").onclick=()=>window.EduCashProPlatform?.close?.();document.getElementById("back").onclick=()=>history.length>1?history.back():location.assign("./");try{const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token&&stored?.profile?.userId){token=stored.token;lang=["pt","en","es","ru"].includes(stored.profile?.language)?stored.profile.language:lang}else{const initData=window.EduCashProPlatform?.telegramInitData?.()||"";if(!initData)throw new Error("session_required");const s=await api("/api/hub/session",{initData});token=s.token;lang=["pt","en","es","ru"].includes(s.profile?.language)?s.profile.language:lang}document.documentElement.lang=lang;await load()}catch{content.innerHTML=`<div class="empty">${esc(t("error"))}</div>`}}
+  async function init(){await resolveTelegramRuntime();document.getElementById("close").onclick=()=>window.EduCashProPlatform?.close?.();document.getElementById("back").onclick=()=>history.length>1?history.back():location.assign("./");try{const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token&&stored?.profile?.userId){token=stored.token;lang=["pt","en","es","ru"].includes(stored.profile?.language)?stored.profile.language:lang}else{const initData=window.EduCashProPlatform?.telegramInitData?.()||"";if(!initData)throw new Error("session_required");const s=await api("/api/hub/session",{initData});token=s.token;lang=["pt","en","es","ru"].includes(s.profile?.language)?s.profile.language:lang}document.documentElement.lang=lang;await load()}catch{content.innerHTML=`<div class="empty">${esc(t("error"))}</div>`}}
   document.addEventListener("DOMContentLoaded",init);
 })();
