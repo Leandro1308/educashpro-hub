@@ -187,7 +187,7 @@
         state.session=touchLocalSession(platform.readWebSession?.());
         await window.EduCashProApp?.setSession?.(state.session);
         closeLayer();
-        await renderAuthenticated();
+        renderAuthenticated();
         window.dispatchEvent(new CustomEvent("educashpro:web-session-ready",{detail:result}));
       }catch(error){
         const reason=String(error?.data?.reason||error?.message||"");
@@ -220,19 +220,22 @@
   async function copyReferral(){const value=referralUrl();if(!value)return;try{await navigator.clipboard.writeText(value)}catch{}const button=document.getElementById("webReferralCopy");if(button){const old=button.textContent;button.textContent=t("copied");setTimeout(()=>button.textContent=old,1200)}}
   async function approvePair(){const input=document.getElementById("webPairApproveCode");const status=document.getElementById("webPairApproveStatus");const code=String(input?.value||"").replace(/\D/g,"").slice(0,6);if(code.length!==6){if(status)status.textContent=t("invalidCode");return}try{await auth.approveDevicePairing(code);if(status)status.textContent=t("approved");if(input)input.value=""}catch{if(status)status.textContent=t("invalidCode")}}
 
-  async function renderAuthenticated(){
+  function renderAuthenticated(){
     const p=profile();
     if(!p?.userId)return false;
     document.querySelector(".growthQuickActions")?.classList.remove("hidden");
     document.getElementById("bottomNav")?.classList.remove("hidden");
-    await window.EduCashProApp?.setSession?.(state.session);
-    if(window.EduCashProApp?.resumeAuthenticatedExperience){
-      await window.EduCashProApp.resumeAuthenticatedExperience();
-      window.__EDUCASHPRO_FAST_RENDERED__=true;
-      return true;
-    }
+    void window.EduCashProApp?.setSession?.(state.session);
+    // Entrar deve abrir imediatamente, como em um site comum.
+    // Rotas antigas, chamadas de API e módulos pesados nunca bloqueiam a primeira tela.
     window.EduCashProApp?.renderHome?.();
     window.__EDUCASHPRO_FAST_RENDERED__=true;
+
+    const params=new URL(location.href).searchParams;
+    const hasExplicitRoute=["view","course","academy","section"].some(key=>params.has(key));
+    if(hasExplicitRoute&&window.EduCashProApp?.resumeAuthenticatedExperience){
+      window.setTimeout(()=>{void window.EduCashProApp.resumeAuthenticatedExperience({restoreNavigation:false,restoreRemembered:false})},0);
+    }
     return true;
   }
 
