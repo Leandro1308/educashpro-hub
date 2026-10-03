@@ -80,8 +80,15 @@
     window.EduCashProRuntime.onSession(value=>{latestSession=value;enhanceHome()});
     window.EduCashProRuntime.onRender(enhanceHome);
   }else{
+    const refreshSession=()=>{
+      latestSession=window.EduCashProPlatform?.readWebSession?.()||window.__EDUCASHPRO_SESSION__||latestSession;
+      enhanceHome();
+    };
     window.addEventListener("educashpro:session",event=>{latestSession=event.detail;enhanceHome()});
-    document.addEventListener("DOMContentLoaded",enhanceHome,{once:true});
+    window.addEventListener("educashpro:web-session-ready",refreshSession);
+    window.addEventListener("educashpro:render",refreshSession);
+    if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",refreshSession,{once:true});
+    else queueMicrotask(refreshSession);
   }
 
   window.EduCashProExperience={showBenefitsGate:benefitsGate,showMembershipQr:openMembershipProof};
