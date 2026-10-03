@@ -1,7 +1,17 @@
 (function(){
   const API="https://educashpro-all.onrender.com";
-  const tg=window.Telegram?.WebApp;
-  try{tg?.ready();tg?.expand();}catch{}
+  let tg=window.Telegram?.WebApp;
+  async function resolveTelegramRuntime(){
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__){
+      await Promise.race([
+        Promise.resolve(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__).catch(()=>false),
+        new Promise(resolve=>setTimeout(resolve,3000))
+      ]);
+    }
+    tg=window.Telegram?.WebApp;
+    try{tg?.ready?.();tg?.expand?.()}catch{}
+    return tg;
+  }
 
   const qs=new URLSearchParams(location.search);
   const lang=window.EduCashProLocale?.resolve?.()||"pt";
@@ -26,6 +36,6 @@
   function startPoll(){stopPoll();pollCount=0;checkIntegration();pollTimer=setInterval(async()=>{pollCount+=1;const done=await checkIntegration();if(done)return;if(pollCount>=20){stopPoll();status("integrationStatus",C.notIntegrated)}},3000)}
   async function startIntegration(){if(!token||!communityId)return;const button=$("integrationButton");button.disabled=true;txt("integrationButton",C.creating);status("integrationStatus","");try{const data=await post("/api/publication/integration-intent",{token,communityId});status("integrationStatus",C.waiting);txt("integrationButton",C.integrate);button.disabled=false;startPoll();if(tg?.openTelegramLink)tg.openTelegramLink(data.authorizationUrl);else location.href=data.authorizationUrl}catch(e){console.error(e);button.disabled=false;txt("integrationButton",C.integrate);status("integrationStatus",C.integrationError,"error")}}
   async function submit(event){event.preventDefault();status("formStatus","");if(!$("consentInput").checked){status("formStatus",C.consentRequired,"error");return}if(!$("publishForm").checkValidity()){$("publishForm").reportValidity();status("formStatus",C.invalidForm,"error");return}const button=$("submitButton");button.disabled=true;txt("submitButton",C.publishing);try{const payload={token,type:$("typeInput").value,name:$("nameInput").value.trim(),url:$("urlInput").value.trim(),description:$("descriptionInput").value.trim(),category:$("categoryInput").value,language:$("languageInput").value,affiliateDisclosureAccepted:true};const data=await post("/api/publication/submit",payload);communityId=data.item?.id||"";publishedType=payload.type;$("successCard").classList.remove("hidden");status("formStatus",C.autoPublished,"success");toast(C.autoPublished);if(data.integrationAvailable&&communityId){$("integrationCard").classList.remove("hidden");updateRights();$("integrationCard").scrollIntoView({behavior:"smooth",block:"start"})}else{$("integrationCard").classList.add("hidden")}}catch(e){console.error(e);status("formStatus",e.reason==="duplicate_url"?C.already:C.submitError,"error")}finally{button.disabled=false;txt("submitButton",C.submit)}}
-  async function boot(){apply();updateRights();$("descriptionInput").addEventListener("input",()=>txt("descriptionCount",`${$("descriptionInput").value.length}/160`));$("typeInput").addEventListener("change",updateRights);$("publishForm").addEventListener("submit",submit);$("integrationButton").addEventListener("click",startIntegration);document.addEventListener("visibilitychange",()=>{if(!document.hidden&&communityId&&["group","channel"].includes(publishedType)){checkIntegration();if(!pollTimer)startPoll()}});addEventListener("focus",()=>{if(communityId)checkIntegration()});try{const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token&&stored?.profile?.userId){token=stored.token}else{const initData=window.EduCashProPlatform?.telegramInitData?.()||tg?.initData||"";if(!initData)throw new Error("session_required");const session=await post("/api/hub/session",{initData});token=session.token||""}if(!token)throw new Error("session_required")}catch(e){console.error(e);status("formStatus",C.telegramOnly,"error");$("submitButton").disabled=true}}
+  async function boot(){await resolveTelegramRuntime();apply();updateRights();$("descriptionInput").addEventListener("input",()=>txt("descriptionCount",`${$("descriptionInput").value.length}/160`));$("typeInput").addEventListener("change",updateRights);$("publishForm").addEventListener("submit",submit);$("integrationButton").addEventListener("click",startIntegration);document.addEventListener("visibilitychange",()=>{if(!document.hidden&&communityId&&["group","channel"].includes(publishedType)){checkIntegration();if(!pollTimer)startPoll()}});addEventListener("focus",()=>{if(communityId)checkIntegration()});try{const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token&&stored?.profile?.userId){token=stored.token}else{const initData=window.EduCashProPlatform?.telegramInitData?.()||tg?.initData||"";if(!initData)throw new Error("session_required");const session=await post("/api/hub/session",{initData});token=session.token||""}if(!token)throw new Error("session_required")}catch(e){console.error(e);status("formStatus",C.telegramOnly,"error");$("submitButton").disabled=true}}
   boot();
 })();
