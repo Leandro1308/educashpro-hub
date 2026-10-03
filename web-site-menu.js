@@ -26,6 +26,7 @@
   };
   function lang(){const canonical=window.EduCashProLocale?.resolve?.({session:session()});if(canonical)return canonical;const raw=String(document.documentElement.lang||navigator.language||"pt").toLowerCase();return raw.startsWith("en")?"en":raw.startsWith("es")?"es":raw.startsWith("ru")?"ru":"pt"}
   function copy(){return COPY[lang()]||COPY.pt}
+  function loginLabel(){return ({pt:"Entrar",en:"Sign in",es:"Entrar",ru:"Войти"})[lang()]||"Entrar"}
   function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
   function session(){return window.__EDUCASHPRO_SESSION__||window.EduCashProWebEntry?.getSession?.()||platform.readWebSession?.()}
   function referral(){return String(session()?.profile?.referralCode||new URL(location.href).searchParams.get("ref")||"").trim()}
@@ -108,7 +109,19 @@
   }
   function install(){
     styles();const topbar=document.querySelector(".topbar");if(!topbar)return;
-    if(!document.getElementById("webSiteMenuButton")){const button=document.createElement("button");button.id="webSiteMenuButton";button.className="webSiteMenuButton";button.type="button";button.innerHTML=`☰ <span>${esc(copy().menu)}</span>`;button.onclick=open;topbar.insertBefore(button,document.getElementById("marketplaceButton")||null)}
+    const signedIn=Boolean(session()?.token&&session()?.profile?.userId);
+    if(!signedIn){
+      document.getElementById("webSiteMenuButton")?.remove();
+      document.getElementById("accountCenterButton")?.classList.add("hidden");
+      let login=document.getElementById("webHeaderLogin");
+      if(!login){login=document.createElement("button");login.id="webHeaderLogin";login.className="webSiteMenuButton";login.type="button";login.dataset.educashEntry="account";topbar.insertBefore(login,document.getElementById("marketplaceButton")||null)}
+      login.textContent=`◇ ${loginLabel()}`;
+      login.onclick=()=>window.EduCashProWebEntry?.open?.();
+    }else{
+      document.getElementById("webHeaderLogin")?.remove();
+      document.getElementById("accountCenterButton")?.classList.remove("hidden");
+      if(!document.getElementById("webSiteMenuButton")){const button=document.createElement("button");button.id="webSiteMenuButton";button.className="webSiteMenuButton";button.type="button";button.innerHTML=`☰ <span>${esc(copy().menu)}</span>`;button.onclick=open;topbar.insertBefore(button,document.getElementById("marketplaceButton")||null)}
+    }
     labelAccount();
     const content=document.getElementById("content");
     if(content&&!content.querySelector(".publicWelcome,.splash")&&!content.querySelector(".webContextBack,[id$='Back'],.gameBack,#formBack,#qrBack,#proofBack,#profilePhotoBack")){
