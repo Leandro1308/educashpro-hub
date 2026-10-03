@@ -6,7 +6,7 @@
       games: "Jogos e entretenimento", gamesSub: "Jogos organizados por categoria", open: "Abrir jogo",
       gamesTitle: "Catálogo de jogos", gamesDesc: "Escolha uma categoria e abra o jogo na plataforma do responsável.",
       all: "Todos", empty: "Nenhum jogo disponível nesta categoria.", external: "Conteúdo operado por terceiros.",
-      tools: "Ferramentas", toolsSub: "Simulador de afiliados e sorteadores locais", free: "ACESSO LIVRE",
+      tools: "Ferramentas", toolsSub: "Controle financeiro, cálculos, documentos informativos e utilidades.", free: "ACESSO LIVRE",
       drawTitle: "Sorteadores locais", drawDesc: "Os dados ficam somente neste aparelho e não são enviados ao EduCashPro.",
       raffleTitle: "Criar rifa / sorteio", raffleSub: "Crie uma rifa por números, compartilhe o link e acompanhe as inscrições.", subscriber: "ASSINANTE",
       names: "Sortear nomes", numbers: "Sortear número", teams: "Formar equipes", listLabel: "Um nome por linha",
@@ -20,12 +20,23 @@
       presentationCta: "✨ Descubra o EduCashPro",
       affiliateCalc: "Simulador do programa de afiliados", affiliateCalcSub: "Simule os cinco níveis e os critérios de desbloqueio.",
       finance: "Controle Financeiro Mensal", financeSub: "Registre renda e gastos e acompanhe o saldo do mês.",
+      limited: "ACESSO LIMITADO", unlimited: "ILIMITADO",
+      financeGroup: "Controle e organização", financeGroupSub: "Registre, acompanhe e organize suas finanças.",
+      businessGroup: "Negócios e cálculos", businessGroupSub: "Ferramentas para precificação, metas e análise.",
+      utilityGroup: "Utilidades", utilityGroupSub: "Recursos práticos do EduCashPro.",
+      receivables: "Contas a Receber", receivablesSub: "Acompanhe clientes, valores e vencimentos.",
+      quote: "Orçamento Informativo", quoteSub: "Crie uma proposta de valores sem emitir fatura.",
+      salePrice: "Preço de Venda", salePriceSub: "Calcule preço, lucro e margem a partir dos custos.",
+      breakEven: "Ponto de Equilíbrio", breakEvenSub: "Descubra quanto precisa vender para cobrir custos.",
+      revenueGoal: "Meta de Faturamento", revenueGoalSub: "Transforme sua meta de lucro em meta de vendas.",
+      roi: "ROI", roiSub: "Calcule o retorno percentual de um investimento.",
+      compound: "Juros Compostos Avançados", compoundSub: "Simule aportes, retiradas, taxa e prazo.",
     },
     en: {
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
       gamesTitle: "Game catalog", gamesDesc: "Choose a category and open the game on its provider's platform.",
       all: "All", empty: "No games available in this category.", external: "Third-party content.",
-      tools: "Tools", toolsSub: "Affiliate simulator and local randomizers", free: "FREE ACCESS",
+      tools: "Tools", toolsSub: "Financial tracking, calculations, informative documents and utilities.", free: "FREE ACCESS",
       drawTitle: "Local randomizers", drawDesc: "Data stays on this device and is not sent to EduCashPro.",
       raffleTitle: "Create raffle / draw", raffleSub: "Create a number raffle, share its link and track entries.", subscriber: "SUBSCRIBER",
       names: "Draw names", numbers: "Draw number", teams: "Create teams", listLabel: "One name per line",
@@ -39,12 +50,23 @@
       presentationCta: "✨ Discover EduCashPro",
       affiliateCalc: "Affiliate program simulator", affiliateCalcSub: "Simulate five levels and unlock requirements.",
       finance: "Monthly Finance Control", financeSub: "Record income and expenses and track the monthly balance.",
+      limited: "LIMITED ACCESS", unlimited: "UNLIMITED",
+      financeGroup: "Tracking and organization", financeGroupSub: "Record, track and organize your finances.",
+      businessGroup: "Business and calculations", businessGroupSub: "Tools for pricing, goals and analysis.",
+      utilityGroup: "Utilities", utilityGroupSub: "Practical EduCashPro resources.",
+      receivables: "Accounts Receivable", receivablesSub: "Track customers, amounts and due dates.",
+      quote: "Informative Quote", quoteSub: "Create a pricing proposal without issuing an invoice.",
+      salePrice: "Sale Price", salePriceSub: "Calculate price, profit and margin from costs.",
+      breakEven: "Break-even Point", breakEvenSub: "Find how much you need to sell to cover costs.",
+      revenueGoal: "Revenue Goal", revenueGoalSub: "Turn your profit goal into a sales target.",
+      roi: "ROI", roiSub: "Calculate percentage return on an investment.",
+      compound: "Advanced Compound Interest", compoundSub: "Simulate contributions, withdrawals, rate and term.",
     },
     es: {
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
       gamesTitle: "Catálogo de juegos", gamesDesc: "Elige una categoría y abre el juego en la plataforma del responsable.",
       all: "Todos", empty: "No hay juegos disponibles en esta categoría.", external: "Contenido operado por terceros.",
-      tools: "Herramientas", toolsSub: "Simulador de afiliados y sorteadores locales", free: "ACCESO LIBRE",
+      tools: "Herramientas", toolsSub: "Control financiero, cálculos, documentos informativos y utilidades.", free: "ACCESO LIBRE",
       drawTitle: "Sorteadores locales", drawDesc: "Los datos quedan en este dispositivo y no se envían a EduCashPro.",
       raffleTitle: "Crear rifa / sorteo", raffleSub: "Crea una rifa por números, comparte el enlace y controla las inscripciones.", subscriber: "SUSCRIPTOR",
       names: "Sortear nombres", numbers: "Sortear número", teams: "Formar equipos", listLabel: "Un nombre por línea",
@@ -58,12 +80,23 @@
       presentationCta: "✨ Descubre EduCashPro",
       affiliateCalc: "Simulador del programa de afiliados", affiliateCalcSub: "Simula cinco niveles y los requisitos de desbloqueo.",
       finance: "Control Financiero Mensual", financeSub: "Registra ingresos y gastos y controla el saldo del mes.",
+      limited: "ACCESO LIMITADO", unlimited: "ILIMITADO",
+      financeGroup: "Control y organización", financeGroupSub: "Registra, controla y organiza tus finanzas.",
+      businessGroup: "Negocios y cálculos", businessGroupSub: "Herramientas para precios, metas y análisis.",
+      utilityGroup: "Utilidades", utilityGroupSub: "Recursos prácticos de EduCashPro.",
+      receivables: "Cuentas por Cobrar", receivablesSub: "Controla clientes, valores y vencimientos.",
+      quote: "Presupuesto Informativo", quoteSub: "Crea una propuesta de valores sin emitir factura.",
+      salePrice: "Precio de Venta", salePriceSub: "Calcula precio, beneficio y margen desde los costos.",
+      breakEven: "Punto de Equilibrio", breakEvenSub: "Descubre cuánto debes vender para cubrir costos.",
+      revenueGoal: "Meta de Facturación", revenueGoalSub: "Convierte tu meta de beneficio en meta de ventas.",
+      roi: "ROI", roiSub: "Calcula el retorno porcentual de una inversión.",
+      compound: "Interés Compuesto Avanzado", compoundSub: "Simula aportes, retiros, tasa y plazo.",
     },
     ru: {
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
       gamesTitle: "Каталог игр", gamesDesc: "Выберите категорию и откройте игру на платформе владельца.",
       all: "Все", empty: "В этой категории пока нет игр.", external: "Контент стороннего поставщика.",
-      tools: "Инструменты", toolsSub: "Партнёрский симулятор и локальная жеребьёвка", free: "СВОБОДНЫЙ ДОСТУП",
+      tools: "Инструменты", toolsSub: "Финансовый учёт, расчёты, информационные документы и утилиты.", free: "СВОБОДНЫЙ ДОСТУП",
       drawTitle: "Локальная жеребьёвка", drawDesc: "Данные остаются на устройстве и не отправляются в EduCashPro.",
       raffleTitle: "Создать розыгрыш", raffleSub: "Создайте розыгрыш по номерам, поделитесь ссылкой и следите за заявками.", subscriber: "ПОДПИСКА",
       names: "Выбрать имена", numbers: "Случайное число", teams: "Создать команды", listLabel: "Одно имя в строке",
@@ -77,6 +110,17 @@
       presentationCta: "✨ Откройте EduCashPro",
       affiliateCalc: "Симулятор партнёрской программы", affiliateCalcSub: "Пять уровней и условия их открытия.",
       finance: "Ежемесячный финансовый контроль", financeSub: "Записывайте доходы и расходы и следите за остатком.",
+      limited: "ОГРАНИЧЕННЫЙ ДОСТУП", unlimited: "БЕЗ ОГРАНИЧЕНИЙ",
+      financeGroup: "Учёт и организация", financeGroupSub: "Записывайте и контролируйте свои финансы.",
+      businessGroup: "Бизнес и расчёты", businessGroupSub: "Инструменты для цены, целей и анализа.",
+      utilityGroup: "Утилиты", utilityGroupSub: "Практические ресурсы EduCashPro.",
+      receivables: "Дебиторская задолженность", receivablesSub: "Контролируйте клиентов, суммы и сроки.",
+      quote: "Информационная смета", quoteSub: "Создайте предложение стоимости без выставления счёта.",
+      salePrice: "Цена продажи", salePriceSub: "Рассчитайте цену, прибыль и маржу.",
+      breakEven: "Точка безубыточности", breakEvenSub: "Узнайте объём продаж для покрытия расходов.",
+      revenueGoal: "Цель по выручке", revenueGoalSub: "Преобразуйте цель прибыли в цель продаж.",
+      roi: "ROI", roiSub: "Рассчитайте доходность инвестиции.",
+      compound: "Сложные проценты", compoundSub: "Смоделируйте пополнения, снятия, ставку и срок.",
     },
   };
 
@@ -84,8 +128,11 @@
   let games = [];
   const originalFetch = window.fetch.bind(window);
 
+  function currentSession() {
+    return session || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.() || {};
+  }
   function language() {
-    const lang = String(session?.profile?.language || "pt").toLowerCase();
+    const lang = String(currentSession()?.profile?.language || "pt").slice(0,2).toLowerCase();
     return COPY[lang] ? lang : "pt";
   }
   function tr(key) { return COPY[language()][key] || COPY.pt[key] || key; }
@@ -210,30 +257,94 @@
     learn();
   }
 
+  async function platformApi(path, payload = {}) {
+    const activeSession = currentSession();
+    const token = String(activeSession?.token || window.EduCashProPlatform?.readWebSession?.()?.token || "");
+    const response = await originalFetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify(payload),
+      cache: "no-store"
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.ok === false) throw new Error(data?.reason || (response.status === 401 ? "session_expired" : "request_failed"));
+    return data;
+  }
+
+  function subscriptionCard() {
+    return window.EduCashProApp?.openSubscription?.();
+  }
+
   async function openFinanceControl() {
     await window.EduCashProResources?.loadFinance?.();
-    window.EduCashProFinance?.render?.({ language: language(), session, active: session?.profile?.active === true, back: renderToolsHub });
+    const activeSession = currentSession();
+    window.EduCashProFinance?.render?.({
+      language: language(),
+      session: activeSession,
+      active: activeSession?.profile?.active === true,
+      back: renderToolsHub,
+      subscribe: subscriptionCard,
+      api: platformApi
+    });
+  }
+
+  async function openFinancialTool(id) {
+    await window.EduCashProResources?.loadFinancialTools?.();
+    const activeSession = currentSession();
+    window.EduCashProFinancialTools?.open?.(id, {
+      language: language(),
+      session: activeSession,
+      active: activeSession?.profile?.active === true,
+      back: renderToolsHub,
+      subscribe: subscriptionCard
+    });
+  }
+
+  function toolCard(id, icon, title, description, access, accessClass = "free") {
+    return `<button class="toolsMenuCard" data-tool-id="${esc(id)}"><span class="toolsMenuIcon">${icon}</span><strong>${esc(title)}</strong><small>${esc(description)}</small><span class="toolsAccess"><span class="${esc(accessClass)}">${esc(access)}</span></span></button>`;
+  }
+
+  function toolsSection(title, description, cards) {
+    return `<section class="toolsCategory"><header class="toolsCategoryHead"><div><h2>${esc(title)}</h2><p>${esc(description)}</p></div></header><div class="toolsMenuGrid">${cards.join("")}</div></section>`;
   }
 
   function renderToolsHub() {
     window.EduCashProApp?.rememberRoute?.("tools");
-    const active = session?.profile?.active === true;
-    content().innerHTML = `<button id="toolsHubBack" class="textButton">←</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section><section class="quickGrid">${active ? `<button class="quickCard" id="financeTool"><span class="emoji">💰</span><strong>${esc(tr("finance"))}</strong><small>${esc(tr("financeSub"))}</small></button><button class="quickCard" id="affiliateTool"><span class="emoji">📊</span><strong>${esc(tr("affiliateCalc"))}</strong><small>${esc(tr("affiliateCalcSub"))}</small></button>` : ""}<button class="quickCard" id="linkPageTool"><span class="emoji">🔗</span><strong>${esc(window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links")}</strong><small>${esc(window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="smartLinkTool"><span class="emoji">✂️</span><strong>${esc(window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente")}</strong><small>${esc(window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada")}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button><button class="quickCard" id="randomizerTool"><span class="emoji">🎲</span><strong>${esc(tr("drawTitle"))}</strong><small>${esc(tr("drawDesc"))}</small><span class="freeAccessBadge">${esc(tr("free"))}</span></button></section>`;
-    const gamesButton = document.createElement("button");
-    gamesButton.className = "quickCard";
-    gamesButton.innerHTML = `<span class="emoji">🎮</span><strong>${esc(tr("games"))}</strong><small>${esc(tr("gamesSub"))}</small>`;
-    content().querySelector(".quickGrid")?.appendChild(gamesButton);
-    gamesButton.onclick = renderGames;
+    window.EduCashProResources?.style?.("./tools-hub-v2.css").catch?.(()=>{});
+    const active = currentSession()?.profile?.active === true;
+    const access = active ? tr("unlimited") : tr("limited");
+    const accessClass = active ? "unlimited" : "limited";
+    const financeCards = [
+      toolCard("monthly-finance","💰",tr("finance"),tr("financeSub"),tr("free"),"free"),
+      toolCard("receivables","📥",tr("receivables"),tr("receivablesSub"),access,accessClass),
+      toolCard("quote","📄",tr("quote"),tr("quoteSub"),access,accessClass)
+    ];
+    const businessCards = [
+      toolCard("sale-price","🏷️",tr("salePrice"),tr("salePriceSub"),access,accessClass),
+      toolCard("break-even","⚖️",tr("breakEven"),tr("breakEvenSub"),access,accessClass),
+      toolCard("revenue-goal","🎯",tr("revenueGoal"),tr("revenueGoalSub"),access,accessClass),
+      toolCard("roi","📊",tr("roi"),tr("roiSub"),access,accessClass),
+      toolCard("compound","📈",tr("compound"),tr("compoundSub"),access,accessClass),
+      toolCard("affiliate","🌐",tr("affiliateCalc"),tr("affiliateCalcSub"),tr("free"),"free")
+    ];
+    const utilityCards = [
+      toolCard("link-page","🔗",window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links",window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página",tr("free"),"free"),
+      toolCard("smart-link","✂️",window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente",window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada",tr("free"),"free"),
+      toolCard("randomizers","🎲",tr("drawTitle"),tr("drawDesc"),tr("free"),"free"),
+      toolCard("games","🎮",tr("games"),tr("gamesSub"),tr("free"),"free")
+    ];
+    content().innerHTML = `<main class="toolsHubPage"><button id="toolsHubBack" class="textButton">←</button><section class="toolsHubHero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section>${toolsSection(tr("financeGroup"),tr("financeGroupSub"),financeCards)}${toolsSection(tr("businessGroup"),tr("businessGroupSub"),businessCards)}${toolsSection(tr("utilityGroup"),tr("utilityGroupSub"),utilityCards)}</main>`;
     document.getElementById("toolsHubBack").onclick = home;
-    document.getElementById("randomizerTool").onclick = renderRandomizers;
-    document.getElementById("affiliateTool")?.addEventListener("click", openAffiliateCalculator);
-    document.getElementById("financeTool")?.addEventListener("click", openFinanceControl);
-    document.getElementById("linkPageTool").onclick = async () => {
-      try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.renderPageEditor?.()}catch(error){console.error("[EduCashPro] links:",error)}
-    };
-    document.getElementById("smartLinkTool").onclick = async () => {
-      try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.renderShortener?.()}catch(error){console.error("[EduCashPro] smart link:",error)}
-    };
+    content().querySelectorAll("[data-tool-id]").forEach(button => button.onclick = () => {
+      const id = button.dataset.toolId;
+      if (id === "monthly-finance") return void openFinanceControl();
+      if (["receivables","quote","sale-price","break-even","revenue-goal","roi","compound"].includes(id)) return void openFinancialTool(id);
+      if (id === "affiliate") return openAffiliateCalculator();
+      if (id === "link-page") return void window.EduCashProResources?.loadLinks?.().then(() => window.EduCashProLinks?.renderPageEditor?.());
+      if (id === "smart-link") return void window.EduCashProResources?.loadLinks?.().then(() => window.EduCashProLinks?.renderShortener?.());
+      if (id === "randomizers") return renderRandomizers();
+      if (id === "games") return void renderGames();
+    });
   }
 
   function enhanceHome() {
