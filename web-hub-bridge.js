@@ -80,12 +80,20 @@
     }
   }
 
-  function installHubSessionExchange(session) {
+  let activeSession=null;
+  let exchangeInstalled=false;
+
+  function installHubSessionExchange() {
+    if(exchangeInstalled)return;
+    exchangeInstalled=true;
     const baseFetch = window.fetch.bind(window);
     window.fetch = async function (input, options = {}) {
       if (!isHubSessionRequest(input, options)) {
         return baseFetch(input, options);
       }
+
+      const session=activeSession||readStoredSession();
+      if(!session?.token)return baseFetch(input,options);
 
       const response = await baseFetch(`${API_BASE}/api/platform-auth/hub-session`, {
         method: "POST",
@@ -105,18 +113,33 @@
     };
   }
 
-  function reloadWhenLoginFinishes() {
-    if (!platform?.writeWebSession) return;
-    const originalWrite = platform.writeWebSession.bind(platform);
-    let reloading = false;
+  function activateWebHub(session,source="platform_web_session"){
+    if(!session?.token)return false;
+    activeSession=session;
+    exposeWebInitData();
+    installHubSessionExchange();
+    window.__EDUCASHPRO_WEB_HUB__={
+      active:true,
+      source,
+      userId:session?.profile?.userId||tokenPayload(session.token)?.sub||null,
+    };
+    try{window.dispatchEvent(new CustomEvent("educashpro:web-hub-ready",{detail:window.__EDUCASHPRO_WEB_HUB__}))}catch{}
+    return true;
+  }
 
-    platform.writeWebSession = function (nextSession) {
+  function watchSessionWrites() {
+    if (!platform?.writeWebSession || platform.writeWebSession.__educashproHubWrapped) return;
+    const originalWrite = platform.writeWebSession.bind(platform);
+    const wrapped=function (nextSession) {
       originalWrite(nextSession);
-      if (!reloading && nextSession?.token) {
-        reloading = true;
-        window.setTimeout(() => location.reload(), 80);
+      if(nextSession?.token)activateWebHub(nextSession,"login");
+      else{
+        activeSession=null;
+        window.__EDUCASHPRO_WEB_HUB__={active:false,source:"anonymous"};
       }
     };
+    wrapped.__educashproHubWrapped=true;
+    platform.writeWebSession=wrapped;
   }
 
   async function boot(){
@@ -127,18 +150,12 @@
 
     const current = readStoredSession();
 
+    watchSessionWrites();
     if (validAppSession(current)) {
-      exposeWebInitData();
-      installHubSessionExchange(current);
-      window.__EDUCASHPRO_WEB_HUB__ = {
-        active: true,
-        source: "platform_web_session",
-        userId: current?.profile?.userId || tokenPayload(current.token)?.sub || null,
-      };
+      activateWebHub(current);
       return;
     }
 
-    reloadWhenLoginFinishes();
     window.__EDUCASHPRO_WEB_HUB__ = { active: false, source: current?.token ? "reauth_required" : "anonymous" };
   }
 
