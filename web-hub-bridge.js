@@ -3,9 +3,15 @@
   const API_BASE = "https://educashpro-all.onrender.com";
   const WEB_SENTINEL = "__EDUCASHPRO_PLATFORM_WEB_SESSION_V1__";
   const SESSION_IDLE_MS = 24*60*60*1000;
-  const nativeFetch = window.fetch.bind(window);
   const platform = window.EduCashProPlatform || null;
-  if(window.__EDUCASHPRO_TELEGRAM_HINT__){window.__EDUCASHPRO_WEB_HUB__={active:false,source:"telegram_launch"};return;}
+
+  async function isConfirmedTelegramLaunch(){
+    if(!window.__EDUCASHPRO_TELEGRAM_HINT__)return false;
+    const sdk=window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__;
+    if(sdk)await Promise.resolve(sdk).catch(()=>false);
+    const value=String(window.Telegram?.WebApp?.initData||"");
+    return Boolean(value&&value!==WEB_SENTINEL);
+  }
 
   function readStoredSession() {
     try {
@@ -75,12 +81,13 @@
   }
 
   function installHubSessionExchange(session) {
+    const baseFetch = window.fetch.bind(window);
     window.fetch = async function (input, options = {}) {
       if (!isHubSessionRequest(input, options)) {
-        return nativeFetch(input, options);
+        return baseFetch(input, options);
       }
 
-      const response = await nativeFetch(`${API_BASE}/api/platform-auth/hub-session`, {
+      const response = await baseFetch(`${API_BASE}/api/platform-auth/hub-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,19 +119,28 @@
     };
   }
 
-  const current = readStoredSession();
+  async function boot(){
+    if(await isConfirmedTelegramLaunch()){
+      window.__EDUCASHPRO_WEB_HUB__={active:false,source:"telegram_launch"};
+      return;
+    }
 
-  if (validAppSession(current)) {
-    exposeWebInitData();
-    installHubSessionExchange(current);
-    window.__EDUCASHPRO_WEB_HUB__ = {
-      active: true,
-      source: "platform_web_session",
-      userId: current?.profile?.userId || tokenPayload(current.token)?.sub || null,
-    };
-    return;
+    const current = readStoredSession();
+
+    if (validAppSession(current)) {
+      exposeWebInitData();
+      installHubSessionExchange(current);
+      window.__EDUCASHPRO_WEB_HUB__ = {
+        active: true,
+        source: "platform_web_session",
+        userId: current?.profile?.userId || tokenPayload(current.token)?.sub || null,
+      };
+      return;
+    }
+
+    reloadWhenLoginFinishes();
+    window.__EDUCASHPRO_WEB_HUB__ = { active: false, source: current?.token ? "reauth_required" : "anonymous" };
   }
 
-  reloadWhenLoginFinishes();
-  window.__EDUCASHPRO_WEB_HUB__ = { active: false, source: current?.token ? "reauth_required" : "anonymous" };
+  void boot();
 })();

@@ -168,7 +168,7 @@
     return result;
   }
 
-  async function validateStoredSession({apiBase=DEFAULT_API_BASE}={}){
+  async function validateStoredSession({apiBase=DEFAULT_API_BASE,preserveOnNetworkError=false}={}){
     const session=platform?.readWebSession?.();
     if(!session?.token)return null;
     try{
@@ -180,8 +180,10 @@
       const updated={...session,profile:result.profile||session.profile||null,server:result.session||null};
       platform?.writeWebSession?.(updated);
       return updated;
-    }catch{
-      platform?.writeWebSession?.(null);
+    }catch(error){
+      const status=Number(error?.status||0);
+      const authenticationRejected=status===401||status===403;
+      if(!preserveOnNetworkError||authenticationRejected)platform?.writeWebSession?.(null);
       return null;
     }
   }
