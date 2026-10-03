@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261002.10";
+  const VERSION="20261003.1";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -54,37 +54,58 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
+  let gamesPromise=null,gamesEnhancementPromise=null,toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
-  function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog && window.EduCashProAdvancedGames?.launch && window.EduCashProLocalCatalogBridge?.ready) return Promise.resolve(true);
-    if(gamesPromise) return gamesPromise;
-    gamesPromise=(async()=>{
-      // O catálogo é o núcleo. Nenhum complemento visual ou jogo extra pode impedir sua abertura.
+  function loadGameEnhancements(){
+    if(gamesEnhancementPromise)return gamesEnhancementPromise;
+    gamesEnhancementPromise=(async()=>{
       await Promise.allSettled([
         style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
         style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
         style("./educash-empire-v12.css")
       ]);
-      await series(["./mental-games.js","./game-suite.js"]);
-      await series(["./local-arcade-core.js","./speed-race-game.js","./air-defense-game.js","./math-learning-game.js"]);
+      await script("./local-arcade-core.js");
+      await Promise.allSettled([
+        script("./speed-race-game.js"),
+        script("./air-defense-game.js"),
+        script("./math-learning-game.js")
+      ]);
       await script("./local-games-bootstrap-v13.js");
-      const optional=[
-        "./game-local-storage-v8.js","./social-play.js","./game-polish-v3.js","./game-experience-v4.js",
-        "./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js",
-        "./game-interaction-fix-v10.js","./educash-empire-v12.js"
-      ];
-      for(const file of optional){
+      try{await script("./game-local-storage-v8.js")}catch(_){}
+      try{await script("./social-play.js")}catch(_){}
+      for(const file of ["./game-polish-v3.js","./game-experience-v4.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js","./game-interaction-fix-v10.js","./educash-empire-v12.js"]){
         try{await script(file)}catch(error){console.warn("[EduCashPro] complemento de jogo ignorado:",file,error?.message||error)}
       }
-      await script("./local-game-catalog-bridge.js");
-      window.EduCashProLocalCatalogBridge?.ensure?.();
-      await script("./game-usage-limit-v14.js");
+      try{
+        await script("./local-game-catalog-bridge.js");
+        window.EduCashProLocalCatalogBridge?.ensure?.();
+      }catch(_){}
+      try{await script("./game-usage-limit-v14.js")}catch(_){}
       const value=currentSession();
       if(value){
         window.EduCashProMentalGames?.setSession?.(value);
         window.EduCashProGameSuite?.setSession?.(value);
       }
+      return true;
+    })().catch(error=>{gamesEnhancementPromise=null;console.warn("[EduCashPro] jogos complementares:",error?.message||error);return false});
+    return gamesEnhancementPromise;
+  }
+
+  function loadGames(){
+    if(window.EduCashProMentalGames?.renderCatalog){
+      void loadGameEnhancements();
+      return Promise.resolve(true);
+    }
+    if(gamesPromise) return gamesPromise;
+    gamesPromise=(async()=>{
+      // Mostra o catálogo principal primeiro. Jogos extras entram progressivamente.
+      await series(["./mental-games.js","./game-suite.js"]);
+      const value=currentSession();
+      if(value){
+        window.EduCashProMentalGames?.setSession?.(value);
+        window.EduCashProGameSuite?.setSession?.(value);
+      }
+      void loadGameEnhancements();
       return true;
     })().catch(error=>{gamesPromise=null;throw error});
     return gamesPromise;
@@ -100,7 +121,7 @@
     if(window.EduCashProAccountCenter)return Promise.resolve(true);
     return accountCenterPromise||(accountCenterPromise=(async()=>{
       await script("./account-center.js");
-      try{await script("./account-center-extras.js")}catch(_){}
+      void script("./account-center-extras.js").catch(()=>{});
       return true;
     })().catch(error=>{accountCenterPromise=null;throw error}));
   }
