@@ -29,7 +29,6 @@
     // Nada pesado disputa rede/CPU com a abertura da Home.
     // Recursos funcionais grandes continuam sob demanda pelo resource-loader.
     schedule(()=>load("./navigation-state.js"),900);
-    schedule(()=>load("./runtime-stability-v11.js"),1400);
     schedule(()=>load("./cross-platform-nav.js"),1800);
     schedule(()=>load("./telegram-account-bridge.js"),2400);
 
