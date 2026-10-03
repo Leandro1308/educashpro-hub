@@ -53,6 +53,24 @@ jobs:
           curl -sSIL --connect-timeout 10 http://go.educashpro.vip/ | sed -n '1,80p'
           echo "=== HTTPS ROOT HTML ==="
           curl -sSL --connect-timeout 10 https://go.educashpro.vip/ | sed -n '1,140p'
+          echo "=== LIVE APP ROUTE ==="
+          echo "--- HEAD /app/ ---"
+          curl -sSIL --connect-timeout 10 https://go.educashpro.vip/app/ | sed -n '1,100p'
+          echo "--- BODY /app/ ---"
+          curl -sSL --connect-timeout 10 https://go.educashpro.vip/app/ | sed -n '1,220p'
+          echo "--- HEAD /app/index.html ---"
+          curl -sSIL --connect-timeout 10 https://go.educashpro.vip/app/index.html | sed -n '1,100p'
+          echo "--- BODY /app/version.json ---"
+          curl -sS -D - --connect-timeout 10 https://go.educashpro.vip/app/version.json -o /tmp/app-version.json | sed -n '1,80p'
+          cat /tmp/app-version.json 2>/dev/null
+          echo
+          echo "--- SITE JS/CSS PROBES ---"
+          for path in site/site.js site/site.css; do
+            echo "--- /$path ---"
+            curl -sS -D - --connect-timeout 10 "https://go.educashpro.vip/$path?probe=$GITHUB_SHA" -o "/tmp/${path//\//_}" | sed -n '1,60p'
+            head -c 1600 "/tmp/${path//\//_}" 2>/dev/null
+            echo
+          done
           echo "=== HTTPS FILE PROBES ==="
           for path in version.json game-suite.js educash-empire-v12.js resource-loader.js; do
             echo "--- /${path} ---"
