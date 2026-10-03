@@ -263,7 +263,8 @@
     }
 
     const wantsEntry=explicit==="email"||explicit==="account"||emailLabels.has(label);
-    if(!wantsEntry||(!explicit&&!isPublicEntryContext(target)))return;
+    const strongEntry=label==="acessar o educashpro"||label==="acessar educashpro"||label==="access educashpro"||label==="acceder a educashpro";
+    if(!wantsEntry||(!explicit&&!strongEntry&&!isPublicEntryContext(target)))return;
     event.preventDefault();
     event.stopImmediatePropagation();
     void openEntry();
