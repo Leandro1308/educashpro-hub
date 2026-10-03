@@ -595,7 +595,9 @@
   function refreshHubSessionInBackground() {
     if (state.hubSessionReady) return Promise.resolve(window.__EDUCASHPRO_SESSION__ || null);
     if (hubBootstrapPromise) return hubBootstrapPromise;
-    const initData = String(tg?.initData || "");
+    const runtime = window.Telegram?.WebApp || tg;
+    if (runtime && runtime !== tg) tg = runtime;
+    const initData = String(runtime?.initData || "");
     if (!initData) return Promise.resolve(null);
     hubBootstrapPromise = api("/api/hub/session", { initData }, { blocking: false, timeoutMs: 6000 })
       .then((session) => acceptHubSession(session))
@@ -2536,6 +2538,10 @@
     if (document.visibilityState === "hidden") flushRememberedRoute();
   });
   window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
+  window.addEventListener("educashpro:web-hub-ready",()=>{
+    tg=window.Telegram?.WebApp||tg;
+    void refreshHubSessionInBackground();
+  });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
