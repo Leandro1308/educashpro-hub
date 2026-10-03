@@ -170,7 +170,7 @@
     return result;
   }
 
-  async function validateStoredSession({apiBase=DEFAULT_API_BASE,preserveOnNetworkError=false}={}){
+  async function validateStoredSession({apiBase=DEFAULT_API_BASE,preserveOnNetworkError=true}={}){
     const session=platform?.readWebSession?.();
     if(!session?.token)return null;
     try{
