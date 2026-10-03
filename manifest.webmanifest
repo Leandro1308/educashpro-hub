@@ -12,15 +12,15 @@
   "theme_color": "#07111f",
   "icons": [
     {
-      "src": "https://educashpro-all.onrender.com/api/platform-public/app-icon?size=192",
+      "src": "/assets/icons/educashpro-192.png?v=20261003.1",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://educashpro-all.onrender.com/api/platform-public/app-icon?size=512",
+      "src": "/assets/icons/educashpro-512.jpg?v=20261003.1",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
     }
   ]
