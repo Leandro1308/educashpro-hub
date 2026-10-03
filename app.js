@@ -181,7 +181,6 @@
       ],
       networkTitle: "Um benefício que também pode gerar renda",
       networkText: "O assinante ativo pode receber 60% sobre novas assinaturas diretas e participar das renovações em até cinco níveis, conforme atividade, qualificações e regras vigentes.",
-      networkNote: "Não é promessa de ganhos. Os resultados dependem de assinaturas e renovações reais, qualificação e atuação individual.",
       chooseTitle: "O que você quer desenvolver?",
       goals: ["💰 Renda extra", "📱 Telegram profissional", "🎓 Novas habilidades", "🚀 Projeto digital"],
       finalTitle: "Comece pelo que faz sentido para você",
@@ -221,7 +220,6 @@
       ],
       networkTitle: "A benefit that can also generate income",
       networkText: "Active subscribers may receive 60% on new direct subscriptions and participate in renewals through up to five levels, subject to activity, qualifications and current rules.",
-      networkNote: "This is not an earnings promise. Results depend on real subscriptions and renewals, qualification and individual effort.",
       chooseTitle: "What do you want to develop?",
       goals: ["💰 Extra income", "📱 Professional Telegram", "🎓 New skills", "🚀 Digital project"],
       finalTitle: "Start with what makes sense for you",
@@ -261,7 +259,6 @@
       ],
       networkTitle: "Un beneficio que también puede generar ingresos",
       networkText: "El suscriptor activo puede recibir el 60% de nuevas suscripciones directas y participar en renovaciones de hasta cinco niveles, según actividad, calificaciones y reglas vigentes.",
-      networkNote: "No es una promesa de ganancias. Los resultados dependen de suscripciones y renovaciones reales, calificación y actuación individual.",
       chooseTitle: "¿Qué quieres desarrollar?",
       goals: ["💰 Ingresos extra", "📱 Telegram profesional", "🎓 Nuevas habilidades", "🚀 Proyecto digital"],
       finalTitle: "Empieza por lo que tiene sentido para ti",
@@ -301,7 +298,6 @@
       ],
       networkTitle: "Преимущество, которое также может приносить доход",
       networkText: "Активный подписчик может получать 60% от новых прямых подписок и участвовать в продлениях до пяти уровней при соблюдении требований активности, квалификации и действующих правил.",
-      networkNote: "Это не обещание дохода. Результаты зависят от реальных подписок и продлений, квалификации и личной работы.",
       chooseTitle: "Что вы хотите развивать?",
       goals: ["💰 Дополнительный доход", "📱 Профессиональный Telegram", "🎓 Новые навыки", "🚀 Цифровой проект"],
       finalTitle: "Начните с того, что важно именно вам",
@@ -459,7 +455,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.03.6";
+  const APP_RUNTIME_BUILD = "2026.10.03.7";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -1109,7 +1105,6 @@
         <h3>${escapeHtml(featureCopy("qualificationsTitle"))}</h3>
         <div class="qualificationList">${contractRules.qualifications.map((item) => `<span>✓ ${escapeHtml(item)}</span>`).join("")}</div>
         <p class="automaticPayment">💵 ${escapeHtml(featureCopy("automatic"))}</p>
-        <small>⚠️ ${escapeHtml(presentationCopy("networkNote"))}</small>
       </section>
       <details class="presentationDetails">
         <summary>🔒 ${escapeHtml(featureCopy("inactiveTitle"))}</summary>
