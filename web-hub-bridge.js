@@ -5,6 +5,7 @@
   const SESSION_IDLE_MS = 24*60*60*1000;
   const nativeFetch = window.fetch.bind(window);
   const platform = window.EduCashProPlatform || null;
+  if(window.__EDUCASHPRO_TELEGRAM_HINT__){window.__EDUCASHPRO_WEB_HUB__={active:false,source:"telegram_launch"};return;}
 
   function readStoredSession() {
     try {
@@ -124,10 +125,6 @@
     return;
   }
 
-  if (current?.token) {
-    try { localStorage.removeItem(SESSION_KEY); } catch {}
-  }
-
   reloadWhenLoginFinishes();
-  window.__EDUCASHPRO_WEB_HUB__ = { active: false };
+  window.__EDUCASHPRO_WEB_HUB__ = { active: false, source: current?.token ? "reauth_required" : "anonymous" };
 })();

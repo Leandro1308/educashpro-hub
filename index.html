@@ -8,10 +8,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="EduCashPro" />
-  <link rel="manifest" href="./manifest.webmanifest?v=20261002.7" />
-  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/educashpro-192.png?v=20261002.7" />
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261002.7" />
-  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261002.7" />
+  <link rel="manifest" href="./manifest.webmanifest?v=20261002.8" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/educashpro-192.png?v=20261002.8" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261002.8" />
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="./assets/icons/educashpro-ios-180.png?v=20261002.8" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -23,7 +23,7 @@
     })();
   </script>
   <script>
-    window.__EDUCASHPRO_PAGE_BUILD__="2026.10.02.7";
+    window.__EDUCASHPRO_PAGE_BUILD__="2026.10.02.8";
     (function(){
       var pageBuild=window.__EDUCASHPRO_PAGE_BUILD__;
       function checkBuild(){
@@ -56,7 +56,6 @@
     .splash p{color:#9db0c6}.loader{width:180px;height:4px;overflow:hidden;border-radius:9px;background:#12243b}.loader span{display:block;width:40%;height:100%;background:#30e6a6;animation:boot-loading 1.1s infinite ease-in-out}
     @keyframes boot-loading{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
   </style>
-  <script defer src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     window.__EDUCASHPRO_BOOT__={startedAt:Date.now(),telegramReady:false,scriptErrors:[]};
     window.addEventListener("error",function(event){var source=event&&event.target&&event.target.src;if(!source)return;window.__EDUCASHPRO_BOOT__.scriptErrors.push(source);console.error("[EduCashPro] Falha ao carregar recurso:",source)},true);
@@ -64,6 +63,9 @@
       var root=document.documentElement;
       var ios=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
       var standalone=window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches===true||window.navigator.standalone===true;
+      var launchText=String(location.search||"")+" "+String(location.hash||"");
+      var telegramHint=/tgWebApp(?:Data|Version|Platform|ThemeParams)/i.test(launchText);
+      window.__EDUCASHPRO_TELEGRAM_HINT__=telegramHint;
       if(ios)root.classList.add("educashproIOS");
       if(standalone)root.classList.add("educashproStandalone");
       root.classList.add("educashproWeb");
@@ -80,14 +82,30 @@
           root.classList.toggle("educashproTelegramFullscreen",webApp.isFullscreen===true);
         }catch(error){console.error("[EduCashPro] Telegram bootstrap:",error)}
       }
+      window.__EDUCASHPRO_SYNC_TELEGRAM__=syncTelegram;
       document.addEventListener("DOMContentLoaded",syncTelegram,{once:true});
+      if(telegramHint){
+        window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=new Promise(function(resolve){
+          var script=document.createElement("script");
+          var done=false;
+          function finish(ok){if(done)return;done=true;if(ok)syncTelegram();resolve(Boolean(ok))}
+          script.src="https://telegram.org/js/telegram-web-app.js";
+          script.async=true;
+          script.onload=function(){finish(true)};
+          script.onerror=function(){finish(false)};
+          document.head.appendChild(script);
+          window.setTimeout(function(){finish(Boolean(window.Telegram&&window.Telegram.WebApp))},1200);
+        });
+      }else{
+        window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__=Promise.resolve(false);
+      }
     })();
   </script>
-  <link rel="stylesheet" href="./style.css?v=20261002.7" />
-  <link rel="stylesheet" href="./experience-v2.css?v=20261002.7" />
-  <link rel="stylesheet" href="./growth-entry-v10.css?v=20261002.7" />
-  <link rel="stylesheet" href="./flow-lite.css?v=20261002.7" />
-  <link rel="stylesheet" href="./educash-empire-miniapp-fix.css?v=20261002.7" />
+  <link rel="stylesheet" href="./style.css?v=20261002.8" />
+  <link rel="stylesheet" href="./experience-v2.css?v=20261002.8" />
+  <link rel="stylesheet" href="./growth-entry-v10.css?v=20261002.8" />
+  <link rel="stylesheet" href="./flow-lite.css?v=20261002.8" />
+  <link rel="stylesheet" href="./educash-empire-miniapp-fix.css?v=20261002.8" />
 </head>
 <body>
   <div id="app">
@@ -108,27 +126,27 @@
   <div id="toast" class="toast" role="status"></div>
   <div id="accessModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modalBackdrop" data-close-modal></div><section class="modalSheet"><button class="modalClose" data-close-modal aria-label="Fechar">✕</button><div id="modalIcon" class="modalIcon">🎓</div><h2 id="modalTitle"></h2><p id="modalDescription"></p><ul id="modalLearning"></ul><button id="modalSubscribe" class="wideButton"></button><button class="secondaryButton modalCancel" data-close-modal></button></section></div>
   <!-- Identidade dual-mode. Estes scripts não iniciam pagamentos. -->
-  <script defer src="./platform-adapter.js?v=20261002.7"></script>
-  <script defer src="./navigation-state.js?v=20261002.7"></script>
-  <script defer src="./feature-registry.js?v=20261002.7"></script>
-  <script defer src="./locale-resolver.js?v=20261002.7"></script>
-  <script defer src="./platform-web-auth.js?v=20261002.7"></script>
-  <script defer src="./web-hub-bridge.js?v=20261002.7"></script>
-  <script defer src="./telegram-account-bridge.js?v=20261002.7"></script>
-  <script defer src="./web-auth-entry-gate.js?v=20261002.7"></script>
-  <script defer src="./web-auth-entry.js?v=20261002.7"></script>
-  <script defer src="./web-auth-entry-gate-restore.js?v=20261002.7"></script>
-  <script defer src="./web-auth-interaction-fix.js?v=20261002.7"></script>
+  <script defer src="./platform-adapter.js?v=20261002.8"></script>
+  <script defer src="./navigation-state.js?v=20261002.8"></script>
+  <script defer src="./feature-registry.js?v=20261002.8"></script>
+  <script defer src="./locale-resolver.js?v=20261002.8"></script>
+  <script defer src="./platform-web-auth.js?v=20261002.8"></script>
+  <script defer src="./web-hub-bridge.js?v=20261002.8"></script>
+  <script defer src="./telegram-account-bridge.js?v=20261002.8"></script>
+  <script defer src="./web-auth-entry-gate.js?v=20261002.8"></script>
+  <script defer src="./web-auth-entry.js?v=20261002.8"></script>
+  <script defer src="./web-auth-entry-gate-restore.js?v=20261002.8"></script>
+  <script defer src="./web-auth-interaction-fix.js?v=20261002.8"></script>
   <!-- Núcleo mínimo. Recursos pesados são carregados somente quando usados. -->
-  <script defer src="./runtime-stability-v11.js?v=20261002.7"></script>
-  <script defer src="./startup-lite.js?v=20261002.7"></script>
-  <script defer src="./resource-loader.js?v=20261002.7"></script>
-  <script defer src="./app.js?v=20261002.7"></script>
-  <script defer src="./web-site-menu.js?v=20261002.7"></script>
-  <script defer src="./idle-features-v11.js?v=20261002.7"></script>
+  <script defer src="./runtime-stability-v11.js?v=20261002.8"></script>
+  <script defer src="./startup-lite.js?v=20261002.8"></script>
+  <script defer src="./resource-loader.js?v=20261002.8"></script>
+  <script defer src="./app.js?v=20261002.8"></script>
+  <script defer src="./web-site-menu.js?v=20261002.8"></script>
+  <script defer src="./idle-features-v11.js?v=20261002.8"></script>
   <script>
     window.setTimeout(function(){if(window.__EDUCASHPRO_APP_STARTED__)return;var loadingText=document.getElementById("loadingText");var loader=document.querySelector(".splash .loader");if(loader)loader.hidden=true;if(loadingText){loadingText.classList.add("error");loadingText.textContent="Não foi possível iniciar. Atualize a página e tente novamente."}console.error("[EduCashPro] Tempo limite de inicialização excedido.",window.__EDUCASHPRO_BOOT__)},12000);
   </script>
-  <script src="./cross-platform-nav.js?v=20261002.7"></script>
+  <script src="./cross-platform-nav.js?v=20261002.8"></script>
 </body>
 </html>

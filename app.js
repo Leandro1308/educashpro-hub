@@ -1,5 +1,5 @@
 (function () {
-  const tg = window.Telegram?.WebApp;
+  let tg = window.Telegram?.WebApp;
   const content = document.getElementById("content");
   const bottomNav = document.getElementById("bottomNav");
   const toast = document.getElementById("toast");
@@ -40,6 +40,20 @@
   };
   let activeBookScrollHandler = null;
   let webQrScanner = null;
+  async function resolveTelegramRuntime(){
+    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&!window.Telegram?.WebApp){
+      const sdk=window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__;
+      if(sdk){
+        await Promise.race([
+          Promise.resolve(sdk).catch(()=>false),
+          new Promise(resolve=>window.setTimeout(resolve,900))
+        ]);
+      }
+    }
+    tg=window.Telegram?.WebApp;
+    window.__EDUCASHPRO_SYNC_TELEGRAM__?.();
+    return tg;
+  }
   function stopBookTracking(){if(activeBookScrollHandler){removeEventListener("scroll",activeBookScrollHandler);activeBookScrollHandler=null}}
 
   const COPY = {
@@ -414,7 +428,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.02.7";
+  const APP_RUNTIME_BUILD = "2026.10.02.8";
   const APP_RELOAD_GUARD_KEY = "educashpro:runtime-reload";
   let updateCheckPromise = null;
 
@@ -2284,6 +2298,7 @@
 
   async function init() {
     window.__EDUCASHPRO_APP_STARTED__ = true;
+    await resolveTelegramRuntime();
     try {
       tg?.ready?.();
       tg?.expand?.();
@@ -2312,6 +2327,16 @@
           navigateFromFooter(button);
         };
       });
+    }
+
+    if (window.__EDUCASHPRO_WEB_HUB__?.active) {
+      const cachedSession = window.EduCashProPlatform?.readWebSession?.();
+      if (cachedSession?.profile?.userId) {
+        syncExternalSession(cachedSession);
+        window.__EDUCASHPRO_FAST_RENDERED__ = true;
+        await resumeAuthenticatedExperience();
+        return;
+      }
     }
 
     if (!tg?.initData) {
