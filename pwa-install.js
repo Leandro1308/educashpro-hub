@@ -67,7 +67,7 @@
     layer.className="educashPwaLayer";
     layer.innerHTML=`<section class="educashPwaCard" role="dialog" aria-modal="true" aria-labelledby="educashPwaTitle">
       <button class="educashPwaX" type="button" aria-label="${c.close}">✕</button>
-      <div class="educashPwaTop"><img class="educashPwaIcon" src="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=180" alt="EduCashPro"><h2 id="educashPwaTitle">${title}</h2></div>
+      <div class="educashPwaTop"><img class="educashPwaIcon" src="./assets/icons/educashpro-ios-180.png?v=20261003.1" alt="EduCashPro"><h2 id="educashPwaTitle">${title}</h2></div>
       <p>${body}</p>
       ${hint?`<p class="educashPwaHint">${hint}</p>`:""}
       <div class="educashPwaActions">
@@ -133,13 +133,16 @@
     window.dispatchEvent(new CustomEvent("educashpro:pwa-installed"));
   });
   if("serviceWorker" in navigator&&location.protocol==="https:"){
-    window.addEventListener("load",async()=>{
-      try{
-        const registration=await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
-        await registration.update();
-      }catch(error){
-        console.warn("[EduCashPro] Service Worker:",error);
-      }
+    window.addEventListener("load",()=>{
+      const register=async()=>{
+        try{
+          await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
+        }catch(error){
+          console.warn("[EduCashPro] Service Worker:",error);
+        }
+      };
+      if("requestIdleCallback" in window)requestIdleCallback(()=>void register(),{timeout:9000});
+      else window.setTimeout(()=>void register(),6000);
     },{once:true});
   }
   window.EduCashProPWA={install,isInstalled,canPrompt:()=>Boolean(deferredPrompt)};
