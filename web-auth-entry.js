@@ -1,7 +1,7 @@
 (function(){
   const platform=window.EduCashProPlatform;
   const auth=window.EduCashProWebAuth;
-  if(!platform?.isWeb?.()||!auth)return;
+  if(window.__EDUCASHPRO_TELEGRAM_HINT__||!platform?.isWeb?.()||!auth)return;
 
   const state={session:null,checking:true,reauthRequired:false,reauthMode:"",ui:null,challenge:null,unsubscribe:null,unsubscribeModal:null,busy:false,pair:null,pairTimer:null,pairCountdownTimer:null,pairExpiresAt:0};
   const MANIFEST_URL="https://go.educashpro.vip/tonconnect-manifest.json";
@@ -264,18 +264,24 @@
       state.session=stored;
       if(withinIdleWindow(stored)){
         state.session=touchLocalSession(stored);
+        if(!state.reauthRequired)void window.EduCashProApp?.setSession?.(state.session);
         const needsSilentRefresh=Date.now()-localSessionValidatedAt(stored)>=SILENT_REFRESH_MS;
         if(needsSilentRefresh){
-          const refreshed=await auth.validateStoredSession({preserveOnNetworkError:true}).catch(()=>null);
-          const current=platform.readWebSession?.();
-          if(refreshed)state.session=touchLocalSession(refreshed);
-          else if(!current?.token){
-            state.session=stored;
-            state.reauthRequired=true;
-            state.reauthMode=requiredReauthMode(stored);
-          }
+          window.setTimeout(async()=>{
+            const refreshed=await auth.validateStoredSession({preserveOnNetworkError:true}).catch(()=>null);
+            const current=platform.readWebSession?.();
+            if(refreshed){
+              state.session=touchLocalSession(refreshed);
+              void window.EduCashProApp?.setSession?.(state.session);
+              return;
+            }
+            if(!current?.token){
+              state.session=stored;
+              state.reauthRequired=true;
+              state.reauthMode=requiredReauthMode(stored);
+            }
+          },1200);
         }
-        if(!state.reauthRequired)await window.EduCashProApp?.setSession?.(state.session);
       }else{
         state.reauthRequired=true;
         state.reauthMode=requiredReauthMode(stored);
