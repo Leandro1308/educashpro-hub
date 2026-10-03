@@ -2397,13 +2397,13 @@
     const scheduleContractConfig = () => void loadPublicContractConfig();
     if (window.EduCashProResources?.idle) window.EduCashProResources.idle(scheduleContractConfig, 1500);
     else window.setTimeout(scheduleContractConfig, 1100);
-    if (await window.EduCashProLinks?.bootPublic?.(publicParams)) return;
+    if (await window.EduCashProLinks?.bootPublic?.(publicParams)) { markAppReady("public-link"); return; }
     if (!tg?.initData && (publicParams.get("game") || publicParams.get("raffle"))) {
       await window.EduCashProResources?.loadGames?.();
-      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) { markAppReady("public-game"); return; }
     }
     const credentialToVerify = publicParams.get("credential");
-    if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); return; }
+    if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); markAppReady("credential"); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
     document.querySelectorAll("[data-close-modal]").forEach((button) => button.onclick = closeModal);
     if (bottomNav.dataset.navigationBound !== "1") {
@@ -2421,8 +2421,9 @@
       if (cachedSession?.profile?.userId) {
         syncExternalSession(cachedSession);
         window.__EDUCASHPRO_FAST_RENDERED__ = true;
+        renderHome();
+        markAppReady("web-cached-shell");
         await resumeAuthenticatedExperience();
-        markAppReady("web-cached-session");
         void refreshHubSessionInBackground();
         return;
       }
@@ -2451,7 +2452,7 @@
       if (publicParams.get("game") || publicParams.get("tournament") || publicParams.get("raffle")) {
         await window.EduCashProResources?.loadGames?.();
         window.EduCashProMentalGames?.setSession?.(session);
-        if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) return;
+        if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) { markAppReady("authenticated-game"); return; }
       }
       const receivedCredential = String(session.membershipCredential || "");
       const cachedCredential = String(localStorage.getItem("educashpro:membership-credential") || "");
@@ -2469,7 +2470,7 @@
       applyLanguage();
       bottomNav.classList.remove("hidden");
       refreshCourseCatalogLater();
-      if (window.EduCashProNavigationState?.restoreLastPage?.()) return;
+      if (window.EduCashProNavigationState?.restoreLastPage?.()) { markAppReady("navigation-restore"); return; }
       const requestedCourse = String(publicParams.get("course") || "");
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
