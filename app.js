@@ -459,7 +459,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.03.1";
+  const APP_RUNTIME_BUILD = "2026.10.03.2";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -2299,6 +2299,12 @@
       ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
     };
     const value = copies[browserLanguage] || copies.pt;
+    const entryCopy = ({
+      pt:["Acessar o EduCashPro","Entrar pelo Telegram"],
+      en:["Access EduCashPro","Enter through Telegram"],
+      es:["Acceder a EduCashPro","Entrar por Telegram"],
+      ru:["Открыть EduCashPro","Войти через Telegram"],
+    })[browserLanguage] || ["Acessar o EduCashPro","Entrar pelo Telegram"];
     const landingCopy = ({
       pt: ["Escolha por onde começar", "Cada área tem um objetivo claro. O menu reúne todas as funções.", "Conhecer", "Entenda a proposta e os recursos do EduCashPro.", "Explorar", "Conheça empresas, benefícios e projetos.", "Minha área", "Perfil, assinatura, credencial e configurações.", "Comunidade EduCashPro", "Canal oficial", "Abrir no Telegram"],
       en: ["Choose where to start", "Each area has a clear purpose. The menu contains every feature.", "Discover", "Understand EduCashPro and its resources.", "Explore", "Find businesses, benefits and projects.", "My area", "Profile, subscription, credential and settings.", "EduCashPro community", "Official channel", "Open in Telegram"],
@@ -2319,6 +2325,10 @@
       <span class="eyebrow">EDUCASHPRO</span>
       <h1>${escapeHtml(value[0])}</h1>
       <p>${escapeHtml(value[1])}</p>
+      <div class="publicEntryActions">
+        <button id="publicEntryButton" class="wideButton" type="button" data-educash-entry="account">🚀 ${escapeHtml(entryCopy[0])}</button>
+        <a id="publicTelegramEntry" class="secondaryButton" data-educash-entry="telegram" href="${escapeHtml(telegramAppUrl.toString())}" target="_blank" rel="noopener">✈️ ${escapeHtml(entryCopy[1])}</a>
+      </div>
       <small class="publicWelcomeHint">${escapeHtml(value[9])}</small>
       <section class="landingPathSection">
         <header><h2>${escapeHtml(landingCopy[0])}</h2><p>${escapeHtml(landingCopy[1])}</p></header>
@@ -2340,6 +2350,7 @@
         <a id="publicTelegramApp" href="${escapeHtml(telegramAppUrl.toString())}" target="_blank" rel="noopener">✈️ ${escapeHtml(landingCopy[10])}</a>
       </div></section>
     </section>`;
+    document.getElementById("publicEntryButton")?.addEventListener("click", () => window.EduCashProWebEntry?.open?.());
     document.getElementById("publicPresentation")?.addEventListener("click", () => renderPresentation(renderPublicLanding));
     document.getElementById("publicMemberArea")?.addEventListener("click", () => {
       if (state.profile) return renderArea();
