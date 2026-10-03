@@ -41,7 +41,8 @@
 
   function saveSession(result){
     if(!result?.token)return null;
-    const session={token:result.token,profile:result.profile||null,storedAt:Date.now()};
+    const now=Date.now();
+    const session={token:result.token,profile:result.profile||null,storedAt:now,lastAccessAt:now,validatedAt:now};
     platform?.writeWebSession?.(session);
     if(result?.profile?.userId)platform?.clearPendingReferral?.();
     return session;
@@ -163,7 +164,8 @@
       headers:{Authorization:`Bearer ${session.token}`},
       body:JSON.stringify({initData}),
     });
-    const updated={...session,profile:result.profile||session.profile||null,storedAt:Date.now()};
+    const now=Date.now();
+    const updated={...session,profile:result.profile||session.profile||null,storedAt:Number(session.storedAt||0)||now,lastAccessAt:now,validatedAt:now};
     platform?.writeWebSession?.(updated);
     return result;
   }
@@ -177,7 +179,16 @@
         headers:{Authorization:`Bearer ${session.token}`},
         body:"{}",
       });
-      const updated={...session,profile:result.profile||session.profile||null,server:result.session||null};
+      const now=Date.now();
+      const updated={
+        ...session,
+        token:result.token||session.token,
+        profile:result.profile||session.profile||null,
+        server:result.session||null,
+        storedAt:Number(session.storedAt||0)||now,
+        lastAccessAt:now,
+        validatedAt:now
+      };
       platform?.writeWebSession?.(updated);
       return updated;
     }catch(error){
