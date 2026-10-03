@@ -82,7 +82,8 @@
           event.preventDefault();event.stopImmediatePropagation();request("telegram");return;
         }
         var email=explicit==="email"||explicit==="account"||emailLabels.has(label);
-        if(!email||(!explicit&&!publicContext(target)))return;
+        var strongEmail=label==="acessar o educashpro"||label==="acessar educashpro"||label==="access educashpro"||label==="acceder a educashpro";
+        if(!email||(!explicit&&!strongEmail&&!publicContext(target)))return;
         event.preventDefault();event.stopImmediatePropagation();request("account");
       },true);
     })();
