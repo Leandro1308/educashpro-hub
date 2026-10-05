@@ -102,6 +102,7 @@
         <div class="adminGrid">
           <button class="adminCard" data-admin="support"><span>💬</span><b>${esc(t("support"))}</b><small>${Number(c.supportOpen||0)} pendentes</small></button>
           <button class="adminCard" data-admin="communities"><span>🌐</span><b>${esc(t("communities"))}</b><small>Moderar e remover</small></button>
+          <button class="adminCard" data-admin="benefit-create"><span>➕</span><b>${esc(({pt:"Cadastrar benefício",en:"Create benefit",es:"Crear beneficio",ru:"Добавить преимущество"})[language()])}</b></button>
           <button class="adminCard" data-admin="benefits"><span>🎁</span><b>${esc(t("benefits"))}</b><small>Aprovar, desativar e excluir</small></button>
           <button class="adminCard" data-admin="partners"><span>🏪</span><b>${esc(t("partners"))}</b><small>Aprovar, suspender e excluir</small></button>
           <button class="adminCard" data-admin="reviewers"><span>🕵️</span><b>${esc(t("reviewers"))}</b><small>${Number(c.reviewers||0)} cadastrados</small></button>
@@ -116,6 +117,7 @@
         const key=button.dataset.admin;
         if(key==="support"){close();location.assign("./support.html");}
         else if(["communities","benefits","partners"].includes(key))void openContent(key);
+        else if(key==="benefit-create")void openBenefitCreate();
         else if(key==="reviewers")void openReviewers();
         else if(key==="broadcast")void openBroadcast();
         else if(key==="channel")void openChannel();
@@ -127,6 +129,12 @@
     }catch(error){
       body.innerHTML=`<div class="adminPanel adminError">${esc(t("error"))}<br><small>${esc(error.message)}</small></div>`;
     }
+  }
+
+  function openBenefitCreate(){
+    const labels={pt:["Cadastrar benefício","Título","Descrição","Link","Categoria","Idioma"],en:["Create benefit","Title","Description","Link","Category","Language"],es:["Crear beneficio","Título","Descripción","Enlace","Categoría","Idioma"],ru:["Добавить преимущество","Название","Описание","Ссылка","Категория","Язык"]}[language()];
+    const body=shell(`<div class="adminPanel"><h3>${esc(labels[0])}</h3><form id="adminBenefitForm">${["title","description","url","category"].map((name,i)=>`<label class="adminLabel">${esc(labels[i+1])}</label>${name==="description"?`<textarea class="adminText" name="${name}" required maxlength="800"></textarea>`:`<input class="adminField" name="${name}" ${name==="url"?'type="url"':'type="text"'} ${name==="category"?'':'required'} maxlength="${name==="title"?120:1000}">`}`).join("")}<label class="adminLabel">${esc(labels[5])}</label><select class="adminSelect" name="language">${["pt","en","es","ru","all"].map(l=>`<option>${l}</option>`).join("")}</select><button class="adminButton" type="submit">${esc(t("save"))}</button><p class="adminStatus" role="status"></p></form></div>`);
+    body.querySelector("form").onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector("button");button.disabled=true;try{await api("/benefits/create",Object.fromEntries(new FormData(e.target)));await openContent("benefits")}catch(error){body.querySelector(".adminStatus").textContent=error.message}finally{button.disabled=false}};
   }
 
   function itemTitle(kind,item){
@@ -192,16 +200,16 @@
   }
 
   async function openBroadcast(){
-    const body=shell(`${backButton()}<div class="adminPanel"><h3>📣 ${esc(t("broadcast"))}</h3><label class="adminLabel">Idioma</label><select id="broadcastLang" class="adminSelect"><option value="all">Todos</option><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option><option value="ru">Русский</option></select><label class="adminLabel">Público</label><select id="broadcastAudience" class="adminSelect"><option value="all">Todos</option><option value="active">Ativos</option><option value="inactive">Inativos</option></select><label class="adminLabel">Mensagem</label><textarea id="broadcastText" class="adminText" maxlength="4000"></textarea><div class="adminToolbar"><button id="broadcastCount" class="adminButton secondary" type="button">Contar destinatários</button><button id="broadcastSend" class="adminButton" type="button">Enviar</button></div><div id="broadcastStatus" class="adminStatus"></div></div>`);bindBack(body);
+    const body=shell(`${backButton()}<div class="adminPanel"><h3>📣 ${esc(t("broadcast"))}</h3><label class="adminLabel">Idioma</label><select id="broadcastLang" class="adminSelect"><option value="all">Todos</option><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option><option value="ru">Русский</option></select><label class="adminLabel">Público</label><select id="broadcastAudience" class="adminSelect"><option value="all">Todos</option><option value="active">Ativos</option><option value="inactive">Inativos</option></select><label class="adminLabel">Mensagem</label><textarea id="broadcastText" class="adminText" maxlength="4000"></textarea><label class="adminLabel">Mídia (opcional)</label><select id="broadcastMediaType" class="adminSelect"><option value="photo">Imagem</option><option value="video">Vídeo</option><option value="audio">Áudio</option><option value="document">Documento</option></select><input id="broadcastMediaUrl" class="adminField" type="url" placeholder="https://..."><label class="adminLabel">Ou copiar mensagem do Telegram</label><input id="broadcastSourceChat" class="adminField" placeholder="@canal ou ID do chat"><input id="broadcastSourceMessage" class="adminField" type="number" min="1" placeholder="ID da mensagem"><div class="adminToolbar"><button id="broadcastCount" class="adminButton secondary" type="button">Contar destinatários</button><button id="broadcastSend" class="adminButton" type="button">Enviar</button></div><div id="broadcastStatus" class="adminStatus"></div></div>`);bindBack(body);
     const status=body.querySelector("#broadcastStatus");
     const filters=()=>({language:body.querySelector("#broadcastLang").value,audience:body.querySelector("#broadcastAudience").value});
     body.querySelector("#broadcastCount").addEventListener("click",async()=>{status.textContent=t("loading");try{const data=await api("/broadcast/count",filters());status.textContent=data.count+" destinatários"}catch(error){status.textContent=t("error")+" "+error.message}});
     body.querySelector("#broadcastSend").addEventListener("click",async()=>{
-      const text=body.querySelector("#broadcastText").value.trim();if(text.length<2)return;
+      const text=body.querySelector("#broadcastText").value.trim();if(text.length<2&&!body.querySelector("#broadcastMediaUrl").value&&!body.querySelector("#broadcastSourceChat").value)return;
       if(!confirm("Confirmar o envio desta mensagem?"))return;
       status.textContent=t("loading");
       try{
-        const data=await api("/broadcast/start",{...filters(),text});
+        const data=await api("/broadcast/start",{...filters(),text,mediaType:body.querySelector("#broadcastMediaType").value,mediaUrl:body.querySelector("#broadcastMediaUrl").value,sourceChatId:body.querySelector("#broadcastSourceChat").value,sourceMessageId:Number(body.querySelector("#broadcastSourceMessage").value||0)});
         const jobId=data.jobId;
         const check=async()=>{try{const result=await api("/broadcast/status",{jobId});const j=result.job;status.textContent=`${j.status} · processados ${j.processed||0} · enviados ${j.sent||0} · falhas ${j.failed||0}`;if(["completed","failed"].includes(j.status))return;pollTimer=setTimeout(check,1800)}catch(error){status.textContent=t("error")+" "+error.message}};
         await check();
@@ -271,7 +279,11 @@
     renderContractFields(body,action.value);
     action.addEventListener("change",()=>renderContractFields(body,action.value));
     try{
-      if(window.TON_CONNECT_UI?.TonConnectUI)tonUi=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"adminTonConnect"});
+      if (!window.TON_CONNECT_UI?.TonConnectUI) await new Promise((resolve,reject)=>{
+        const script=document.createElement("script");script.src="https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js";script.onload=resolve;script.onerror=reject;document.head.appendChild(script);
+      });
+      tonUi=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"adminTonConnect"});
+      tonUi.onModalStateChange?.(state=>{const layer=document.querySelector(".adminCenterLayer");if(layer)layer.style.visibility=state?.status==="opened"?"hidden":"visible"});
     }catch{}
     body.querySelector("#contractSend").addEventListener("click",async()=>{
       const wallet=tonUi?.account?.address||tonUi?.wallet?.account?.address||"";

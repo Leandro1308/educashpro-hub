@@ -543,9 +543,9 @@
             <div class="accountMetric"><small>${esc(t("status"))}</small><b>${esc(subscription.active ? t("active") : t("inactive"))}</b></div>
             <div class="accountMetric"><small>${esc(t("validUntil"))}</small><b>${esc(formatDate(subscription.activeUntil))}</b></div>
           </div>
-          <p class="accountNote">${esc(t("readOnly"))}</p>
-          <p class="accountNote">${esc(t("noPayment"))}</p>
+          ${platform?.isWeb?.() && window.EduCashProWebCheckout ? (subscription.lifetime ? "" : `<button id="accountPaySubscription" class="accountSecondary" type="button">${esc(({pt:subscription.active?"Renovar assinatura":"Assinar",en:subscription.active?"Renew subscription":"Subscribe",es:subscription.active?"Renovar suscripción":"Suscribirse",ru:subscription.active?"Продлить подписку":"Оформить подписку"})[lang()])}</button>`) : `<p class="accountNote">${esc(t("readOnly"))}</p><p class="accountNote">${esc(t("noPayment"))}</p>`}
         </div>`;
+      body.querySelector("#accountPaySubscription")?.addEventListener("click", () => { close(); void window.EduCashProWebCheckout.open(Number(subscription.activeUntil || 0) > 0 ? "renew" : "pay"); });
     } catch {
       body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
     }
@@ -944,6 +944,9 @@
   }
 
   async function openAdmin() {
+    if (window.EduCashProPlatform?.isWeb?.() && !window.EduCashProAdminCenter?.open) {
+      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261005.1"); } catch {}
+    }
     if (window.EduCashProAdminCenter?.open) {
       close();
       return window.EduCashProAdminCenter.open();
@@ -1111,3 +1114,4 @@
     mountAdminShortcut,
   };
 })();
+

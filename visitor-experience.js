@@ -119,6 +119,7 @@
   };
 
   function openSubscription() {
+    if (window.EduCashProPlatform?.isWeb?.() && window.EduCashProWebCheckout) return window.EduCashProWebCheckout.open();
     const url = String(visitorState.session?.subscribeUrl || visitorState.session?.botUrl || "").trim();
     if (!url) return;
     if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) return tg.openTelegramLink(url);
@@ -385,3 +386,4 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener("DOMContentLoaded", enhance);
 })();
+

@@ -441,6 +441,7 @@
   }
 
   function openSubscription() {
+    if (window.EduCashProPlatform?.isWeb?.() && window.EduCashProWebCheckout) return window.EduCashProWebCheckout.open();
     const url = subscriptionDestination();
     if (/^https:\/\/t\.me\//i.test(url) && tg?.openTelegramLink) {
       tg.openTelegramLink(url);
@@ -455,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.03.7";
+  const APP_RUNTIME_BUILD = "2026.10.05.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -2522,3 +2523,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
+
