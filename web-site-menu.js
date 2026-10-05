@@ -51,6 +51,18 @@
     .webSiteMenuGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.webSiteMenuItem{display:flex;align-items:center;gap:10px;min-height:58px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:#11243a;color:#f7fbff;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}.webSiteMenuItem:hover{border-color:rgba(48,230,166,.38);transform:translateY(-1px)}.webSiteMenuItem span{font-size:22px}.webSiteMenuItem b{font-size:13px;line-height:1.25}
     body.webSiteMenuOpen{overflow:hidden}
     @media(max-width:560px){.webSiteMenuButton{padding:0 11px}.webSiteMenuSheet{width:100%;padding:16px}.webSiteMenuHead{top:-16px;padding-top:16px}.webSiteMenuGrid{grid-template-columns:1fr}html.educashproWeb #accountCenterButton{width:44px;padding:0 6px}html.educashproWeb #accountCenterButton .accountHeaderLabel{display:none}}
+    @media(max-width:560px){
+      .topbar{gap:6px!important;padding-left:10px!important;padding-right:10px!important;flex-wrap:nowrap;box-sizing:border-box}
+      .topbar .brandmark{flex:0 0 30px;width:30px!important;height:30px!important;border-radius:10px!important;font-size:17px!important}
+      .topbar .brandcopy{flex:1 1 0;min-width:0;overflow:hidden;margin-right:0!important}
+      .topbar .brandcopy strong,.topbar .brandcopy span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .topbar .brandcopy strong{font-size:13px!important}.topbar .brandcopy span{font-size:10px!important}
+      .topbar>.iconButton,.topbar>.educashCrossNav,.topbar>#accountCenterButton,.topbar>#siteInboxButton,.topbar>#webSiteMenuButton{flex:0 0 36px!important;width:36px!important;min-width:36px!important;height:36px!important;min-height:36px!important;padding:0!important;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;font-size:18px!important;border-radius:11px!important}
+      .topbar #webSiteMenuButton>span,.topbar #accountCenterButton .accountHeaderLabel{display:none}
+      .topbar #accountCenterButton .accountHeaderAvatar{width:25px;height:25px;flex-basis:25px;font-size:17px}
+      .topbar>#webHeaderLogin{flex:0 0 auto;min-height:36px;height:36px;padding:0 8px;font-size:12px;white-space:nowrap}
+      .topbar .siteInboxBadge{right:-3px;top:-3px;font-size:10px;min-width:16px;padding:2px 3px}
+    }
   `;document.head.appendChild(style)}
   function open(){
     styles();close();const c=copy(),groups=c.groups.map(([title,items])=>[title,items.slice()]);
@@ -121,7 +133,7 @@
     }else{
       document.getElementById("webHeaderLogin")?.remove();
       document.getElementById("accountCenterButton")?.classList.remove("hidden");
-      if(!document.getElementById("webSiteMenuButton")){const button=document.createElement("button");button.id="webSiteMenuButton";button.className="webSiteMenuButton";button.type="button";button.innerHTML=`☰ <span>${esc(copy().menu)}</span>`;button.onclick=open;topbar.insertBefore(button,document.getElementById("marketplaceButton")||null)}
+      if(!document.getElementById("webSiteMenuButton")){const button=document.createElement("button");button.id="webSiteMenuButton";button.className="webSiteMenuButton";button.type="button";button.innerHTML=`☰ <span>${esc(copy().menu)}</span>`;button.setAttribute("aria-label",copy().menu);button.title=copy().menu;button.onclick=open;topbar.insertBefore(button,document.getElementById("marketplaceButton")||null)}
     }
     labelAccount();
     const content=document.getElementById("content");
