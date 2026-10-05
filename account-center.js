@@ -945,7 +945,7 @@
 
   async function openAdmin() {
     if (window.EduCashProPlatform?.isWeb?.() && !window.EduCashProAdminCenter?.open) {
-      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261005.1"); } catch {}
+      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261005.2"); } catch {}
     }
     if (window.EduCashProAdminCenter?.open) {
       close();
