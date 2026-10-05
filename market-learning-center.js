@@ -44,9 +44,9 @@
       title: "Bolsa de Valores, Análise Técnica e Price Action",
       intro: "Ações, índices, Forex, ouro e cripto em uma central de análise com gráfico, indicadores, calendário, visão de mercados e formação em Price Action.",
       tools: "Análise de mercado",
-      toolsSub: "Use as ferramentas de Bolsa e análise técnica. No gráfico e no resumo, escolha livremente o ativo e o período; as demais abas ampliam a leitura do mercado.",
+      toolsSub: "Use as ferramentas de Bolsa e análise técnica. No gráfico e na tendência, escolha livremente o ativo e o período; as demais abas ampliam a leitura do mercado.",
       chart: "Gráfico",
-      technical: "Resumo técnico",
+      technical: "TENDÊNCIA",
       pairs: "Pares Binance",
       overview: "Bolsa e índices",
       heatmap: "Mapa de calor Forex",
@@ -62,7 +62,7 @@
       searchPlaceholder: "Ex.: AVAXUSDT ou NASDAQ:AAPL",
       openAsset: "Abrir",
       searchHelp: "Este ativo será usado no gráfico e no resumo técnico, mesmo que não apareça na seleção de alta ou baixa.",
-      fibTitle: "Rompeu? Fibo nela!",
+      fibTitle: "Fibonacci",
       fibLoading: "Procurando rompimentos confirmados e calculando Fibonacci…",
       fibUnavailable: "A leitura automática de Fibonacci está disponível para pares da Binance.",
       fibNone: "Nenhum rompimento confirmado do canal nos 12 candles mais recentes.",
@@ -129,17 +129,17 @@
       title: "Stocks, Technical Analysis and Price Action",
       intro: "Stocks, indices, Forex, gold and crypto in one analysis center with charts, indicators, calendar, market overview and Price Action training.",
       tools: "Market analysis",
-      toolsSub: "Use the stock-market and technical-analysis tools. Choose any asset and timeframe in the chart and summary; the other tabs broaden the market view.",
+      toolsSub: "Use the stock-market and technical-analysis tools. Choose any asset and timeframe in the chart and trend; the other tabs broaden the market view.",
       chart: "Chart",
-      technical: "Technical summary",
-      pairs: "Binance pairs", overview: "Stocks & indices", heatmap: "Forex heatmap", calendar: "Economic calendar", pairsTitle: "Trends for leading USDT pairs", pairsHelp: "Classification calculated for the selected timeframe. Tap a pair to open it in the chart and summary.", sideways: "Sideways", noSideways: "No sideways pair in this timeframe.", pairsLoading: "Loading leading pairs by volume and calculating trends…",
+      technical: "TREND",
+      pairs: "Binance pairs", overview: "Stocks & indices", heatmap: "Forex heatmap", calendar: "Economic calendar", pairsTitle: "Trends for leading USDT pairs", pairsHelp: "Classification calculated for the selected timeframe. Tap a pair to open it in the chart and trend.", sideways: "Sideways", noSideways: "No sideways pair in this timeframe.", pairsLoading: "Loading leading pairs by volume and calculating trends…",
       timeframe: "Analysis timeframe",
       daily: "Daily",
       searchAsset: "Open any asset",
       searchPlaceholder: "E.g. AVAXUSDT or NASDAQ:AAPL",
       openAsset: "Open",
       searchHelp: "This asset will be used in both the chart and technical summary, even when it is not listed as trending up or down.",
-      fibTitle: "Breakout? Apply Fibonacci!", fibLoading: "Scanning confirmed breakouts and calculating Fibonacci…", fibUnavailable: "Automatic Fibonacci analysis is available for Binance pairs.", fibNone: "No confirmed channel breakout in the latest 12 candles.", fibBullish: "Bullish breakout", fibBearish: "Bearish breakout", fibImpulse: "Impulse", fibCurrent: "Current price", fibInvalidation: "Invalidation", fibVolume: "Breakout volume", fibConfirmed: "Confirmed", fibModerate: "No expansion", fibLevels: "Retracements and extensions", fibEducational: "Educational technical reading. Levels adapt to the selected asset and timeframe.",
+      fibTitle: "Fibonacci", fibLoading: "Scanning confirmed breakouts and calculating Fibonacci…", fibUnavailable: "Automatic Fibonacci analysis is available for Binance pairs.", fibNone: "No confirmed channel breakout in the latest 12 candles.", fibBullish: "Bullish breakout", fibBearish: "Bearish breakout", fibImpulse: "Impulse", fibCurrent: "Current price", fibInvalidation: "Invalidation", fibVolume: "Breakout volume", fibConfirmed: "Confirmed", fibModerate: "No expansion", fibLevels: "Retracements and extensions", fibEducational: "Educational technical reading. Levels adapt to the selected asset and timeframe.",
       loading: "Loading market data…",
       error: "This tool could not be loaded right now.",
       locked: "Active subscribers only",
@@ -193,9 +193,9 @@
       title: "Bolsa, Análisis Técnico y Price Action",
       intro: "Acciones, índices, Forex, oro y cripto en un centro de análisis con gráficos, indicadores, calendario, visión de mercados y formación en Price Action.",
       tools: "Análisis de mercado",
-      toolsSub: "Usa las herramientas de Bolsa y análisis técnico. En el gráfico y el resumen, elige libremente el activo y el período; las demás pestañas amplían la lectura del mercado.",
+      toolsSub: "Usa las herramientas de Bolsa y análisis técnico. En el gráfico y la tendencia, elige libremente el activo y el período; las demás pestañas amplían la lectura del mercado.",
       chart: "Gráfico",
-      technical: "Resumen técnico",
+      technical: "TENDENCIA",
       pairs: "Pares Binance", overview: "Bolsa e índices", heatmap: "Mapa de calor Forex", calendar: "Calendario económico", pairsTitle: "Tendencias de los principales pares USDT", pairsHelp: "Clasificación calculada en el período seleccionado. Toca un par para abrirlo en el gráfico y el resumen.", sideways: "Lateralidad", noSideways: "No hay pares laterales en este período.", pairsLoading: "Cargando los principales pares por volumen y calculando tendencias…",
       timeframe: "Período del análisis",
       daily: "Diario",
@@ -203,7 +203,7 @@
       searchPlaceholder: "Ej.: AVAXUSDT o NASDAQ:AAPL",
       openAsset: "Abrir",
       searchHelp: "Este activo se utilizará en el gráfico y el resumen técnico, aunque no aparezca en la selección de alza o baja.",
-      fibTitle: "¿Rompió? ¡Fibonacci!", fibLoading: "Buscando rupturas confirmadas y calculando Fibonacci…", fibUnavailable: "El análisis automático de Fibonacci está disponible para pares de Binance.", fibNone: "No hubo ruptura confirmada del canal en las últimas 12 velas.", fibBullish: "Ruptura alcista", fibBearish: "Ruptura bajista", fibImpulse: "Impulso", fibCurrent: "Precio actual", fibInvalidation: "Invalidación", fibVolume: "Volumen de ruptura", fibConfirmed: "Confirmado", fibModerate: "Sin expansión", fibLevels: "Retrocesos y extensiones", fibEducational: "Lectura técnica educativa. Los niveles se adaptan al activo y período seleccionados.",
+      fibTitle: "Fibonacci", fibLoading: "Buscando rupturas confirmadas y calculando Fibonacci…", fibUnavailable: "El análisis automático de Fibonacci está disponible para pares de Binance.", fibNone: "No hubo ruptura confirmada del canal en las últimas 12 velas.", fibBullish: "Ruptura alcista", fibBearish: "Ruptura bajista", fibImpulse: "Impulso", fibCurrent: "Precio actual", fibInvalidation: "Invalidación", fibVolume: "Volumen de ruptura", fibConfirmed: "Confirmado", fibModerate: "Sin expansión", fibLevels: "Retrocesos y extensiones", fibEducational: "Lectura técnica educativa. Los niveles se adaptan al activo y período seleccionados.",
       loading: "Cargando datos del mercado…",
       error: "No fue posible cargar esta herramienta.",
       locked: "Recurso exclusivo para suscriptores activos",
@@ -257,9 +257,9 @@
       title: "Акции, технический анализ и Price Action",
       intro: "Акции, индексы, Forex, золото и крипто в одном центре анализа с графиками, индикаторами, календарём, обзором рынков и обучением Price Action.",
       tools: "Анализ рынка",
-      toolsSub: "Используйте инструменты фондового рынка и технического анализа. На графике и в сводке можно выбрать актив и период; остальные вкладки расширяют обзор рынка.",
+      toolsSub: "Используйте инструменты фондового рынка и технического анализа. На графике и в тенденции можно выбрать актив и период; остальные вкладки расширяют обзор рынка.",
       chart: "График",
-      technical: "Техническая сводка",
+      technical: "ТЕНДЕНЦИЯ",
       pairs: "Пары Binance", overview: "Акции и индексы", heatmap: "Тепловая карта Forex", calendar: "Экономический календарь", pairsTitle: "Тренды ведущих пар USDT", pairsHelp: "Классификация рассчитана для выбранного периода. Нажмите пару, чтобы открыть её на графике и в сводке.", sideways: "Боковой рынок", noSideways: "На этом периоде боковых пар нет.", pairsLoading: "Загрузка ведущих пар по объёму и расчёт трендов…",
       timeframe: "Период анализа",
       daily: "День",
@@ -267,7 +267,7 @@
       searchPlaceholder: "Напр.: AVAXUSDT или NASDAQ:AAPL",
       openAsset: "Открыть",
       searchHelp: "Этот актив будет использоваться на графике и в технической сводке, даже если его нет в списке роста или снижения.",
-      fibTitle: "Пробой? Фибоначчи!", fibLoading: "Поиск подтверждённых пробоев и расчёт Фибоначчи…", fibUnavailable: "Автоматический анализ Фибоначчи доступен для пар Binance.", fibNone: "За последние 12 свечей подтверждённого пробоя канала нет.", fibBullish: "Пробой вверх", fibBearish: "Пробой вниз", fibImpulse: "Импульс", fibCurrent: "Текущая цена", fibInvalidation: "Отмена", fibVolume: "Объём пробоя", fibConfirmed: "Подтверждено", fibModerate: "Без роста", fibLevels: "Коррекции и расширения", fibEducational: "Учебный технический анализ. Уровни адаптируются к активу и периоду.",
+      fibTitle: "Фибоначчи", fibLoading: "Поиск подтверждённых пробоев и расчёт Фибоначчи…", fibUnavailable: "Автоматический анализ Фибоначчи доступен для пар Binance.", fibNone: "За последние 12 свечей подтверждённого пробоя канала нет.", fibBullish: "Пробой вверх", fibBearish: "Пробой вниз", fibImpulse: "Импульс", fibCurrent: "Текущая цена", fibInvalidation: "Отмена", fibVolume: "Объём пробоя", fibConfirmed: "Подтверждено", fibModerate: "Без роста", fibLevels: "Коррекции и расширения", fibEducational: "Учебный технический анализ. Уровни адаптируются к активу и периоду.",
       loading: "Загрузка рыночных данных…",
       error: "Не удалось загрузить инструмент.",
       locked: "Только для активных подписчиков",
@@ -488,9 +488,20 @@
     };
   }
 
+  async function marketFetch(url, init = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(url, { ...init, signal: controller.signal });
+      // Keep the deadline until the body is fully received as well.
+      const data = await response.json();
+      return { ok: response.ok, status: response.status, json: async () => data };
+    } finally { clearTimeout(timer); }
+  }
+
   async function fetchDirection(asset) {
     const url = `${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=1h&limit=30`;
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await marketFetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`market_${response.status}`);
     const rows = await response.json();
     if (!Array.isArray(rows)) throw new Error("invalid_market_data");
@@ -694,7 +705,7 @@
   }
 
   async function leadingBinancePairs() {
-    const response = await fetch(BINANCE_24H_DATA, { cache: "no-store" });
+    const response = await marketFetch(BINANCE_24H_DATA, { cache: "no-store" });
     if (!response.ok) throw new Error("pairs_market");
     const rows = await response.json();
     const excluded = new Set(["USDC", "FDUSD", "TUSD", "USDP", "DAI", "EUR", "TRY", "BRL"]);
@@ -709,7 +720,7 @@
 
   async function pairDirectionAt(asset, timeframe) {
     const limit = Math.min(180, 60 * timeframe.aggregate);
-    const response = await fetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
+    const response = await marketFetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
     if (!response.ok) throw new Error("pair_direction");
     const rows = await response.json();
     const candles = aggregateCandles(rows, timeframe.aggregate);
@@ -819,7 +830,7 @@
     panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(asset.label)} · ${esc(selectedTimeframe)}</span></div><div class="marketFibStatus">${esc(copy.fibLoading)}</div>`;
     try {
       const limit = Math.min(500, 180 * timeframe.aggregate);
-      const response = await fetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
+      const response = await marketFetch(`${BINANCE_MARKET_DATA}?symbol=${encodeURIComponent(asset.api)}&interval=${encodeURIComponent(timeframe.market)}&limit=${limit}`, { cache: "no-store" });
       if (!response.ok) throw new Error("fib_market");
       const rows = await response.json();
       const result = fibonacciBreakout(aggregateCandles(rows, timeframe.aggregate));
@@ -899,23 +910,26 @@
 
   async function loadChart(force = false) {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
-    if (!host) return;
+    if (!host || currentWidget !== "chart") return;
     if (!options.active) return lockedView("chart");
     document.getElementById("marketExpand").hidden = false;
-    host.style.height = "auto";
-    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionStatus">${esc(copy.scannerLoading)}</div></div><div class="marketChartFrame"><div class="marketWidgetLoading">${esc(copy.loading)}</div></div>`;
+    selectedAsset = selectedAsset || DIRECTION_SYMBOLS[0];
+    saveMarketState();
+    renderChart(directionSnapshot);
+    await refreshDirections(host, force);
+  }
 
-    try {
-      const snapshot = await scanDirections(force);
-      const directional = [...sortedDirectional(snapshot, "up"), ...sortedDirectional(snapshot, "down")];
-      if (!selectedAsset) selectedAsset = directional[0]?.asset || DIRECTION_SYMBOLS[0];
-      saveMarketState();
-      renderChart(snapshot, false);
-    } catch {
-      selectedAsset = selectedAsset || DIRECTION_SYMBOLS[0];
-      renderChart(directionSnapshot, true);
-    }
+  async function refreshDirections(host, force) {
+    let snapshot, error = false;
+    try { snapshot = await scanDirections(force); error = !snapshot.length; }
+    catch { snapshot = directionSnapshot; error = true; }
+    if (!host.isConnected || currentWidget !== "chart" || document.getElementById("marketWidget") !== host) return;
+    const panel = host.querySelector(".marketDirectionPanel");
+    if (!panel) return;
+    const replacement = document.createElement("div");
+    replacement.innerHTML = scannerMarkup(snapshot, COPY[options.language] || COPY.pt, error);
+    panel.replaceWith(replacement.firstElementChild);
+    bindScanner(host, snapshot);
   }
 
   function loadTechnical() {
@@ -925,7 +939,8 @@
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
     host.style.height = "auto";
-    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${symbolPickerMarkup(copy)}${timeframeMarkup(copy)}${fibonacciPanelMarkup()}`;
+    host.innerHTML = `<div class="marketDirectionPanel"><div class="marketDirectionTop"><strong>${esc(copy.selected)}: ${esc(selectedAsset?.label || "XAU/USD")}</strong><button id="marketTechnicalRefresh" type="button">↻ ${esc(copy.refresh)}</button></div><div class="marketDirectionStatus">${esc(copy.toolsSub)}</div></div>${symbolPickerMarkup(copy)}${timeframeMarkup(copy)}${fibonacciPanelMarkup()}`;
+    host.querySelector("#marketTechnicalRefresh").onclick = loadTechnical;
     host.appendChild(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
     bindSymbolPicker(host);
     bindTimeframes(host);
@@ -952,6 +967,24 @@
     if (kind === "overview" || kind === "heatmap" || kind === "calendar") return loadGenericWidget(kind);
     return loadChart(false);
   }
+
+  let liveRefreshAt = 0;
+  let liveRefreshing = false;
+  async function refreshLiveTools() {
+    const host = document.getElementById("marketWidget");
+    if (document.hidden || !host || !options?.active || liveRefreshing || !["chart", "technical"].includes(currentWidget)) return;
+    if (Date.now() - liveRefreshAt < 60000) return;
+    liveRefreshing = true; liveRefreshAt = Date.now();
+    try {
+      if (currentWidget === "technical") {
+        host.querySelector(".marketTechnicalFrame")?.replaceWith(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
+        loadFibonacci(host);
+      }
+      else { await refreshDirections(host, true); if (host.isConnected && currentWidget === "chart") loadFibonacci(host); }
+    } finally { liveRefreshing = false; }
+  }
+  setInterval(() => void refreshLiveTools(), 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) void refreshLiveTools(); });
 
   function toggleExpand() {
     const section = document.getElementById("marketAnalysisSection");
@@ -1036,3 +1069,4 @@
 
   window.EduCashProMarkets = { render };
 })();
+

@@ -153,7 +153,7 @@
     })().catch(error=>{professionalPromise=null;throw error}));
   }
   function loadHelp(){if(window.EduCashProHelp)return Promise.resolve(true);return helpPromise||(helpPromise=script("./help-center.js").catch(error=>{helpPromise=null;throw error}))}
-  function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js").catch(error=>{marketPromise=null;throw error}))}
+  function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js?market=20261005.4").catch(error=>{marketPromise=null;throw error}))}
   function loadQr(){return qrPromise||(qrPromise=script("https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",{external:true}).catch(error=>{qrPromise=null;throw error}))}
   function loadQrScanner(){return qrScannerPromise||(qrScannerPromise=script("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js",{external:true}).catch(error=>{qrScannerPromise=null;throw error}))}
 
