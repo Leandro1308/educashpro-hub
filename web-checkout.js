@@ -6,6 +6,12 @@
   const WALLET_REF = "https://telegram.me/walt/start?startapp=ref-4-QhxQcMqCsfw";
   let ui = null, unsubscribe = null, layer = null, busy = false, verifiedWallet = "", pollTimer = 0;
   let selectedAction = "pay", pendingOpen = false, challenge = null, closed = true;
+  const PLANS = {
+    pt:{monthly:"Mensal",annual:"Anual",dailyNote:"Ciclo atual: 1 USDT por 24 horas. Renovação manual.",yearNote:"365 dias de acesso. Renovação manual."},
+    en:{monthly:"Monthly",annual:"Annual",dailyNote:"Current cycle: 1 USDT per 24 hours. Manual renewal.",yearNote:"365 days of access. Manual renewal."},
+    es:{monthly:"Mensual",annual:"Anual",dailyNote:"Ciclo actual: 1 USDT por 24 horas. Renovación manual.",yearNote:"365 días de acceso. Renovación manual."},
+    ru:{monthly:"Месячная",annual:"Годовая",dailyNote:"Текущий цикл: 1 USDT за 24 часа. Ручное продление.",yearNote:"365 дней доступа. Ручное продление."}
+  };
   const COPY = {
     pt: {title:"Prepare sua carteira e assine",close:"Fechar",login:"Entre com seu e-mail para preservar sua conta e indicação.",steps:["Crie ou acesse sua carteira na Walt pelo botão abaixo. Para conectar ao site, use a carteira não custodial (DeFi Account / TON Wallet), quando disponível.","Deposite USDT na rede TON. Reserve o valor da assinatura e, se possível, US$ 1 adicional para taxas de transação. Confira a rede e o endereço antes de depositar.","Na opção de troca da carteira, converta esse valor adicional de USDT em TON. Mantenha o valor da assinatura em USDT. A reserva em TON pode servir para futuras renovações; o custo varia e pode exigir reposição.","Volte a esta página, conecte a carteira e confira o valor antes de autorizar o pagamento."],create:"Criar ou acessar carteira na Walt",connect:"Já preparei minha carteira — conectar",pay:"Pagar assinatura",connecting:"Confirme a conexão na carteira. Essa etapa não cobra a assinatura.",ready:"Carteira verificada e vinculada à sua conta. Você pode autorizar o pagamento.",sent:"Transação enviada. Aguardando confirmação na blockchain…",done:"Assinatura confirmada! Seu acesso foi atualizado.",wait:"A confirmação ainda está em processamento. Você pode fechar esta página; confira sua assinatura em Minha Área. Não pague novamente enquanto houver uma compra em processamento.",error:"Não foi possível concluir. Confira sua conexão e os saldos de USDT e TON e tente novamente.",price:"Valor da assinatura",fee:"A taxa de transação é exibida pela carteira antes de confirmar.",back:"Voltar à minha área",other:"Se a Walt estiver indisponível, use outra carteira compatível com TON Connect.",loading:"Consultando o valor atual…"},
     en: {title:"Prepare your wallet and subscribe",close:"Close",login:"Sign in with email to preserve your account and referral.",steps:["Create or open your Walt wallet using the button below. To connect to the website, use its self-custodial wallet (DeFi Account / TON Wallet), when available.","Deposit USDT on the TON network. Set aside the subscription amount and, if possible, an extra US$1 for transaction fees. Check the network and address before depositing.","Use the wallet's swap feature to convert the extra USDT into TON. Keep the subscription amount in USDT. The TON reserve can cover future renewal fees; costs vary and you may need to replenish it.","Return here, connect your wallet and review the amount before authorizing payment."],create:"Create or open wallet in Walt",connect:"My wallet is ready — connect",pay:"Pay subscription",connecting:"Approve the connection in your wallet. This step does not charge the subscription.",ready:"Wallet verified and linked to your account. You can authorize payment.",sent:"Transaction sent. Waiting for blockchain confirmation…",done:"Subscription confirmed! Your access has been updated.",wait:"Confirmation is still processing. You may close this page and check My Area. Do not pay again while a purchase is processing.",error:"Could not complete. Check your connection and USDT and TON balances, then try again.",price:"Subscription amount",fee:"Your wallet displays the transaction fee before confirmation.",back:"Back to my area",other:"If Walt is unavailable, use another TON Connect compatible wallet.",loading:"Checking the current price…"},
@@ -56,7 +62,7 @@
         }catch(error){status(copy().error+" "+error.message)}
       });
       await ui.openModal();
-    }catch(error){status(copy().error+" "+(error?.message||""))}finally{busy=false}
+    }catch(error){status(copy().error+" "+(error?.message||""))}finally{busy=false;if(layer)layer.querySelector("[data-plan]").disabled=false}
   }
   async function confirmPayment(previousUntil, previousActive, attempt=0){
     if(closed)return;
@@ -76,7 +82,7 @@
   async function pay(){
     if(busy || !verifiedWallet || closed)return;
     if(ui?.wallet?.account?.address!==verifiedWallet){status(copy().connecting);return;}
-    busy=true;const button=layer.querySelector("[data-pay]");button.disabled=true;
+    busy=true;const button=layer.querySelector("[data-pay]");button.disabled=true;layer.querySelector("[data-plan]").disabled=true;
     try{
       const before=await request("/api/platform-account/overview",{method:"POST",body:"{}"});
       const qs=new URLSearchParams({owner:verifiedWallet,action:selectedAction});
@@ -90,20 +96,35 @@
   }
   async function open(action="pay"){
     if(!platform.isWeb())return false;
-    selectedAction=["pay","renew","lifetime"].includes(action)?action:"pay";
+    selectedAction=["pay","renew","annual"].includes(action)?action:"pay";
     if(!session()?.token){pendingOpen=true;window.EduCashProWebEntry?.openEmail?.();return true;}
     close();closed=false;verifiedWallet="";busy=false;
     document.getElementById("accessModal")?.classList.add("hidden");
-    const c=copy();layer=document.createElement("div");layer.className="webCheckoutLayer";
-    layer.innerHTML=`<section class="webCheckoutSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><button data-close aria-label="${esc(c.close)}">✕</button><h2>${esc(c.title)}</h2><p data-price>${esc(c.loading)}</p><ol>${c.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol><a class="wideButton" href="${WALLET_REF}" target="_blank" rel="noopener noreferrer">${esc(c.create)}</a><p>${esc(c.fee)}</p><button class="wideButton" data-connect>${esc(c.connect)}</button><button class="wideButton" data-pay disabled>${esc(c.pay)}</button><p data-status role="status" aria-live="polite"></p><p>${esc(c.other)}</p><button class="secondaryButton" data-back>${esc(c.back)}</button></section>`;
+    const c=copy();const plans=PLANS[language()]||PLANS.pt;layer=document.createElement("div");layer.className="webCheckoutLayer";
+    layer.innerHTML=`<section class="webCheckoutSheet" role="dialog" aria-modal="true" aria-label="${esc(c.title)}"><button data-close aria-label="${esc(c.close)}">✕</button><h2>${esc(c.title)}</h2><select data-plan aria-label="${esc(c.price)}" style="width:100%;padding:12px;font-size:16px"><option value="monthly">${esc(plans.monthly)}</option><option value="annual">${esc(plans.annual)}</option></select><p data-period></p><p data-price>${esc(c.loading)}</p><ol>${c.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol><a class="wideButton" href="${WALLET_REF}" target="_blank" rel="noopener noreferrer">${esc(c.create)}</a><p>${esc(c.fee)}</p><button class="wideButton" data-connect>${esc(c.connect)}</button><button class="wideButton" data-pay disabled>${esc(c.pay)}</button><p data-status role="status" aria-live="polite"></p><p>${esc(c.other)}</p><button class="secondaryButton" data-back>${esc(c.back)}</button></section>`;
     if(!document.getElementById("webCheckoutStyle")){const s=document.createElement("style");s.id="webCheckoutStyle";s.textContent=".webCheckoutLayer{position:fixed;inset:0;z-index:9998;background:rgba(1,7,15,.85);display:grid;place-items:center;padding:15px}.webCheckoutLayer.walletPickerOpen{visibility:hidden;pointer-events:none}.webCheckoutSheet{width:min(100%,560px);box-sizing:border-box;max-height:92vh;overflow:auto;background:#0d1b2d;color:#fff;border-radius:22px;padding:24px}.webCheckoutSheet li{margin:15px 0;line-height:1.6}.webCheckoutSheet p{line-height:1.5;color:#bdd0df}.webCheckoutSheet [data-close]{float:right;background:transparent;color:white;border:0;font-size:24px}.webCheckoutSheet .wideButton{display:block;box-sizing:border-box;width:100%;text-align:center;margin:12px 0;padding:14px;text-decoration:none}.webCheckoutSheet button:disabled{opacity:.5}";document.head.appendChild(s)}
     document.body.appendChild(layer);layer.querySelector("[data-close]").onclick=close;layer.querySelector("[data-back]").onclick=close;layer.querySelector("[data-connect]").onclick=connect;layer.querySelector("[data-pay]").onclick=pay;
-    try{const cfg=await request("/api/webapp/config");if(!closed){const value=Number(selectedAction==="lifetime"?cfg.lifetimePriceUsdt:cfg.planPriceUsdt);if(!Number.isFinite(value)||value<=0)throw new Error("price_unavailable");layer.querySelector("[data-price]").textContent=`${c.price}: ${value.toFixed(2)} USDT`;}}
+    const selector=layer.querySelector("[data-plan]");
+    selector.value=selectedAction==="annual"?"annual":"monthly";
+    let config=null;
+    function showPlan(){
+      const annual=selector.value==="annual";
+      selectedAction=annual?"annual":"pay";
+      const value=Number(annual?config?.annualPriceUsdt:config?.planPriceUsdt);
+      layer.querySelector("[data-period]").textContent=annual?plans.yearNote:plans.dailyNote;
+      layer.querySelector("[data-price]").textContent=Number.isFinite(value)&&value>0?`${c.price}: ${value.toFixed(2)} USDT`:c.loading;
+      const unavailable=!Number.isFinite(value)||value<=0;
+      layer.querySelector("[data-connect]").disabled=unavailable;
+      layer.querySelector("[data-pay]").disabled=unavailable||!verifiedWallet;
+    }
+    selector.onchange=showPlan;
+    showPlan();
+    try{config=await request("/api/webapp/config");if(!closed)showPlan();}
     catch(error){status(c.error);layer?.querySelector("[data-connect]")?.setAttribute("disabled","");}
     return true;
   }
   window.EduCashProWebCheckout={open,close};
   window.addEventListener("educashpro:web-session-ready",()=>{if(pendingOpen){pendingOpen=false;void open(selectedAction)}});
   const requested=new URL(location.href).searchParams.get("subscribe");
-  if(requested){selectedAction=["pay","renew","lifetime"].includes(requested)?requested:"pay";pendingOpen=true;window.addEventListener("educashpro:entry-api-ready",()=>{if(session()?.token&&pendingOpen){pendingOpen=false;void open(selectedAction)}},{once:true});setTimeout(()=>{if(pendingOpen&&session()?.token){pendingOpen=false;void open(selectedAction)}},1500);}
+  if(requested){selectedAction=["pay","renew","annual"].includes(requested)?requested:"pay";pendingOpen=true;window.addEventListener("educashpro:entry-api-ready",()=>{if(session()?.token&&pendingOpen){pendingOpen=false;void open(selectedAction)}},{once:true});setTimeout(()=>{if(pendingOpen&&session()?.token){pendingOpen=false;void open(selectedAction)}},1500);}
 })();
