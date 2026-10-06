@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261006.4";
+  const VERSION="20261006.5";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -131,6 +131,7 @@
     return financePromise||(financePromise=(async()=>{
       await Promise.allSettled([style("./monthly-finance-control.css"),style("./tools-hub-v2.css")]);
       await script("./monthly-finance-sharing.js");
+      await script("./finance-model.js");
       await script("./monthly-finance-control.js");
       return true;
     })().catch(error=>{financePromise=null;throw error}));

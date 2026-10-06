@@ -69,12 +69,14 @@
   let ownerWorkspace = null;
   let lastRecord = { income: 0, expenses: [] };
   let lastMonth = "";
+  let displayCurrency = "USD";
   let lastCategories = [];
   let syncTimer = null;
+  let viewedWorkspace = null;
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   const c = () => COPY[options?.language] || COPY.pt;
-  const fmt = (value) => new Intl.NumberFormat(options?.language === "pt" ? "pt-BR" : options?.language || "en", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
+  const fmt = (value) => new Intl.NumberFormat(options?.language === "pt" ? "pt-BR" : options?.language || "en", { style: "currency", currency: displayCurrency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
   const totals = (record) => { const spent = (record?.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0); return { spent, balance: Number(record?.income || 0) - spent }; };
   const categoryName = (id) => { const source = lastCategories.length ? lastCategories.map((item) => [item[0], item[2]]) : c().categories; return source.find((item) => item[0] === id)?.[1] || id; };
 
@@ -110,12 +112,29 @@
     catch { workspaces = []; ownerWorkspace = null; }
   }
 
+  let syncReady=false, syncing=false, queuedData=null, syncError="";
+  const conflictCopy={pt:"O controle foi atualizado por outra pessoa. Seus registros locais foram preservados. Abra o controle compartilhado para conferir antes de tentar novamente.",en:"Someone else updated this control. Your local entries were kept. Open the shared control and review it before trying again.",es:"Otra persona actualizó este control. Tus registros locales se conservaron. Abre el control compartido y revísalo antes de volver a intentarlo.",ru:"Другой участник обновил учёт. Локальные записи сохранены. Откройте общий учёт и проверьте изменения перед повторной попыткой."};
   async function sync(data) {
-    if (!options?.active || !ownerWorkspace?.workspaceId) return;
+    if(!options?.active||!ownerWorkspace?.workspaceId||!syncReady)return;
+    queuedData=JSON.parse(JSON.stringify(data||options.read?.()||{}));
     window.clearTimeout(syncTimer);
-    await new Promise((resolve) => { syncTimer = window.setTimeout(resolve, 350); });
-    try { await api("/api/monthly-finance/share/sync", { workspaceId: ownerWorkspace.workspaceId, months: data || options.read?.() || {} }); }
-    catch (error) { console.log("[EduCashPro] finance shared sync:", error); }
+    syncTimer=window.setTimeout(flushSync,500);
+  }
+  async function flushSync(){
+    if(syncing||!queuedData||!syncReady)return;
+    syncing=true;
+    const data=queuedData;queuedData=null;
+    try{
+      const result=await api("/api/monthly-finance/share/sync",{workspaceId:ownerWorkspace.workspaceId,months:data,expectedUpdatedAt:ownerWorkspace.updatedAt});
+      ownerWorkspace.updatedAt=result.updatedAt;
+      if(!queuedData)options.markSynced?.();syncError="";
+    }catch(error){
+      syncReady=false;
+      const message=String(error?.message||'').includes('sharing_conflict')?conflictCopy[options.language]:c().error;
+      syncError=message;
+      const node=document.getElementById("financeNotice");if(node)node.textContent=message;
+      else window.alert(message);
+    }finally{syncing=false;if(queuedData&&syncReady)void flushSync();}
   }
 
   function renderSharedAccess() {
@@ -142,24 +161,32 @@
   }
 
   function bind({ record, month, categories } = {}) {
-    lastRecord = record || lastRecord; lastMonth = month || lastMonth; lastCategories = Array.isArray(categories) ? categories : lastCategories;
+    displayCurrency = record?.currency || displayCurrency; lastRecord = record || lastRecord; lastMonth = month || lastMonth; lastCategories = Array.isArray(categories) ? categories : lastCategories;
     const share = document.getElementById("financeShareAction");
     const pdf = document.getElementById("financePdfAction");
     if (share) { share.textContent = `${options?.active ? "👥" : "🔒"} ${options?.active ? c().share : c().lockedShare}`; share.classList.toggle("locked", !options?.active); share.onclick = () => options?.active ? openManager() : showPremiumCard("share"); }
     if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => options?.active ? exportPdf(lastRecord, lastMonth, "") : showPremiumCard("pdf"); }
     renderSharedAccess();
+    if(syncError){const node=document.getElementById("financeNotice");if(node)node.textContent=syncError;const root=document.getElementById("financeSharedAccess");if(root&&ownerWorkspace){const button=document.createElement("button");button.className="wideButton";button.textContent=c().open;button.onclick=()=>openViewer(ownerWorkspace.workspaceId,lastMonth);root.appendChild(button);}}
   }
 
   async function init(args = {}) {
+    window.clearTimeout(syncTimer);queuedData=null;syncReady=false;
     options = args;
+    const startingData=JSON.stringify(options.read?.()||{});
     await refresh();
     if (options?.active && options?.session?.profile?.userId && !ownerWorkspace && typeof options?.api === "function") {
       try {
         await api("/api/monthly-finance/share/create", { months: options.read?.() || {} });
+        options.markSynced?.();
         await refresh();
       } catch (error) {
         console.log("[EduCashPro] finance cloud init:", error);
       }
+    }
+    if(options.active && ownerWorkspace?.workspaceId){
+      try{const data=await api("/api/monthly-finance/owner-data",{workspaceId:ownerWorkspace.workspaceId});if(JSON.stringify(options.read?.()||{})!==startingData || options.hasPending?.()){syncError=conflictCopy[options.language];syncReady=false;}else{options.hydrate?.(data.months || {});ownerWorkspace.updatedAt=data.updatedAt;syncReady=true;syncError="";}}
+      catch{syncReady=false;}
     }
     bind({});
   }
@@ -268,6 +295,7 @@
         }
       };
     });
+    guardSharedActions();
   }
 
   async function openViewer(workspaceId, month = lastMonth || new Date().toISOString().slice(0, 7)) {
@@ -287,15 +315,18 @@
       return;
     }
 
+    const entryLabels={pt:{description:"Descrição",date:"Data / vencimento",paid:"Pago",pending:"A pagar"},en:{description:"Description",date:"Date / due date",paid:"Paid",pending:"To pay"},es:{description:"Descripción",date:"Fecha / vencimiento",paid:"Pagado",pending:"Por pagar"},ru:{description:"Описание",date:"Дата / срок оплаты",paid:"Оплачено",pending:"К оплате"}}[options.language];
     const workspace = result.workspace || {};
+    viewedWorkspace = workspace;
     const record = result.record || { income: 0, expenses: [] };
+    displayCurrency = record.currency || "USD";
     const sum = totals(record);
     const categories = lastCategories.length ? lastCategories : [
       ["housing","🏠",categoryName("housing")],["food","🍽️",categoryName("food")],["transport","🚗",categoryName("transport")],["health","❤️",categoryName("health")],["education","📚",categoryName("education")],["debts","💳",categoryName("debts")],["leisure","🎉",categoryName("leisure")],["investment","📈",categoryName("investment")],["other","•••",categoryName("other")]
     ];
 
     const history = (record.expenses || []).length
-      ? record.expenses.map((item) => `<article class="financeHistoryItem"><span>${esc(categories.find((cat) => cat[0] === item.category)?.[1] || "•")}</span><div><strong>${esc(categoryName(item.category))}</strong><small>${new Date(item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language)}</small></div><b>${fmt(item.amount)}</b>${workspace.canEdit ? `<button data-shared-edit="${esc(item.id)}" aria-label="${esc(labels.edit)}">✎</button><button data-shared-remove="${esc(item.id)}" aria-label="${esc(labels.remove)}">×</button>` : ""}</article>`).join("")
+      ? record.expenses.map((item) => `<article class="financeHistoryItem"><span>${esc(categories.find((cat) => cat[0] === item.category)?.[1] || "•")}</span><div><strong>${esc(item.description || categoryName(item.category))}</strong><small>${new Date(item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language)}</small></div><b>${fmt(item.amount)}</b>${workspace.canEdit ? `<button data-shared-edit="${esc(item.id)}" aria-label="${esc(labels.edit)}">✎</button><button data-shared-remove="${esc(item.id)}" aria-label="${esc(labels.remove)}">×</button>` : ""}</article>`).join("")
       : `<div class="empty">${esc(copy.empty)}</div>`;
 
     document.getElementById("content").innerHTML = `
@@ -308,7 +339,7 @@
         ${workspace.canEdit ? `
           <section class="financeSharedEntry">
             <div class="financeSharedFormBlock"><h3>＋ ${esc(labels.setIncome)}</h3><div class="financeSharedFormRow"><input id="sharedIncomeValue" type="number" min="0" step="0.01" inputmode="decimal" value="${Number(record.income || 0)}"><button id="sharedIncomeSave" class="wideButton">${esc(labels.saveIncome)}</button></div></div>
-            <div class="financeSharedFormBlock"><h3>− ${esc(labels.addExpense)}</h3><div class="financeSharedExpenseGrid"><input id="sharedExpenseValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${esc(labels.amount)}"><select id="sharedExpenseCategory"><option value="">${esc(labels.category)}</option>${categories.map((cat) => `<option value="${esc(cat[0])}">${esc(cat[1] + " " + cat[2])}</option>`).join("")}</select></div><button id="sharedExpenseSave" class="wideButton">${esc(labels.saveExpense)}</button><button id="sharedExpenseCancel" class="textButton hidden" type="button">×</button><p id="sharedExpenseMessage" class="financeMessage"></p></div>
+            <div class="financeSharedFormBlock"><h3>− ${esc(labels.addExpense)}</h3><div class="financeSharedExpenseGrid"><input id="sharedExpenseValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${esc(labels.amount)}"><select id="sharedExpenseCategory"><option value="">${esc(labels.category)}</option>${categories.map((cat) => `<option value="${esc(cat[0])}">${esc(cat[1] + " " + cat[2])}</option>`).join("")}</select><input id="sharedExpenseDescription" maxlength="160" placeholder="${esc(entryLabels.description)}" aria-label="${esc(entryLabels.description)}"><input id="sharedExpenseDate" type="date" aria-label="${esc(entryLabels.date)}" value="${month}-01"><select id="sharedExpensePaid" aria-label="${esc(entryLabels.paid)}"><option value="true">${esc(entryLabels.paid)}</option><option value="false">${esc(entryLabels.pending)}</option></select></div><button id="sharedExpenseSave" class="wideButton">${esc(labels.saveExpense)}</button><button id="sharedExpenseCancel" class="textButton hidden" type="button">×</button><p id="sharedExpenseMessage" class="financeMessage"></p></div>
           </section>
         ` : ""}
         <section class="financeHistory"><header><div><h2>${esc(copy.history)}</h2><small>☁️ ${esc(copy.active)}</small></div></header>${history}</section>
@@ -316,7 +347,7 @@
 
     document.getElementById("financeViewerBack").onclick = () => options.backToFinance?.();
     document.getElementById("financeSharedRefresh").onclick = () => openViewer(workspaceId, month);
-    document.getElementById("financeViewerPdf")?.addEventListener("click", () => exportPdf(record, month, workspace.ownerName || ""));
+    document.getElementById("financeViewerPdf")?.addEventListener("click", () => exportPdf(record, month, workspace.ownerName || "", workspace));
     document.getElementById("financeViewerMonth").onchange = (event) => openViewer(workspaceId, event.target.value || month);
 
     if (!workspace.canEdit) return;
@@ -340,10 +371,14 @@
       const category = String(categoryInput.value || "");
       if (!(amount > 0)) { message.textContent = labels.invalid; return; }
       if (!category) { message.textContent = labels.choose; return; }
+      const description=document.getElementById("sharedExpenseDescription").value.trim();
+      const date=document.getElementById("sharedExpenseDate").value;
+      const paid=document.getElementById("sharedExpensePaid").value === "true";
+      if(!date || date.slice(0,7)!==month){message.textContent=labels.invalid;return;}
       if (editingId) {
-        await api("/api/monthly-finance/expense", { workspaceId, month, action: "update", expenseId: editingId, amount, category });
+        await api("/api/monthly-finance/expense", { workspaceId, month, action: "update", expenseId: editingId, amount, category, description, date, paid });
       } else {
-        await api("/api/monthly-finance/expense", { workspaceId, month, action: "add", expense: { amount, category, createdAt: Date.now() } });
+        await api("/api/monthly-finance/expense", { workspaceId, month, action: "add", expense: { amount, category, description, date, paid, createdAt: Date.now() } });
       }
       openViewer(workspaceId, month);
     };
@@ -355,6 +390,9 @@
         editingId = item.id;
         valueInput.value = item.amount;
         categoryInput.value = item.category;
+        document.getElementById("sharedExpenseDescription").value=item.description || "";
+        document.getElementById("sharedExpenseDate").value=item.date || month+"-01";
+        document.getElementById("sharedExpensePaid").value=String(item.paid !== false);
         saveButton.textContent = labels.updateExpense;
         cancelButton.classList.remove("hidden");
         valueInput.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -365,6 +403,9 @@
       editingId = "";
       valueInput.value = "";
       categoryInput.value = "";
+      document.getElementById("sharedExpenseDescription").value="";
+      document.getElementById("sharedExpenseDate").value=month+"-01";
+      document.getElementById("sharedExpensePaid").value="true";
       saveButton.textContent = labels.saveExpense;
       cancelButton.classList.add("hidden");
       message.textContent = "";
@@ -377,11 +418,21 @@
         openViewer(workspaceId, month);
       };
     });
+    guardSharedActions();
+  }
+
+  function guardSharedActions(){
+    document.querySelectorAll("#financeSharedWorkspaceRoot button").forEach(button=>{
+      const action=button.onclick;if(!action)return;
+      button.onclick=async event=>{button.disabled=true;try{await action(event);}catch(error){window.alert(String(error?.message||"").includes("sharing_conflict")?conflictCopy[options.language]:c().error);}finally{button.disabled=false;}};
+    });
   }
 
   function reportHtml(record, month, ownerName = "") {
+    displayCurrency = record.currency || "USD";
     const copy = c(); const sum = totals(record);
-    const rows = (record.expenses || []).map((item) => `<tr><td style="padding:7px;border-bottom:1px solid #ddd">${esc(new Date(item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language))}</td><td style="padding:7px;border-bottom:1px solid #ddd">${esc(categoryName(item.category))}</td><td style="padding:7px;border-bottom:1px solid #ddd;text-align:right">${esc(fmt(item.amount))}</td></tr>`).join("");
+    const labels={pt:{paid:"Pago",pending:"A pagar"},en:{paid:"Paid",pending:"To pay"},es:{paid:"Pagado",pending:"Por pagar"},ru:{paid:"Оплачено",pending:"К оплате"}}[options.language];
+    const rows = (record.expenses || []).map((item) => `<tr><td style="padding:7px;border-bottom:1px solid #ddd">${esc(new Date((item.date || "").length ? item.date+"T12:00:00" : item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language))}</td><td style="padding:7px;border-bottom:1px solid #ddd">${esc(item.description || categoryName(item.category))}<br><small>${esc(categoryName(item.category))} · ${esc(item.paid === false ? labels.pending : labels.paid)}</small></td><td style="padding:7px;border-bottom:1px solid #ddd;text-align:right">${esc(fmt(item.amount))}</td></tr>`).join("");
     return `<div style="font-family:Arial,sans-serif;color:#142033;background:#fff;padding:24px"><h1 style="margin:0 0 6px;font-size:24px">${esc(copy.report)}</h1><p style="margin:0 0 18px;color:#667">${ownerName ? `${esc(copy.owner)} ${esc(ownerName)} • ` : ""}${esc(month)}</p><table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.income)}</b><br>${esc(fmt(record.income))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.spent)}</b><br>${esc(fmt(sum.spent))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.balance)}</b><br>${esc(fmt(sum.balance))}</td></tr></table><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:7px">${esc(copy.date)}</th><th style="text-align:left;padding:7px">${esc(copy.category)}</th><th style="text-align:right;padding:7px">${esc(copy.value)}</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="padding:12px">${esc(copy.empty)}</td></tr>`}</tbody><tfoot><tr><td colspan="2" style="padding:8px;border-top:2px solid #222"><b>${esc(copy.total)}</b></td><td style="padding:8px;border-top:2px solid #222;text-align:right"><b>${esc(fmt(sum.spent))}</b></td></tr></tfoot></table><p style="margin-top:24px;font-size:10px;color:#777">${esc(copy.generated)} ${esc(new Date().toLocaleString(options.language === "pt" ? "pt-BR" : options.language))} • EduCashPro</p></div>`;
   }
 
@@ -392,7 +443,9 @@
     return window.__EDUCASHPRO_HTML2PDF__;
   }
 
-  async function exportPdf(record, month, ownerName = "") {
+  async function exportPdf(record, month, ownerName = "", workspace = null) {
+    const shared = workspace || (document.getElementById("financeSharedWorkspaceRoot") ? viewedWorkspace : null);
+    if(shared && (shared.role !== "owner" || shared.canExportPdf !== true)) return;
     if (!options?.active) return options?.subscribe?.();
     const copy = c(); const button = document.getElementById("financeViewerPdf") || document.getElementById("financePdfAction"); const original = button?.textContent || "";
     if (button) { button.disabled = true; button.textContent = copy.pdfPreparing; }
@@ -404,3 +457,4 @@
 
   window.EduCashProFinanceShare = { init, bind, sync, openManager, openViewer, exportPdf };
 })();
+
