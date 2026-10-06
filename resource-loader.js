@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261005.4";
+  const VERSION="20261006.1";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -94,11 +94,12 @@
   function loadGames(){
     if(window.EduCashProMentalGames?.renderCatalog){
       void loadGameEnhancements();
-      return Promise.resolve(true);
+      return parallelStyles(["./local-games.css","./game-controls.css"]).then(()=>true);
     }
     if(gamesPromise) return gamesPromise;
     gamesPromise=(async()=>{
       // Mostra o catálogo principal primeiro. Jogos extras entram progressivamente.
+      await parallelStyles(["./local-games.css","./game-controls.css"]);
       await series(["./mental-games.js","./game-suite.js"]);
       const value=currentSession();
       if(value){
