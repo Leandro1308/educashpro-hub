@@ -139,7 +139,10 @@
   function loadFinancialTools(){
     if(window.EduCashProFinancialTools)return Promise.resolve(true);
     return financialToolsPromise||(financialToolsPromise=(async()=>{
-      await Promise.allSettled([style("./financial-tools-suite.css"),style("./tools-hub-v2.css")]);
+      await Promise.allSettled([style("./financial-tools-suite.css"),style("./tools-hub-v2.css"),style("./receivables.css")]);
+      await script("./finance-model.js");
+      await script("./receivables-model.js");
+      await script("./receivables.js");
       await script("./financial-tools-suite.js");
       return true;
     })().catch(error=>{financialToolsPromise=null;throw error}));

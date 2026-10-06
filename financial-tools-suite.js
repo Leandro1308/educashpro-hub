@@ -109,22 +109,7 @@ function renderHub(){
 }
 
 function renderReceivables(){
- const limit=10;let list=read("receivables",[]);
- const refresh=()=>{
-  const now=new Date();now.setHours(0,0,0,0);
-  list=list.map(x=>({...x,status:x.status==="received"?"received":new Date(x.due+"T00:00:00")<now?"overdue":"pending"}));write("receivables",list);
-  const cur=document.getElementById("finCurrency")?.value||"USD";
-  const open=list.filter(x=>x.status!=="received").reduce((s,x)=>s+Number(x.value),0),rec=list.filter(x=>x.status==="received").reduce((s,x)=>s+Number(x.value),0),over=list.filter(x=>x.status==="overdue").reduce((s,x)=>s+Number(x.value),0);
-  document.getElementById("recSummary").innerHTML=resultBox([[t("totalOpen"),money(open,cur)],[t("totalReceived"),money(rec,cur)],[t("totalOverdue"),money(over,cur)]]);
-  document.getElementById("recList").innerHTML=list.length?list.map(x=>`<article class="finListItem"><div><strong>${esc(x.client)}</strong><small>${esc(x.description||"")} · ${esc(x.due)}</small><span class="finStatus ${esc(x.status)}">${esc(t(x.status))}</span></div><b>${esc(money(x.value,x.currency||cur))}</b><div class="finListActions">${x.status!=="received"?`<button data-rec-paid="${x.id}">✓ ${esc(t("markReceived"))}</button>`:""}<button data-rec-remove="${x.id}">× ${esc(t("remove"))}</button></div></article>`).join(""):`<div class="empty">${esc(t("empty"))}</div>`;
-  document.querySelectorAll("[data-rec-paid]").forEach(b=>b.onclick=()=>{const x=list.find(i=>String(i.id)===b.dataset.recPaid);if(x){x.status="received";x.receivedAt=Date.now();write("receivables",list);refresh()}});
-  document.querySelectorAll("[data-rec-remove]").forEach(b=>b.onclick=()=>{list=list.filter(i=>String(i.id)!==b.dataset.recRemove);write("receivables",list);refresh()});
- };
- target().innerHTML=header(t("receivables"),t("receivablesSub"))+`<section class="finCard"><div class="finGrid">${currencyField()}${field("recClient",t("client"),"text")}${field("recDesc",t("description"),"text")}${field("recValue",t("value"))}${field("recDue",t("due"),"date")}</div><button id="recAdd" class="wideButton">＋ ${esc(t("addReceivable"))}</button><small class="finRule">${esc(rule(limit))}</small></section><div id="recSummary"></div><section id="recList" class="finList"></section>`;
- wireBack();wireHelp(t("helpReceivables"));
- document.getElementById("finCurrency").onchange=refresh;
- document.getElementById("recAdd").onclick=()=>{if(!canAdd("receivables",limit))return showLimit();const client=document.getElementById("recClient").value.trim(),value=num("recValue"),due=document.getElementById("recDue").value;if(!client||!(value>0)||!due)return alert(t("invalid"));list.unshift({id:Date.now(),client,description:document.getElementById("recDesc").value.trim(),value,due,currency:document.getElementById("finCurrency").value,status:"pending"});write("receivables",list);refresh()};
- refresh();
+ window.EduCashProReceivables.open({...opt,back:opt.toolBack||renderHub});
 }
 
 function renderQuote(){
