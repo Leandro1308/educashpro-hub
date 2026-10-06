@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261006.8";
+  const VERSION="20261006.9";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -130,6 +130,7 @@
     if(window.EduCashProFinance&&window.EduCashProFinanceShare)return Promise.resolve(true);
     return financePromise||(financePromise=(async()=>{
       await Promise.allSettled([style("./monthly-finance-control.css"),style("./tools-hub-v2.css")]);
+      await script("./pdf-documents.js");
       await script("./monthly-finance-sharing.js");
       await script("./finance-model.js");
       await script("./monthly-finance-control.js");
@@ -139,10 +140,13 @@
   function loadFinancialTools(){
     if(window.EduCashProFinancialTools)return Promise.resolve(true);
     return financialToolsPromise||(financialToolsPromise=(async()=>{
-      await Promise.allSettled([style("./financial-tools-suite.css"),style("./tools-hub-v2.css"),style("./receivables.css")]);
+      await Promise.allSettled([style("./financial-tools-suite.css"),style("./tools-hub-v2.css"),style("./receivables.css"),style("./quotes.css")]);
       await script("./finance-model.js");
       await script("./receivables-model.js");
+      await script("./pdf-documents.js");
       await script("./receivables.js");
+      await script("./quotes-model.js");
+      await script("./quotes.js");
       await script("./financial-tools-suite.js");
       return true;
     })().catch(error=>{financialToolsPromise=null;throw error}));

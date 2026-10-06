@@ -439,23 +439,16 @@
     return `<div style="font-family:Arial,sans-serif;color:#142033;background:#fff;padding:24px"><h1 style="margin:0 0 6px;font-size:24px">${esc(copy.report)}</h1><p style="margin:0 0 18px;color:#667">${ownerName ? `${esc(copy.owner)} ${esc(ownerName)} • ` : ""}${esc(month)}</p><table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.income)}</b><br>${esc(fmt(record.income))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.spent)}</b><br>${esc(fmt(sum.spent))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.balance)}</b><br>${esc(fmt(sum.balance))}</td></tr></table><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:7px">${esc(copy.date)}</th><th style="text-align:left;padding:7px">${esc(copy.category)}</th><th style="text-align:right;padding:7px">${esc(copy.value)}</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="padding:12px">${esc(copy.empty)}</td></tr>`}</tbody><tfoot><tr><td colspan="2" style="padding:8px;border-top:2px solid #222"><b>${esc(copy.total)}</b></td><td style="padding:8px;border-top:2px solid #222;text-align:right"><b>${esc(fmt(sum.spent))}</b></td></tr></tfoot></table><p style="margin-top:24px;font-size:10px;color:#777">${esc(copy.generated)} ${esc(new Date().toLocaleString(options.language === "pt" ? "pt-BR" : options.language))} • EduCashPro</p></div>`;
   }
 
-  function loadPdf() {
-    if (window.html2pdf) return Promise.resolve(window.html2pdf);
-    if (window.__EDUCASHPRO_HTML2PDF__) return window.__EDUCASHPRO_HTML2PDF__;
-    window.__EDUCASHPRO_HTML2PDF__ = new Promise((resolve, reject) => { const script = document.createElement("script"); script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"; script.onload = () => window.html2pdf ? resolve(window.html2pdf) : reject(new Error("pdf_library_missing")); script.onerror = () => reject(new Error("pdf_library_failed")); document.head.appendChild(script); });
-    return window.__EDUCASHPRO_HTML2PDF__;
-  }
-
   async function exportPdf(record, month, ownerName = "", workspace = null) {
     const shared = workspace || (document.getElementById("financeSharedWorkspaceRoot") ? viewedWorkspace : null);
     if(shared && (shared.role !== "owner" || shared.canExportPdf !== true)) return;
     if (!options?.active) return options?.subscribe?.();
     const copy = c(); const button = document.getElementById("financeViewerPdf") || document.getElementById("financePdfAction"); const original = button?.textContent || "";
     if (button) { button.disabled = true; button.textContent = copy.pdfPreparing; }
-    const html = reportHtml(record, month, ownerName); const holder = document.createElement("div"); holder.style.cssText = "position:fixed;left:-10000px;top:0;width:760px;background:#fff"; holder.innerHTML = html; document.body.appendChild(holder);
-    try { const html2pdf = await loadPdf(); await html2pdf().set({ margin: 10, filename: `educashpro-financas-${month}.pdf`, image: { type: "jpeg", quality: 0.96 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: "mm", format: "a4", orientation: "portrait" } }).from(holder.firstElementChild).save(); }
+    const html = `<div>${reportHtml(record, month, ownerName)}${window.EduCashProPdf.footerHtml({session:options?.session,language:options?.language})}</div>`;
+    try { await window.EduCashProPdf.exportHtml(html, { filename: `educashpro-financas-${month}.pdf`, session:options?.session, language:options?.language }); }
     catch (error) { const win = window.open("", "_blank", "noopener,noreferrer"); if (win) { win.document.open(); win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>EduCashPro</title></head><body>${html}<script>setTimeout(()=>window.print(),250)<\/script></body></html>`); win.document.close(); } window.alert(copy.pdfFallback); }
-    finally { holder.remove(); if (button) { button.disabled = false; button.textContent = original; } }
+    finally { if (button) { button.disabled = false; button.textContent = original; } }
   }
 
   window.EduCashProFinanceShare = { init, bind, sync, openManager, openViewer, exportPdf };
