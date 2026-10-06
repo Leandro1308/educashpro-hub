@@ -28,7 +28,7 @@
   function close(){layer?.remove();layer=null;}
   function syncIdentity(){
     const current=session();const key=current?.token?String(current.profile?.userId||current.token):"";
-    if(key!==identity){identity=key;close();card?.remove();card=null;items=[];next=null;unreadCount=0;document.getElementById("siteInboxButton")?.remove();}
+    if(key!==identity){lastSummaryAt=0;identity=key;close();card?.remove();card=null;items=[];next=null;unreadCount=0;document.getElementById("siteInboxButton")?.remove();}
     return Boolean(key);
   }
   async function api(action,body={}) {
@@ -68,10 +68,12 @@
     card.querySelector("[data-dismiss]").onclick=async()=>{const el=card;el.querySelector("[data-dismiss]").disabled=true;try{await api("update",{messageId:message.id,action:"dismiss"});el.remove();if(card===el)card=null;window.EduCashProApp?.toast?.(copy().dismissed);void refresh();}catch{el.querySelector("p").textContent=copy().error;el.querySelector("[data-dismiss]").disabled=false;}};
     card.querySelector("[data-read]").onclick=()=>void open(message);
   }
-  async function refresh(){
+  let lastSummaryAt=0;
+  async function refresh({cached=false}={}){
     if(!syncIdentity())return;
     if(refreshing)return refreshing;
-    mount();refreshing=(async()=>{try{const result=await api("summary");if(!syncIdentity())return;unreadCount=result.unread;mount(result.unread);showCard(result.card);}catch{}finally{refreshing=null;}})();return refreshing;
+    if(cached&&Date.now()-lastSummaryAt<300000)return;
+    mount();refreshing=(async()=>{try{const result=await api("summary");if(!syncIdentity())return;lastSummaryAt=Date.now();unreadCount=result.unread;mount(result.unread);showCard(result.card);}catch{}finally{refreshing=null;}})();return refreshing;
   }
   function shell(){
     close();styles();layer=document.createElement("div");layer.className="siteInboxLayer";
@@ -107,9 +109,9 @@
   }
   window.EduCashProInbox={open,refresh};
   window.addEventListener("educashpro:web-session-ready",()=>void refresh());
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refresh();});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refresh({cached:true});});
   window.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
   let scheduled=false;new MutationObserver(()=>{if(scheduled||document.getElementById("siteInboxButton")||!session()?.token)return;scheduled=true;setTimeout(()=>{scheduled=false;void refresh();},200);}).observe(document.documentElement,{childList:true,subtree:true});
   setTimeout(()=>void refresh(),2000);
-  setInterval(()=>{if(!document.hidden)void refresh();},60000);
+  setInterval(()=>{if(!document.hidden)void refresh({cached:true});},300000);
 })();

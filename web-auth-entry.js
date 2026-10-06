@@ -7,7 +7,7 @@
   const MANIFEST_URL="https://go.educashpro.vip/tonconnect-manifest.json";
   const BOT_URL="https://t.me/EduCashProBot";
   const SESSION_IDLE_MS=24*60*60*1000;
-  const SILENT_REFRESH_MS=7*24*60*60*1000;
+  const SILENT_REFRESH_MS=24*60*60*1000;
 
   const I18N={
     pt:{
@@ -91,17 +91,16 @@
   }
   function localSessionLastAccess(value){return Number(value?.lastAccessAt||value?.storedAt||0)||0}
   function localSessionValidatedAt(value){return Number(value?.validatedAt||value?.storedAt||0)||0}
-  function withinIdleWindow(value){const last=localSessionLastAccess(value);return Boolean(value?.token&&value?.profile?.userId&&last&&Date.now()-last<SESSION_IDLE_MS)}
+  function withinIdleWindow(value){return Boolean(window.EduCashProSessionPolicy?.canResume(value))}
   function touchLocalSession(value){
     if(!value?.token||!value?.profile?.userId)return value||null;
     const next={...value,lastAccessAt:Date.now()};
     platform?.writeWebSession?.(next);
     return next;
   }
-  function requiredReauthMode(value){return profileIsActive(value?.profile)?"wallet":"email"}
+  function requiredReauthMode(value){return window.EduCashProSessionPolicy?.walletLinked(value)?"wallet":"email"}
 
-  let tonConnectLoadPromise=null;
-  async function ensureTonConnectUi(){
+  let tonConnectLoadPromise=nulnc function ensureTonConnectUi(){
     if(window.TON_CONNECT_UI?.TonConnectUI)return true;
     if(tonConnectLoadPromise)return tonConnectLoadPromise;
     tonConnectLoadPromise=(async()=>{
@@ -211,12 +210,12 @@
     };
   }
 
-  async function openWallet(){if(!state.session?.profile?.userId||!profileIsActive(state.session?.profile))return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();else layer.querySelector("#webPairInstead").onclick=openPairLogin;
+  async function openWallet(){if(!state.session?.profile?.userId||!window.EduCashProSessionPolicy?.walletLinked(state.session))return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();else layer.querySelector("#webPairInstead").onclick=openPairLogin;
     try{await ensureTonConnectUi();state.unsubscribe?.();state.ui=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"webAuthTonConnect"});state.unsubscribeModal?.();state.unsubscribeModal=state.ui.onModalStateChange?.(syncWalletPickerLayer)||null;state.challenge=await auth.prepareWalletAuthentication(state.ui);state.unsubscribe=auth.watchWalletAuthentication(state.ui,{getChallenge:()=>state.challenge});window.addEventListener("educashpro:web-authenticated",()=>{state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()},{once:true});window.addEventListener("educashpro:web-auth-error",event=>setError(event.detail?.message||t("authError")),{once:true});if(state.ui.wallet)await finishWallet(state.ui.wallet)}catch(error){setError(error?.message||t("webUnavailable"))}
   }
 
   async function openPairLogin(){injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("phoneLoginText"))}</p><div id="webPairLoading" class="webPairStatus">${esc(t("waiting"))}</div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;
-    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
+    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.reauthRequired=false;ate.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
   }
 
 
@@ -378,7 +377,7 @@
     if(!platform?.isWeb?.())return;
     injectStyles();
     const stored=platform.readWebSession?.();
-    if(stored?.token&&stored?.profile?.userId){
+    if(stored?.profile?.userId){
       state.session=stored;
       if(withinIdleWindow(stored)){
         state.session=touchLocalSession(stored);
@@ -427,3 +426,4 @@
   publishEntryApi();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
+

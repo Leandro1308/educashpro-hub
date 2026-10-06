@@ -42,7 +42,7 @@
   function saveSession(result){
     if(!result?.token)return null;
     const now=Date.now();
-    const session={token:result.token,profile:result.profile||null,storedAt:now,lastAccessAt:now,validatedAt:now};
+    const session={token:result.token,profile:result.profile||null,authenticatedAt:now,storedAt:now,lastAccessAt:now,validatedAt:now};
     platform?.writeWebSession?.(session);
     if(result?.profile?.userId)platform?.clearPendingReferral?.();
     return session;
@@ -170,33 +170,34 @@
     return result;
   }
 
-  async function validateStoredSession({apiBase=DEFAULT_API_BASE,preserveOnNetworkError=true}={}){
+  const validations=new Map();
+  async function validateStoredSession({apiBase=DEFAULT_API_BASE,force=false}={}){
     const session=platform?.readWebSession?.();
     if(!session?.token)return null;
-    try{
-      const result=await jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/session`,{
-        method:"POST",
-        headers:{Authorization:`Bearer ${session.token}`},
-        body:"{}",
-      });
-      const now=Date.now();
-      const updated={
-        ...session,
-        token:result.token||session.token,
-        profile:result.profile||session.profile||null,
-        server:result.session||null,
-        storedAt:Number(session.storedAt||0)||now,
-        lastAccessAt:now,
-        validatedAt:now
-      };
-      platform?.writeWebSession?.(updated);
-      return updated;
-    }catch(error){
-      const status=Number(error?.status||0);
-      const authenticationRejected=status===401||status===403;
-      if(!preserveOnNetworkError||authenticationRejected)platform?.writeWebSession?.(null);
-      return null;
-    }
+    const policy=window.EduCashProSessionPolicy;
+    if(!force&&policy?.canResume(session)&&!policy.validationDue(session))return session;
+    const key=`${cleanBase(apiBase)}:${session.token}`;
+    if(validations.has(key))return validations.get(key);
+    const pending=(async()=>{
+      try{
+        const result=await jsonFetch(`${cleanBase(apiBase)}/api/platform-auth/session`,{
+          method:"POST",headers:{Authorization:`Bearer ${session.token}`},body:"{}"
+        });
+        const current=platform?.readWebSession?.();
+        if(current?.token!==session.token)return current;
+        const now=Date.now();
+        const updated={...session,token:result.token||session.token,profile:result.profile||session.profile,
+          authenticatedAt:Number(session.authenticatedAt||session.storedAt||0),
+          server:result.session||null,lastAccessAt:now,validatedAt:now};
+        platform?.writeWebSession?.(updated);
+        return updated;
+      }catch(error){
+        if(Number(error?.status)===401)policy?.reject(session.token);
+        return null;
+      }
+    })();
+    validations.set(key,pending);
+    try{return await pending;}finally{validations.delete(key);}
   }
 
   async function startDevicePairing({apiBase=DEFAULT_API_BASE}={}){
@@ -238,3 +239,4 @@
     saveSession,
   };
 })();
+

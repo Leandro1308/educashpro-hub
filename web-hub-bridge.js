@@ -34,13 +34,7 @@
   }
 
   function validAppSession(session) {
-    if (!session?.token) return false;
-    const payload = tokenPayload(session.token);
-    if (!payload?.sub || !String(payload.sub).startsWith("usr_")) return false;
-    const exp = Number(payload.exp || 0);
-    const lastAccessAt = Number(session?.lastAccessAt || session?.storedAt || 0);
-    const withinIdleWindow = lastAccessAt > 0 && Date.now() - lastAccessAt < SESSION_IDLE_MS;
-    return withinIdleWindow && Number.isFinite(exp) && exp > Math.floor(Date.now() / 1000) + 15;
+    return Boolean(window.EduCashProSessionPolicy?.canResume(session));
   }
 
   function exposeWebInitData() {
@@ -82,6 +76,7 @@
 
   let activeSession=null;
   let exchangeInstalled=false;
+  const exchanges=new Map();
 
   function installHubSessionExchange() {
     if(exchangeInstalled)return;
@@ -95,7 +90,8 @@
       const session=activeSession||readStoredSession();
       if(!session?.token)return baseFetch(input,options);
 
-      const response = await baseFetch(`${API_BASE}/api/platform-auth/hub-session`, {
+      if(exchanges.has(session.token))return (await exchanges.get(session.token)).clone();
+      const pending=baseFetch(`${API_BASE}/api/platform-auth/hub-session`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,16 +101,21 @@
         cache: "no-store",
       });
 
+      exchanges.set(session.token,pending);
+      let response;
+      try{response=await pending;}finally{exchanges.delete(session.token);}
+
       if (response.status === 401) {
-        try { localStorage.removeItem(SESSION_KEY); } catch {}
+        window.EduCashProSessionPolicy?.reject(session.token);
       }
 
-      return response;
+      return response.clone();
     };
   }
 
   function activateWebHub(session,source="platform_web_session"){
     if(!session?.token)return false;
+    const sameToken=activeSession?.token===session.token;
     activeSession=session;
     exposeWebInitData();
     installHubSessionExchange();
@@ -123,6 +124,7 @@
       source,
       userId:session?.profile?.userId||tokenPayload(session.token)?.sub||null,
     };
+    if(sameToken)return true;
     try{window.dispatchEvent(new CustomEvent("educashpro:web-hub-ready",{detail:window.__EDUCASHPRO_WEB_HUB__}))}catch{}
     return true;
   }
@@ -132,7 +134,7 @@
     const originalWrite = platform.writeWebSession.bind(platform);
     const wrapped=function (nextSession) {
       originalWrite(nextSession);
-      if(nextSession?.token)activateWebHub(nextSession,"login");
+      if(validAppSession(nextSession))activateWebHub(nextSession,"login");
       else{
         activeSession=null;
         window.__EDUCASHPRO_WEB_HUB__={active:false,source:"anonymous"};
@@ -161,3 +163,4 @@
 
   void boot();
 })();
+
