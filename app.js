@@ -1785,6 +1785,10 @@
       ${!p.active ? `<button id="reactivate" class="wideButton" style="margin-top:16px">⚡ ${escapeHtml(t("reactivate"))}</button>` : ""}
     `;
 
+    document.dispatchEvent(new Event("educashpro:area-rendered"));
+    window.EduCashProAccountCenter?.mountAdminShortcut?.();
+    if(!window.EduCashProAccountCenter)void window.EduCashProResources?.script?.("./admin-center.js?v=20261006-admin-actions").then(()=>window.EduCashProAdminCenter?.mountShortcut?.()).catch(()=>{});
+
     document.getElementById("areaProfessional")?.addEventListener("click", () => void openAreaProfessional());
     document.getElementById("editProfilePhoto")?.addEventListener("click", () => renderProfilePhotoEditor(renderArea));
     document.getElementById("areaLinkPage")?.addEventListener("click", () => void openAreaLinks("page"));

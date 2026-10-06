@@ -3,10 +3,13 @@
   const MANIFEST_URL = "https://go.educashpro.vip/tonconnect-manifest.json";
   const BOT_URL = "https://t.me/EduCashProBot";
   const platform = window.EduCashProPlatform;
-  if (!platform?.isWeb?.()) return;
+  if (!platform) return;
 
   let pollTimer = 0;
   let tonUi = null;
+  let adminAccess={admin:false,primary:false,actions:[]};
+  let allowedContractActions=[];
+  const can=key=>adminAccess.primary||adminAccess.actions?.includes(key);
 
   function session() {
     return platform.readWebSession?.() || window.__EDUCASHPRO_SESSION__ || null;
@@ -37,17 +40,55 @@
     if (!token) throw new Error("session_missing");
     const response = await fetch(API_BASE + "/api/platform-admin" + path,{
       method:"POST",
-      headers:{"Content-Type":"application/json",Authorization:"Bearer " + token},
+      headers:{"Content-Type":"application/json",Authorization:"Bearer " + token,"X-Admin-Unlock":sessionStorage.getItem("educashpro.admin.unlock")||""},
       body:JSON.stringify(body),
       cache:"no-store"
     });
     const data = await response.json().catch(()=>({}));
+    if(response.status===423 && path!=="/unlock"){await unlock();return api(path,body)}
+    if(data.permissions){adminAccess=data.permissions;allowedContractActions=data.contractActions||allowedContractActions;}
     if(!response.ok) {
       const error = new Error(data?.message || data?.reason || ("HTTP_" + response.status));
       error.status=response.status;
       throw error;
     }
     return data;
+  }
+
+  async function unlock(){
+    const password=await new Promise((resolve,reject)=>{
+      const layer=document.createElement('div');layer.className='adminCenterLayer';layer.style.zIndex='15000';
+      layer.innerHTML='<form class="adminCenterSheet"><h3>Acesso ao Admin</h3><label class="adminLabel">Senha</label><input class="adminField" type="password" autocomplete="off" required maxlength="180"><div class="adminToolbar"><button class="adminButton" type="submit">Liberar acesso</button><button class="adminButton secondary" type="button">Cancelar</button></div></form>';
+      document.body.appendChild(layer);const field=layer.querySelector('input');field.focus();
+      layer.querySelector('form').onsubmit=e=>{e.preventDefault();const value=field.value;field.value='';layer.remove();resolve(value)};
+      layer.querySelector('[type="button"]').onclick=()=>{layer.remove();reject(new Error('Acesso cancelado'))};
+    });
+    const data=await api('/unlock',{password});sessionStorage.setItem('educashpro.admin.unlock',data.token);
+  }
+  const ADMIN_AREA_PERMISSIONS={support:'support.read',communities:'communities.read','benefit-create':'benefits.create',benefits:'benefits.read',partners:'partners.read',reviewers:'reviewers.read',broadcast:'inbox.send',channel:'channel.publish',invite:'invite.create',branding:'branding.edit',contract:'contract.read',delegates:'admins.manage'};
+  function navigateAdmin(key){
+    if(key==='support'){close();location.assign('./support.html')}
+    else if(['communities','benefits','partners'].includes(key))void openContent(key);
+    else if(key==='benefit-create')void openBenefitCreate();
+    else if(key==='reviewers')void openReviewers();
+    else if(key==='broadcast')void openBroadcast();
+    else if(key==='channel')void openChannel();
+    else if(key==='invite')void openInvite();
+    else if(key==='branding'){close();window.EduCashProAccountCenter?.openAdminIcon?.()}
+    else if(key==='delegates')void openDelegates();
+    else if(key==='contract')void openContract();
+    else if(key==='manual')void openManual();
+  }
+  async function openDelegates(){
+    const body=shell(`${backButton()}<div class="adminPanel">${esc(t('loading'))}</div>`);bindBack(body);
+    try{const data=await api('/delegates/list');
+      const catalog=data.catalog||[];
+      body.querySelector('.adminPanel').innerHTML=`<h3>Administradores e permissões</h3><p>Selecione uma conta já cadastrada pelo e-mail ou ID. Somente o administrador principal pode conceder, alterar e revogar permissões. As alterações do contrato continuam exigindo assinatura da owner.</p><form id="delegateForm"><label class="adminLabel">E-mail ou ID da conta</label><input class="adminField" name="identifier" required maxlength="254"><div class="adminChecks">${catalog.map(p=>`<label><input type="checkbox" name="permission" value="${esc(p.key)}">${esc(CONTRACT_SCHEMA[p.key.replace('contract.','')]?.label||p.label)}</label>`).join('')}</div><button class="adminButton" type="submit">Salvar permissões</button><p class="adminStatus"></p></form><h4>Contas administradoras</h4>${(data.items||[]).map((item,i)=>`<div class="adminItem"><b>${esc(item.name||item.email||item.userId)}</b><p>${esc(item.email||item.userId)} · ${item.active?'Ativo':'Revogado'} · ${(item.permissions||[]).length} permissões</p><button class="adminButton secondary" data-edit="${i}">Editar</button><button class="adminButton danger" data-revoke="${i}">Revogar acesso</button></div>`).join('')}`;
+      const form=body.querySelector('form');
+      form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('button');button.disabled=true;try{await api('/delegates/save',{identifier:form.elements.identifier.value,permissions:[...form.querySelectorAll('[name="permission"]:checked')].map(f=>f.value)});await openDelegates()}catch(error){form.querySelector('.adminStatus').textContent=error.message}finally{button.disabled=false}};
+      body.querySelectorAll('[data-edit]').forEach(button=>button.onclick=()=>{const item=data.items[Number(button.dataset.edit)];form.elements.identifier.value=item.userId;form.querySelectorAll('[name="permission"]').forEach(field=>field.checked=item.permissions?.includes(field.value));form.scrollIntoView({behavior:'smooth',block:'start'})});
+      body.querySelectorAll('[data-revoke]').forEach(button=>button.onclick=async()=>{if(!confirm('Revogar todas as permissões desta conta?'))return;button.disabled=true;try{await api('/delegates/save',{identifier:data.items[Number(button.dataset.revoke)].userId,permissions:[]});await openDelegates()}catch(error){alert(error.message);button.disabled=false}});
+    }catch(error){body.querySelector('.adminPanel').textContent=error.message}
   }
 
   function injectStyles(){
@@ -100,6 +141,7 @@
           <div class="adminMetric"><small>${esc(t("partners"))}</small><b>${Number(c.partners||0)}</b></div>
         </div>
         <div class="adminGrid">
+          <button class="adminCard" data-admin="delegates"><span>🔐</span><b>Administradores e permissões</b><small>Conceder, editar ou revogar acesso</small></button>
           <button class="adminCard" data-admin="support"><span>💬</span><b>${esc(t("support"))}</b><small>${Number(c.supportOpen||0)} pendentes</small></button>
           <button class="adminCard" data-admin="communities"><span>🌐</span><b>${esc(t("communities"))}</b><small>Moderar e remover</small></button>
           <button class="adminCard" data-admin="benefit-create"><span>➕</span><b>${esc(({pt:"Cadastrar benefício",en:"Create benefit",es:"Crear beneficio",ru:"Добавить преимущество"})[language()])}</b></button>
@@ -113,19 +155,13 @@
           <button class="adminCard" data-admin="contract"><span>⛓️</span><b>${esc(t("contract"))}</b><small>Estado e transações owner</small></button>
           <button class="adminCard" data-admin="manual"><span>📘</span><b>${esc(t("manual"))}</b><small>Passo a passo do painel e contrato V6</small></button>
         </div>`;
-      body.querySelectorAll("[data-admin]").forEach((button)=>button.addEventListener("click",()=>{
-        const key=button.dataset.admin;
-        if(key==="support"){close();location.assign("./support.html");}
-        else if(["communities","benefits","partners"].includes(key))void openContent(key);
-        else if(key==="benefit-create")void openBenefitCreate();
-        else if(key==="reviewers")void openReviewers();
-        else if(key==="broadcast")void openBroadcast();
-        else if(key==="channel")void openChannel();
-        else if(key==="invite")void openInvite();
-        else if(key==="branding"){close();window.EduCashProAccountCenter?.openAdminIcon?.()}
-        else if(key==="contract")void openContract();
-        else if(key==="manual")void openManual();
-      }));
+      body.querySelectorAll('[data-admin]').forEach(button=>{
+        const key=button.dataset.admin,permission=ADMIN_AREA_PERMISSIONS[key];
+        if(permission&&!can(permission)&&!(key==='broadcast'&&can('broadcast.send'))){button.remove();return}
+        button.onclick=()=>navigateAdmin(key);
+      });
+      if(!can("overview"))body.querySelector(".adminStats")?.remove();
+      const lock=document.createElement('button');lock.className='adminButton secondary';lock.textContent='Bloquear painel';lock.onclick=()=>{sessionStorage.removeItem('educashpro.admin.unlock');close()};body.appendChild(lock);
     }catch(error){
       body.innerHTML=`<div class="adminPanel adminError">${esc(t("error"))}<br><small>${esc(error.message)}</small></div>`;
     }
@@ -166,7 +202,7 @@
           <h4>${esc(itemTitle(kind,item))}</h4>
           <p>${esc(itemSubtitle(kind,item))}</p>
           <p>${esc(item.description||item.discountRules||"")}</p>
-          <div class="adminToolbar">${actionSet(kind).map(([action,label])=>`<button class="adminButton ${action==="delete"?"danger":"secondary"}" data-action="${action}" type="button">${esc(label)}</button>`).join("")}</div>
+          <div class="adminToolbar">${actionSet(kind).filter(([action])=>can(`${kind}.${action}`)).map(([action,label])=>`<button class="adminButton ${action==="delete"?"danger":"secondary"}" data-action="${action}" type="button">${esc(label)}</button>`).join("")}</div>
         </article>`).join(""):`<p class="adminNote">${esc(t("noItems"))}</p>`}</div>`;
       body.querySelectorAll("[data-item]").forEach((card)=>{
         card.querySelectorAll("[data-action]").forEach((button)=>button.addEventListener("click",async()=>{
@@ -188,6 +224,7 @@
     async function load(){
       const data=await api("/reviewers/list");
       list.innerHTML=(data.items||[]).map((item)=>`<article class="adminItem"><span class="adminTag">${item.active===false?"INATIVO":"ATIVO"}</span><h4>${esc(item.tgId)}</h4><p>${esc((item.languages||[]).join(", "))}</p><button class="adminButton danger" data-remove="${esc(item.tgId)}" type="button">${esc(t("remove"))}</button></article>`).join("")||`<p>${esc(t("noItems"))}</p>`;
+      list.querySelectorAll("[data-remove]").forEach(button=>{if(!can("reviewers.remove"))button.remove()});
       list.querySelectorAll("[data-remove]").forEach((button)=>button.addEventListener("click",async()=>{if(!confirm(t("confirmDelete")))return;await api("/reviewers/remove",{tgId:button.dataset.remove});await load()}));
     }
     body.querySelector("#reviewerAdd").addEventListener("click",async()=>{
@@ -196,6 +233,7 @@
       status.textContent=t("loading");
       try{await api("/reviewers/add",{tgId,languages});body.querySelector("#reviewerId").value="";status.textContent="OK";await load()}catch(error){status.textContent=t("error")+" "+error.message}
     });
+    if(!can("reviewers.add")){body.querySelector("#reviewerAdd").remove();body.querySelector("#reviewerId").remove();body.querySelector(".adminChecks").remove();}
     try{await load()}catch(error){status.textContent=t("error")+" "+error.message}
   }
 
@@ -203,6 +241,8 @@
     const l=({pt:{destination:"Destino",site:"Caixa de mensagens do site",telegram:"Telegram",language:"Idioma",all:"Todos",audience:"Público",active:"Assinantes ativos",inactive:"Não assinantes / inativos",message:"Mensagem",link:"Link clicável (opcional)",linkLabel:"Texto do link (opcional)",count:"Contar destinatários",send:"Enviar",recipients:"destinatários",sent:"Mensagens entregues",confirm:"Confirmar o envio desta mensagem?",media:"Mídia (opcional)",copy:"Ou copiar mensagem do Telegram"},en:{destination:"Destination",site:"Website inbox",telegram:"Telegram",language:"Language",all:"All",audience:"Audience",active:"Active subscribers",inactive:"Non-subscribers / inactive",message:"Message",link:"Clickable link (optional)",linkLabel:"Link label (optional)",count:"Count recipients",send:"Send",recipients:"recipients",sent:"Messages delivered",confirm:"Send this message?",media:"Media (optional)",copy:"Or copy a Telegram message"},es:{destination:"Destino",site:"Buzón del sitio",telegram:"Telegram",language:"Idioma",all:"Todos",audience:"Público",active:"Suscriptores activos",inactive:"No suscriptores / inactivos",message:"Mensaje",link:"Enlace clicable (opcional)",linkLabel:"Texto del enlace (opcional)",count:"Contar destinatarios",send:"Enviar",recipients:"destinatarios",sent:"Mensajes entregados",confirm:"¿Enviar este mensaje?",media:"Multimedia (opcional)",copy:"O copiar mensaje de Telegram"},ru:{destination:"Куда отправить",site:"Входящие на сайте",telegram:"Telegram",language:"Язык",all:"Все",audience:"Аудитория",active:"Активные подписчики",inactive:"Без подписки / неактивные",message:"Сообщение",link:"Ссылка (необязательно)",linkLabel:"Текст ссылки (необязательно)",count:"Посчитать получателей",send:"Отправить",recipients:"получателей",sent:"Сообщений доставлено",confirm:"Отправить сообщение?",media:"Медиа (необязательно)",copy:"Или скопировать сообщение Telegram"}})[language()];
     const body=shell(`${backButton()}<div class="adminPanel"><h3>📣 ${esc(t("broadcast"))}</h3><label class="adminLabel">${esc(l.destination)}</label><select id="broadcastDestination" class="adminSelect"><option value="site">${esc(l.site)}</option><option value="telegram">${esc(l.telegram)}</option></select><label class="adminLabel">${esc(l.language)}</label><select id="broadcastLang" class="adminSelect"><option value="all">${esc(l.all)}</option><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option><option value="ru">Русский</option></select><label class="adminLabel">${esc(l.audience)}</label><select id="broadcastAudience" class="adminSelect"><option value="all">${esc(l.all)}</option><option value="active">${esc(l.active)}</option><option value="inactive">${esc(l.inactive)}</option></select><label class="adminLabel">${esc(l.message)}</label><textarea id="broadcastText" class="adminText" maxlength="4000"></textarea><label class="adminLabel">${esc(l.link)}</label><input id="broadcastLinkUrl" class="adminField" type="url" placeholder="https://..."><label class="adminLabel">${esc(l.linkLabel)}</label><input id="broadcastLinkLabel" class="adminField" maxlength="120"><div id="broadcastTelegramMedia" hidden><label class="adminLabel">${esc(l.media)}</label><select id="broadcastMediaType" class="adminSelect"><option value="photo">Imagem / Photo</option><option value="video">Vídeo / Video</option><option value="audio">Áudio / Audio</option><option value="document">Documento / Document</option></select><input id="broadcastMediaUrl" class="adminField" type="url" placeholder="https://..."><label class="adminLabel">${esc(l.copy)}</label><input id="broadcastSourceChat" class="adminField" placeholder="@canal / ID"><input id="broadcastSourceMessage" class="adminField" type="number" min="1" placeholder="ID"></div><div class="adminToolbar"><button id="broadcastCount" class="adminButton secondary" type="button">${esc(l.count)}</button><button id="broadcastSend" class="adminButton" type="button">${esc(l.send)}</button></div><div id="broadcastStatus" class="adminStatus" role="status"></div></div>`);bindBack(body);
     const status=body.querySelector("#broadcastStatus"),destination=body.querySelector("#broadcastDestination");
+    [...destination.options].forEach(option=>{if(!can(option.value==="site"?"inbox.send":"broadcast.send"))option.remove()});
+    body.querySelector("#broadcastTelegramMedia").hidden=destination.value!=="telegram";
     destination.onchange=()=>{body.querySelector("#broadcastTelegramMedia").hidden=destination.value!=="telegram";status.textContent="";};
     const filters=()=>({language:body.querySelector("#broadcastLang").value,audience:body.querySelector("#broadcastAudience").value});
     body.querySelector("#broadcastCount").onclick=async e=>{e.target.disabled=true;status.textContent=t("loading");try{const data=await api(destination.value==="site"?"/inbox/count":"/broadcast/count",filters());status.textContent=data.count+" "+l.recipients;}catch(error){status.textContent=t("error")+" "+error.message;}finally{e.target.disabled=false;}};
@@ -288,14 +328,15 @@
       (item.verify?`<p><b>Como conferir:</b> ${esc(item.verify)}</p>`:"");
   }
 
-  async function openContract(){
-    const body=shell(`${backButton()}<div class="adminPanel"><h3>⛓️ ${esc(t("contract"))}</h3><div id="contractState">${esc(t("loading"))}</div></div><div class="adminPanel"><h3>Carteira owner</h3><div id="adminTonConnect"></div><p class="adminNote">A sessão de administrador é validada pelo servidor. A transação só é construída e enviada se a carteira conectada também for o owner do contrato.</p></div><div class="adminPanel"><h3>Ação administrativa</h3><select id="contractAction" class="adminSelect">${Object.entries(CONTRACT_SCHEMA).map(([key,spec])=>`<option value="${key}">${esc(spec.label)}</option>`).join("")}</select><div id="contractFields"></div><div id="contractHelp" class="adminNote"></div><button id="contractSend" class="adminButton" style="margin-top:12px" type="button">Construir e assinar</button><div id="contractStatus" class="adminStatus"></div></div>`);bindBack(body);
+  async function openContract(selectedAction=""){
+    const body=shell(`${backButton()}<div class="adminPanel"><h3>⛓️ ${esc(t("contract"))}</h3><div id="contractState">${esc(t("loading"))}</div></div><div class="adminPanel"><h3>Carteira owner</h3><div id="adminTonConnect"></div><p class="adminNote">A sessão de administrador é validada pelo servidor. A transação só é construída e enviada se a carteira conectada também for o owner do contrato.</p></div><div class="adminPanel"><h3>Ação administrativa</h3><select id="contractAction" class="adminSelect">${Object.entries(CONTRACT_SCHEMA).filter(([key])=>can(`contract.${key}`)).map(([key,spec])=>`<option value="${key}">${esc(spec.label)}</option>`).join("")}</select><div id="contractFields"></div><div id="contractHelp" class="adminNote"></div><button id="contractSend" class="adminButton" style="margin-top:12px" type="button">Construir e assinar</button><div id="contractStatus" class="adminStatus"></div></div>`);bindBack(body);
     const stateBox=body.querySelector("#contractState"), action=body.querySelector("#contractAction"), status=body.querySelector("#contractStatus");
     try{
       const data=await api("/contract/state");
       stateBox.innerHTML=`<div class="adminStats"><div class="adminMetric"><small>Preço periódico</small><b>${data.currentPriceUsdt==null?"—":esc(data.currentPriceUsdt+" USDT")}</b></div><div class="adminMetric"><small>Preço anual</small><b>${data.annualPriceUsdt==null?"—":esc(data.annualPriceUsdt+" USDT")}</b></div><div class="adminMetric"><small>Ciclo em segundos</small><b>${esc(data.cycleSeconds??"—")}</b></div><div class="adminMetric"><small>Qualificação</small><b>${data.qualificationEnabled==null?"—":data.qualificationEnabled?"ON":"OFF"}</b></div></div><p><b>Owner:</b> ${esc(data.ownerFriendly||data.owner||"—")}</p><p><b>Tesouraria:</b> ${esc(data.treasuryFriendly||data.treasury||"—")}</p><p><b>Jetton Wallet:</b> ${data.myJettonWalletConfigured?"✅ configurada":"⚠️ revisar"}</p>`;
     }catch(error){stateBox.innerHTML=`<span class="adminError">${esc(t("error"))} ${esc(error.message)}</span>`}
     try{contractManual=(await api("/manual")).manual}catch{contractManual=null}
+    if(selectedAction&&[...action.options].some(o=>o.value===selectedAction))action.value=selectedAction;
     renderContractFields(body,action.value);
     action.addEventListener("change",()=>renderContractFields(body,action.value));
     try{
@@ -332,13 +373,43 @@
     });
   }
 
+  async function sendManualForm(form){
+    const action=form.dataset.contractAction,status=form.querySelector('.adminStatus'),button=form.querySelector('button');
+    const wallet=tonUi?.account?.address||tonUi?.wallet?.account?.address||'';
+    if(!wallet){status.textContent='Conecte a carteira owner acima.';return}
+    const params={};for(const field of form.querySelectorAll('[name]')){if(!field.value.trim()&&field.name!=='referrer'){status.textContent='Preencha os campos obrigatórios.';return}params[field.name]=field.dataset.type==='boolean'?field.value==='true':field.value;}
+    if(!confirm(`Confirmar ${CONTRACT_SCHEMA[action].label}?\n${Object.entries(params).map(([key,value])=>key+': '+String(value)).join('\n')}\nOwner: ${wallet}`))return;
+    button.disabled=true;form.querySelectorAll('input,select').forEach(f=>f.disabled=true);
+    try{const data=await api('/contract/build',{owner:wallet,action,params});await tonUi.sendTransaction(data.tx);status.textContent='Solicitação enviada. Confira a execução na blockchain e consulte o estado do contrato.'}catch(error){status.textContent=error.message}finally{button.disabled=false;form.querySelectorAll('input,select').forEach(f=>f.disabled=false)}
+  }
+  async function connectManualWallet(){
+    if(!window.TON_CONNECT_UI?.TonConnectUI)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js';script.onload=resolve;script.onerror=reject;document.head.appendChild(script)});
+    tonUi=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:'manualTonConnect'});
+    tonUi.onModalStateChange?.(state=>{const layer=document.querySelector('.adminCenterLayer');if(layer)layer.style.visibility=state?.status==='opened'?'hidden':'visible'});
+  }
   async function openManual(){
-    const body=shell(`${backButton()}<div class="adminPanel">${esc(t("loading"))}</div>`);bindBack(body);
+    const body=shell(`${backButton()}<div class="adminPanel">${esc(t('loading'))}</div>`);bindBack(body);
     try{
-      const data=await api("/manual"), manual=data.manual||{};
-      body.querySelector(".adminPanel").innerHTML=`<h3>📘 ${esc(manual.title||t("manual"))}</h3><p>${esc(manual.subtitle||"")}</p>${(manual.notes||[]).map((note)=>`<p>• ${esc(note)}</p>`).join("")}${(manual.sections||[]).map((section)=>`<section class="adminManualSection"><h4>${esc(section.title)}</h4><p>${esc(section.description||"")}</p>${(section.items||[]).map((item)=>`<details><summary>${esc(item.name||"Função")} ${item.opcode?`· ${esc(item.opcode)}`:""}</summary><p><b>Acesso:</b> ${esc(item.access||"—")}</p><p>${esc(item.purpose||"")}</p>${manualProcedure(item)}</details>`).join("")}</section>`).join("")}</div>`;
-    }catch(error){body.querySelector(".adminPanel").innerHTML=`<span class="adminError">${esc(t("error"))} ${esc(error.message)}</span>`}
+      const data=await api('/manual'),manual=data.manual||{};contractManual=manual;
+      const operational={ 'Visão geral e acesso':'overview','Mensagens e suporte':'support','Comunidades':'communities','Cadastrar benefício':'benefit-create','Benefícios e Parceiros':'benefits','Benefícios':'benefits','Parceiros':'partners','Avaliadores':'reviewers','Enviar mensagem para o site':'broadcast','Enviar mensagem para o Telegram':'broadcast','Publicar no canal':'channel','Convite de parceiro':'invite','Identidade do aplicativo':'branding','Consultar e alterar o contrato':'contract','Administradores e permissões':'delegates'};
+      body.querySelector('.adminPanel').innerHTML=`<h3>📘 ${esc(manual.title||t('manual'))}</h3><p>${esc(manual.subtitle||'')}</p><label class="adminLabel">Buscar função</label><input class="adminField" id="manualSearch" type="search" placeholder="Ex.: preço anual, tesouraria, mensagens"><div class="adminToolbar"><button class="adminButton secondary" data-manual-area="contract">Consultar estado do contrato</button><button class="adminButton secondary" data-manual-area="delegates">Administradores e permissões</button></div>${data.contractActions?.length?'<div class="adminItem"><b>Carteira para assinar alterações</b><div id="manualTonConnect"></div><p>Conecte a owner. Ler o manual e preencher campos não envia transações.</p></div>':''}${(manual.notes||[]).map(note=>`<p>• ${esc(note)}</p>`).join('')}${(manual.sections||[]).map(section=>`<section class="adminManualSection"><h4>${esc(section.title)}</h4><p>${esc(section.description||'')}</p>${(section.items||[]).filter(item=>!item.action||can('contract.'+item.action)).map(item=>{
+        const spec=CONTRACT_SCHEMA[item.action];const area=operational[item.name];
+        const form=spec&&can('contract.'+item.action)?`<form data-contract-action="${esc(item.action)}">${spec.fields.map(([name,label,type])=>`<label class="adminLabel">${esc(label)}</label>${type==='boolean'?`<select class="adminSelect" name="${name}" data-type="boolean"><option value="true">${name==='paused'?'Sim — pausar pagamentos':'Sim — ativar'}</option><option value="false">${name==='paused'?'Não — abrir pagamentos':'Não — desativar'}</option></select>`:`<input class="adminField" name="${name}" type="${type==='number'?'number':'text'}" step="any" ${name==='referrer'?'':'required'} autocomplete="off">`}`).join('')}<button class="adminButton" style="margin-top:12px" type="submit">${esc(spec.label)} — assinar na Wallet</button><p class="adminStatus" role="status"></p></form>`:area?`<button class="adminButton secondary" data-manual-area="${esc(area)}">Abrir ${esc(item.name)}</button>`:'';
+        return `<details data-manual-item><summary>${esc(item.name||'Função')}</summary><p><b>O que faz:</b> ${esc(item.purpose||'')}</p><p><b>Quem pode executar:</b> ${esc(item.access||'—')}</p>${manualProcedure(item)}${form}</details>`;
+      }).join('')}</section>`).join('')}`;
+      body.querySelectorAll('[data-manual-area]').forEach(button=>{const permission=ADMIN_AREA_PERMISSIONS[button.dataset.manualArea];if(permission&&!can(permission)&&!(button.dataset.manualArea==='broadcast'&&can('broadcast.send'))){button.remove();return}button.onclick=()=>button.dataset.manualArea==='overview'?void open():navigateAdmin(button.dataset.manualArea)});
+      body.querySelectorAll('[data-contract-action]').forEach(form=>form.onsubmit=e=>{e.preventDefault();void sendManualForm(form)});
+      body.querySelector('#manualSearch').oninput=e=>{const query=e.target.value.toLocaleLowerCase();body.querySelectorAll('[data-manual-item]').forEach(item=>item.hidden=!item.textContent.toLocaleLowerCase().includes(query));body.querySelectorAll('.adminManualSection').forEach(section=>section.hidden=![...section.querySelectorAll('[data-manual-item]')].some(item=>!item.hidden))};
+      if(data.contractActions?.length)try{await connectManualWallet()}catch{body.querySelector('#manualTonConnect').textContent='Não foi possível carregar a conexão. Reabra o manual para tentar novamente.'}
+    }catch(error){body.querySelector('.adminPanel').innerHTML=`<span class="adminError">${esc(t('error'))} ${esc(error.message)}</span>`}
   }
 
-  window.EduCashProAdminCenter={open,close,openContent,openReviewers,openBroadcast,openChannel,openInvite,openContract,openManual};
+  async function mountShortcut(){
+    const target=document.getElementById('areaAdminShortcut');if(!target)return;
+    try{const data=await api('/access');if(!data.permissions?.admin||!target.isConnected)return;
+      target.classList.remove('hidden');target.innerHTML=`<button class="areaAdminEntry" type="button"><span>🛠️</span><span><strong>${esc(t('title'))}</strong><small>${esc(t('manual'))}</small></span><b>›</b></button>`;target.querySelector('button').onclick=()=>void open();
+    }catch{if(target.isConnected)target.classList.add('hidden')}
+  }
+  document.addEventListener('educashpro:area-rendered',()=>void mountShortcut());
+  window.EduCashProAdminCenter={mountShortcut,open,close,openContent,openReviewers,openBroadcast,openChannel,openInvite,openContract,openManual,openDelegates};
 })();

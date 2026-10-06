@@ -364,6 +364,7 @@
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        ...(path.startsWith("/api/admin/") || path.startsWith("/api/platform-admin/") ? {"X-Admin-Unlock":sessionStorage.getItem("educashpro.admin.unlock")||""}:{}),
       },
       body: JSON.stringify(body),
       cache: "no-store",
@@ -825,7 +826,7 @@
     const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
     try {
       const data = await loadOverview(true);
-      if (!data.permissions?.admin) {
+      if (!data.permissions?.admin || (!data.permissions.primary && !data.permissions.actions?.includes("branding.edit"))) {
         body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
         return;
       }
@@ -898,6 +899,7 @@
             headers: {
               "Content-Type": "image/png",
               Authorization: `Bearer ${token}`,
+        "X-Admin-Unlock": sessionStorage.getItem("educashpro.admin.unlock") || "",
             },
             body: blob,
             cache: "no-store",
@@ -945,7 +947,7 @@
 
   async function openAdmin() {
     if (window.EduCashProPlatform?.isWeb?.() && !window.EduCashProAdminCenter?.open) {
-      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261006-admin-guide"); } catch {}
+      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261006-admin-actions"); } catch {}
     }
     if (window.EduCashProAdminCenter?.open) {
       close();
@@ -1051,11 +1053,12 @@
     target.dataset.checked = "1";
     if (adminShortcutCheck) {
       await adminShortcutCheck.catch(() => {});
+      if(target.isConnected){delete target.dataset.checked;void mountAdminShortcut();}
       return;
     }
     adminShortcutCheck = (async () => {
       try {
-        const data = await loadOverview();
+        const data = await loadOverview(true);
         if (!data?.permissions?.admin || !target.isConnected) return;
         target.classList.remove("hidden");
         target.innerHTML = `
@@ -1066,7 +1069,7 @@
           </button>`;
         target.querySelector("#areaAdminEntry")?.addEventListener("click", () => openAdmin());
       } catch {
-        if (target.isConnected) target.classList.add("hidden");
+        if (target.isConnected) { target.classList.add("hidden"); delete target.dataset.checked; }
       } finally {
         adminShortcutCheck = null;
       }
@@ -1100,6 +1103,7 @@
     setTimeout(install, 100);
   }
   window.addEventListener("educashpro:web-session-ready", () => setTimeout(install, 100));
+  document.addEventListener("educashpro:area-rendered", () => void mountAdminShortcut());
   window.EduCashProAccountCenter = {
     open,
     openAdmin,
