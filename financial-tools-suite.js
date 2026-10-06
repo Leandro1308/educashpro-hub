@@ -93,29 +93,14 @@ function help(text){const el=document.createElement("div");el.className="finHelp
 function wireHelp(text){document.getElementById("finHelp").onclick=()=>help(text)}
 function showLimit(){const el=document.createElement("div");el.className="finHelpOverlay";el.innerHTML=`<section class="finHelpCard"><button class="finHelpClose">✕</button><h2>🔒 ${esc(t("limitTitle"))}</h2><p>${esc(t("limitText"))}</p><button id="finSubscribe" class="wideButton">${esc(t("activate"))}</button></section>`;document.body.appendChild(el);el.querySelector(".finHelpClose").onclick=()=>el.remove();el.querySelector("#finSubscribe").onclick=()=>{el.remove();opt.subscribe?.()}}
 function canAdd(name,limit){return active()||read(name,[]).length<limit}
-function persistScenario(name,data,limit=3){const list=read(name,[]);if(!active()&&list.length>=limit)return showLimit();list.unshift({id:Date.now(),...data});write(name,list)}
-function canCalculateToday(name,limit=5){if(active())return true;const day=new Date().toISOString().slice(0,10),k="usage:"+name+":"+day,count=Number(read(k,0)||0);if(count>=limit){showLimit();return false}write(k,count+1);return true}
 function rule(n){return t("freeRule").replace("{n}",String(n))}
 function field(id,label,type="number",value=""){return `<label class="finField"><span>${esc(label)}</span><input id="${id}" type="${type}" value="${esc(value)}" ${type==="number"?'step="any" inputmode="decimal"':""}></label>`}
 function currencyField(){return `<label class="finField"><span>${esc(t("currency"))}</span><select id="finCurrency">${currencies()}</select></label>`}
 function resultBox(rows){return `<section class="finResults">${rows.map(([a,b])=>`<article><small>${esc(a)}</small><strong>${esc(b)}</strong></article>`).join("")}</section>`}
-function calcShell(title,sub,helpKey,fields,calc,example,saveName){
- target().innerHTML=header(title,sub)+`<section class="finCard"><div class="finGrid">${currencyField()}${fields}</div><div class="finActions"><button id="finCalc" class="wideButton">${esc(t("calculate"))}</button><button id="finExample" class="secondaryButton">${esc(t("example"))}</button><button id="finSave" class="secondaryButton">${esc(t("save"))}</button></div><div id="finResult"></div><small class="finRule">${esc(active()?t("unlimited"):(lang()==="pt"?"Até 5 cálculos por dia e 3 resultados salvos.":lang()==="en"?"Up to 5 calculations per day and 3 saved results.":lang()==="es"?"Hasta 5 cálculos por día y 3 resultados guardados.":"До 5 расчётов в день и 3 сохранённых результатов."))}</small></section>`;
- wireBack();wireHelp(t(helpKey));let last=null;
- document.getElementById("finCalc").onclick=()=>{const candidate=calc();if(candidate?.data&&!canCalculateToday(saveName,5))return;last=candidate;if(last?.html)document.getElementById("finResult").innerHTML=last.html};
- document.getElementById("finExample").onclick=()=>example();
- document.getElementById("finSave").onclick=()=>{if(!last)document.getElementById("finCalc").click();if(last?.data)persistScenario(saveName,last.data,3)};
-}
-
 function renderHub(){
  const cards=[
  ["📥",t("receivables"),t("receivablesSub"),renderReceivables],
- ["📄",t("quote"),t("quoteSub"),renderQuote],
- ["🏷️",t("salePrice"),t("salePriceSub"),renderSalePrice],
- ["⚖️",t("breakEven"),t("breakEvenSub"),renderBreakEven],
- ["🎯",t("revenueGoal"),t("revenueGoalSub"),renderRevenueGoal],
- ["📊",t("roi"),t("roiSub"),renderRoi],
- ["📈",t("compound"),t("compoundSub"),renderCompound]
+ ["📄",t("quote"),t("quoteSub"),renderQuote]
  ];
  target().innerHTML=`<button id="finBack" class="textButton">← ${esc(t("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>💼 ${esc(t("hubTitle"))}</h1><p>${esc(t("hubSub"))}</p></section><section class="quickGrid">${cards.map((c,i)=>`<button class="quickCard" data-fin-card="${i}"><span class="emoji">${c[0]}</span><strong>${esc(c[1])}</strong><small>${esc(c[2])}</small><span class="freeAccessBadge">${esc(active()?t("unlimited"):t("limited"))}</span></button>`).join("")}</section>`;
  document.getElementById("finBack").onclick=()=>opt.back?.();
@@ -151,29 +136,13 @@ function renderQuote(){
  document.getElementById("qGenerate").onclick=()=>{const issuer=document.getElementById("qIssuer").value.trim(),customer=document.getElementById("qCustomer").value.trim(),currency=document.getElementById("finCurrency").value,ref=document.getElementById("qRef").value.trim();const parsed=items.map((_,i)=>({name:document.getElementById("qiN"+i)?.value.trim(),qty:num("qiQ"+i),price:num("qiP"+i)})).filter(x=>x.name&&x.qty>0&&x.price>=0);if(!issuer||!customer||!parsed.length)return alert(t("invalid"));if(!active()&&!canAdd("quotes",limit))return showLimit();const total=parsed.reduce((s,x)=>s+x.qty*x.price,0);const doc={id:Date.now(),issuer,customer,currency,ref,items:parsed,notes:document.getElementById("qNotes").value.trim(),total};const saved=read("quotes",[]);saved.unshift(doc);write("quotes",saved);document.getElementById("quotePreview").innerHTML=`<section class="finDocument" id="finPrintable"><header><strong>EduCashPro</strong><h2>${esc(t("docTitle"))}</h2><small>${esc(t("quoteNumber"))}: ${esc(ref)}</small></header><p><b>${esc(t("issuer"))}:</b> ${esc(issuer)}</p><p><b>${esc(t("customer"))}:</b> ${esc(customer)}</p><table><thead><tr><th>${esc(t("item"))}</th><th>${esc(t("qty"))}</th><th>${esc(t("unitPrice"))}</th><th>Total</th></tr></thead><tbody>${parsed.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.qty}</td><td>${esc(money(x.price,currency))}</td><td>${esc(money(x.qty*x.price,currency))}</td></tr>`).join("")}</tbody><tfoot><tr><td colspan="3">Total</td><td>${esc(money(total,currency))}</td></tr></tfoot></table>${doc.notes?`<p>${esc(doc.notes)}</p>`:""}<p class="finDocNote">${esc(t("docNote"))}</p><button id="qPrint" class="wideButton noPrint">${esc(t("print"))}</button></section>`;document.getElementById("qPrint").onclick=()=>window.print()};
 }
 
-function renderSalePrice(){
- calcShell(t("salePrice"),t("salePriceSub"),"helpSalePrice",field("spCost",t("cost"))+field("spExtra",t("extraCosts"))+field("spFees",t("fees"))+field("spMargin",t("targetMargin")) ,()=>{const c=num("spCost")+num("spExtra"),f=num("spFees")/100,m=num("spMargin")/100,den=1-f-m;if(!(c>0)||den<=0)return {html:`<p class="finError">${esc(t("invalid"))}</p>`};const p=c/den,fees=p*f,profit=p-c-fees,margin=profit/p*100,cur=document.getElementById("finCurrency").value;return {html:resultBox([[t("salePriceResult"),money(p,cur)],[t("profit"),money(profit,cur)],[t("margin"),margin.toFixed(2)+"%"]]),data:{c,f,m,p,profit,margin,cur}}},()=>{spCost.value=50;spExtra.value=10;spFees.value=5;spMargin.value=30},"sale-price");
-}
-function renderBreakEven(){
- calcShell(t("breakEven"),t("breakEvenSub"),"helpBreakEven",field("beFixed",t("fixedCosts"))+field("beVar",t("variableUnit"))+field("bePrice",t("unitPriceLabel")) ,()=>{const F=num("beFixed"),v=num("beVar"),p=num("bePrice");if(!(F>=0)||!(p>v))return {html:`<p class="finError">${esc(t("invalid"))}</p>`};const q=Math.ceil(F/(p-v)),rev=q*p,cur=document.getElementById("finCurrency").value;return {html:resultBox([[t("breakEvenQty"),String(q)],[t("breakEvenRevenue"),money(rev,cur)]]),data:{F,v,p,q,rev,cur}}},()=>{beFixed.value=5000;beVar.value=40;bePrice.value=100},"break-even");
-}
-function renderRevenueGoal(){
- calcShell(t("revenueGoal"),t("revenueGoalSub"),"helpRevenueGoal",field("rgFixed",t("fixedCosts"))+field("rgVar",t("variablePercent"))+field("rgProfit",t("desiredProfit")) ,()=>{const F=num("rgFixed"),v=num("rgVar")/100,P=num("rgProfit");if(F<0||P<0||v<0||v>=1)return {html:`<p class="finError">${esc(t("invalid"))}</p>`};const r=(F+P)/(1-v),cur=document.getElementById("finCurrency").value;return {html:resultBox([[t("revenueNeeded"),money(r,cur)],[t("dailyGoal"),money(r/30,cur)],[t("weeklyGoal"),money(r/4.345,cur)]]),data:{F,v,P,r,cur}}},()=>{rgFixed.value=3000;rgVar.value=30;rgProfit.value=5000},"revenue-goal");
-}
-function renderRoi(){
- calcShell(t("roi"),t("roiSub"),"helpRoi",field("roiInv",t("investment"))+field("roiRev",t("revenue"))+field("roiCosts",t("otherCosts")) ,()=>{const I=num("roiInv"),R=num("roiRev"),C=num("roiCosts");if(!(I>0))return {html:`<p class="finError">${esc(t("invalid"))}</p>`};const net=R-C-I,roi=net/I*100,cur=document.getElementById("finCurrency").value;return {html:resultBox([[t("netReturn"),money(net,cur)],[t("roiResult"),roi.toFixed(2)+"%"]]),data:{I,R,C,net,roi,cur}}},()=>{roiInv.value=2000;roiRev.value=3400;roiCosts.value=400},"roi");
-}
-function renderCompound(){
- calcShell(t("compound"),t("compoundSub"),"helpCompound",field("ciInitial",t("initial"))+field("ciContribution",t("monthlyContribution"))+field("ciWithdrawal",t("monthlyWithdrawal"))+field("ciRate",t("rateAnnual"))+field("ciYears",t("years")) ,()=>{const initial=num("ciInitial"),con=num("ciContribution"),wit=num("ciWithdrawal"),annual=num("ciRate")/100,years=num("ciYears");if(initial<0||con<0||wit<0||annual<0||years<=0)return {html:`<p class="finError">${esc(t("invalid"))}</p>`};const months=Math.round(years*12),monthly=Math.pow(1+annual,1/12)-1;let balance=initial;for(let i=0;i<months;i++){balance=balance*(1+monthly)+con-wit}const contributed=initial+con*months,withdrawn=wit*months,interest=balance+withdrawn-contributed,cur=document.getElementById("finCurrency").value;return {html:resultBox([[t("future"),money(balance,cur)],[t("contributed"),money(contributed,cur)],[t("withdrawn"),money(withdrawn,cur)],[t("interestGain"),money(interest,cur)]]),data:{initial,con,wit,annual,years,balance,contributed,withdrawn,interest,cur}}},()=>{ciInitial.value=1000;ciContribution.value=200;ciWithdrawal.value=0;ciRate.value=8;ciYears.value=10},"compound");
-}
-
 function setOptions(args={},toolBack=null){
  opt={language:LANGS.includes(args.language)?args.language:(window.EduCashProLocale?.resolve?.()||"pt"),session:args.session||window.__EDUCASHPRO_SESSION__||{},active:args.active===true,back:args.back,toolBack,subscribe:args.subscribe};
 }
 function render(args={}){setOptions(args,null);renderHub()}
 function open(id,args={}){
  setOptions(args,args.back||null);
- const map={receivables:renderReceivables,quote:renderQuote,"sale-price":renderSalePrice,"break-even":renderBreakEven,"revenue-goal":renderRevenueGoal,roi:renderRoi,compound:renderCompound};
+ const map={receivables:renderReceivables,quote:renderQuote};
  const fn=map[id];
  if(!fn)return renderHub();
  fn();

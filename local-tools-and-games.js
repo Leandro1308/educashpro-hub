@@ -334,11 +334,6 @@
       toolCard("quote","📄",tr("quote"),tr("quoteSub"),access,accessClass)
     ];
     const businessCards = [
-      toolCard("sale-price","🏷️",tr("salePrice"),tr("salePriceSub"),access,accessClass),
-      toolCard("break-even","⚖️",tr("breakEven"),tr("breakEvenSub"),access,accessClass),
-      toolCard("revenue-goal","🎯",tr("revenueGoal"),tr("revenueGoalSub"),access,accessClass),
-      toolCard("roi","📊",tr("roi"),tr("roiSub"),access,accessClass),
-      toolCard("compound","📈",tr("compound"),tr("compoundSub"),access,accessClass),
       toolCard("affiliate","🌐",tr("affiliateCalc"),tr("affiliateCalcSub"),tr("free"),"free")
     ];
     const utilityCards = [
@@ -356,7 +351,7 @@
 
   async function openTool(id){
     if(id.startsWith("monthly-finance"))return openFinanceControl(id);
-    if(["receivables","quote","sale-price","break-even","revenue-goal","roi","compound"].includes(id))return openFinancialTool(id);
+    if(["receivables","quote"].includes(id))return openFinancialTool(id);
     if(id==="affiliate")return openAffiliateCalculator();
     if(id==="randomizers")return renderRandomizers();
     if(id==="games")return renderGames();
