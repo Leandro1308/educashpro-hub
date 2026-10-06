@@ -111,7 +111,7 @@
           <button class="adminCard" data-admin="invite"><span>🎟️</span><b>${esc(t("invite"))}</b><small>Convite vitalício de uso único</small></button>
           <button class="adminCard" data-admin="branding"><span>🎨</span><b>${esc(t("branding"))}</b><small>Ícone e identidade visual</small></button>
           <button class="adminCard" data-admin="contract"><span>⛓️</span><b>${esc(t("contract"))}</b><small>Estado e transações owner</small></button>
-          <button class="adminCard" data-admin="manual"><span>📘</span><b>${esc(t("manual"))}</b><small>Funções do SubscriptionSplitV6</small></button>
+          <button class="adminCard" data-admin="manual"><span>📘</span><b>${esc(t("manual"))}</b><small>Passo a passo do painel e contrato V6</small></button>
         </div>`;
       body.querySelectorAll("[data-admin]").forEach((button)=>button.addEventListener("click",()=>{
         const key=button.dataset.admin;
@@ -260,8 +260,10 @@
     recoverJettonUsdt:{label:"Recuperar USDT",fields:[["to","Destino","text"],["usdt","USDT","number"]]},
     recoverTon:{label:"Recuperar TON",fields:[["to","Destino","text"],["ton","TON","number"]]},
     setLifetimeUser:{label:"Definir vitalício",fields:[["user","Carteira do usuário","text"],["enabled","Ativo","boolean"]]},
-    setLifetimePriceUsdt:{label:"Preço vitalício",fields:[["newPriceUsdt","Preço em USDT","number"]]},
-    setRefundWindowSeconds:{label:"Janela de reembolso",fields:[["seconds","Segundos","number"]]},
+    setAnnualPriceUsdt:{label:"Preço anual",fields:[["newPriceUsdt","Preço anual em USDT","number"]]},
+    grantAnnualUser:{label:"Conceder um ano",fields:[["user","Carteira do usuário","text"],["referrer","Carteira do afiliado (opcional; somente usuário novo)","text"]]},
+    setJoinCommissionBps:{label:"Comissão da primeira compra",fields:[["bps","Comissão em BPS (6000 = 60%)","number"]]},
+    setRenewCommissionBps:{label:"Comissão de renovação",fields:[["level","Nível 1–5","number"],["bps","Comissão em BPS","number"]]},
     setRenewWindowSeconds:{label:"Janela de renovação",fields:[["seconds","Segundos","number"]]},
     setLifetimeManager:{label:"Lifetime Manager",fields:[["newManager","Endereço do manager","text"]]},
     grantLifetimeUser:{label:"Conceder vitalício",fields:[["user","Carteira do usuário","text"]]},
@@ -274,15 +276,26 @@
   function renderContractFields(body,action){
     const target=body.querySelector("#contractFields");const spec=CONTRACT_SCHEMA[action];if(!target||!spec)return;
     target.innerHTML=spec.fields.map(([name,label,type])=>`<label class="adminLabel">${esc(label)}</label>${type==="boolean"?`<select class="adminSelect" data-contract-field="${name}" data-type="boolean"><option value="true">Sim</option><option value="false">Não</option></select>`:`<input class="adminField" data-contract-field="${name}" data-type="${type}" type="${type==="number"?"number":"text"}" step="any">`}`).join("");
+    const hint=body.querySelector("#contractHelp");
+    const item=contractManual?.sections?.flatMap(section=>section.items||[]).find(item=>item.action===(action==="setCycleDays"?"setCycleSeconds":action));
+    if(hint)hint.innerHTML=item?`<p>${esc(item.purpose)}</p>${manualProcedure(item)}`:"Consulte o Manual do Admin antes de assinar.";
+  }
+
+  let contractManual=null;
+  function manualProcedure(item){
+    return (item.fields?`<p><b>Campos e exemplo:</b> ${esc(item.fields)}</p>`:"")+
+      (item.steps?.length?`<ol>${item.steps.map(step=>`<li>${esc(step)}</li>`).join("")}</ol>`:`<p><b>Como executar:</b> ${esc(item.use||"—")}</p>`)+
+      (item.verify?`<p><b>Como conferir:</b> ${esc(item.verify)}</p>`:"");
   }
 
   async function openContract(){
-    const body=shell(`${backButton()}<div class="adminPanel"><h3>⛓️ ${esc(t("contract"))}</h3><div id="contractState">${esc(t("loading"))}</div></div><div class="adminPanel"><h3>Carteira owner</h3><div id="adminTonConnect"></div><p class="adminNote">A sessão de administrador é validada pelo servidor. A transação só é construída e enviada se a carteira conectada também for o owner do contrato.</p></div><div class="adminPanel"><h3>Ação administrativa</h3><select id="contractAction" class="adminSelect">${Object.entries(CONTRACT_SCHEMA).map(([key,spec])=>`<option value="${key}">${esc(spec.label)}</option>`).join("")}</select><div id="contractFields"></div><button id="contractSend" class="adminButton" style="margin-top:12px" type="button">Construir e assinar</button><div id="contractStatus" class="adminStatus"></div></div>`);bindBack(body);
+    const body=shell(`${backButton()}<div class="adminPanel"><h3>⛓️ ${esc(t("contract"))}</h3><div id="contractState">${esc(t("loading"))}</div></div><div class="adminPanel"><h3>Carteira owner</h3><div id="adminTonConnect"></div><p class="adminNote">A sessão de administrador é validada pelo servidor. A transação só é construída e enviada se a carteira conectada também for o owner do contrato.</p></div><div class="adminPanel"><h3>Ação administrativa</h3><select id="contractAction" class="adminSelect">${Object.entries(CONTRACT_SCHEMA).map(([key,spec])=>`<option value="${key}">${esc(spec.label)}</option>`).join("")}</select><div id="contractFields"></div><div id="contractHelp" class="adminNote"></div><button id="contractSend" class="adminButton" style="margin-top:12px" type="button">Construir e assinar</button><div id="contractStatus" class="adminStatus"></div></div>`);bindBack(body);
     const stateBox=body.querySelector("#contractState"), action=body.querySelector("#contractAction"), status=body.querySelector("#contractStatus");
     try{
       const data=await api("/contract/state");
-      stateBox.innerHTML=`<div class="adminStats"><div class="adminMetric"><small>Preço</small><b>${data.currentPriceUsdt==null?"—":esc(data.currentPriceUsdt+" USDT")}</b></div><div class="adminMetric"><small>Ciclo</small><b>${esc(data.cycleSeconds??"—")}</b></div><div class="adminMetric"><small>Qualificação</small><b>${data.qualificationEnabled?"ON":"OFF"}</b></div></div><p><b>Owner:</b> ${esc(data.ownerFriendly||data.owner||"—")}</p><p><b>Tesouraria:</b> ${esc(data.treasuryFriendly||data.treasury||"—")}</p><p><b>Jetton Wallet:</b> ${data.myJettonWalletConfigured?"✅ configurada":"⚠️ revisar"}</p>`;
+      stateBox.innerHTML=`<div class="adminStats"><div class="adminMetric"><small>Preço periódico</small><b>${data.currentPriceUsdt==null?"—":esc(data.currentPriceUsdt+" USDT")}</b></div><div class="adminMetric"><small>Preço anual</small><b>${data.annualPriceUsdt==null?"—":esc(data.annualPriceUsdt+" USDT")}</b></div><div class="adminMetric"><small>Ciclo em segundos</small><b>${esc(data.cycleSeconds??"—")}</b></div><div class="adminMetric"><small>Qualificação</small><b>${data.qualificationEnabled==null?"—":data.qualificationEnabled?"ON":"OFF"}</b></div></div><p><b>Owner:</b> ${esc(data.ownerFriendly||data.owner||"—")}</p><p><b>Tesouraria:</b> ${esc(data.treasuryFriendly||data.treasury||"—")}</p><p><b>Jetton Wallet:</b> ${data.myJettonWalletConfigured?"✅ configurada":"⚠️ revisar"}</p>`;
     }catch(error){stateBox.innerHTML=`<span class="adminError">${esc(t("error"))} ${esc(error.message)}</span>`}
+    try{contractManual=(await api("/manual")).manual}catch{contractManual=null}
     renderContractFields(body,action.value);
     action.addEventListener("change",()=>renderContractFields(body,action.value));
     try{
@@ -296,21 +309,26 @@
       const wallet=tonUi?.account?.address||tonUi?.wallet?.account?.address||"";
       if(!wallet){status.textContent="Conecte a carteira owner.";return}
       const params={};
+      let missing=false;
       body.querySelectorAll("[data-contract-field]").forEach((field)=>{
         const type=field.dataset.type;let value=field.value;
+        if(type!=="boolean"&&!value.trim()&&field.dataset.contractField!=="referrer")missing=true;
         if(type==="boolean")value=value==="true";
-        else if(type==="number")value=Number(value);
         params[field.dataset.contractField]=value;
       });
+      if(missing){status.textContent="Preencha todos os campos obrigatórios.";return}
       const label=CONTRACT_SCHEMA[action.value]?.label||action.value;
-      if(!confirm("Confirmar a ação: "+label+"?"))return;
+      const reviewedAction=action.value;
+      const details=Object.entries(params).map(([key,value])=>key+": "+(String(value)||"tesouraria / vínculo existente")).join("\n");
+      if(!confirm("Confirmar a ação: "+label+"?\n"+details+"\nCarteira owner: "+wallet))return;
+      const sendButton=body.querySelector("#contractSend");sendButton.disabled=true;action.disabled=true;
       status.textContent=t("loading");
       try{
-        const data=await api("/contract/build",{owner:wallet,action:action.value,params});
+        const data=await api("/contract/build",{owner:wallet,action:reviewedAction,params});
         if(!data.tx)throw new Error("transaction_not_built");
         await tonUi.sendTransaction(data.tx);
-        status.textContent="Transação enviada para confirmação na carteira.";
-      }catch(error){status.textContent=t("error")+" "+error.message}
+        status.textContent="Solicitação enviada. Aguarde a confirmação na blockchain; depois reabra Contrato V6 para consultar o estado. Envio não comprova execução.";
+      }catch(error){status.textContent=t("error")+" "+error.message}finally{sendButton.disabled=false;action.disabled=false}
     });
   }
 
@@ -318,7 +336,7 @@
     const body=shell(`${backButton()}<div class="adminPanel">${esc(t("loading"))}</div>`);bindBack(body);
     try{
       const data=await api("/manual"), manual=data.manual||{};
-      body.querySelector(".adminPanel").innerHTML=`<h3>📘 ${esc(manual.title||t("manual"))}</h3><p>${esc(manual.subtitle||"")}</p>${(manual.notes||[]).map((note)=>`<p>• ${esc(note)}</p>`).join("")}${(manual.sections||[]).map((section)=>`<section class="adminManualSection"><h4>${esc(section.title)}</h4><p>${esc(section.description||"")}</p>${(section.items||[]).map((item)=>`<details><summary>${esc(item.name||"Função")} ${item.opcode?`· ${esc(item.opcode)}`:""}</summary><p><b>Acesso:</b> ${esc(item.access||"—")}</p><p>${esc(item.purpose||"")}</p><p><b>Uso:</b> ${esc(item.use||"")}</p></details>`).join("")}</section>`).join("")}</div>`;
+      body.querySelector(".adminPanel").innerHTML=`<h3>📘 ${esc(manual.title||t("manual"))}</h3><p>${esc(manual.subtitle||"")}</p>${(manual.notes||[]).map((note)=>`<p>• ${esc(note)}</p>`).join("")}${(manual.sections||[]).map((section)=>`<section class="adminManualSection"><h4>${esc(section.title)}</h4><p>${esc(section.description||"")}</p>${(section.items||[]).map((item)=>`<details><summary>${esc(item.name||"Função")} ${item.opcode?`· ${esc(item.opcode)}`:""}</summary><p><b>Acesso:</b> ${esc(item.access||"—")}</p><p>${esc(item.purpose||"")}</p>${manualProcedure(item)}</details>`).join("")}</section>`).join("")}</div>`;
     }catch(error){body.querySelector(".adminPanel").innerHTML=`<span class="adminError">${esc(t("error"))} ${esc(error.message)}</span>`}
   }
 
