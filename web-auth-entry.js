@@ -100,7 +100,8 @@
   }
   function requiredReauthMode(value){return window.EduCashProSessionPolicy?.walletLinked(value)?"wallet":"email"}
 
-  let tonConnectLoadPromise=nulnc function ensureTonConnectUi(){
+  let tonConnectLoadPromise=null;
+  async function ensureTonConnectUi(){
     if(window.TON_CONNECT_UI?.TonConnectUI)return true;
     if(tonConnectLoadPromise)return tonConnectLoadPromise;
     tonConnectLoadPromise=(async()=>{
@@ -215,7 +216,7 @@
   }
 
   async function openPairLogin(){injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("phoneLoginText"))}</p><div id="webPairLoading" class="webPairStatus">${esc(t("waiting"))}</div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;
-    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.reauthRequired=false;ate.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
+    try{state.pair=await auth.startDevicePairing();state.pairExpiresAt=resolvePairExpiry(state.pair);const sheet=layer.querySelector(".webAuthSheet");sheet.innerHTML=`<button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("pairTitle"))}</h2><p>${esc(t("pairInstructions"))}</p><div class="webPairCode">${esc(state.pair.code)}</div><div class="webPairStatus" id="webPairStatus">${esc(t("waiting"))}<br><span id="webPairCountdown">${esc(pairCountdownText())}</span></div>`;sheet.querySelector(".webAuthClose").onclick=closeLayer;updatePairCountdown();state.pairCountdownTimer=setInterval(updatePairCountdown,250);state.pairTimer=setInterval(async()=>{try{const result=await auth.checkDevicePairing(state.pair);if(result?.status==="approved"&&result?.token){clearPairTimer();state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()}}catch(error){if(error?.status===404||error?.data?.reason==="pair_expired"){clearPairTimer();const status=document.getElementById("webPairStatus");if(status)status.textContent=t("invalidCode")}}},1800)}catch(error){const status=document.getElementById("webPairLoading");if(status)status.textContent=t("pairFailed")}
   }
 
 
@@ -328,14 +329,11 @@
     void window.EduCashProApp?.setSession?.(state.session);
     // Entrar deve abrir imediatamente, como em um site comum.
     // Rotas antigas, chamadas de API e módulos pesados nunca bloqueiam a primeira tela.
-    window.EduCashProApp?.renderHome?.();
     window.__EDUCASHPRO_FAST_RENDERED__=true;
-
-    const params=new URL(location.href).searchParams;
-    const hasExplicitRoute=["view","course","academy","section"].some(key=>params.has(key));
-    if(hasExplicitRoute&&window.EduCashProApp?.resumeAuthenticatedExperience){
-      window.setTimeout(()=>{void window.EduCashProApp.resumeAuthenticatedExperience({restoreNavigation:false,restoreRemembered:false})},0);
-    }
+    const chosen=window.EduCashProNavigation?.current?.();
+    const entry=document.querySelector(".publicWelcome, .splash");
+    if(!chosen)void window.EduCashProApp?.resumeAuthenticatedExperience?.({restoreNavigation:false});
+    else if(entry)void window.EduCashProApp?.restoreRoute?.(chosen);
     return true;
   }
 

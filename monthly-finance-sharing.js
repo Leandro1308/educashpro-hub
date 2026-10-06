@@ -307,6 +307,8 @@
       ru: { shared: "Совместный финансовый контроль", editable: "Вы и приглашённые пользователи можете добавлять и изменять расходы.", refresh: "Обновить", setIncome: "Указать доход", addExpense: "Добавить расход", amount: "Сумма", category: "Категория", saveIncome: "Сохранить доход", saveExpense: "Добавить расход", updateExpense: "Обновить расход", edit: "Изменить", remove: "Удалить", confirm: "Удалить этот расход?", invalid: "Введите корректную сумму.", choose: "Выберите категорию." }
     }[options?.language] || null;
 
+    window.EduCashProApp?.rememberRoute?.("tools",`monthly-finance:shared:${workspaceId}:${month}`);
+    const viewerTicket=window.EduCashProNavigation?.stamp?.();
     let result;
     try {
       result = await api("/api/monthly-finance/month", { workspaceId, month });
@@ -315,6 +317,7 @@
       return;
     }
 
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(viewerTicket))return;
     const entryLabels={pt:{description:"Descrição",date:"Data / vencimento",paid:"Pago",pending:"A pagar"},en:{description:"Description",date:"Date / due date",paid:"Paid",pending:"To pay"},es:{description:"Descripción",date:"Fecha / vencimiento",paid:"Pagado",pending:"Por pagar"},ru:{description:"Описание",date:"Дата / срок оплаты",paid:"Оплачено",pending:"К оплате"}}[options.language];
     const workspace = result.workspace || {};
     viewedWorkspace = workspace;

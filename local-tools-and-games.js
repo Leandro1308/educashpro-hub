@@ -173,7 +173,9 @@
 
   async function renderGames(category = "") {
     window.EduCashProApp?.rememberRoute?.("tools", "games");
+    const ticket=window.EduCashProNavigation?.stamp?.();
     await window.EduCashProResources?.loadGames?.();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     if (window.EduCashProMentalGames?.renderCatalog) {
       return window.EduCashProMentalGames.renderCatalog({ back: renderToolsHub, lang: language() });
     }
@@ -207,6 +209,7 @@
   }
 
   function renderRandomizers() {
+    window.EduCashProApp?.rememberRoute?.("tools","randomizers");
     content().innerHTML = `<button id="drawBack" class="textButton">←</button><section class="hero"><span class="eyebrow">${esc(tr("free"))}</span><h1>🎲 ${esc(tr("drawTitle"))}</h1><p>${esc(tr("drawDesc"))}</p></section><button id="openRaffleCreator" class="quickCard"><span class="emoji">🎟️</span><strong>${esc(tr("raffleTitle"))}</strong><small>${esc(tr("raffleSub"))}</small><span class="freeAccessBadge">${esc(tr("subscriber"))}</span></button><div id="drawHelpOverlay" class="drawHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="drawHelpTitle"><section class="drawHelpCard"><button id="closeDrawHelp" class="drawHelpClose" type="button" aria-label="${esc(tr("closeHelp"))}">✕</button><span class="drawHelpIcon">🎲</span><h2 id="drawHelpTitle">${esc(tr("helpTitle"))}</h2><article><strong>👥 ${esc(tr("names"))}</strong><p>${esc(tr("helpNames"))}</p></article><article><strong>🔢 ${esc(tr("numbers"))}</strong><p>${esc(tr("helpNumbers"))}</p></article><article><strong>🤝 ${esc(tr("teams"))}</strong><p>${esc(tr("helpTeams"))}</p></article><button id="drawPresentationCta" class="drawPresentationCta" type="button">${esc(tr("presentationCta"))}</button></section></div><article class="toolCard"><div class="drawTabs"><button class="filter active" data-draw-tab="names">${esc(tr("names"))}</button><button class="filter" data-draw-tab="numbers">${esc(tr("numbers"))}</button><button class="filter" data-draw-tab="teams">${esc(tr("teams"))}</button></div><div id="drawFields"></div><button id="runDraw" class="wideButton">${esc(tr("draw"))}</button><button id="clearDraw" class="secondaryButton drawClear">${esc(tr("clear"))}</button><div id="localDrawResult" class="resultBox hidden"></div></article>`;
     document.getElementById("drawBack").onclick = home;
     document.getElementById("closeDrawHelp").onclick = () => document.getElementById("drawHelpOverlay")?.remove();
@@ -275,22 +278,33 @@
     return window.EduCashProApp?.openSubscription?.();
   }
 
-  async function openFinanceControl() {
+  async function openFinanceControl(route="monthly-finance") {
+    window.EduCashProApp?.rememberRoute?.("tools",route);
+    const ticket=window.EduCashProNavigation?.stamp?.();
+    const parts=route.split(":");
     await window.EduCashProResources?.loadFinance?.();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     const activeSession = currentSession();
-    window.EduCashProFinance?.render?.({
+    return window.EduCashProFinance?.render?.({
       language: language(),
       session: activeSession,
       active: activeSession?.profile?.active === true,
       back: renderToolsHub,
       subscribe: subscriptionCard,
-      api: platformApi
+      api: platformApi,
+      screen: parts[1] || "intro",
+      month: parts[2],
+      sharedWorkspace: parts[1] === "shared" ? parts[2] : "",
+      sharedMonth: parts[3]
     });
   }
 
   async function openFinancialTool(id) {
+    window.EduCashProApp?.rememberRoute?.("tools",id);
+    const ticket=window.EduCashProNavigation?.stamp?.();
     await window.EduCashProResources?.loadFinancialTools?.();
     const activeSession = currentSession();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     window.EduCashProFinancialTools?.open?.(id, {
       language: language(),
       session: activeSession,
@@ -336,15 +350,25 @@
     content().innerHTML = `<main class="toolsHubPage"><button id="toolsHubBack" class="textButton">←</button><section class="toolsHubHero"><span class="eyebrow">EDUCASHPRO</span><h1>🧰 ${esc(tr("tools"))}</h1><p>${esc(tr("toolsSub"))}</p></section>${toolsSection(tr("financeGroup"),tr("financeGroupSub"),financeCards)}${toolsSection(tr("businessGroup"),tr("businessGroupSub"),businessCards)}${toolsSection(tr("utilityGroup"),tr("utilityGroupSub"),utilityCards)}</main>`;
     document.getElementById("toolsHubBack").onclick = home;
     content().querySelectorAll("[data-tool-id]").forEach(button => button.onclick = () => {
-      const id = button.dataset.toolId;
-      if (id === "monthly-finance") return void openFinanceControl();
-      if (["receivables","quote","sale-price","break-even","revenue-goal","roi","compound"].includes(id)) return void openFinancialTool(id);
-      if (id === "affiliate") return openAffiliateCalculator();
-      if (id === "link-page") return void window.EduCashProResources?.loadLinks?.().then(() => window.EduCashProLinks?.renderPageEditor?.());
-      if (id === "smart-link") return void window.EduCashProResources?.loadLinks?.().then(() => window.EduCashProLinks?.renderShortener?.());
-      if (id === "randomizers") return renderRandomizers();
-      if (id === "games") return void renderGames();
+      void Promise.resolve(openTool(button.dataset.toolId)).catch(error=>console.warn("[EduCashPro] tool navigation:",error?.message||error));
     });
+  }
+
+  async function openTool(id){
+    if(id.startsWith("monthly-finance"))return openFinanceControl(id);
+    if(["receivables","quote","sale-price","break-even","revenue-goal","roi","compound"].includes(id))return openFinancialTool(id);
+    if(id==="affiliate")return openAffiliateCalculator();
+    if(id==="randomizers")return renderRandomizers();
+    if(id==="games")return renderGames();
+    if(["link-page","smart-link"].includes(id)){
+      window.EduCashProApp?.rememberRoute?.("tools",id);
+      const ticket=window.EduCashProNavigation?.stamp?.();
+      await window.EduCashProResources?.loadLinks?.();
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+      const action=id==="link-page"?window.EduCashProLinks?.renderPageEditor:window.EduCashProLinks?.renderShortener;
+      return action?.({back:renderToolsHub});
+    }
+    return renderToolsHub();
   }
 
   function enhanceHome() {
@@ -354,7 +378,7 @@
     grid.querySelectorAll('[data-target="tools"], [data-visitor-tools="1"]').forEach((button) => {
       button.classList.remove("lockedExperience");
       button.dataset.localToolsReady = "1";
-      button.onclick = renderToolsHub;
+      button.onclick = () => window.EduCashProApp?.renderTools?.();
     });
   }
 
@@ -362,5 +386,6 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener("DOMContentLoaded", enhanceHome);
 
-  window.EduCashProLocal = { renderGames, renderRandomizers, renderToolsHub };
+  window.EduCashProLocal = { renderGames, renderRandomizers, renderToolsHub, openTool };
 })();
+

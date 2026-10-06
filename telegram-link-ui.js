@@ -65,7 +65,7 @@
     try{
       const updated=await auth.validateStoredSession();
       const linked=updated?.profile?.telegramLinked===true;
-      if(linked&&!lastLinked){location.reload();return}
+      if(linked&&!lastLinked){await window.EduCashProApp?.setSession?.(updated);window.dispatchEvent(new CustomEvent("educashpro:telegram-linked",{detail:updated.profile}));}
       lastLinked=linked;
     }catch{}finally{checking=false}
   }
@@ -76,3 +76,4 @@
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")setTimeout(refreshAfterTelegram,300)});
   window.addEventListener("focus",()=>setTimeout(refreshAfterTelegram,300));
 })();
+

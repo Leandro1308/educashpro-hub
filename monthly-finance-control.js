@@ -536,6 +536,7 @@
       : `<p class="empty">${esc(t().empty)}</p>`;
   }
   function renderIntroduction() {
+    window.EduCashProApp?.rememberRoute?.("tools", "monthly-finance");
     const l = t();
     document.getElementById("content").innerHTML =
       `<main class="financeControl"><button class="textButton" id="financeBack">← ${esc(c().back)}</button><section class="financeWelcome"><span class="financeEyebrow">${esc(l.title)}</span><h1>${esc(l.lead)}</h1><p>${esc(l.intro)}</p><div class="financeAccessGrid"><article><h2>${esc(l.free)}</h2><p>${esc(l.basic)}</p></article><article class="financeAccessActive"><h2>${esc(l.premium)}</h2><p>${esc(l.full)}</p></article></div><p class="financeHint">👥 ${esc(l.guest)}</p><div class="financeWelcomeActions"><button id="financeStart" class="wideButton">${esc(l.start)} →</button>${options.active ? "" : `<button data-subscribe class="secondaryButton">${esc(l.subscribe)}</button>`}</div></section><section class="financePanel"><h2>${esc(l.about)}</h2><p>${esc(l.how)}</p></section><div id="financeSharedAccess"></div></main>`;
@@ -592,6 +593,10 @@
       .join("")}</section>`;
   }
   function renderPage() {
+    window.EduCashProApp?.rememberRoute?.(
+      "tools",
+      `monthly-finance:${tab}:${month}`,
+    );
     const r = record(),
       l = t();
     document.getElementById("content").innerHTML =
@@ -849,14 +854,22 @@
       active: args.active === true,
       session: args.session || {},
     };
-    month = currentMonth();
-    tab = "overview";
+    month = /^\d{4}-(0[1-9]|1[0-2])$/.test(args.month || "")
+      ? args.month
+      : currentMonth();
+    tab = ["overview", "entries", "plan", "reports"].includes(args.screen)
+      ? args.screen
+      : "overview";
     editing = "";
     search = "";
     filter = "";
     notice = "";
-    renderIntroduction();
-    window.EduCashProFinanceShare?.init?.({
+    if (!args.sharedWorkspace) {
+      if (args.screen && args.screen !== "intro") renderPage();
+      else renderIntroduction();
+    }
+    const financeTicket = window.EduCashProNavigation?.stamp?.();
+    const initialized = window.EduCashProFinanceShare?.init?.({
       ...options,
       read,
       hasPending: () => localStorage.getItem(storageKey() + ":pending") === "1",
@@ -868,6 +881,19 @@
       },
       backToFinance: renderPage,
     }).catch?.(() => {});
+    if (args.sharedWorkspace)
+      return Promise.resolve(initialized).then(() => {
+        if (
+          window.EduCashProNavigation &&
+          !window.EduCashProNavigation.isCurrent(financeTicket)
+        )
+          return;
+        return window.EduCashProFinanceShare?.openViewer?.(
+          args.sharedWorkspace,
+          args.sharedMonth,
+        );
+      });
+    return initialized;
   }
   window.EduCashProFinance = { render };
 })();

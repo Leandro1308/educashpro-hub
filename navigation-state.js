@@ -111,18 +111,7 @@
   }
 
   function restoreLastPage() {
-    if (restoring || !isEntryPath(location.pathname) || hasExplicitEntryIntent() || !hasIdentity()) {
-      return false;
-    }
-    const saved = read();
-    if (!saved || isEntryPath(saved.path)) return false;
-    restoring = true;
-    const target = new URL(location.href);
-    target.pathname = saved.path;
-    target.search = saved.search;
-    target.hash = saved.hash;
-    location.replace(target.toString());
-    return true;
+    return false;
   }
 
   function markEntry() {
@@ -158,8 +147,11 @@
   }
 
   document.addEventListener("click", (event) => {
-    const target = event.target?.closest?.("a[href], #back, .back, .backButton, [data-educash-home]");
+    const target = event.target?.closest?.("a[href], #back, .back, .backButton, .educashFallbackBack, [data-educash-home]");
     if (!target) return;
+    if(!isEntryPath(location.pathname) && target.matches("#back, .back, .backButton, .educashFallbackBack") && history.length > 1){
+      try{if(document.referrer && new URL(document.referrer).origin === location.origin){event.preventDefault();event.stopImmediatePropagation();history.back();return;}}catch{}
+    }
     if (target.matches("#back, .back, .backButton, [data-educash-home]")) {
       markEntry();
       return;

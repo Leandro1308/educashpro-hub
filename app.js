@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.05.2";
+  const APP_RUNTIME_BUILD = "2026.10.06.6";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -612,10 +612,6 @@
     applyLanguage();
     refreshCourseCatalogLater();
     if (window.__EDUCASHPRO_WEB_HUB__?.active && !state.hubSessionReady) void refreshHubSessionInBackground();
-    if (window.__EDUCASHPRO_MARKETS_OPEN__ === true) {
-      await openMarkets();
-      return true;
-    }
     return true;
   }
 
@@ -733,6 +729,7 @@
 
   function rememberRoute(view, detail = "") {
     try {
+      state.view = view;
       currentRouteDetail = String(detail || "").slice(0, 160);
       if (RESTORABLE_VIEWS.has(view)) {
         localStorage.setItem(LAST_ROUTE_KEY, JSON.stringify({ view, detail: currentRouteDetail, scrollY: 0 }));
@@ -746,7 +743,8 @@
       if (view === "learn" && detail) url.searchParams.set("academy", detail);
       if (view === "course" && detail) url.searchParams.set("course", detail);
       if (view === "benefits" && detail) url.searchParams.set("section", detail);
-      history.replaceState({ view, detail }, "", url.toString());
+      if(window.EduCashProNavigation)window.EduCashProNavigation.record({view,detail:currentRouteDetail});
+      else history.replaceState({ view, detail }, "", url.toString());
     } catch {}
   }
 
@@ -776,9 +774,12 @@
   }
 
   async function restoreRoute(route) {
+    const restoreTicket=window.EduCashProNavigation?.stamp?.();
     if (!route || !RESTORABLE_VIEWS.has(route.view)) return false;
     if (route.view === "course" && route.detail) {
-      await openCourse(route.detail);
+      const [id,mode]=route.detail.split(":");
+      await openCourse(id);
+      if(mode === "reader" && state.currentCourse?.id === id)renderBookReader();
       restoreRememberedScroll(route);
       return true;
     }
@@ -808,21 +809,20 @@
       return true;
     }
     if (route.view === "area" && ["professional", "links", "smart-link"].includes(route.detail)) {
-      renderArea();
       if (route.detail === "professional") await openAreaProfessional();
       else await openAreaLinks(route.detail === "smart-link" ? "short" : "page");
       restoreRememberedScroll(route);
       return true;
     }
-    if (route.view === "tools" && route.detail === "games") {
-      renderTools();
-      await window.EduCashProResources?.loadGames?.();
-      window.EduCashProMentalGames?.renderCatalog?.({ back: window.EduCashProLocal?.renderToolsHub, lang: state.language });
-      restoreRememberedScroll(route);
-      return true;
-    }
-    if (route.view === "tools") {
-      renderTools();
+    if(route.view === "area" && route.detail === "photo"){renderProfilePhotoEditor();return true;}
+    if(route.view === "area" && route.detail === "membership"){await renderMembershipProof();return true;}
+    if(["area","benefits"].includes(route.view) && route.detail?.startsWith("form-")){renderSubmissionForm(route.detail.slice(5));return true;}
+    if(route.view === "tools"){
+      if(route.detail){
+        await window.EduCashProResources?.loadToolsHub?.();
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(restoreTicket))return false;
+        await window.EduCashProLocal?.openTool?.(route.detail);
+      }else await renderTools();
       restoreRememberedScroll(route);
       return true;
     }
@@ -846,13 +846,14 @@
     const requestedView = String(params.get("view") || "");
     const requestedSection = String(params.get("section") || "");
 
-    if (requestedCourse) await openCourse(requestedCourse);
+    if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
     else if (requestedAcademy === "technical_analysis") await openMarkets();
     else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
     else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
     else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
     else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
-    else if (requestedView === "tools") renderTools();
+    else if(requestedView === "area" && params.get("panel"))await restoreRoute({view:"area",detail:params.get("panel")});
+    else if (requestedView === "tools") await restoreRoute({view:"tools",detail:params.get("tool")||""});
     else if (requestedView === "presentation") renderPresentation();
     else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
     else {
@@ -1231,6 +1232,8 @@
   }
 
   async function openMarkets() {
+    rememberRoute("learn","technical_analysis");
+    const marketTicket=window.EduCashProNavigation?.stamp?.();
     syncExternalSession();
     try {
       const access = await window.EduCashProAccess?.refresh?.();
@@ -1246,10 +1249,12 @@
         window.__EDUCASHPRO_SESSION__ = { ...currentSession, profile: state.profile };
       }
     } catch {}
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(marketTicket))return;
     state.view = "learn";
     rememberRoute("learn", "technical_analysis");
     updateNav();
     await window.EduCashProResources?.loadMarkets?.();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(marketTicket))return;
     const active = window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true;
     return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
   }
@@ -1308,7 +1313,9 @@
     state.view = "course";
     rememberRoute("course", courseId);
     updateNav();
+    const courseTicket=window.EduCashProNavigation?.stamp?.();
     await window.EduCashProResources?.loadCourses?.();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
     content.innerHTML = loadingCard();
     try {
       const localTechnicalCourse = window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
@@ -1321,11 +1328,13 @@
         return;
       }
       const data = await api("/api/hub/course", { token: state.token, courseId }, { blocking:false });
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
       state.currentCourse = data.course;
       try { localStorage.setItem(courseCacheKey(courseId), JSON.stringify(data.course)); } catch {}
       state.currentLesson = Math.min(getProgress(courseId), Math.max(0, data.course.lessons.length - 1));
       renderCourseIndex();
     } catch (error) {
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
       try {
         const cached = JSON.parse(localStorage.getItem(courseCacheKey(courseId)) || "null");
         const meta = state.courseCatalog.find((item) => item.id === courseId);
@@ -1343,6 +1352,7 @@
   function renderCourseIndex() {
     stopBookTracking();
     const course = state.currentCourse;
+    rememberRoute("course",course.id);
     const courseMeta = state.courseCatalog.find((item) => item.id === course.id);
     const completed = getProgress(course.id), storedPercent = Math.max(0,Math.min(100,Number(localStorage.getItem(`educashpro:course-percent:${course.id}`)||0)));
     const percent = storedPercent;
@@ -1362,6 +1372,7 @@
 
   function renderBookReader(startIndex=0){
     const course=state.currentCourse;if(!course)return renderLearn();
+    rememberRoute("course",`${course.id}:reader`);
     const copy={pt:{contents:"Sumário",back:"Sobre o curso",smaller:"Diminuir texto",larger:"Aumentar texto",finished:"Fim da formação",next:"Voltar às trilhas",light:"Usar página branca",dark:"Usar página preta"},en:{contents:"Contents",back:"About the course",smaller:"Smaller text",larger:"Larger text",finished:"End of course",next:"Back to paths",light:"Use white page",dark:"Use black page"},es:{contents:"Contenido",back:"Sobre el curso",smaller:"Reducir texto",larger:"Aumentar texto",finished:"Fin de la formación",next:"Volver a las rutas",light:"Usar página blanca",dark:"Usar página negra"},ru:{contents:"Содержание",back:"О курсе",smaller:"Уменьшить текст",larger:"Увеличить текст",finished:"Конец курса",next:"К направлениям",light:"Белая страница",dark:"Чёрная страница"}}[state.language];
     const grouped=course.chapters.map(ch=>({chapter:ch,lessons:course.lessons.map((lesson,index)=>({...lesson,index})).filter(lesson=>Number(lesson.ch)===Number(ch.id))})).filter(group=>group.lessons.length);
     const fontSize=Math.max(15,Math.min(23,Number(localStorage.getItem("educashpro:reader-font")||18)));
@@ -1416,6 +1427,7 @@
   }
 
   function renderNetworkProjection() {
+    rememberRoute("tools","affiliate");
     const saved = (() => { try { return JSON.parse(localStorage.getItem("educashpro:network-projection") || "{}"); } catch { return {}; } })();
     const levelFields = [1, 2, 3, 4, 5].map((level) => `<div class="field"><label>${escapeHtml(t("levelMembers"))} ${level}</label><input id="level${level}" inputmode="numeric" value="${Math.max(0, Number(saved[`level${level}`] || 0))}"></div>`).join("");
     content.innerHTML = `<button id="projectionBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero"><span class="eyebrow">EDUCASHPRO</span><h2>📊 ${escapeHtml(t("projection"))}</h2><p>${escapeHtml(t("projectionDesc"))}</p></section><article class="toolCard" style="margin-top:14px"><div class="fieldGrid"><div class="field"><label>${escapeHtml(t("price"))}</label><input id="projectionPrice" inputmode="decimal" value="${Number(saved.price || state.planPriceUsdt || 12)}"></div><div class="field"><label>${escapeHtml(t("newDirect"))}</label><input id="newDirect" inputmode="numeric" value="${Math.max(0, Number(saved.newDirect || 0))}"></div><div class="field"><label>${escapeHtml(t("activeDirect"))}</label><input id="activeDirect" inputmode="numeric" value="${Math.max(0, Number(saved.activeDirect || 0))}"></div>${levelFields}</div><button id="calculateProjection" class="wideButton" style="margin-top:14px">${escapeHtml(t("calculate"))}</button><div id="projectionResult" class="resultBox hidden"></div><div class="disclaimer">⚠️ ${escapeHtml(t("projectionDisclaimer"))}</div></article>`;
@@ -1467,9 +1479,12 @@
 
   async function loadDirectory() {
     const container = document.getElementById("directoryList");
+    if(!container)return;
+    const directoryTicket=window.EduCashProNavigation?.stamp?.();
     container.innerHTML = loadingCard();
     try {
       const data = await api("/api/hub/directory", { token: state.token, page: state.directoryPage, type: state.directoryType }, { blocking:false });
+      if(!container.isConnected || (window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(directoryTicket)))return;
       state.directoryData = data;
       container.innerHTML = `${data.sample ? `<div class="notice">${escapeHtml(t("sample"))}</div>` : ""}<div class="cardList" style="margin-top:12px">${data.items.length ? data.items.map(directoryCard).join("") : `<div class="empty">${escapeHtml(t("noItems"))}</div>`}</div><div class="pager"><button id="prevPage" ${data.page <= 1 ? "disabled" : ""}>← ${escapeHtml(t("previous"))}</button><span>${escapeHtml(t("page"))} ${data.page}</span><button id="nextPage" ${!data.hasMore ? "disabled" : ""}>${escapeHtml(t("next"))} →</button></div>`;
       container.querySelectorAll("[data-access]").forEach((button) => button.onclick = () => openUrl(button.dataset.access));
@@ -1489,6 +1504,7 @@
   }
 
   function renderSubmissionForm(kind, existingPartner = null) {
+    rememberRoute(kind === "project" ? "area" : "benefits",`form-${kind}`);
     if (!state.profile?.active) return openSubscription();
     const title = fc(kind);
     const common = field("description", fc("description"), "textarea") + field("destinationUrl", fc("url"));
@@ -1597,7 +1613,9 @@
   async function openAreaLinks(kind = "page") {
     try {
       rememberRoute("area", kind === "short" ? "smart-link" : "links");
+      const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadLinks?.();
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
       const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
       window.EduCashProLinks?.setSession?.(effectiveSession);
       const action = kind === "short" ? window.EduCashProLinks?.renderShortener : window.EduCashProLinks?.renderPageEditor;
@@ -1609,7 +1627,9 @@
   async function openAreaProfessional() {
     try {
       rememberRoute("area", "professional");
+      const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadProfessional?.();
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
       const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
       window.EduCashProProfessional?.setSession?.(effectiveSession);
       if (typeof window.EduCashProProfessional?.render !== "function") throw new Error("professional_unavailable");
@@ -1833,18 +1853,19 @@
     }
   }
 
-  function renderTools() {
+  async function renderTools() {
     state.view = "tools";
     rememberRoute("tools");
     updateNav();
-    if (window.EduCashProLocal?.renderToolsHub) return window.EduCashProLocal.renderToolsHub();
-    const load = window.EduCashProResources?.loadToolsHub;
-    if (typeof load === "function") {
-      content.innerHTML = loadingCard();
-      void load().then(() => window.EduCashProLocal?.renderToolsHub?.() || renderNetworkProjection()).catch(() => renderNetworkProjection());
-      return;
-    }
-    renderNetworkProjection();
+    const ticket=window.EduCashProNavigation?.stamp?.();
+    if(window.EduCashProLocal?.renderToolsHub){window.EduCashProLocal.renderToolsHub();return;}
+    content.innerHTML=loadingCard();
+    try{
+      await window.EduCashProResources?.loadToolsHub?.();
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+      if(typeof window.EduCashProLocal?.renderToolsHub!=="function")throw new Error("tools_unavailable");
+      window.EduCashProLocal.renderToolsHub();
+    }catch(error){if(!window.EduCashProNavigation || window.EduCashProNavigation.isCurrent(ticket))handleError(error);}
   }
 
   function calculateProfitMargin() {
@@ -2053,6 +2074,7 @@
   }
 
   function renderProfilePhotoEditor(backAction = renderArea) {
+    rememberRoute("area","photo");
     syncExternalSession();
     const copy = {
       pt: ["Foto do perfil", "Esta foto aparecerá no seu perfil EduCashPro no site e no mini app.", "Escolher foto", "Salvar foto", "Remover foto", "Salvando…", "Não foi possível enviar a foto. Verifique sua conexão e tente novamente.", "Escolha uma imagem válida de até 20 MB.", "Sua sessão expirou. Entre novamente e tente salvar a foto.", "O serviço de imagens ainda não está configurado. Tente novamente mais tarde.", "Não foi possível salvar a foto. Tente outra imagem ou tente novamente."],
@@ -2085,11 +2107,13 @@
     };
     save.onclick = async () => {
       const status = document.getElementById("profilePhotoStatus");
+      const photoTicket=window.EduCashProNavigation?.stamp?.();
       try {
         save.disabled = true; save.textContent = copy[5];
         const profileImage = await uploadProfilePhoto(input.selectedFile);
         await saveProfilePhoto(profileImage);
         updateLocalProfileImage(profileImage);
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(photoTicket))return;
         renderArea();
       } catch (error) {
         console.error("[EduCashPro] Falha ao salvar foto do perfil:", error?.message || error);
@@ -2231,8 +2255,11 @@
   }
 
   async function renderMembershipProof(backAction = renderArea) {
+    rememberRoute("area","membership");
+    const proofTicket=window.EduCashProNavigation?.stamp?.();
     const returnTo = typeof backAction === "function" ? backAction : renderArea;
     const credential = await refreshMembershipCredential();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(proofTicket))return;
     const payload = decodeCredential(credential);
     if (!credential || !payload) {
       const unavailable = {
@@ -2407,7 +2434,8 @@
       if (cachedSession?.profile?.userId) {
         syncExternalSession(cachedSession);
         window.__EDUCASHPRO_FAST_RENDERED__ = true;
-        renderHome();
+        markAppReady("web-route-loading");
+        await resumeAuthenticatedExperience({restoreNavigation:false});
         markAppReady("web-cached-shell");
         void refreshHubSessionInBackground();
         return;
@@ -2422,9 +2450,11 @@
     // A primeira tela nunca depende do backend. A sessão do Telegram é sincronizada depois.
     renderPublicLanding();
 
+    const initTicket=window.EduCashProNavigation?.stamp?.();
     try {
       const session = await api("/api/hub/session", { initData: tg.initData }, { blocking: false, timeoutMs: 6000 });
       acceptHubSession(session);
+      if(window.EduCashProNavigation?.current?.() && !window.EduCashProNavigation.isCurrent(initTicket)){applyLanguage();bottomNav.classList.remove("hidden");markAppReady("session-only");return;}
       if (window.__EDUCASHPRO_FAST_RENDERED__ === true && window.__EDUCASHPRO_WEB_HUB__?.active) {
         hydrateCourseCatalogFromCache();
         applyLanguage();
@@ -2460,13 +2490,14 @@
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");
       const requestedSection = String(publicParams.get("section") || "");
-      if (requestedCourse) await openCourse(requestedCourse);
+      if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
       else if (requestedAcademy === "technical_analysis") await openMarkets();
       else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
       else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
       else if (requestedView === "benefits" && requestedSection === "partner-stores") location.assign("./marketplace.html");
       else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
-      else if (requestedView === "tools") renderTools();
+      else if(requestedView === "area" && publicParams.get("panel"))await restoreRoute({view:"area",detail:publicParams.get("panel")});
+      else if (requestedView === "tools") await restoreRoute({view:"tools",detail:publicParams.get("tool")||""});
       else if (requestedView === "presentation") renderPresentation();
       else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
       else {
@@ -2520,6 +2551,7 @@
     if (document.visibilityState === "hidden") flushRememberedRoute();
   });
   window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
+  window.EduCashProNavigation?.configure?.(restoreRoute);
   window.addEventListener("educashpro:web-hub-ready",()=>{
     tg=window.Telegram?.WebApp||tg;
     void refreshHubSessionInBackground();
