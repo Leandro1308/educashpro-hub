@@ -3,6 +3,7 @@
 
   const COPY = {
     pt: {
+      qrTitle: "Gerador de QR Code", qrSub: "Transforme seu link em QR Code e baixe a imagem.",
       games: "Jogos e entretenimento", gamesSub: "Jogos organizados por categoria", open: "Abrir jogo",
       gamesTitle: "Catálogo de jogos", gamesDesc: "Escolha uma categoria e abra o jogo na plataforma do responsável.",
       all: "Todos", empty: "Nenhum jogo disponível nesta categoria.", external: "Conteúdo operado por terceiros.",
@@ -33,6 +34,7 @@
       compound: "Juros Compostos Avançados", compoundSub: "Simule aportes, retiradas, taxa e prazo.",
     },
     en: {
+      qrTitle: "QR Code Generator", qrSub: "Turn your link into a QR code and download the image.",
       games: "Games and entertainment", gamesSub: "Games organized by category", open: "Open game",
       gamesTitle: "Game catalog", gamesDesc: "Choose a category and open the game on its provider's platform.",
       all: "All", empty: "No games available in this category.", external: "Third-party content.",
@@ -63,6 +65,7 @@
       compound: "Advanced Compound Interest", compoundSub: "Simulate contributions, withdrawals, rate and term.",
     },
     es: {
+      qrTitle: "Generador de QR", qrSub: "Convierte tu enlace en un código QR y descarga la imagen.",
       games: "Juegos y entretenimiento", gamesSub: "Juegos organizados por categoría", open: "Abrir juego",
       gamesTitle: "Catálogo de juegos", gamesDesc: "Elige una categoría y abre el juego en la plataforma del responsable.",
       all: "Todos", empty: "No hay juegos disponibles en esta categoría.", external: "Contenido operado por terceros.",
@@ -93,6 +96,7 @@
       compound: "Interés Compuesto Avanzado", compoundSub: "Simula aportes, retiros, tasa y plazo.",
     },
     ru: {
+      qrTitle: "Генератор QR-кода", qrSub: "Создайте QR-код из ссылки и скачайте изображение.",
       games: "Игры и развлечения", gamesSub: "Игры по категориям", open: "Открыть игру",
       gamesTitle: "Каталог игр", gamesDesc: "Выберите категорию и откройте игру на платформе владельца.",
       all: "Все", empty: "В этой категории пока нет игр.", external: "Контент стороннего поставщика.",
@@ -314,6 +318,24 @@
     });
   }
 
+  async function openQrGenerator() {
+    window.EduCashProApp?.rememberRoute?.("tools","qr-code");
+    const ticket=window.EduCashProNavigation?.stamp?.();
+    try {
+      await Promise.all([
+        window.EduCashProResources.style("./qr-generator.css"),
+        window.EduCashProResources.script("./vendor/qrcode.min.js")
+      ]);
+      await window.EduCashProResources.script("./qr-generator.js");
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+      window.EduCashProQrGenerator.render({language:language(),back:renderToolsHub});
+    } catch(error) {
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+      renderToolsHub();
+      console.warn("[EduCashPro] QR:",error?.message||error);
+    }
+  }
+
   function toolCard(id, icon, title, description, access, accessClass = "free") {
     return `<button class="toolsMenuCard" data-tool-id="${esc(id)}"><span class="toolsMenuIcon">${icon}</span><strong>${esc(title)}</strong><small>${esc(description)}</small><span class="toolsAccess"><span class="${esc(accessClass)}">${esc(access)}</span></span></button>`;
   }
@@ -339,6 +361,7 @@
     const utilityCards = [
       toolCard("link-page","🔗",window.EduCashProLinks?.text?.("pageTitle") || "Minha página de links",window.EduCashProLinks?.text?.("pageCardSub") || "Reúna seus links em uma página",tr("free"),"free"),
       toolCard("smart-link","✂️",window.EduCashProLinks?.text?.("shortTitle") || "Link Inteligente",window.EduCashProLinks?.text?.("shortCardSub") || "Crie links curtos com sua chamada",tr("free"),"free"),
+      toolCard("qr-code","▦",tr("qrTitle"),tr("qrSub"),tr("free"),"free"),
       toolCard("randomizers","🎲",tr("drawTitle"),tr("drawDesc"),tr("free"),"free"),
       toolCard("games","🎮",tr("games"),tr("gamesSub"),tr("free"),"free")
     ];
@@ -352,6 +375,7 @@
   async function openTool(id){
     if(id.startsWith("monthly-finance"))return openFinanceControl(id);
     if(["receivables","quote"].includes(id))return openFinancialTool(id);
+    if(id==="qr-code")return openQrGenerator();
     if(id==="affiliate")return openAffiliateCalculator();
     if(id==="randomizers")return renderRandomizers();
     if(id==="games")return renderGames();
