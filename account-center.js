@@ -1095,8 +1095,6 @@
     topbar.insertBefore(button, closeButton || null);
   }
 
-  const observer = new MutationObserver(install);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => setTimeout(install, 100), { once: true });
   } else {
