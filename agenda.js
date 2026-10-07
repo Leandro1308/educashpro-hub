@@ -1,62 +1,1388 @@
-(function(){
-  let tg=window.Telegram?.WebApp;const content=document.getElementById("content"),toast=document.getElementById("toast");
-  async function resolveTelegramRuntime(){
-    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__){
-      await Promise.race([
-        Promise.resolve(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__).catch(()=>false),
-        new Promise(resolve=>setTimeout(resolve,3000))
-      ]);
+import { COPY } from "./agenda-copy.js?v=20261007.1";
+import {
+  CURRENCIES,
+  defaultWeekly,
+  validateSettings,
+  localInput,
+  utcLocal,
+  dateKey,
+  minorDigits,
+  paymentSummary,
+} from "./agenda-model.js?v=20261007.1";
+import { encryptNote, decryptNote } from "./agenda-crypto.js?v=20261007.1";
+const root = document.getElementById("content"),
+  toast = document.getElementById("toast"),
+  escape = (v) =>
+    String(v ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c],
+    );
+const state = {
+  language: window.EduCashProLocale?.resolve?.() || "pt",
+  token: "",
+  profile: null,
+  access: null,
+  data: { appointments: [], services: [], clients: [], staff: [] },
+  agendas: [],
+  view: "agenda",
+  mode: "list",
+  date: new Date().toISOString().slice(0, 10),
+  agendaId: "",
+  query: "",
+  provider: "",
+  service: "",
+  publicId: "",
+  setupStep: 0,
+  setupDraft: {},
+  loadedRange: "",
+  busy: false,
+};
+let navigationEpoch = 0,
+  password = "",
+  financialCache = null;
+const detailAppointments = new Map();
+const t = (k) => COPY[state.language]?.[k] || COPY.pt[k] || k,
+  $ = (id) => document.getElementById(id),
+  zone = () =>
+    state.access?.agenda.settings.timeZone ||
+    Intl.DateTimeFormat().resolvedOptions().timeZone ||
+    "UTC",
+  currency = () => state.access?.agenda.settings.currency || "BRL",
+  p = () => state.access?.permissions || {},
+  uid = () =>
+    state.profile?.userId
+      ? `u:${state.profile.userId}`
+      : `t:${state.profile?.tgId || state.profile?.telegramId || ""}`;
+const money = (n, c = currency()) =>
+  c === "USDT"
+    ? new Intl.NumberFormat(state.language, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(n / 100) + " USDT"
+    : new Intl.NumberFormat(
+        state.language === "pt" ? "pt-BR" : state.language,
+        { style: "currency", currency: c },
+      ).format(n / 10 ** minorDigits(c));
+const dateText = (v) =>
+  new Intl.DateTimeFormat(state.language === "pt" ? "pt-BR" : state.language, {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: zone(),
+  }).format(new Date(v));
+function show(key) {
+  toast.textContent = t(key);
+  toast.classList.add("show");
+  window.setTimeout(() => toast.classList.remove("show"), 4500);
+}
+function button(id, label, cls = "secondary") {
+  return `<button type="button" id="${id}" class="button ${cls}">${escape(t(label))}</button>`;
+}
+function input(id, label, value = "", type = "text", extra = "") {
+  return `<label class="field">${escape(t(label))}<input id="${id}" type="${type}" value="${escape(value)}" ${extra}></label>`;
+}
+const option = (v, label, selected) =>
+  `<option value="${escape(v)}" ${String(v) === String(selected) ? "selected" : ""}>${escape(label)}</option>`;
+function select(id, label, items, value = "", empty = false) {
+  return `<label class="field">${escape(t(label))}<select id="${id}">${empty ? option("", t("all"), value) : ""}${items.map((x) => option(x.id, x.name, value)).join("")}</select></label>`;
+}
+function check(id, label, checked = false) {
+  return `<label class="check"><input id="${id}" type="checkbox" ${checked ? "checked" : ""}>${escape(t(label))}</label>`;
+}
+function noteTextarea(id, label, value = "", max = 1000) {
+  return `<label class="field">${escape(t(label))}<textarea id="${id}" maxlength="${max}">${escape(value)}</textarea></label>`;
+}
+const val = (id) => $(id)?.value || "",
+  checked = (id) => $(id)?.checked === true;
+const API_BASE =
+  window.EDUCASHPRO_API_BASE || "https://educashpro-all.onrender.com";
+const pending = new Map();
+async function api(path, payload = {}) {
+  const body = { token: state.token, agendaId: state.agendaId, ...payload },
+    key = path + JSON.stringify(body);
+  if (pending.has(key)) return pending.get(key);
+  const task = (async () => {
+    const controller = new AbortController(),
+      timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(`${API_BASE}/api/agenda/${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(state.token ? { Authorization: `Bearer ${state.token}` } : {}),
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      const data = await response.json();
+      if (!response.ok || data.ok === false)
+        throw Error(data.reason || "error");
+      return data;
+    } finally {
+      clearTimeout(timer);
+      pending.delete(key);
     }
-    tg=window.Telegram?.WebApp;
-    try{tg?.ready?.();tg?.expand?.()}catch{}
-    return tg;
+  })();
+  pending.set(key, task);
+  return task;
+}
+async function action(fn) {
+  if (state.busy) return;
+  state.busy = true;
+  document.body.classList.add("is-loading");
+  try {
+    await fn();
+  } catch (e) {
+    show(COPY.pt[e.message] ? e.message : "error");
+    console.warn("Agenda action failed:", e.message);
+  } finally {
+    state.busy = false;
+    document.body.classList.remove("is-loading");
   }
-  const API_BASE="https://educashpro-all.onrender.com";
-  const state={token:"",profile:null,language:window.EduCashProLocale?.resolve?.()||"pt",access:null,agendas:[],selectedAgendaId:"",subscriberActive:false,data:null,botUrl:"",publicId:"",publicData:null,view:"appointments",editingAppointmentId:""};
-  const C={
-    pt:{subtitle:"Agenda profissional",loading:"Carregando…",back:"Voltar",title:"Agenda EduCashPro",createIntro:"Crie sua agenda para organizar serviços, clientes e horários.",create:"Criar minha agenda",agendaName:"Nome da agenda ou profissional",active:"Recebendo agendamentos",inactive:"Consulta disponível · novos agendamentos bloqueados",inactiveHelp:"A agenda continua funcionando para consultas e alterações existentes. Reative para criar novos agendamentos.",appointments:"Agenda",services:"Serviços",clients:"Clientes",staff:"Equipe",newAppointment:"Novo agendamento",client:"Cliente",service:"Serviço",dateTime:"Data e horário",save:"Salvar",confirm:"Confirmar",cancel:"Cancelar",requested:"Solicitado",confirmed:"Confirmado",cancelled:"Cancelado",noAppointments:"Nenhum agendamento neste período.",newService:"Cadastrar serviço",serviceName:"Nome do serviço",duration:"Duração em minutos",regularPrice:"Preço normal",subscriberPrice:"Preço para assinantes",noServices:"Nenhum serviço cadastrado.",newClient:"Cadastrar cliente",clientName:"Nome do cliente",contact:"Contato",noClients:"Nenhum cliente cadastrado.",newStaff:"Cadastrar funcionário",staffName:"Nome",telegramId:"ID do Telegram",role:"Permissão",editor:"Pode agendar e editar",viewer:"Somente visualizar",noStaff:"Nenhum funcionário cadastrado.",share:"Compartilhar agenda",copied:"Link copiado",created:"Salvo com sucesso",error:"Não foi possível concluir.",required:"Preencha todos os campos.",subscribe:"Assinar EduCashPro",publicTitle:"Agende seu horário",chooseService:"Escolha o serviço",request:"Solicitar agendamento",notAccepting:"Esta agenda não está recebendo novos agendamentos no momento.",requestSent:"Solicitação enviada. Guarde este link para consultar seu agendamento:",myAppointment:"Consultar meu agendamento",consult:"Consultar",code:"Código ou link do agendamento",status:"Situação",onlyTelegram:"Abra esta página dentro do Telegram.",activeRequired:"É necessária uma assinatura ativa para criar a agenda.",reactivate:"Reativar assinatura",unavailable:"Este horário não está disponível."},
-    en:{subtitle:"Professional schedule",loading:"Loading…",back:"Back",title:"EduCashPro Schedule",createIntro:"Create your schedule to organize services, clients and appointments.",create:"Create my schedule",agendaName:"Schedule or professional name",active:"Accepting appointments",inactive:"Viewing available · new appointments blocked",inactiveHelp:"The schedule remains available for viewing and existing changes. Reactivate to create new appointments.",appointments:"Schedule",services:"Services",clients:"Clients",staff:"Team",newAppointment:"New appointment",client:"Client",service:"Service",dateTime:"Date and time",save:"Save",confirm:"Confirm",cancel:"Cancel",requested:"Requested",confirmed:"Confirmed",cancelled:"Cancelled",noAppointments:"No appointments in this period.",newService:"Add service",serviceName:"Service name",duration:"Duration in minutes",regularPrice:"Regular price",subscriberPrice:"Subscriber price",noServices:"No services added.",newClient:"Add client",clientName:"Client name",contact:"Contact",noClients:"No clients added.",newStaff:"Add employee",staffName:"Name",telegramId:"Telegram ID",role:"Permission",editor:"Can schedule and edit",viewer:"View only",noStaff:"No employees added.",share:"Share schedule",copied:"Link copied",created:"Saved successfully",error:"Could not complete.",required:"Complete all fields.",subscribe:"Subscribe to EduCashPro",publicTitle:"Book your time",chooseService:"Choose a service",request:"Request appointment",notAccepting:"This schedule is not accepting new appointments now.",requestSent:"Request sent. Keep this link to check your appointment:",myAppointment:"Check my appointment",consult:"Check",code:"Appointment code or link",status:"Status",onlyTelegram:"Open this page inside Telegram.",activeRequired:"An active subscription is required to create a schedule.",reactivate:"Reactivate subscription",unavailable:"This time is unavailable."},
-    es:{subtitle:"Agenda profesional",loading:"Cargando…",back:"Volver",title:"Agenda EduCashPro",createIntro:"Crea tu agenda para organizar servicios, clientes y horarios.",create:"Crear mi agenda",agendaName:"Nombre de la agenda o profesional",active:"Recibiendo citas",inactive:"Consulta disponible · nuevas citas bloqueadas",inactiveHelp:"La agenda sigue disponible para consultas y cambios existentes. Reactiva para crear nuevas citas.",appointments:"Agenda",services:"Servicios",clients:"Clientes",staff:"Equipo",newAppointment:"Nueva cita",client:"Cliente",service:"Servicio",dateTime:"Fecha y hora",save:"Guardar",confirm:"Confirmar",cancel:"Cancelar",requested:"Solicitado",confirmed:"Confirmado",cancelled:"Cancelado",noAppointments:"No hay citas en este período.",newService:"Registrar servicio",serviceName:"Nombre del servicio",duration:"Duración en minutos",regularPrice:"Precio normal",subscriberPrice:"Precio para suscriptores",noServices:"No hay servicios registrados.",newClient:"Registrar cliente",clientName:"Nombre del cliente",contact:"Contacto",noClients:"No hay clientes registrados.",newStaff:"Registrar empleado",staffName:"Nombre",telegramId:"ID de Telegram",role:"Permiso",editor:"Puede agendar y editar",viewer:"Solo visualizar",noStaff:"No hay empleados registrados.",share:"Compartir agenda",copied:"Enlace copiado",created:"Guardado con éxito",error:"No fue posible completar.",required:"Completa todos los campos.",subscribe:"Suscribirse a EduCashPro",publicTitle:"Reserva tu horario",chooseService:"Elige el servicio",request:"Solicitar cita",notAccepting:"Esta agenda no recibe nuevas citas en este momento.",requestSent:"Solicitud enviada. Guarda este enlace para consultar tu cita:",myAppointment:"Consultar mi cita",consult:"Consultar",code:"Código o enlace de la cita",status:"Estado",onlyTelegram:"Abre esta página dentro de Telegram.",activeRequired:"Se necesita una suscripción activa para crear la agenda.",reactivate:"Reactivar suscripción",unavailable:"Este horario no está disponible."},
-    ru:{subtitle:"Профессиональная запись",loading:"Загрузка…",back:"Назад",title:"Расписание EduCashPro",createIntro:"Создайте расписание для услуг, клиентов и записей.",create:"Создать расписание",agendaName:"Название расписания или имя специалиста",active:"Запись открыта",inactive:"Просмотр доступен · новые записи закрыты",inactiveHelp:"Расписание и существующие записи остаются доступными. Продлите подписку для новых записей.",appointments:"Расписание",services:"Услуги",clients:"Клиенты",staff:"Команда",newAppointment:"Новая запись",client:"Клиент",service:"Услуга",dateTime:"Дата и время",save:"Сохранить",confirm:"Подтвердить",cancel:"Отменить",requested:"Запрошено",confirmed:"Подтверждено",cancelled:"Отменено",noAppointments:"В этом периоде записей нет.",newService:"Добавить услугу",serviceName:"Название услуги",duration:"Длительность в минутах",regularPrice:"Обычная цена",subscriberPrice:"Цена для подписчиков",noServices:"Услуги не добавлены.",newClient:"Добавить клиента",clientName:"Имя клиента",contact:"Контакт",noClients:"Клиенты не добавлены.",newStaff:"Добавить сотрудника",staffName:"Имя",telegramId:"Telegram ID",role:"Разрешение",editor:"Может записывать и изменять",viewer:"Только просмотр",noStaff:"Сотрудники не добавлены.",share:"Поделиться расписанием",copied:"Ссылка скопирована",created:"Успешно сохранено",error:"Не удалось выполнить.",required:"Заполните все поля.",subscribe:"Подписаться на EduCashPro",publicTitle:"Записаться",chooseService:"Выберите услугу",request:"Запросить запись",notAccepting:"Новые записи сейчас не принимаются.",requestSent:"Запрос отправлен. Сохраните ссылку для просмотра записи:",myAppointment:"Проверить мою запись",consult:"Проверить",code:"Код или ссылка записи",status:"Статус",onlyTelegram:"Откройте страницу внутри Telegram.",activeRequired:"Для создания расписания нужна активная подписка.",reactivate:"Продлить подписку",unavailable:"Это время недоступно."}
+}
+function download(content, name, type) {
+  const blob =
+      content instanceof Blob ? content : new Blob([content], { type }),
+    url = URL.createObjectURL(blob),
+    a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+function range() {
+  const d = new Date(state.date + "T12:00Z"),
+    start = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1)),
+    end = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 2, 1));
+  return {
+    from: start.toISOString(),
+    to: end.toISOString(),
+    appointmentLimit: 500,
   };
-  Object.assign(C.pt,{title:"Agenda Profissional",createIntro:"Organize atendimentos, serviços, reuniões, aulas, visitas e compromissos.",appointments:"Compromissos",clients:"Clientes / participantes",staff:"Colaboradores",newAppointment:"Novo compromisso",client:"Cliente ou participante",newClient:"Cadastrar cliente ou participante",clientName:"Nome do cliente ou participante",noClients:"Nenhum cliente ou participante cadastrado.",newStaff:"Cadastrar colaborador",noStaff:"Nenhum colaborador cadastrado.",settings:"Apresentação",description:"Descrição da atividade",descriptionHint:"Ex.: Atendimento presencial e online",activityType:"Tipo de atividade",activity_service:"Atendimento ou serviço",activity_meeting:"Reunião",activity_class:"Aula",activity_consulting:"Consultoria",activity_visit:"Visita",activity_event:"Evento",activity_schedule:"Compromissos pessoais",activity_other:"Outro",telegramContact:"Telegram para atendimento direto",telegramHelp:"Informe @usuario ou t.me/usuario. Campo opcional.",invalidTelegram:"Informe um usuário público válido do Telegram.",directContact:"Falar pelo Telegram",publicTitle:"Solicite um atendimento, serviço ou compromisso."});
-  Object.assign(C.en,{title:"Professional Schedule",createIntro:"Organize appointments, services, meetings, classes, visits and commitments.",appointments:"Appointments",clients:"Clients / participants",staff:"Collaborators",newAppointment:"New appointment",client:"Client or participant",newClient:"Add client or participant",clientName:"Client or participant name",noClients:"No clients or participants added.",newStaff:"Add collaborator",noStaff:"No collaborators added.",settings:"Profile",description:"Activity description",descriptionHint:"E.g. In-person and online service",activityType:"Activity type",activity_service:"Appointment or service",activity_meeting:"Meeting",activity_class:"Class",activity_consulting:"Consulting",activity_visit:"Visit",activity_event:"Event",activity_schedule:"Personal commitments",activity_other:"Other",telegramContact:"Telegram for direct contact",telegramHelp:"Enter @username or t.me/username. Optional.",invalidTelegram:"Enter a valid public Telegram username.",directContact:"Contact on Telegram",publicTitle:"Request an appointment, service or commitment."});
-  Object.assign(C.es,{title:"Agenda Profesional",createIntro:"Organiza atenciones, servicios, reuniones, clases, visitas y compromisos.",appointments:"Compromisos",clients:"Clientes / participantes",staff:"Colaboradores",newAppointment:"Nuevo compromiso",client:"Cliente o participante",newClient:"Registrar cliente o participante",clientName:"Nombre del cliente o participante",noClients:"No hay clientes o participantes registrados.",newStaff:"Registrar colaborador",noStaff:"No hay colaboradores registrados.",settings:"Presentación",description:"Descripción de la actividad",descriptionHint:"Ej.: Atención presencial y en línea",activityType:"Tipo de actividad",activity_service:"Atención o servicio",activity_meeting:"Reunión",activity_class:"Clase",activity_consulting:"Consultoría",activity_visit:"Visita",activity_event:"Evento",activity_schedule:"Compromisos personales",activity_other:"Otro",telegramContact:"Telegram para atención directa",telegramHelp:"Ingresa @usuario o t.me/usuario. Campo opcional.",invalidTelegram:"Ingresa un usuario público válido de Telegram.",directContact:"Hablar por Telegram",publicTitle:"Solicita una atención, servicio o compromiso."});
-  Object.assign(C.ru,{title:"Профессиональное расписание",createIntro:"Организуйте приёмы, услуги, встречи, занятия, визиты и личные дела.",appointments:"Записи",clients:"Клиенты / участники",staff:"Сотрудники",newAppointment:"Новая запись",client:"Клиент или участник",newClient:"Добавить клиента или участника",clientName:"Имя клиента или участника",noClients:"Клиенты или участники не добавлены.",newStaff:"Добавить сотрудника",noStaff:"Сотрудники не добавлены.",settings:"Профиль",description:"Описание деятельности",descriptionHint:"Например: очные и онлайн-услуги",activityType:"Вид деятельности",activity_service:"Приём или услуга",activity_meeting:"Встреча",activity_class:"Занятие",activity_consulting:"Консультация",activity_visit:"Визит",activity_event:"Мероприятие",activity_schedule:"Личные дела",activity_other:"Другое",telegramContact:"Telegram для прямой связи",telegramHelp:"Укажите @username или t.me/username. Необязательно.",invalidTelegram:"Укажите действительное публичное имя Telegram.",directContact:"Написать в Telegram",publicTitle:"Запишитесь на приём, услугу или встречу."});
-  Object.assign(C.pt,{myAgendas:"Minhas agendas",newAgenda:"Criar outra agenda",renameAgenda:"Renomear agenda",deleteAgenda:"Excluir agenda",deleteAgendaWarning:"Esta ação excluirá permanentemente esta agenda e todos os serviços, clientes, colaboradores e compromissos vinculados. Deseja continuar?",deleteAgendaFinal:"Confirme novamente: excluir definitivamente esta agenda?",agendaDeleted:"Agenda excluída.",edit:"Editar",delete:"Excluir",editAppointment:"Editar compromisso",deleteAppointmentWarning:"Deseja excluir permanentemente este compromisso?",appointmentDeleted:"Compromisso excluído.",discard:"Descartar alterações",cancelCreation:"Cancelar"});
-  Object.assign(C.en,{myAgendas:"My schedules",newAgenda:"Create another schedule",renameAgenda:"Rename schedule",deleteAgenda:"Delete schedule",deleteAgendaWarning:"This will permanently delete this schedule and all linked services, clients, collaborators and appointments. Continue?",deleteAgendaFinal:"Confirm again: permanently delete this schedule?",agendaDeleted:"Schedule deleted.",edit:"Edit",delete:"Delete",editAppointment:"Edit appointment",deleteAppointmentWarning:"Permanently delete this appointment?",appointmentDeleted:"Appointment deleted.",discard:"Discard changes",cancelCreation:"Cancel"});
-  Object.assign(C.es,{myAgendas:"Mis agendas",newAgenda:"Crear otra agenda",renameAgenda:"Renombrar agenda",deleteAgenda:"Eliminar agenda",deleteAgendaWarning:"Esta acción eliminará permanentemente esta agenda y todos los servicios, clientes, colaboradores y compromisos vinculados. ¿Deseas continuar?",deleteAgendaFinal:"Confirma nuevamente: ¿eliminar definitivamente esta agenda?",agendaDeleted:"Agenda eliminada.",edit:"Editar",delete:"Eliminar",editAppointment:"Editar compromiso",deleteAppointmentWarning:"¿Deseas eliminar permanentemente este compromiso?",appointmentDeleted:"Compromiso eliminado.",discard:"Descartar cambios",cancelCreation:"Cancelar"});
-  Object.assign(C.ru,{myAgendas:"Мои расписания",newAgenda:"Создать ещё одно расписание",renameAgenda:"Переименовать расписание",deleteAgenda:"Удалить расписание",deleteAgendaWarning:"Расписание и все связанные услуги, клиенты, сотрудники и записи будут удалены навсегда. Продолжить?",deleteAgendaFinal:"Подтвердите ещё раз: удалить расписание навсегда?",agendaDeleted:"Расписание удалено.",edit:"Изменить",delete:"Удалить",editAppointment:"Изменить запись",deleteAppointmentWarning:"Удалить эту запись навсегда?",appointmentDeleted:"Запись удалена.",discard:"Отменить изменения",cancelCreation:"Отмена"});
-  Object.assign(C.pt,{connectionSlow:"A conexão está demorando. Verifique a internet e tente novamente.",retry:"Tentar novamente",loadingAction:"Processando…",loadMore:"Carregar mais compromissos"});
-  Object.assign(C.en,{connectionSlow:"The connection is taking too long. Check your internet and try again.",retry:"Try again",loadingAction:"Processing…",loadMore:"Load more appointments"});
-  Object.assign(C.es,{connectionSlow:"La conexión está tardando. Verifica internet e inténtalo nuevamente.",retry:"Intentar nuevamente",loadingAction:"Procesando…",loadMore:"Cargar más compromisos"});
-  Object.assign(C.ru,{connectionSlow:"Соединение занимает слишком много времени. Проверьте интернет и повторите попытку.",retry:"Повторить",loadingAction:"Обработка…",loadMore:"Загрузить ещё записи"});
-  const t=k=>C[state.language]?.[k]||C.pt[k]||k,esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
-  const activityOptions=selected=>["service","meeting","class","consulting","visit","event","schedule","other"].map(value=>`<option value="${value}" ${value===selected?"selected":""}>${esc(t(`activity_${value}`))}</option>`).join("");
-  const show=m=>{toast.textContent=m;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2300)};
-  const pendingRequests=new Map();async function api(path,payload={}){if(state.selectedAgendaId&&!payload.agendaId&&path.startsWith("/api/agenda/")&&!["/api/agenda/create","/api/agenda/public","/api/agenda/request","/api/agenda/lookup","/api/agenda/lookup/confirm"].includes(path))payload={...payload,agendaId:state.selectedAgendaId};const key=path+JSON.stringify(payload);if(pendingRequests.has(key))return pendingRequests.get(key);const job=(async()=>{const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);document.body.classList.add("is-loading");try{const r=await fetch(`${API_BASE}${path}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),cache:"no-store",signal:controller.signal});const d=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(d.reason||"error");e.reason=d.reason;throw e}return d}catch(error){if(error?.name==="AbortError"){const e=new Error("timeout");e.reason="timeout";throw e}throw error}finally{clearTimeout(timeout);pendingRequests.delete(key);if(!pendingRequests.size)document.body.classList.remove("is-loading")}})();pendingRequests.set(key,job);return job}
-  const localDate=v=>new Date(v).toLocaleString(state.language==="pt"?"pt-BR":state.language,{dateStyle:"short",timeStyle:"short"});
-  const price=v=>new Intl.NumberFormat(state.language==="pt"?"pt-BR":state.language,{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(v||0));
-  function shell(inner){const a=state.access;const tabs=a?.role==="viewer"?`<nav class="tabs"><button data-tab="appointments">${esc(t("appointments"))}</button></nav>`:`<nav class="tabs"><button data-tab="appointments">${esc(t("appointments"))}</button><button data-tab="services">${esc(t("services"))}</button><button data-tab="clients">${esc(t("clients"))}</button><button data-tab="staff">${esc(t("staff"))}</button>${a?.role==="owner"?`<button data-tab="settings">${esc(t("settings"))}</button>`:""}</nav>`;const chooser="";return `${chooser}<section class="hero"><span class="pill ${a?.ownerActive?"":"warn"}">${esc(a?.ownerActive?t("active"):t("inactive"))}</span><h1>${esc(a?.agenda?.displayName||t("title"))}</h1>${a?.agenda?.description?`<p>${esc(a.agenda.description)}</p>`:""}${a&&!a.ownerActive?`<p>${esc(t("inactiveHelp"))}</p>`:""}${a?.role==="owner"?`<button id="share" class="button secondary wide">↗ ${esc(t("share"))}</button>`:""}</section>${a?tabs:""}${inner}`}
-  function bindShell(){document.querySelectorAll("[data-tab]").forEach(b=>{b.classList.toggle("active",b.dataset.tab===state.view);b.onclick=()=>{state.view=b.dataset.tab;renderDashboard()}});document.getElementById("share")?.addEventListener("click",shareAgenda)}
-  function agendaProfileFields(agenda={}){return `<div class="field"><label>${esc(t("agendaName"))}</label><input id="agendaName" maxlength="100" value="${esc(agenda.displayName||"")}"></div><div class="field"><label>${esc(t("description"))}</label><input id="agendaDescription" maxlength="240" placeholder="${esc(t("descriptionHint"))}" value="${esc(agenda.description||"")}"></div><div class="field"><label>${esc(t("activityType"))}</label><select id="activityType">${activityOptions(agenda.activityType||"service")}</select></div><div class="field"><label>${esc(t("telegramContact"))}</label><input id="telegramContact" maxlength="120" placeholder="@usuario" value="${esc(agenda.telegramContact||"")}"><small>${esc(t("telegramHelp"))}</small></div>`}
-  function profilePayload(){return {displayName:document.getElementById("agendaName").value.trim(),description:document.getElementById("agendaDescription").value.trim(),activityType:document.getElementById("activityType").value,telegramContact:document.getElementById("telegramContact").value.trim()}}
-  function renderCreate(subscriberActive,isAdditional=false){content.innerHTML=shell(`<section class="card"><h2>${esc(t("create"))}</h2><p class="muted">${esc(t("createIntro"))}</p>${!subscriberActive?`<div class="notice">${esc(t("activeRequired"))}</div>`:""}${agendaProfileFields()}<button id="create" class="button primary wide" ${subscriberActive?"":"disabled"}>${esc(t("create"))}</button>${isAdditional?`<button id="cancelCreate" class="button secondary wide">${esc(t("cancelCreation"))}</button>`:""}</section>`);bindShell();document.getElementById("cancelCreate")?.addEventListener("click",loadDashboard);document.getElementById("create")?.addEventListener("click",async()=>{const payload=profilePayload();if(!payload.displayName)return show(t("required"));try{const result=await api("/api/agenda/create",{token:state.token,...payload});state.selectedAgendaId=result.agenda?.id||"";await loadDashboard();show(t("created"))}catch(e){show(e.reason==="invalid_telegram_contact"?t("invalidTelegram"):t("error"))}})}
-  async function loadDashboard(){try{const d=await api("/api/agenda/bootstrap",{token:state.token,agendaId:state.selectedAgendaId,appointmentOffset:0,appointmentLimit:50});state.agendas=d.agendas||[];state.subscriberActive=!!d.subscriberActive;state.access=d.access;state.data=d;if(!state.access){state.selectedAgendaId="";return renderCreate(state.subscriberActive)}state.selectedAgendaId=state.access.agenda.id;renderDashboard()}catch(error){renderRetry(error)}}
-  function renderRetry(){content.innerHTML=`<section class="card retry-card"><div class="logo">⏳</div><h2>${esc(t("connectionSlow"))}</h2><button id="retryLoad" class="button primary wide">${esc(t("retry"))}</button></section>`;document.getElementById("retryLoad").onclick=loadDashboard}
-  function renderDashboard(){if(state.view==="services")return renderServices();if(state.view==="clients")return renderClients();if(state.view==="staff")return renderStaff();if(state.view==="settings")return renderSettings();renderAppointments()}
-  function renderSettings(){const a=state.access;if(a.role!=="owner"){state.view="appointments";return renderAppointments()}content.innerHTML=shell(`<section class="card"><h2>${esc(t("settings"))}</h2><p class="muted">${esc(t("createIntro"))}</p>${agendaProfileFields(a.agenda)}<button id="saveSettings" class="button primary wide">${esc(t("renameAgenda"))}</button><button id="deleteAgenda" class="button danger wide">${esc(t("deleteAgenda"))}</button></section>`);bindShell();document.getElementById("deleteAgenda").onclick=deleteCurrentAgenda;document.getElementById("saveSettings").onclick=async()=>{const payload=profilePayload();if(!payload.displayName)return show(t("required"));try{await api("/api/agenda/settings",{token:state.token,...payload});await loadDashboard();show(t("created"))}catch(e){show(e.reason==="invalid_telegram_contact"?t("invalidTelegram"):t("error"))}}}
-  async function deleteCurrentAgenda(){if(!confirm(t("deleteAgendaWarning"))||!confirm(t("deleteAgendaFinal")))return;try{await api("/api/agenda/delete",{token:state.token,agendaId:state.selectedAgendaId});state.selectedAgendaId="";state.view="appointments";await loadDashboard();show(t("agendaDeleted"))}catch{show(t("error"))}}
-  function renderAppointments(){const d=state.data,a=state.access,can=a.canEdit,editing=d.appointments.find(x=>x.id===state.editingAppointmentId);const form=can?`<section class="card"><h2>${esc(t(editing?"editAppointment":"newAppointment"))}</h2>${!a.canCreateAppointments&&!editing?`<div class="notice">${esc(t("inactiveHelp"))}</div>`:""}<div class="grid"><div class="field"><label>${esc(t("client"))}</label><select id="client">${d.clients.map(x=>`<option value="${x.id}" ${editing?.clientId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><div class="field"><label>${esc(t("service"))}</label><select id="service">${d.services.map(x=>`<option value="${x.id}" ${editing?.serviceId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><div class="field full"><label>${esc(t("dateTime"))}</label><input id="startsAt" type="datetime-local" value="${editing?new Date(editing.startsAt).toISOString().slice(0,16):""}"></div></div><button id="newAppointment" class="button primary wide" ${a.canCreateAppointments||editing?"":"disabled"}>${esc(t("save"))}</button>${editing?`<button id="discardEdit" class="button secondary wide">${esc(t("discard"))}</button>`:""}</section>`:"";const list=d.appointments.length?d.appointments.map(x=>`<article class="item"><h3>${esc(x.clientName)}</h3><p>${esc(x.serviceName)} · ${esc(localDate(x.startsAt))}</p><span class="pill ${x.status==="cancelled"?"warn":""}">${esc(t(x.status))}</span>${can?`<div class="actions">${x.status==="requested"?`<button class="button primary" data-status="confirmed" data-id="${x.id}">${esc(t("confirm"))}</button>`:""}<button class="button secondary" data-edit="${x.id}">${esc(t("edit"))}</button><button class="button danger" data-delete="${x.id}">${esc(t("delete"))}</button></div>`:""}</article>`).join(""):`<div class="empty">${esc(t("noAppointments"))}</div>`;content.innerHTML=shell(form+`<section class="card"><h2>${esc(t("appointments"))}</h2><div class="list">${list}</div>${d.appointments.length<(d.appointmentTotal||0)?`<button id="loadMoreAppointments" class="button secondary wide">${esc(t("loadMore"))}</button>`:""}</section>`);bindShell();document.getElementById("loadMoreAppointments")?.addEventListener("click",loadMoreAppointments);document.getElementById("newAppointment")?.addEventListener("click",createAppointment);document.getElementById("discardEdit")?.addEventListener("click",()=>{state.editingAppointmentId="";renderAppointments()});document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{state.editingAppointmentId=b.dataset.edit;renderAppointments()});document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!confirm(t("deleteAppointmentWarning")))return;try{await api("/api/agenda/appointment/delete",{token:state.token,appointmentId:b.dataset.delete});state.data.appointments=state.data.appointments.filter(x=>x.id!==b.dataset.delete);state.editingAppointmentId="";renderAppointments();show(t("appointmentDeleted"))}catch{show(t("error"))}});document.querySelectorAll("[data-status]").forEach(b=>b.onclick=async()=>{try{await api("/api/agenda/appointment/update",{token:state.token,appointmentId:b.dataset.id,status:b.dataset.status});const item=state.data.appointments.find(x=>x.id===b.dataset.id);if(item)item.status=b.dataset.status;renderAppointments()}catch{show(t("error"))}})}
-  async function loadMoreAppointments(){try{const page=await api("/api/agenda/data",{token:state.token,agendaId:state.selectedAgendaId,appointmentOffset:state.data.appointments.length,appointmentLimit:50});const known=new Set(state.data.appointments.map(x=>x.id));state.data.appointments.push(...(page.appointments||[]).filter(x=>!known.has(x.id)));state.data.appointmentTotal=page.appointmentTotal||state.data.appointmentTotal;renderAppointments()}catch(error){show(error?.reason==="timeout"?t("connectionSlow"):t("error"))}}
-  async function createAppointment(){const clientId=document.getElementById("client").value,serviceId=document.getElementById("service").value,startsAt=document.getElementById("startsAt").value;if(!clientId||!serviceId||!startsAt)return show(t("required"));try{if(state.editingAppointmentId){const current=state.data.appointments.find(x=>x.id===state.editingAppointmentId),iso=new Date(startsAt).toISOString();await api("/api/agenda/appointment/update",{token:state.token,appointmentId:state.editingAppointmentId,status:current?.status||"confirmed",clientId,serviceId,startsAt:iso});const client=state.data.clients.find(x=>x.id===clientId),service=state.data.services.find(x=>x.id===serviceId);Object.assign(current,{clientId,clientName:client?.name||current.clientName,serviceId,serviceName:service?.name||current.serviceName,startsAt:iso});state.editingAppointmentId=""}else{const result=await api("/api/agenda/appointment",{token:state.token,clientId,serviceId,startsAt:new Date(startsAt).toISOString()});if(result.appointment)state.data.appointments.push(result.appointment)}state.data.appointments.sort((a,b)=>String(a.startsAt).localeCompare(String(b.startsAt)));renderAppointments();show(t("created"))}catch(e){show(e.reason==="time_unavailable"?t("unavailable"):t("error"))}}
-  function renderServices(){const d=state.data,owner=state.access.role==="owner";content.innerHTML=shell(`${owner?`<section class="card"><h2>${esc(t("newService"))}</h2><div class="grid"><div class="field full"><label>${esc(t("serviceName"))}</label><input id="serviceName"></div><div class="field"><label>${esc(t("duration"))}</label><input id="duration" type="number" value="30" min="5"></div><div class="field"><label>${esc(t("regularPrice"))}</label><input id="regular" inputmode="decimal"></div><div class="field"><label>${esc(t("subscriberPrice"))}</label><input id="subscriber" inputmode="decimal"></div></div><button id="addService" class="button primary wide">${esc(t("save"))}</button></section>`:""}<section class="card"><h2>${esc(t("services"))}</h2><div class="list">${d.services.length?d.services.map(x=>`<article class="item"><h3>${esc(x.name)}</h3><p>${x.durationMinutes} min · ${esc(t("regularPrice"))}: ${price(x.regularPrice)} · ${esc(t("subscriberPrice"))}: ${price(x.subscriberPrice)}</p></article>`).join(""):`<div class="empty">${esc(t("noServices"))}</div>`}</div></section>`);bindShell();document.getElementById("addService")?.addEventListener("click",async()=>{try{await api("/api/agenda/service",{token:state.token,name:document.getElementById("serviceName").value,durationMinutes:document.getElementById("duration").value,regularPrice:document.getElementById("regular").value,subscriberPrice:document.getElementById("subscriber").value});await loadDashboard();show(t("created"))}catch{show(t("error"))}})}
-  function renderClients(){const d=state.data,can=state.access.canEdit;content.innerHTML=shell(`${can?`<section class="card"><h2>${esc(t("newClient"))}</h2><div class="field"><label>${esc(t("clientName"))}</label><input id="clientName"></div><div class="field"><label>${esc(t("contact"))}</label><input id="contact"></div><button id="addClient" class="button primary wide">${esc(t("save"))}</button></section>`:""}<section class="card"><h2>${esc(t("clients"))}</h2><div class="list">${d.clients.length?d.clients.map(x=>`<article class="item"><h3>${esc(x.name)}</h3><p>${esc(x.contact||"")}</p></article>`).join(""):`<div class="empty">${esc(t("noClients"))}</div>`}</div></section>`);bindShell();document.getElementById("addClient")?.addEventListener("click",async()=>{try{await api("/api/agenda/client",{token:state.token,name:document.getElementById("clientName").value,contact:document.getElementById("contact").value});await loadDashboard();show(t("created"))}catch{show(t("error"))}})}
-  function renderStaff(){const d=state.data,owner=state.access.role==="owner";content.innerHTML=shell(`${owner?`<section class="card"><h2>${esc(t("newStaff"))}</h2><div class="field"><label>${esc(t("staffName"))}</label><input id="staffName"></div><div class="field"><label>${esc(t("telegramId"))}</label><input id="staffId" inputmode="numeric"></div><div class="field"><label>${esc(t("role"))}</label><select id="role"><option value="editor">${esc(t("editor"))}</option><option value="viewer">${esc(t("viewer"))}</option></select></div><button id="addStaff" class="button primary wide">${esc(t("save"))}</button></section>`:""}<section class="card"><h2>${esc(t("staff"))}</h2><div class="list">${d.staff.length?d.staff.map(x=>`<article class="item"><h3>${esc(x.name)}</h3><p>${esc(t(x.role))} · ${esc(x.tgId)}</p></article>`).join(""):`<div class="empty">${esc(t("noStaff"))}</div>`}</div></section>`);bindShell();document.getElementById("addStaff")?.addEventListener("click",async()=>{try{await api("/api/agenda/staff",{token:state.token,name:document.getElementById("staffName").value,tgId:document.getElementById("staffId").value,role:document.getElementById("role").value});await loadDashboard();show(t("created"))}catch{show(t("error"))}})}
-  async function shareAgenda(){const url=`${location.origin}${location.pathname}?agenda=${encodeURIComponent(state.access.agenda.publicId)}`;try{if(navigator.share){await navigator.share({url,title:state.access.agenda.displayName});return}await navigator.clipboard.writeText(url);show(t("copied"))}catch{try{await navigator.clipboard.writeText(url);show(t("copied"))}catch{}}}
-  async function renderPublic(){const d=await api("/api/agenda/public",{token:state.token,publicId:state.publicId});state.publicData=d;content.innerHTML=`<section class="hero"><span class="pill ${d.acceptingAppointments?"":"warn"}">${esc(d.acceptingAppointments?t("active"):t("notAccepting"))}</span><h1>${esc(d.agenda.displayName)}</h1>${d.agenda.description?`<p>${esc(d.agenda.description)}</p>`:`<p>${esc(t("publicTitle"))}</p>`}${d.agenda.telegramContact?`<button id="directContact" class="button telegram wide">✈️ ${esc(t("directContact"))}</button>`:""}</section><section class="card"><h2>${esc(t("chooseService"))}</h2><div class="field"><label>${esc(t("service"))}</label><select id="publicService">${d.services.map(x=>`<option value="${x.id}">${esc(x.name)} · ${esc(t("regularPrice"))} ${price(x.regularPrice)} · ${esc(t("subscriberPrice"))} ${price(x.subscriberPrice)}</option>`).join("")}</select></div><div class="field"><label>${esc(t("clientName"))}</label><input id="publicName"></div><div class="field"><label>${esc(t("contact"))}</label><input id="publicContact"></div><div class="field"><label>${esc(t("dateTime"))}</label><input id="publicDate" type="datetime-local"></div>${!d.acceptingAppointments?`<div class="notice">${esc(t("notAccepting"))}</div>`:""}<button id="request" class="button primary wide" ${d.acceptingAppointments?"":"disabled"}>${esc(t("request"))}</button>${d.agenda.affiliateLink?`<button id="subscribe" class="button secondary wide" style="margin-top:9px">${esc(t("subscribe"))}</button>`:""}</section><section class="card"><h2>${esc(t("myAppointment"))}</h2><div class="field"><label>${esc(t("code"))}</label><input id="lookup"></div><button id="consult" class="button secondary wide">${esc(t("consult"))}</button><div id="lookupResult"></div></section>`;document.getElementById("directContact")?.addEventListener("click",()=>{if(tg?.openTelegramLink)tg.openTelegramLink(d.agenda.telegramContact);else window.open(d.agenda.telegramContact,"_blank","noopener")});document.getElementById("subscribe")?.addEventListener("click",()=>{if(tg?.openLink)tg.openLink(d.agenda.affiliateLink);else location.assign(d.agenda.affiliateLink)});document.getElementById("request")?.addEventListener("click",requestPublic);document.getElementById("consult").onclick=()=>lookup(document.getElementById("lookup").value)}
-  async function requestPublic(){try{const d=await api("/api/agenda/request",{token:state.token,publicId:state.publicId,serviceId:document.getElementById("publicService").value,clientName:document.getElementById("publicName").value,contact:document.getElementById("publicContact").value,startsAt:new Date(document.getElementById("publicDate").value).toISOString()});const url=`${location.origin}${location.pathname}?appointment=${encodeURIComponent(d.appointment.lookupToken)}`;document.getElementById("request").insertAdjacentHTML("afterend",`<div class="success">${esc(t("requestSent"))}<br>${esc(url)}</div>`)}catch(e){show(e.reason==="time_unavailable"?t("unavailable"):t("error"))}}
-  async function lookup(value){const token=String(value||"").match(/[?&]appointment=([^&]+)/)?.[1]||String(value||"").trim();try{const clean=decodeURIComponent(token),d=await api("/api/agenda/lookup",{token:state.token,lookupToken:clean});document.getElementById("lookupResult").innerHTML=`<div class="success"><b>${esc(d.agenda.displayName)}</b><br>${esc(d.appointment.serviceName)}<br>${esc(localDate(d.appointment.startsAt))}<br>${esc(t("status"))}: ${esc(t(d.appointment.status))}<br>${esc(t("regularPrice"))}: ${price(d.appointment.regularPrice)}<br>${esc(t("subscriberPrice"))}: ${price(d.appointment.subscriberPrice)}${d.appointment.status==="requested"?`<button id="clientConfirm" class="button primary wide" style="margin-top:10px">${esc(t("confirm"))}</button>`:""}</div>`;document.getElementById("clientConfirm")?.addEventListener("click",async()=>{try{await api("/api/agenda/lookup/confirm",{token:state.token,lookupToken:clean});await lookup(clean);show(t("created"))}catch{show(t("error"))}})}catch{show(t("error"))}}
-  async function init(){await resolveTelegramRuntime();document.getElementById("close").onclick=()=>window.EduCashProPlatform?.close?.();document.getElementById("back").onclick=()=>history.length>1?history.back():location.assign("./");const p=new URL(location.href).searchParams;state.publicId=p.get("agenda")||"";const appointment=p.get("appointment");document.documentElement.lang=state.language;document.getElementById("subtitle").textContent=t("subtitle");try{if(state.publicId){await renderPublic();return}if(appointment){content.innerHTML=`<section class="card"><h2>${esc(t("myAppointment"))}</h2><div id="lookupResult"></div></section>`;await lookup(appointment);return}const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token&&stored?.profile?.userId){state.token=stored.token;state.profile=stored.profile;state.language=["pt","en","es","ru"].includes(stored.profile?.language)?stored.profile.language:state.language}else{const initData=window.EduCashProPlatform?.telegramInitData?.()||"";if(!initData)throw new Error("session_required");const s=await api("/api/hub/session",{initData});state.token=s.token;state.profile=s.profile;state.language=["pt","en","es","ru"].includes(s.profile.language)?s.profile.language:state.language;state.botUrl=s.botUrl}document.documentElement.lang=state.language;document.getElementById("subtitle").textContent=t("subtitle");const requestedView=p.get("view")||"";if(["appointments","services","clients","staff","settings"].includes(requestedView))state.view=requestedView;await loadDashboard()}catch(error){renderRetry(error)}}
-  document.addEventListener("DOMContentLoaded",init);
-})();
+}
+function route() {
+  const url = new URL(location.href);
+  url.searchParams.set("view", state.view);
+  url.searchParams.set("date", state.date);
+  if (state.agendaId) url.searchParams.set("agendaId", state.agendaId);
+  return url;
+}
+function remember(push = true) {
+  const url = route();
+  if (url.href !== location.href) {
+    if (push) history.pushState({ agenda: true }, "", url);
+    else history.replaceState({ agenda: true }, "", url);
+  }
+}
+async function load(force = false) {
+  const bounds = range(),
+    key = state.agendaId + JSON.stringify(bounds);
+  if (!force && state.loadedRange === key && state.data) return render();
+  const epoch = ++navigationEpoch;
+  const data = await api("bootstrap", bounds);
+  if (epoch !== navigationEpoch) return;
+  state.data = data;
+  detailAppointments.clear();
+  state.access = data.access;
+  state.agendas = data.agendas || [];
+  state.agendaId = data.access?.agenda.id || "";
+  state.loadedRange = state.agendaId + JSON.stringify(bounds);
+  financialCache = null;
+  if (!state.access) return setup();
+  render();
+}
+function shell(body) {
+  const a = state.access,
+    tabs = [
+      ["agenda", "agenda"],
+      ...(p().schedule || p().manage ? [["clients", "clients"]] : []),
+      ...(p().manage
+        ? [
+            ["services", "services"],
+            ["team", "team"],
+            ["settings", "settings"],
+          ]
+        : []),
+      ...(p().finance || p().ownFinance ? [["finance", "finance"]] : []),
+    ];
+  root.innerHTML = `${
+    state.agendas.length > 1
+      ? select(
+          "agendaChooser",
+          "selectAgenda",
+          state.agendas.map((x) => ({ id: x.id, name: x.displayName })),
+          state.agendaId,
+        )
+      : ""
+  }<header class="agendaHero"><div><span class="eyebrow">${escape(t(a.role === "professional" ? "professional" : "title"))}</span><h1>${escape(a.agenda.displayName)}</h1><small>${escape(a.agenda.settings.timeZone)}</small></div>${p().manage ? button("shareAgenda", "share") : ""}</header>${!a.ownerActive ? `<div class="notice">${escape(t("inactiveHelp"))}</div>` : ""}<nav class="agendaTabs" aria-label="${escape(t("title"))}">${tabs.map(([v, label]) => `<button data-view="${v}" aria-current="${state.view === v ? "page" : "false"}">${escape(t(label))}</button>`).join("")}</nav>${body}`;
+  document
+    .querySelectorAll("[data-view]")
+    .forEach((b) => (b.onclick = () => navigate(b.dataset.view)));
+  $("agendaChooser")?.addEventListener("change", () =>
+    action(async () => {
+      state.agendaId = val("agendaChooser");
+      state.loadedRange = "";
+      await load(true);
+      remember();
+    }),
+  );
+  $("shareAgenda")?.addEventListener("click", () =>
+    action(async () => {
+      const url = new URL(location.pathname, location.origin);
+      url.searchParams.set("agenda", a.agenda.publicId);
+      if (navigator.share)
+        await navigator.share({ title: a.agenda.displayName, url: url.href });
+      else {
+        await navigator.clipboard.writeText(url.href);
+        show("copied");
+      }
+    }),
+  );
+}
+function navigate(view, push = true) {
+  state.view = view;
+  remember(push);
+  if (
+    view === "agenda" &&
+    state.loadedRange !== state.agendaId + JSON.stringify(range())
+  ) {
+    void action(() => load());
+    return;
+  }
+  render();
+}
+function render() {
+  if (!state.access) return setup();
+  if (state.view === "services") return renderServices();
+  if (state.view === "clients") return renderClients();
+  if (state.view === "team") return renderTeam();
+  if (state.view === "settings") return renderSettings();
+  if (state.view === "finance")
+    return void renderFinance().catch(() => show("error"));
+  renderAgenda();
+}
+function dialog(title, html) {
+  $("agendaDialog")?.remove();
+  const layer = document.createElement("dialog");
+  layer.id = "agendaDialog";
+  layer.className = "agendaDialog";
+  layer.innerHTML = `<header><h2>${escape(t(title))}</h2>${button("closeDialog", "close")}</header><div class="dialogBody">${html}</div>`;
+  document.body.append(layer);
+  layer.showModal();
+  $("closeDialog").onclick = () => layer.close();
+  layer.addEventListener("close", () => layer.remove());
+  return layer;
+}
+function closeDialog() {
+  $("agendaDialog")?.close();
+}
+const professionals = () =>
+    state.data.staff.filter(
+      (x) => x.role === "professional" && x.active !== false,
+    ),
+  providers = () =>
+    professionals().length
+      ? professionals()
+      : [{ id: "", name: t("unassigned") }];
+function appointmentCard(a) {
+  const fin = p().finance || p().ownFinance ? paymentSummary(a) : null;
+  return `<button class="appointmentCard ${escape(a.status)}" data-appointment="${escape(a.id)}"><span class="appointmentTime">${escape(new Intl.DateTimeFormat(state.language, { hour: "2-digit", minute: "2-digit", timeZone: zone() }).format(new Date(a.startsAt)))}</span><span><strong>${escape(a.clientName)}</strong><small>${escape(a.serviceName)} · ${escape(a.providerName || t("unassigned"))}</small></span><span class="status">${escape(t(a.status))}${fin ? `<small>${escape(t(fin.paymentStatus))}</small>` : ""}</span></button>`;
+}
+function renderAgenda() {
+  const rows = state.data.appointments.filter(
+      (a) =>
+        (!state.provider || a.providerId === state.provider) &&
+        (!state.service || String(a.serviceId) === state.service) &&
+        (!state.query ||
+          `${a.clientName} ${a.serviceName}`
+            .toLowerCase()
+            .includes(state.query.toLowerCase())),
+    ),
+    today = dateKey(new Date(), zone()),
+    next = rows.filter(
+      (a) => a.startsAt >= new Date().toISOString() && a.status !== "cancelled",
+    ),
+    day = state.date;
+  let list = "";
+  if (state.mode === "month") {
+    const base = new Date(day + "T12:00Z"),
+      y = base.getUTCFullYear(),
+      m = base.getUTCMonth(),
+      offset = (new Date(Date.UTC(y, m, 1)).getUTCDay() + 6) % 7,
+      last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    list = `<div class="monthGrid">${[1, 2, 3, 4, 5, 6, 0].map((i) => `<small class="weekdayLabel">${escape(weekdays()[i].slice(0, 3))}</small>`).join("")}${Array.from({ length: offset }, () => "<span></span>").join("")}${Array.from(
+      { length: last },
+      (_, i) => {
+        const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`,
+          items = rows.filter((a) => dateKey(a.startsAt, zone()) === key);
+        return `<button class="monthDay ${key === today ? "isToday" : ""}" data-day="${key}"><strong>${i + 1}</strong><small>${items.length}</small>${items
+          .slice(0, 2)
+          .map((a) => `<span>${escape(a.clientName)}</span>`)
+          .join("")}</button>`;
+      },
+    ).join("")}</div>`;
+  } else {
+    let dates = [day];
+    if (state.mode === "week") {
+      const start = new Date(day + "T12:00Z");
+      start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+      dates = Array.from({ length: 7 }, (_, i) =>
+        new Date(+start + i * 86400000).toISOString().slice(0, 10),
+      );
+    }
+    list = dates
+      .map((key) => {
+        const items = rows.filter((a) => dateKey(a.startsAt, zone()) === key);
+        return `<section class="daySection"><h2>${escape(new Intl.DateTimeFormat(state.language, { dateStyle: "full", timeZone: "UTC" }).format(new Date(key + "T12:00Z")))}</h2>${items.length ? items.map(appointmentCard).join("") : `<p class="empty">${escape(t("empty"))}</p>`}</section>`;
+      })
+      .join("");
+  }
+  shell(
+    `<section class="summary"><article><small>${escape(t("today"))}</small><strong>${rows.filter((a) => dateKey(a.startsAt, zone()) === today && a.status !== "cancelled").length}</strong></article><article><small>${escape(t("requested"))}</small><strong>${rows.filter((a) => a.status === "requested").length}</strong></article><article><small>${escape(t("upcoming"))}</small><strong>${next.length}</strong></article></section><section class="toolbar">${input("agendaDate", "date", day, "date")}${p().schedule ? button("newAppointment", "newAppointment", "primary") : ""}${button("todayButton", "today")}<div class="segmented">${["list", "day", "week", "month"].map((mode) => `<button data-mode="${mode}" aria-pressed="${state.mode === mode}">${escape(t(mode))}</button>`).join("")}</div></section><section class="filters">${input("searchAgenda", "search", state.query)}${state.access.role !== "professional" ? select("providerFilter", "professional", providers(), state.provider, true) : ""}${select("serviceFilter", "serviceFilter", state.data.services, state.service, true)}</section>${list}${state.data.appointments.length < (state.data.appointmentTotal || 0) ? button("loadMore", "loadMore") : ""}${p().notes ? `<section class="card"><h2>${escape(t("privateNote"))}</h2><p>${escape(t("recoveryHelp"))}</p><div class="actions">${button("notesBackup", "backupNotes")}${button("notesRestore", "restoreNotes")}</div></section>` : ""}`,
+  );
+  $("agendaDate").onchange = () =>
+    action(async () => {
+      state.date = val("agendaDate");
+      await load();
+      remember();
+    });
+  $("todayButton").onclick = () =>
+    action(async () => {
+      state.date = today;
+      await load();
+      remember();
+    });
+  document.querySelectorAll("[data-mode]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.mode = b.dataset.mode;
+        renderAgenda();
+      }),
+  );
+  document.querySelectorAll("[data-day]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        state.date = b.dataset.day;
+        state.mode = "day";
+        remember();
+        renderAgenda();
+      }),
+  );
+  $("searchAgenda").oninput = () => {
+    state.query = val("searchAgenda");
+    const focus = $("searchAgenda").selectionStart;
+    renderAgenda();
+    $("searchAgenda").focus();
+    $("searchAgenda").setSelectionRange(focus, focus);
+  };
+  for (const id of ["providerFilter", "serviceFilter"])
+    $(id)?.addEventListener("change", () => {
+      state[id === "providerFilter" ? "provider" : "service"] = val(id);
+      renderAgenda();
+    });
+  document
+    .querySelectorAll("[data-appointment]")
+    .forEach(
+      (b) => (b.onclick = () => appointmentDetail(b.dataset.appointment)),
+    );
+  $("newAppointment")?.addEventListener("click", newAppointment);
+  $("loadMore")?.addEventListener("click", () =>
+    action(async () => {
+      const data = await api("data", {
+        ...range(),
+        appointmentOffset: state.data.appointments.length,
+      });
+      const known = new Set(state.data.appointments.map((x) => x.id));
+      state.data.appointments.push(
+        ...data.appointments.filter((x) => !known.has(x.id)),
+      );
+      state.data.appointmentTotal = data.appointmentTotal;
+      renderAgenda();
+    }),
+  );
+  $("notesBackup")?.addEventListener("click", backupNotes);
+  $("notesRestore")?.addEventListener("click", restoreNotes);
+}
+function appointmentDetail(id) {
+  const a =
+    state.data.appointments.find((x) => x.id === id) ||
+    detailAppointments.get(id);
+  if (!a) return;
+  const finance = p().finance || p().ownFinance ? paymentSummary(a) : null;
+  const html = `<p><strong>${escape(a.clientName)}</strong><br>${escape(a.serviceName)} · ${escape(a.providerName)}<br>${escape(dateText(a.startsAt))}<br>${escape(t(a.status))}</p>${a.administrativeNote ? `<section><h3>${escape(t("adminNote"))}</h3><p>${escape(a.administrativeNote)}</p></section>` : ""}${finance ? `<section class="summary"><article><small>${escape(t("amount"))}</small><strong>${escape(money(a.amount, a.currency))}</strong></article><article><small>${escape(t("received"))}</small><strong>${escape(money(finance.received, a.currency))}</strong></article><article><small>${escape(t("balance"))}</small><strong>${escape(money(finance.due, a.currency))}</strong></article></section><p>${escape(t(finance.paymentStatus))} · ${escape(t("dueDate"))}: ${escape(a.dueDate)}</p><p>${escape(t("professionalShare"))}: ${escape(money(finance.professional, a.currency))} · ${escape(t("payoutDue"))}: ${escape(money(finance.payoutDue, a.currency))}</p>` : ""}<div class="actions">${p().schedule ? button("editAppointment", "edit") : ""}${p().finance && a.status !== "cancelled" ? button("addPayment", "payment", "primary") : ""}${p().notes && (state.access.role === "professional" || !a.providerId) ? button("openPrivateNote", "privateNote", "primary") : ""}${button("downloadCalendar", "calendar")}</div><p class="hint">${escape(t("calendarHelp"))}</p>${finance ? `<h3>${escape(t("payments"))}</h3>${(a.payments || []).map((x) => `<p>${escape(dateText(x.date))} · ${escape(money(x.amount, a.currency))} · ${escape(x.method)} · ${escape(x.note)}</p>`).join("")}<h3>${escape(t("payouts"))}</h3>${(a.payouts || []).map((x) => `<p>${escape(dateText(x.date))} · ${escape(money(x.amount, a.currency))} · ${escape(x.method)}</p>`).join("")}` : ""}<h3>${escape(t("history"))}</h3>${(a.history || []).map((x) => `<p>${escape(dateText(x.date))} · ${escape(t(x.status))}${x.previousStart ? `<br>${escape(dateText(x.previousStart))} → ${escape(dateText(x.newStart))}` : ""}</p>`).join("")}`;
+  dialog("details", html);
+  $("editAppointment")?.addEventListener("click", () => editAppointment(a));
+  $("addPayment")?.addEventListener("click", () => moneyDialog(a));
+  $("openPrivateNote")?.addEventListener("click", () => privateNote(a));
+  $("downloadCalendar").onclick = () => calendarFile(a);
+}
+function editAppointment(a) {
+  dialog(
+    "edit",
+    `${select(
+      "appointmentStatus",
+      "agenda",
+      ["requested", "confirmed", "attended", "rescheduled", "cancelled"].map(
+        (id) => ({ id, name: t(id) }),
+      ),
+      a.status,
+    )}${input("editStart", "date", localInput(a.startsAt, zone()), "datetime-local")}${noteTextarea("adminNote", "adminNote", a.administrativeNote)}<p class="hint">${escape(t("snapshotHelp"))}</p>${button("saveAppointment", "save", "primary")}`,
+  );
+  $("saveAppointment").onclick = () =>
+    action(async () => {
+      const local = val("editStart"),
+        startsAt =
+          local === localInput(a.startsAt, zone())
+            ? a.startsAt
+            : utcLocal(local, zone());
+      await api("appointment/update", {
+        appointmentId: a.id,
+        status: val("appointmentStatus"),
+        startsAt,
+        administrativeNote: val("adminNote"),
+      });
+      closeDialog();
+      await load(true);
+      show("saved");
+    });
+}
+function newAppointment() {
+  if (!state.access.ownerActive) return show("owner_subscription_inactive");
+  if (!state.data.services.length || !state.data.clients.length) {
+    show("firstService");
+    return;
+  }
+  dialog(
+    "newAppointment",
+    `${select("newClient", "client", state.data.clients)}${select("newService", "service", state.data.services)}${select("newProvider", "professional", providers())}${input("slotDay", "date", state.date, "date")}<div id="availableSlots"></div>${p().finance ? input("newAmount", "amount", "", "text", 'inputmode="decimal"') : ""}${input("newDue", "dueDate", state.date, "date")}${check("subscriberPrice", "subscriberPrice")}${noteTextarea("newAdminNote", "adminNote")}${button("bookAppointment", "save", "primary")}`,
+  );
+  let selected = "",
+    requestId = crypto.randomUUID(),
+    seq = 0;
+  const refresh = async () => {
+    const ticket = ++seq;
+    const service = state.data.services.find((s) => s.id === val("newService"));
+    if ($("newAmount"))
+      $("newAmount").value = String(
+        checked("subscriberPrice")
+          ? service.subscriberPrice
+          : service.regularPrice,
+      );
+    $("newDue").value = val("slotDay");
+    selected = "";
+    const d = await api("availability", {
+      day: val("slotDay"),
+      serviceId: val("newService"),
+      providerId: val("newProvider"),
+    });
+    if (ticket !== seq || !$("availableSlots")) return;
+    slotButtons(d.slots, "availableSlots", (v) => (selected = v));
+  };
+  for (const id of ["newService", "newProvider", "slotDay", "subscriberPrice"])
+    $(id).onchange = () => action(refresh);
+  void action(refresh);
+  $("bookAppointment").onclick = () =>
+    action(async () => {
+      if (!selected) throw Error("selectSlot");
+      await api("appointment", {
+        clientId: val("newClient"),
+        serviceId: val("newService"),
+        providerId: val("newProvider"),
+        startsAt: selected,
+        ...(p().finance ? { amount: val("newAmount") } : {}),
+        dueDate: val("newDue"),
+        administrativeNote: val("newAdminNote"),
+        requestId,
+      });
+      closeDialog();
+      await load(true);
+      show("saved");
+    });
+}
+function slotButtons(slots, id, choose, timeZone = zone()) {
+  $(id).innerHTML =
+    `<p>${escape(t(slots.length ? "selectSlot" : "noSlots"))}</p><div class="slots">${slots.map((v) => `<button type="button" data-slot="${escape(v)}">${escape(new Intl.DateTimeFormat(state.language, { hour: "2-digit", minute: "2-digit", timeZone: timeZone, timeZoneName: "short" }).format(new Date(v)))}</button>`).join("")}</div>`;
+  $(id)
+    .querySelectorAll("[data-slot]")
+    .forEach(
+      (b) =>
+        (b.onclick = () => {
+          $(id)
+            .querySelectorAll("[data-slot]")
+            .forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+          choose(b.dataset.slot);
+        }),
+    );
+}
+function paymentDate(day) {
+  return day === dateKey(new Date(), zone())
+    ? new Date().toISOString()
+    : utcLocal(day + "T12:00", zone());
+}
+function moneyDialog(a) {
+  dialog(
+    "payment",
+    `${input("payAmount", "amount", "", "text", 'inputmode="decimal"')}${input("payDate", "date", dateKey(new Date(), zone()), "date")}${input("payMethod", "method")}${input("payNote", "note")}<p class="hint">${escape(t("ledgerWarning"))}</p>${button("savePayment", "save", "primary")}`,
+  );
+  const requestId = crypto.randomUUID();
+  $("savePayment").onclick = () =>
+    action(async () => {
+      await api("payment", {
+        appointmentId: a.id,
+        amount: val("payAmount"),
+        date: paymentDate(val("payDate")),
+        method: val("payMethod"),
+        note: val("payNote"),
+        requestId,
+      });
+      closeDialog();
+      await load(true);
+      show("saved");
+    });
+}
+function renderServices() {
+  if (!p().manage) return navigate("agenda");
+  shell(
+    `<section class="card"><div class="sectionHeader"><h2>${escape(t("services"))}</h2>${button("newServiceButton", "services", "primary")}</div><p class="hint">${escape(t("futurePercent"))}</p>${state.data.services.map((x) => `<article class="catalogItem"><div><strong>${escape(x.name)}</strong><small>${x.durationMinutes} min · ${escape(money(x.regularAmount ?? Math.round(x.regularPrice * 100), x.currency || currency()))}</small></div><button data-service="${escape(x.id)}" class="button secondary">${escape(t("edit"))}</button></article>`).join("")}</section>`,
+  );
+  $("newServiceButton").onclick = () => serviceForm();
+  document
+    .querySelectorAll("[data-service]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          serviceForm(
+            state.data.services.find((x) => x.id === b.dataset.service),
+          )),
+    );
+}
+function serviceForm(x = {}) {
+  dialog(
+    "services",
+    `${input("serviceName", "name", x.name)}${input("serviceDuration", "duration", x.durationMinutes || 30, "number", 'min="5" max="720"')}${input("regularPrice", "price", x.regularPrice ?? 0, "text", 'inputmode="decimal"')}${input("serviceSubscriberPrice", "subscriberPrice", x.subscriberPrice ?? 0, "text", 'inputmode="decimal"')}${input("serviceShare", "sharePercent", x.shareBps == null ? "" : x.shareBps / 100, "text", 'inputmode="decimal"')}<p class="hint">${escape(t("futurePercent"))}</p><div class="actions">${button("saveService", "save", "primary")}${x.id ? button("archiveService", "archive") : ""}</div>`,
+  );
+  const payload = () => ({
+    serviceId: x.id,
+    name: val("serviceName"),
+    durationMinutes: Number(val("serviceDuration")),
+    regularPrice: val("regularPrice"),
+    subscriberPrice: val("serviceSubscriberPrice"),
+    sharePercent: val("serviceShare"),
+  });
+  $("saveService").onclick = () =>
+    action(async () => {
+      await api("service", payload());
+      closeDialog();
+      await load(true);
+      show("saved");
+    });
+  $("archiveService")?.addEventListener("click", () =>
+    action(async () => {
+      if (!confirm(t("archiveConfirm"))) return;
+      await api("service", { ...payload(), active: false });
+      closeDialog();
+      await load(true);
+    }),
+  );
+}
+function renderClients() {
+  if (!p().schedule) return navigate("agenda");
+  shell(
+    `<section class="card"><div class="sectionHeader"><h2>${escape(t("clients"))}</h2>${button("newClientButton", "client", "primary")}</div>${input("clientSearch", "search")}<div id="clientCatalog"></div></section>`,
+  );
+  const update = () => {
+    $("clientCatalog").innerHTML = state.data.clients
+      .filter((x) =>
+        `${x.name} ${x.contact}`
+          .toLowerCase()
+          .includes(val("clientSearch").toLowerCase()),
+      )
+      .map(
+        (x) =>
+          `<article class="catalogItem"><div><strong>${escape(x.name)}</strong><small>${escape(x.contact)}</small></div><button data-client="${escape(x.id)}" class="button secondary">${escape(t("edit"))}</button></article>`,
+      )
+      .join("");
+    document
+      .querySelectorAll("[data-client]")
+      .forEach(
+        (b) =>
+          (b.onclick = () =>
+            clientForm(
+              state.data.clients.find((x) => x.id === b.dataset.client),
+            )),
+      );
+  };
+  update();
+  $("clientSearch").oninput = update;
+  $("newClientButton").onclick = () => clientForm();
+}
+function clientForm(x = {}) {
+  dialog(
+    "client",
+    `${input("clientName", "name", x.name)}${input("clientContact", "contact", x.contact)}<div class="actions">${button("saveClient", "save", "primary")}${x.id ? button("archiveClient", "archive") : ""}</div>`,
+  );
+  const payload = () => ({
+    clientId: x.id,
+    name: val("clientName"),
+    contact: val("clientContact"),
+  });
+  $("saveClient").onclick = () =>
+    action(async () => {
+      await api("client", payload());
+      closeDialog();
+      await load(true);
+      show("saved");
+    });
+  $("archiveClient")?.addEventListener("click", () =>
+    action(async () => {
+      if (!confirm(t("archiveConfirm"))) return;
+      await api("client", { ...payload(), active: false });
+      closeDialog();
+      await load(true);
+    }),
+  );
+}
+function renderTeam() {
+  if (!p().manage) return navigate("agenda");
+  shell(
+    `<section class="card"><div class="sectionHeader"><h2>${escape(t("team"))}</h2>${button("newMember", "invite", "primary")}</div><p>${escape(t("inviteHelp"))}</p>${state.data.staff.map((x) => `<article class="catalogItem"><div><strong>${escape(x.name)}</strong><small>${escape(t(x.role))} ${x.role === "professional" ? `· ${x.shareBps / 100}%` : ""}</small></div><button data-member="${escape(x.id)}" class="button secondary">${escape(t("edit"))}</button></article>`).join("")}</section>`,
+  );
+  $("newMember").onclick = () => teamForm();
+  document
+    .querySelectorAll("[data-member]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          teamForm(state.data.staff.find((x) => x.id === b.dataset.member))),
+    );
+}
+function teamForm(x = {}) {
+  dialog(
+    "team",
+    `${input("memberName", "name", x.name)}${select(
+      "memberRole",
+      "team",
+      ["professional", "editor", "viewer"].map((id) => ({ id, name: t(id) })),
+      x.role || "professional",
+    )}${input("memberShare", "sharePercent", (x.shareBps || 0) / 100, "text", 'inputmode="decimal"')}${check("memberSchedule", "schedulePermission", x.role === "editor" && x.permissions?.schedule !== false)}${check("memberFinance", "financePermission", x.permissions?.finance === true)}${check("memberOwnFinance", "ownFinancePermission", x.permissions?.ownFinance === true)}${check("memberInherit", "inheritSchedule", !x.settings)}<details id="memberHours"><summary>${escape(t("ownSchedule"))}</summary>${hoursFields(x.settings || state.access.agenda.settings)}</details><p class="hint">${escape(t("futurePercent"))}</p><div class="actions">${button("saveMember", x.id ? "save" : "invite", "primary")}${x.id && !x.userId && !x.tgId ? button("renewInvite", "invite") : ""}${x.id ? button("archiveMember", "archive") : ""}</div><div id="memberInvite"></div>`,
+  );
+  const adjust = () => {
+    const role = val("memberRole");
+    $("memberSchedule").disabled = role !== "editor";
+    $("memberFinance").disabled = role !== "editor";
+    $("memberOwnFinance").disabled = role !== "professional";
+    $("memberShare").disabled = role !== "professional";
+    $("memberHours").hidden =
+      role !== "professional" || checked("memberInherit");
+  };
+  adjust();
+  bindHours(zone());
+  $("memberRole").onchange = adjust;
+  $("memberInherit").onchange = adjust;
+  const payload = () => ({
+    staffId: x.id,
+    name: val("memberName"),
+    role: val("memberRole"),
+    sharePercent: val("memberShare"),
+    settings:
+      val("memberRole") === "professional" && !checked("memberInherit")
+        ? readHours({ ...state.access.agenda.settings })
+        : null,
+    permissions: {
+      schedule: checked("memberSchedule"),
+      finance: checked("memberFinance"),
+      ownFinance: checked("memberOwnFinance"),
+    },
+  });
+  $("saveMember").onclick = () =>
+    action(async () => {
+      const data = await api("staff", payload());
+      if (data.inviteToken) {
+        const url = new URL(location.pathname, location.origin);
+        url.searchParams.set("invite", data.inviteToken);
+        $("memberInvite").innerHTML =
+          `<div class="success"><p>${escape(t("inviteHelp"))}</p><a href="${escape(url.href)}">${escape(url.href)}</a>${button("copyInvite", "share")}</div>`;
+        $("copyInvite").onclick = () =>
+          action(async () => {
+            await navigator.clipboard.writeText(url.href);
+            show("copied");
+          });
+        $("saveMember").disabled = true;
+        state.loadedRange = "";
+      } else {
+        closeDialog();
+        await load(true);
+        show("saved");
+      }
+    });
+  $("renewInvite")?.addEventListener("click", () => {
+    $("saveMember").onclick = () =>
+      action(async () => {
+        const data = await api("staff", {
+          ...payload(),
+          regenerateInvite: true,
+        });
+        const url = new URL(location.pathname, location.origin);
+        url.searchParams.set("invite", data.inviteToken);
+        $("memberInvite").innerHTML =
+          `<div class="success"><p>${escape(t("inviteHelp"))}</p><a href="${escape(url.href)}">${escape(url.href)}</a>${button("copyInvite", "share")}</div>`;
+        $("copyInvite").onclick = () =>
+          action(async () => {
+            await navigator.clipboard.writeText(url.href);
+            show("copied");
+          });
+        $("saveMember").disabled = true;
+        state.loadedRange = "";
+      });
+    $("saveMember").click();
+  });
+  $("archiveMember")?.addEventListener("click", () =>
+    action(async () => {
+      if (!confirm(t("archiveConfirm"))) return;
+      await api("staff", { ...payload(), active: false });
+      closeDialog();
+      await load(true);
+    }),
+  );
+}
+function profileFields(a = {}) {
+  return `${input("agendaName", "name", a.displayName)}${noteTextarea("agendaDescription", "description", a.description, 240)}${input("agendaTelegram", "telegram", a.telegramContact || "")}<div class="formGrid">${select(
+    "agendaCurrency",
+    "currency",
+    CURRENCIES.map((id) => ({ id, name: id })),
+    a.settings?.currency ||
+      { pt: "BRL", en: "USD", es: "EUR", ru: "RUB" }[state.language],
+  )}${input("agendaZone", "timezone", a.settings?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC", "text", 'list="timeZones"')}<datalist id="timeZones">${(Intl.supportedValuesOf?.("timeZone") || ["UTC"]).map((z) => option(z, z)).join("")}</datalist></div>`;
+}
+const weekdays = () =>
+  Array.from({ length: 7 }, (_, i) =>
+    new Intl.DateTimeFormat(state.language, {
+      weekday: "long",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(2026, 0, 4 + i))),
+  );
+let blocks = [];
+function hoursFields(cfg = {}) {
+  const weekly = cfg.weekly || defaultWeekly();
+  blocks = [...(cfg.blocks || [])];
+  return `<h3>${escape(t("weekly"))}</h3><div class="weeklyEditor">${weekly.map((d, i) => `<fieldset><legend>${escape(weekdays()[i])}</legend>${check("workDay" + i, "day", !!d.ranges.length)}<div class="workRanges">${[0, 1].map((n) => `${input(`start${i}_${n}`, "start", d.ranges[n]?.start || "", "time")}${input(`end${i}_${n}`, "end", d.ranges[n]?.end || "", "time")}`).join("")}</div></fieldset>`).join("")}</div><div class="formGrid">${input("bufferMinutes", "buffer", cfg.bufferMinutes || 0, "number", 'min="0" max="240"')}${input("noticeMinutes", "notice", cfg.minNoticeMinutes || 0, "number", 'min="0" max="43200"')}${input("maxDays", "maxDays", cfg.maxDays || 90, "number", 'min="1" max="730"')}</div><h3>${escape(t("blocks"))}</h3><div id="blockList"></div><div class="formGrid">${input("blockStart", "start", "", "datetime-local")}${input("blockEnd", "end", "", "datetime-local")}${input("blockReason", "note")}</div>${button("addBlock", "addBlock")}`;
+}
+function bindHours(timeZone) {
+  const update = () => {
+    $("blockList").innerHTML = blocks
+      .map(
+        (b, i) =>
+          `<article class="catalogItem"><span>${escape(localInput(b.start, timeZone))} → ${escape(localInput(b.end, timeZone))}<br>${escape(b.reason)}</span><button class="button secondary" data-remove-block="${i}">${escape(t("remove"))}</button></article>`,
+      )
+      .join("");
+    document.querySelectorAll("[data-remove-block]").forEach(
+      (b) =>
+        (b.onclick = () => {
+          blocks.splice(Number(b.dataset.removeBlock), 1);
+          update();
+        }),
+    );
+  };
+  update();
+  $("addBlock").onclick = () =>
+    action(async () => {
+      const start = utcLocal(val("blockStart"), timeZone),
+        end = utcLocal(val("blockEnd"), timeZone);
+      if (end <= start) throw Error("invalid_date");
+      blocks.push({ start, end, reason: val("blockReason") });
+      update();
+    });
+}
+function readHours(base = {}) {
+  return validateSettings({
+    ...base,
+    weekly: Array.from({ length: 7 }, (_, day) => ({
+      day,
+      ranges: checked("workDay" + day)
+        ? [0, 1]
+            .map((n) => ({
+              start: val(`start${day}_${n}`),
+              end: val(`end${day}_${n}`),
+            }))
+            .filter((r) => r.start || r.end)
+        : [],
+    })),
+    bufferMinutes: Number(val("bufferMinutes")),
+    minNoticeMinutes: Number(val("noticeMinutes")),
+    maxDays: Number(val("maxDays")),
+    blocks,
+  });
+}
+function renderSettings() {
+  if (!p().manage) return navigate("agenda");
+  const a = state.access.agenda;
+  shell(
+    `<section class="card"><h2>${escape(t("settings"))}</h2>${profileFields(a)}${hoursFields(a.settings)}<div class="actions">${button("saveSettings", "save", "primary")}${button("archiveAgenda", "archive")}</div></section>`,
+  );
+  bindHours(a.settings.timeZone);
+  $("saveSettings").onclick = () =>
+    action(async () => {
+      const settings = readHours({
+        timeZone: val("agendaZone"),
+        currency: val("agendaCurrency"),
+      });
+      await api("settings", {
+        displayName: val("agendaName"),
+        description: val("agendaDescription"),
+        telegram: val("agendaTelegram"),
+        settings,
+      });
+      state.loadedRange = "";
+      await load(true);
+      show("saved");
+    });
+  $("archiveAgenda").onclick = () =>
+    action(async () => {
+      if (!confirm(t("archiveConfirm"))) return;
+      await api("delete");
+      state.access = null;
+      state.agendaId = "";
+      state.loadedRange = "";
+      await load(true);
+    });
+}
+function setup() {
+  if (!state.data.subscriberActive) {
+    root.innerHTML = `<section class="card"><h1>${escape(t("title"))}</h1><p>${escape(t("activeOnly"))}</p>${button("subscribe", "subscribe", "primary")}</section>`;
+    $("subscribe").onclick = () => location.assign("./?checkout=monthly");
+    return;
+  }
+  const draft = state.setupDraft;
+  root.innerHTML = `<section class="card"><h1>${escape(t("create"))}</h1><nav class="steps">${["profileStep", "servicesStep", "hoursStep"].map((k, i) => `<span aria-current="${state.setupStep === i ? "step" : "false"}">${i + 1}. ${escape(t(k))}</span>`).join("")}</nav>${state.setupStep === 0 ? profileFields(draft) : state.setupStep === 1 ? `${input("firstName", "service", draft.first?.name)}${input("firstDuration", "duration", draft.first?.durationMinutes || 30, "number", 'min="5" max="720"')}${input("firstPrice", "price", draft.first?.regularPrice ?? 0, "text", 'inputmode="decimal"')}${input("firstSubscriber", "subscriberPrice", draft.first?.subscriberPrice ?? 0, "text", 'inputmode="decimal"')}` : hoursFields(draft.settings)}<div class="actions">${state.setupStep ? button("setupPrevious", "previous") : ""}${button("setupNext", state.setupStep === 2 ? "create" : "next", "primary")}</div></section>`;
+  if (state.setupStep === 2) bindHours(draft.settings.timeZone);
+  $("setupPrevious")?.addEventListener("click", () => {
+    state.setupStep--;
+    setup();
+  });
+  $("setupNext").onclick = () =>
+    action(async () => {
+      if (state.setupStep === 0) {
+        if (!val("agendaName")) throw Error("name_required");
+        Object.assign(draft, {
+          displayName: val("agendaName"),
+          description: val("agendaDescription"),
+          telegram: val("agendaTelegram"),
+          settings: validateSettings({
+            timeZone: val("agendaZone"),
+            currency: val("agendaCurrency"),
+          }),
+        });
+        state.setupStep = 1;
+        setup();
+      } else if (state.setupStep === 1) {
+        if (!val("firstName")) throw Error("invalid_service");
+        draft.first = {
+          name: val("firstName"),
+          durationMinutes: Number(val("firstDuration")),
+          regularPrice: val("firstPrice"),
+          subscriberPrice: val("firstSubscriber"),
+        };
+        state.setupStep = 2;
+        setup();
+      } else {
+        draft.settings = readHours(draft.settings);
+        const data = await api("create", draft);
+        state.agendaId = data.agenda.id;
+        state.view = "agenda";
+        state.date = dateKey(new Date(), draft.settings.timeZone);
+        await load(true);
+        remember(false);
+        show("setupComplete");
+      }
+    });
+}
+async function renderFinance() {
+  if (!p().finance && !p().ownFinance) return navigate("agenda");
+  const month = state.date.slice(0, 7),
+    key = state.agendaId + month + state.provider + state.service;
+  const ticket = ++navigationEpoch;
+  const data =
+    financialCache?.key === key
+      ? financialCache.data
+      : await api("financial", {
+          month,
+          providerId: state.provider,
+          serviceId: state.service,
+        });
+  if (ticket !== navigationEpoch || state.view !== "finance") return;
+  financialCache = { key, data };
+  shell(
+    `<section class="card"><h2>${escape(t("finance"))}</h2><div class="filters">${input("financeMonth", "month", month, "month")}${state.access.role !== "professional" ? select("financeProvider", "professional", providers(), state.provider, true) : ""}${select("financeService", "serviceFilter", state.data.services, state.service, true)}</div><p class="hint">${escape(t("financialHelp"))}</p>${data.currencies
+      .map(
+        (g) =>
+          `<h3>${escape(g.currency)}</h3><section class="summary financeSummary">${[
+            ["totalServices", "services"],
+            ["monthReceived", "received"],
+            ["clientsDue", "due"],
+            ["pastDue", "overdue"],
+            ["company", "company"],
+            ["professionalShare", "professional"],
+            ["monthPayouts", "payouts"],
+            ["payoutDue", "payoutDue"],
+          ]
+            .filter(
+              ([k]) =>
+                state.access.role !== "professional" ||
+                ["professionalShare", "monthPayouts", "payoutDue"].includes(k),
+            )
+            .map(
+              ([k, v]) =>
+                `<article><small>${escape(t(k))}</small><strong>${escape(money(g[v], g.currency))}</strong></article>`,
+            )
+            .join("")}</section><div class="financeChart">${data.daily
+            .filter((x) => x.currency === g.currency)
+            .map(
+              (x) =>
+                `<div><small>${escape(x.date.slice(8))}</small><span style="--bar:${Math.max(2, (100 * x.amount) / Math.max(1, ...data.daily.filter((d) => d.currency === g.currency).map((d) => d.amount)))}%"></span><small>${escape(money(x.amount, g.currency))}</small></div>`,
+            )
+            .join("")}</div>`,
+      )
+      .join(
+        "",
+      )}<h3>${escape(t("professional"))}</h3>${data.professionals.map((x, i) => `<button class="professionalRow" data-finance-professional="${i}"><strong>${escape(x.name || t("unassigned"))}</strong><span>${escape(t("attendances"))}: ${x.attended}</span><span>${escape(t("paidAppointments"))}: ${x.paidAppointments}</span><span>${escape(t("payoutDue"))}: ${escape(money(x.payoutDue, x.currency))}</span></button>`).join("")}</section>`,
+  );
+  $("financeMonth").onchange = () => {
+    state.date = val("financeMonth") + "-01";
+    financialCache = null;
+    remember();
+    void action(renderFinance);
+  };
+  for (const id of ["financeProvider", "financeService"])
+    $(id)?.addEventListener("change", () => {
+      state[id === "financeProvider" ? "provider" : "service"] = val(id);
+      financialCache = null;
+      void action(renderFinance);
+    });
+  document
+    .querySelectorAll("[data-finance-professional]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          action(() =>
+            professionalFinance(
+              data.professionals[Number(b.dataset.financeProfessional)],
+            ),
+          )),
+    );
+}
+async function professionalFinance(x) {
+  const detail = await api("financial/details", {
+    providerId: x.providerId,
+    currency: x.currency,
+  });
+  const rows = detail.appointments;
+  for (const a of rows) detailAppointments.set(a.id, a);
+  dialog(
+    "details",
+    `<h3>${escape(x.name || t("unassigned"))}</h3><p>${escape(t("attendances"))}: ${x.attended}<br>${escape(t("paidAppointments"))}: ${x.paidAppointments}<br>${escape(t("partialAppointments"))}: ${x.partialAppointments}<br>${escape(t("unpaidAppointments"))}: ${x.unpaidAppointments}</p><section class="summary">${[
+      ["received", "received"],
+      ["company", "company"],
+      ["professionalShare", "professional"],
+      ["payouts", "payouts"],
+      ["payoutDue", "payoutDue"],
+    ]
+      .filter(
+        ([k]) =>
+          state.access.role !== "professional" ||
+          ["professionalShare", "payouts", "payoutDue"].includes(k),
+      )
+      .map(
+        ([k, v]) =>
+          `<article><small>${escape(t(k))}</small><strong>${escape(money(x[v], x.currency))}</strong></article>`,
+      )
+      .join(
+        "",
+      )}</section><div id="professionalDetailRows">${rows.map(appointmentCard).join("")}</div>${rows.length < detail.total ? button("moreFinancialRows", "loadMore") : ""}${p().finance && x.payoutDue > 0 ? `${input("payoutAmount", "amount", "", "text", 'inputmode="decimal"')}${input("payoutDate", "date", dateKey(new Date(), zone()), "date")}${input("payoutMethod", "method")}${input("payoutNote", "note")}${button("savePayout", "payout", "primary")}` : ""}`,
+  );
+  document
+    .querySelectorAll("#agendaDialog [data-appointment]")
+    .forEach(
+      (b) => (b.onclick = () => appointmentDetail(b.dataset.appointment)),
+    );
+  $("moreFinancialRows")?.addEventListener("click", () =>
+    action(async () => {
+      const next = await api("financial/details", {
+        providerId: x.providerId,
+        currency: x.currency,
+        offset: rows.length,
+      });
+      rows.push(...next.appointments);
+      for (const a of next.appointments) detailAppointments.set(a.id, a);
+      $("professionalDetailRows").innerHTML = rows
+        .map(appointmentCard)
+        .join("");
+      $("moreFinancialRows").hidden = rows.length >= detail.total;
+      document
+        .querySelectorAll("#agendaDialog [data-appointment]")
+        .forEach(
+          (b) => (b.onclick = () => appointmentDetail(b.dataset.appointment)),
+        );
+    }),
+  );
+  const requestId = crypto.randomUUID();
+  $("savePayout")?.addEventListener("click", () =>
+    action(async () => {
+      await api("payout", {
+        providerId: x.providerId,
+        currency: x.currency,
+        amount: val("payoutAmount"),
+        date: paymentDate(val("payoutDate")),
+        method: val("payoutMethod"),
+        note: val("payoutNote"),
+        requestId,
+      });
+      closeDialog();
+      await load(true);
+      show("saved");
+    }),
+  );
+}
+async function privateNote(a) {
+  dialog(
+    "privateNote",
+    `<p>${escape(t("noteHelp"))}</p><p class="hint">${escape(t("recoveryHelp"))}</p>${input("notePassword", "password", "", "password", 'autocomplete="off" minlength="12"')}${button("unlockNote", "unlock", "primary")}<div id="noteEditor"></div>`,
+  );
+  $("notePassword").value = password;
+  $("unlockNote").onclick = () =>
+    action(async () => {
+      password = val("notePassword");
+      if (password.length < 12) throw Error("noteFailure");
+      const data = await api("note/get", { appointmentId: a.id });
+      let plain = "";
+      try {
+        if (data.note)
+          plain = await decryptNote(
+            data.note.encrypted,
+            password,
+            `${uid()}:${a.id}`,
+          );
+      } catch {
+        throw Error("noteFailure");
+      }
+      $("noteEditor").innerHTML =
+        `${noteTextarea("privateNoteText", "privateNote", plain, 20000)}${button("saveNote", "save", "primary")}`;
+      let version = data.note?.version || 0;
+      $("saveNote").onclick = () =>
+        action(async () => {
+          const encrypted = await encryptNote(
+            val("privateNoteText"),
+            password,
+            `${uid()}:${a.id}`,
+          );
+          const saved = await api("note/save", {
+            appointmentId: a.id,
+            encrypted: { ...encrypted, expectedVersion: version },
+          });
+          version = saved.version;
+          show("saved");
+        });
+    });
+}
+async function backupNotes() {
+  return action(async () => {
+    const data = await api("note/backup");
+    download(
+      JSON.stringify(
+        { format: "educashpro-private-notes-v1", ...data },
+        null,
+        2,
+      ),
+      "educashpro-private-notes.json",
+      "application/json",
+    );
+    show("recoveryHelp");
+  });
+}
+function restoreNotes() {
+  dialog(
+    "restoreNotes",
+    `<p>${escape(t("restoreHelp"))}</p><input id="notesFile" type="file" accept="application/json">${button("restoreNotesButton", "restoreNotes", "primary")}`,
+  );
+  $("restoreNotesButton").onclick = () =>
+    action(async () => {
+      const file = $("notesFile").files[0];
+      if (!file || file.size > 5e6) throw Error("invalid_note");
+      const data = JSON.parse(await file.text());
+      if (
+        data.format !== "educashpro-private-notes-v1" ||
+        data.authorKey !== uid() ||
+        !Array.isArray(data.notes)
+      )
+        throw Error("invalid_note");
+      for (const note of data.notes)
+        await api("note/restore", {
+          backup: {
+            format: data.format,
+            authorKey: data.authorKey,
+            notes: [note],
+          },
+        });
+      closeDialog();
+      show("restoreSuccess");
+    });
+}
+function foldCalendarLine(line) {
+  let out = "",
+    part = "",
+    bytes = 0;
+  for (const char of line) {
+    const n = new TextEncoder().encode(char).length;
+    if (bytes + n > 73) {
+      out += part + "\r\n ";
+      part = "";
+      bytes = 1;
+    }
+    part += char;
+    bytes += n;
+  }
+  return out + part;
+}
+function calendarFile(a) {
+  const compact = (v) =>
+      new Date(v)
+        .toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}/, ""),
+    safe = (s) =>
+      String(s || "")
+        .replace(/\\/g, "\\\\")
+        .replace(/\r?\n/g, "\\n")
+        .replace(/,/g, "\\,")
+        .replace(/;/g, "\\;"),
+    lines = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//EduCashPro//Agenda//EN",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${a.id}@educashpro.vip`,
+      `DTSTAMP:${compact(new Date())}`,
+      `DTSTART:${compact(a.startsAt)}`,
+      `DTEND:${compact(+new Date(a.startsAt) + a.durationMinutes * 60000)}`,
+      `SUMMARY:${safe(a.serviceName)}`,
+      `DESCRIPTION:${safe(a.providerName || "")}`,
+      `STATUS:${a.status === "cancelled" ? "CANCELLED" : "CONFIRMED"}`,
+      "BEGIN:VALARM",
+      "TRIGGER:-PT30M",
+      "ACTION:DISPLAY",
+      `DESCRIPTION:${safe(t("reminder"))}`,
+      "END:VALARM",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ];
+  download(
+    lines.map((l) => foldCalendarLine(l)).join("\r\n") + "\r\n",
+    "educashpro-appointment.ics",
+    "text/calendar;charset=utf-8",
+  );
+}
+async function publicPage() {
+  const data = await api("public", { publicId: state.publicId });
+  if (
+    ["pt", "en", "es", "ru"].includes(
+      new URL(location.href).searchParams.get("lang"),
+    )
+  )
+    state.language = new URL(location.href).searchParams.get("lang");
+  else if (data.agenda.language) state.language = data.agenda.language;
+  document.documentElement.lang = state.language;
+  $("subtitle").textContent = t("title");
+  const z = data.agenda.settings.timeZone;
+  root.innerHTML = `<header class="agendaHero"><h1>${escape(data.agenda.displayName)}</h1><p>${escape(data.agenda.description || t("publicLead"))}</p></header><section class="card"><h2>${escape(t("request"))}</h2><p>${escape(t("publicLead"))}</p>${!data.acceptingAppointments ? `<div class="notice">${escape(t("inactive"))}</div>` : ""}${select(
+    "publicService",
+    "service",
+    data.services.map((s) => ({
+      id: s.id,
+      name: `${s.name} · ${s.durationMinutes} min · ${t("price")}: ${money(s.regularAmount ?? Math.round(s.regularPrice * 100), s.currency || data.agenda.settings.currency)} · ${t("subscriberPrice")}: ${money(s.subscriberAmount ?? Math.round(s.subscriberPrice * 100), s.currency || data.agenda.settings.currency)}`,
+    })),
+  )}${select("publicProvider", "professional", data.providers.length ? data.providers : [{ id: "", name: data.agenda.displayName }])}${input("publicDay", "date", dateKey(new Date(), z), "date")}<p class="hint">${escape(z)}</p><div id="publicSlots"></div>${input("publicName", "name")}${input("publicContact", "contact")}${button("requestPublic", "request", "primary")}<div id="publicResult"></div></section><section class="card"><h2>${escape(t("lookup"))}</h2>${input("lookupCode", "code")}${button("lookupButton", "lookup")}<div id="lookupResult"></div></section>`;
+  let selected = "",
+    seq = 0,
+    requestId = crypto.randomUUID();
+  $("requestPublic").disabled =
+    !data.acceptingAppointments || !data.services.length;
+  const refresh = async () => {
+    selected = "";
+    if (!data.services.length) return;
+    const ticket = ++seq,
+      d = await api("availability", {
+        publicId: state.publicId,
+        day: val("publicDay"),
+        serviceId: val("publicService"),
+        providerId: val("publicProvider"),
+      });
+    if (ticket !== seq || !$("publicSlots")) return;
+    slotButtons(d.slots, "publicSlots", (v) => (selected = v), z);
+  };
+  for (const id of ["publicService", "publicProvider", "publicDay"])
+    $(id).onchange = () => action(refresh);
+  if (data.acceptingAppointments) await refresh();
+  $("requestPublic").onclick = () =>
+    action(async () => {
+      if (!selected) throw Error("selectSlot");
+      const result = await api("request", {
+        publicId: state.publicId,
+        serviceId: val("publicService"),
+        providerId: val("publicProvider"),
+        startsAt: selected,
+        clientName: val("publicName"),
+        contact: val("publicContact"),
+        requestId,
+      });
+      const url = new URL(location.pathname, location.origin);
+      url.searchParams.set("appointment", result.appointment.lookupToken);
+      $("publicResult").innerHTML =
+        `<div class="success"><p>${escape(t("requestSent"))}</p><a href="${escape(url.href)}">${escape(url.href)}</a>${button("publicCalendar", "calendar")}</div>`;
+      $("publicCalendar").onclick = () => calendarFile(result.appointment);
+      $("requestPublic").disabled = true;
+    });
+  $("lookupButton").onclick = () => action(() => lookup(val("lookupCode")));
+}
+async function lookup(token) {
+  const parsed =
+      String(token).match(/[?&]appointment=([^&]+)/)?.[1] ||
+      String(token).trim(),
+    data = await api("lookup", { lookupToken: decodeURIComponent(parsed) }),
+    a = data.appointment;
+  const container = $("lookupResult") || root;
+  container.innerHTML = `<section class="card"><h2>${escape(data.agenda.displayName)}</h2><p>${escape(a.serviceName)} · ${escape(a.providerName)}<br>${escape(new Intl.DateTimeFormat(state.language, { dateStyle: "short", timeStyle: "short", timeZone: a.timeZone || data.agenda.settings?.timeZone || "UTC" }).format(new Date(a.startsAt)))}<br>${escape(t(a.status))}</p>${button("lookupCalendar", "calendar")}${a.status === "requested" ? button("clientConfirm", "confirm", "primary") : ""}</section>`;
+  $("lookupCalendar").onclick = () => calendarFile(a);
+  $("clientConfirm")?.addEventListener("click", () =>
+    action(async () => {
+      await api("lookup/confirm", { lookupToken: parsed });
+      await lookup(parsed);
+    }),
+  );
+}
+async function init() {
+  try {
+    await Promise.race([
+      window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__ || Promise.resolve(),
+      new Promise((resolve) => setTimeout(resolve, 3000)),
+    ]);
+    try {
+      window.Telegram?.WebApp?.ready();
+      window.Telegram?.WebApp?.expand();
+    } catch {}
+    const query = new URL(location.href).searchParams;
+    state.publicId = query.get("agenda") || "";
+    const stored = window.EduCashProPlatform?.readWebSession?.();
+    if (stored?.token) {
+      state.token = stored.token;
+      state.profile = stored.profile;
+      state.language = stored.profile?.language || state.language;
+    }
+    if (!COPY[state.language]) state.language = "pt";
+    $("subtitle").textContent = t("title");
+    $("back").ariaLabel = t("back");
+    $("close").ariaLabel = t("close");
+    $("back").onclick = () =>
+      history.length > 1 ? history.back() : location.assign("./");
+    $("close").onclick = () => window.EduCashProPlatform?.close?.();
+    document.documentElement.lang = state.language;
+    if (state.publicId) {
+      await publicPage();
+      return;
+    }
+    if (query.get("appointment")) {
+      await lookup(query.get("appointment"));
+      return;
+    }
+    if (!state.token) {
+      const initData =
+        window.EduCashProPlatform?.telegramInitData?.() ||
+        window.Telegram?.WebApp?.initData;
+      if (!initData) {
+        if (query.get("invite"))
+          try {
+            sessionStorage.setItem(
+              "educashpro:agenda-return",
+              JSON.stringify({
+                path: location.pathname + location.search,
+                createdAt: Date.now(),
+              }),
+            );
+          } catch {}
+        location.assign("./");
+        return;
+      }
+      const response = await fetch(`${API_BASE}/api/hub/session`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ initData }),
+        }),
+        s = await response.json();
+      if (!s.token) throw Error("session_required");
+      state.token = s.token;
+      state.profile = s.profile;
+      state.language = s.profile.language || "pt";
+    }
+    state.date = /^\d{4}-\d\d-\d\d$/.test(query.get("date") || "")
+      ? query.get("date")
+      : dateKey(new Date(), Intl.DateTimeFormat().resolvedOptions().timeZone);
+    state.agendaId = query.get("agendaId") || "";
+    const requestedView =
+      { appointments: "agenda", staff: "team" }[query.get("view")] ||
+      query.get("view");
+    state.view = [
+      "agenda",
+      "services",
+      "clients",
+      "team",
+      "finance",
+      "settings",
+    ].includes(requestedView)
+      ? requestedView
+      : "agenda";
+    if (query.get("invite")) {
+      root.innerHTML = `<section class="card"><h1>${escape(t("acceptInvite"))}</h1><p>${escape(t("acceptInviteHelp"))}</p>${button("acceptInvite", "acceptInvite", "primary")}</section>`;
+      $("acceptInvite").onclick = () =>
+        action(async () => {
+          const d = await api("invite/accept", {
+            inviteToken: query.get("invite"),
+          });
+          state.agendaId = d.agendaId;
+          history.replaceState(
+            {},
+            "",
+            location.pathname + "?agendaId=" + encodeURIComponent(d.agendaId),
+          );
+          await load(true);
+          show("accepted");
+        });
+      return;
+    }
+    await load();
+  } catch (e) {
+    root.innerHTML = `<section class="card"><h2>${escape(t("error"))}</h2>${button("retry", "loading")}</section>`;
+    $("retry").onclick = () => location.reload();
+    console.warn("Agenda start failed", e.message);
+  }
+}
+window.addEventListener("popstate", () => {
+  const query = new URL(location.href).searchParams;
+  state.view = query.get("view") || "agenda";
+  state.date = query.get("date") || state.date;
+  state.agendaId = query.get("agendaId") || state.agendaId;
+  closeDialog();
+  void action(() => load());
+});
+window.addEventListener("pagehide", () => {
+  password = "";
+});
+window.EduCashProAgenda = { state, init };
+void init();

@@ -324,6 +324,14 @@
   function renderAuthenticated(){
     const p=profile();
     if(!p?.userId)return false;
+    try{
+      const pending=JSON.parse(sessionStorage.getItem("educashpro:agenda-return")||"null");
+      if(pending){
+        sessionStorage.removeItem("educashpro:agenda-return");
+        const next=new URL(pending.path,location.origin);
+        if(next.origin===location.origin&&/(^|\/)agenda\.html$/.test(next.pathname)&&next.searchParams.has("invite")&&Date.now()-Number(pending.createdAt)<60*60*1000){location.assign(next.href);return true;}
+      }
+    }catch{}
     document.querySelector(".growthQuickActions")?.classList.remove("hidden");
     document.getElementById("bottomNav")?.classList.remove("hidden");
     void window.EduCashProApp?.setSession?.(state.session);
@@ -426,4 +434,5 @@
   publishEntryApi();
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});else boot();
 })();
+
 
