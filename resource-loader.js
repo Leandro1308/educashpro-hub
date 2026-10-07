@@ -1,10 +1,11 @@
 (function(){
   "use strict";
 
-  const VERSION="20261007.2";
+  const VERSION="20261007.3";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
+  const prefetched=new Set();
 
   function withVersion(src){
     const separator=String(src).includes("?")?"&":"?";
@@ -29,6 +30,20 @@
     }).catch(error=>{scripts.delete(key);throw error});
     scripts.set(key,promise);
     return promise;
+  }
+
+  function prefetch(src,{external=false,as="script"}={}){
+    const href=external?String(src):withVersion(src);
+    const key=`${as}:${href}`;
+    if(prefetched.has(key))return true;
+    prefetched.add(key);
+    const node=document.createElement("link");
+    node.rel="prefetch";
+    node.as=as;
+    node.href=href;
+    node.crossOrigin=external?"anonymous":"";
+    document.head.appendChild(node);
+    return true;
   }
 
   function style(href){
@@ -116,7 +131,11 @@
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadToolsHub(){
     if(window.EduCashProLocal?.renderToolsHub)return Promise.resolve(true);
-    return toolsHubPromise||(toolsHubPromise=script("./local-tools-and-games.js").then(()=>true).catch(error=>{toolsHubPromise=null;throw error}));
+    return toolsHubPromise||(toolsHubPromise=script("./local-tools-and-games.js").then(()=>{
+      const value=currentSession();
+      if(value)window.EduCashProLocal?.setSession?.(value);
+      return true;
+    }).catch(error=>{toolsHubPromise=null;throw error}));
   }
   function loadAccountCenter(){
     if(window.EduCashProAccountCenter)return Promise.resolve(true);
@@ -153,8 +172,8 @@
   }
   function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=Promise.all([style("./link-campaigns.css"),script("./link-tools.js")]).then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
+    if(window.EduCashProProfessional?.render)return Promise.resolve(true);
     return professionalPromise||(professionalPromise=(async()=>{
-      await loadLinks();
       await script("./professional-profile.js");
       const value=currentSession();
       if(value)window.EduCashProProfessional?.setSession?.(value);
@@ -162,7 +181,7 @@
     })().catch(error=>{professionalPromise=null;throw error}));
   }
   function loadHelp(){if(window.EduCashProHelp)return Promise.resolve(true);return helpPromise||(helpPromise=script("./help-center.js").catch(error=>{helpPromise=null;throw error}))}
-  function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js?market=20261005.4").catch(error=>{marketPromise=null;throw error}))}
+  function loadMarkets(){return marketPromise||(marketPromise=script("./market-learning-center.js?market=20261005.4").then(()=>{window.EduCashProAccess?.patchMarkets?.();return true}).catch(error=>{marketPromise=null;throw error}))}
   function loadQr(){return qrPromise||(qrPromise=script("https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js",{external:true}).catch(error=>{qrPromise=null;throw error}))}
   function loadQrScanner(){return qrScannerPromise||(qrScannerPromise=script("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js",{external:true}).catch(error=>{qrScannerPromise=null;throw error}))}
 
@@ -172,6 +191,6 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
 
