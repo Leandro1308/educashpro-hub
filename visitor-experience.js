@@ -104,19 +104,12 @@
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function isVisitor() { return visitorState.session && visitorState.session.profile?.active !== true; }
 
-  window.fetch = async function (...args) {
-    const response = await originalFetch(...args);
-    try {
-      const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
-      if (/\/api\/hub\/(session|partners)$/.test(url)) {
-        const data = await response.clone().json();
-        if (url.endsWith("/session") && data?.ok) visitorState.session = data;
-        if (url.endsWith("/partners") && data?.ok && Array.isArray(data.items)) visitorState.partnerItems = data.items;
-        queueMicrotask(enhance);
-      }
-    } catch {}
-    return response;
-  };
+  function syncSession(value){
+    visitorState.session=value||window.__EDUCASHPRO_SESSION__||window.EduCashProWebEntry?.getSession?.()||visitorState.session;
+    queueMicrotask(enhance);
+  }
+  window.addEventListener("educashpro:web-session-ready",event=>syncSession(event.detail||null));
+  window.addEventListener("educashpro:app-ready",()=>syncSession());
 
   function openSubscription() {
     if (window.EduCashProPlatform?.isWeb?.() && window.EduCashProWebCheckout) return window.EduCashProWebCheckout.open();
@@ -383,7 +376,8 @@
   }
 
   const observer = new MutationObserver(() => enhance());
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  document.addEventListener("DOMContentLoaded", enhance);
+  const observedRoot=document.getElementById("content")||document.body;
+  observer.observe(observedRoot, { childList: true, subtree: false });
+  document.addEventListener("DOMContentLoaded",()=>{syncSession();enhance()});
 })();
 
