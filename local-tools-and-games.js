@@ -151,18 +151,6 @@
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
   function learn() { document.querySelector('#bottomNav button[data-view="learn"]')?.click(); }
 
-  window.fetch = async function (...args) {
-    const response = await originalFetch(...args);
-    try {
-      const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
-      if (/\/api\/hub\/session$/.test(url)) {
-        const data = await response.clone().json();
-        if (data?.ok) { session = data; window.EduCashProMentalGames?.setSession?.(data); queueMicrotask(enhanceHome); }
-      }
-    } catch {}
-    return response;
-  };
-
   async function loadGames() {
     if (games.length) return games;
     try {
@@ -177,16 +165,16 @@
 
   async function renderGames(category = "") {
     window.EduCashProApp?.rememberRoute?.("tools", "games");
+    const target = content();
+    if(target)target.innerHTML = `<button id="gamesBack" class="textButton">←</button><section class="hero"><span class="eyebrow">DISCOVERY</span><h1>🎮 ${esc(tr("gamesTitle"))}</h1><p>${esc(tr("gamesDesc"))}</p></section><div id="gameCatalog"><div class="empty">•••</div></div>`;
+    document.getElementById("gamesBack")?.addEventListener("click",home);
     const ticket=window.EduCashProNavigation?.stamp?.();
     await window.EduCashProResources?.loadGames?.();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     if (window.EduCashProMentalGames?.renderCatalog) {
       return window.EduCashProMentalGames.renderCatalog({ back: renderToolsHub, lang: language() });
     }
-    const target = content();
     if (!target) return;
-    target.innerHTML = `<button id="gamesBack" class="textButton">←</button><section class="hero"><span class="eyebrow">DISCOVERY</span><h1>🎮 ${esc(tr("gamesTitle"))}</h1><p>${esc(tr("gamesDesc"))}</p></section><div id="gameCatalog"><div class="empty">•••</div></div>`;
-    document.getElementById("gamesBack").onclick = home;
     const items = await loadGames();
     const categories = [...new Set(items.map((item) => gameText(item.category)).filter(Boolean))];
     const visible = category ? items.filter((item) => gameText(item.category) === category) : items;
@@ -286,6 +274,8 @@
     window.EduCashProApp?.rememberRoute?.("tools",route);
     const ticket=window.EduCashProNavigation?.stamp?.();
     const parts=route.split(":");
+    content().innerHTML=`<main class="toolsHubPage"><button class="textButton" id="toolLoadBack">←</button><section class="toolsHubHero"><h1>💰 ${esc(tr("finance"))}</h1><p>${esc(tr("financeSub"))}</p><div class="empty">•••</div></section></main>`;
+    document.getElementById("toolLoadBack").onclick=renderToolsHub;
     await window.EduCashProResources?.loadFinance?.();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     const activeSession = currentSession();
@@ -306,6 +296,8 @@
   async function openFinancialTool(id) {
     window.EduCashProApp?.rememberRoute?.("tools",id);
     const ticket=window.EduCashProNavigation?.stamp?.();
+    content().innerHTML=`<main class="toolsHubPage"><button class="textButton" id="toolLoadBack">←</button><section class="toolsHubHero"><div class="empty">•••</div></section></main>`;
+    document.getElementById("toolLoadBack").onclick=renderToolsHub;
     await window.EduCashProResources?.loadFinancialTools?.();
     const activeSession = currentSession();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
@@ -321,6 +313,8 @@
   async function openQrGenerator() {
     window.EduCashProApp?.rememberRoute?.("tools","qr-code");
     const ticket=window.EduCashProNavigation?.stamp?.();
+    content().innerHTML=`<main class="toolsHubPage"><button class="textButton" id="toolLoadBack">←</button><section class="toolsHubHero"><h1>▦ ${esc(tr("qrTitle"))}</h1><p>${esc(tr("qrSub"))}</p><div class="empty">•••</div></section></main>`;
+    document.getElementById("toolLoadBack").onclick=renderToolsHub;
     try {
       await Promise.all([
         window.EduCashProResources.style("./qr-generator.css"),
@@ -397,6 +391,8 @@
     if(["link-page","smart-link"].includes(id)){
       window.EduCashProApp?.rememberRoute?.("tools",id);
       const ticket=window.EduCashProNavigation?.stamp?.();
+      content().innerHTML=`<main class="toolsHubPage"><button class="textButton" id="toolLoadBack">←</button><section class="toolsHubHero"><div class="empty">•••</div></section></main>`;
+      document.getElementById("toolLoadBack").onclick=renderToolsHub;
       await window.EduCashProResources?.loadLinks?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
       const action=id==="link-page"?window.EduCashProLinks?.renderPageEditor:window.EduCashProLinks?.renderShortener;
@@ -420,6 +416,6 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
   document.addEventListener("DOMContentLoaded", enhanceHome);
 
-  window.EduCashProLocal = { renderGames, renderRandomizers, renderToolsHub, openTool };
+  window.EduCashProLocal = { renderGames, renderRandomizers, renderToolsHub, openTool, setSession(value){session=value||session;window.EduCashProMentalGames?.setSession?.(session);queueMicrotask(enhanceHome)} };
 })();
 
