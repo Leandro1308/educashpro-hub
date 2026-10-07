@@ -23,6 +23,10 @@ const technicalCourse=await read("technical-analysis-course.js");
 const marketCenter=await read("market-learning-center.js");
 const financeControl=await read("monthly-finance-control.js");
 const localTools=await read("local-tools-and-games.js");
+const idleFeatures=await read("idle-features-v11.js");
+const visitorExperience=await read("visitor-experience.js");
+const subscriptionCoherence=await read("subscription-coherence.js");
+const siteInbox=await read("site-inbox.js");
 const affiliatePage=await read("affiliate.js");
 const publishedBuild=String(JSON.parse(versionFile)?.build||"").trim();
 const buildParts=publishedBuild.split(".");
@@ -35,6 +39,13 @@ const localAssetVersions=[...index.matchAll(/\.\/[^"'?]+\.(?:js|css|webmanifest)
 assert(localAssetVersions.length>0&&localAssetVersions.every(version=>version===assetBuild),"Index contains mixed local asset versions");
 assert(serviceWorker.includes(`BUILD="${publishedBuild}"`)&&serviceWorker.includes("skipWaiting")&&serviceWorker.includes("clients.claim")&&!serviceWorker.includes("client.navigate")&&!serviceWorker.includes('addEventListener("fetch"'),"Service worker must refresh safely without intercepting or forcing client navigation");
 assert(pwaInstall.includes('updateViaCache:"none"')&&pwaInstall.includes("registration.update()"),"PWA registration does not explicitly refresh the service worker");
+assert(loader.includes("function prefetch(")&&idleFeatures.includes('prefetch("./professional-profile.js")')&&idleFeatures.includes('prefetch("./local-tools-and-games.js")'),"Heavy feature assets are not warmed without execution");
+assert(!idleFeatures.includes('load("./visitor-experience.js")')&&!idleFeatures.includes('load("./admin-center.js")'),"Heavy observer modules must not execute automatically during startup");
+assert(!links.includes("window.fetch =")&&!localTools.includes("window.fetch =")&&!visitorExperience.includes("window.fetch =")&&!subscriptionCoherence.includes("window.fetch ="),"Feature modules must not stack global fetch interceptors");
+assert(!siteInbox.includes("observe(document.documentElement")&&webAuthEntry.includes("{childList:true,subtree:false}"),"Critical-page observers are still too broad");
+assert(app.includes("const deferRoute=")&&app.includes('renderArea(); deferRoute(()=>restoreRoute({view:"area",detail:params.get("panel")}))'),"Deep Web routes must paint their parent page before lazy restoration");
+assert(professional.includes('id="professionalBack"')&&professional.includes('const timer = setTimeout(() => controller.abort(), 7000)'),"Professional profile does not paint immediately or still waits too long for APIs");
+assert(loader.includes("function loadProfessional()")&&!loader.includes("await loadLinks();\n      await script(\"./professional-profile.js\")"),"Professional profile still blocks on the link editor bundle");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
@@ -51,7 +62,7 @@ assert(app.includes("readerThemeDot")&&app.includes("educashpro:reader-theme"),"
 assert(technicalCourse.includes("campaign=43340")&&!technicalCourse.includes("campaign=43335"),"Exness affiliate campaign is incorrect");
 assert(technicalCourse.includes('button: "CURSO EM VÍDEO"')&&technicalCourse.includes("url: VIDEO_COURSE_URL, videoUrl: EXNESS_URL"),"Free video and Exness actions are not separated correctly");
 assert(loader.includes("market-learning-center.js")&&loader.includes("loadMarkets")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
-assert(index.includes("resource-loader.js")&&loader.includes('script("./market-learning-center.js")')&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
+assert(index.includes("resource-loader.js")&&loader.includes("market-learning-center.js")&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
 assert(!index.includes('src="./market-learning-center.js'),"Markets center must not race the lazy loader with an eager script");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=43340"),"Partner attribution is missing from the markets center");
 assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
@@ -179,7 +190,7 @@ assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("b
 
 const localCatalogBridge=await read("local-game-catalog-bridge.js");
 assert(loader.includes('script("./local-game-catalog-bridge.js")'),"Runtime local-game catalog bridge is not loaded after game patches");
-assert(loader.includes("EduCashProLocalCatalogBridge?.ready"),"Game loader can return before local-game catalog bridge is ready");
+assert(loader.includes("EduCashProLocalCatalogBridge?.ensure"),"Game loader does not finalize the local-game catalog bridge");
 for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
   assert(localCatalogBridge.includes(gameId),`Catalog bridge does not guarantee card visibility: ${gameId}`);
 }
@@ -187,7 +198,8 @@ assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.inclu
 assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
 
 const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
-assert(index.includes(`local-games-bootstrap-v13.js?v=${assetBuild}`),"Direct local-games bootstrap is not loaded by index.html");
+assert(!index.includes("local-games-bootstrap-v13.js"),"Local game bootstrap must stay out of the critical HTML path");
+assert(loader.includes('script("./local-games-bootstrap-v13.js")'),"Local game bootstrap must be lazy-loaded by the resource loader");
 assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
 for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
   assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);
