@@ -8,7 +8,6 @@
   const rawFetch = window.fetch.bind(window);
   let snapshot = null;
   let refreshPromise = null;
-  let marketPatchTimer = null;
 
   function normalizeUntil(value) {
     const raw = Number(value || 0);
@@ -133,48 +132,6 @@
     return current.activeUntil || null;
   }
 
-  function isHubSessionUrl(input) {
-    const url = typeof input === "string" ? input : String(input?.url || "");
-    return /\/api\/platform-auth\/hub-session(?:\?|$)/.test(url);
-  }
-
-  function patchedJsonResponse(response, data) {
-    const headers = new Headers(response.headers);
-    headers.set("Content-Type", "application/json; charset=utf-8");
-    headers.set("Cache-Control", "no-store");
-    return new Response(JSON.stringify(data), {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
-  }
-
-  window.fetch = async function (input, options = {}) {
-    const hubSessionRequest = isHubSessionUrl(input);
-    if (hubSessionRequest) await refresh();
-
-    const response = await rawFetch(input, options);
-    if (!hubSessionRequest || !response.ok) return response;
-
-    try {
-      const data = await response.clone().json();
-      const canonical = snapshot?.known ? snapshot : fromStoredSession();
-      if (data?.profile && canonical.known) {
-        data.profile.active = canonical.active === true;
-        data.profile.activeUntil = canonical.activeUntil;
-        data.profile.subscription = {
-          ...(data.profile.subscription || {}),
-          active: canonical.active === true,
-          activeUntil: canonical.activeUntil,
-          source: canonical.source,
-        };
-      }
-      return patchedJsonResponse(response, data);
-    } catch {
-      return response;
-    }
-  };
-
   function patchMarkets() {
     const markets = window.EduCashProMarkets;
     if (!markets?.render || markets.__subscriptionCoherencePatched) return false;
@@ -191,24 +148,13 @@
     isActive,
     activeUntil,
     refresh,
+    patchMarkets,
     snapshot: () => ({ ...(snapshot?.known ? snapshot : fromStoredSession()) }),
   };
 
   snapshot = fromStoredSession();
-  refresh().catch(() => {});
-
-  if (!patchMarkets()) {
-    marketPatchTimer = window.setInterval(() => {
-      if (patchMarkets()) {
-        window.clearInterval(marketPatchTimer);
-        marketPatchTimer = null;
-      }
-    }, 100);
-    window.setTimeout(() => {
-      if (marketPatchTimer) {
-        window.clearInterval(marketPatchTimer);
-        marketPatchTimer = null;
-      }
-    }, 12000);
-  }
+  refresh().then(()=>patchMarkets()).catch(() => {});
+  window.addEventListener("educashpro:web-session-ready",()=>void refresh().then(()=>patchMarkets()).catch(()=>{}));
+  window.addEventListener("educashpro:app-ready",()=>patchMarkets());
+  window.addEventListener("educashpro:markets-ready",()=>patchMarkets());
 })();
