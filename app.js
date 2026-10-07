@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.07.2";
+  const APP_RUNTIME_BUILD = "2026.10.07.3";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -846,20 +846,28 @@
     const requestedView = String(params.get("view") || "");
     const requestedSection = String(params.get("section") || "");
 
-    if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
-    else if (requestedAcademy === "technical_analysis") await openMarkets();
-    else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
-    else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
+    const deferRoute=(task)=>{
+      const run=()=>Promise.resolve().then(task).catch(error=>handleError(error));
+      if(window.requestAnimationFrame)window.requestAnimationFrame(()=>window.setTimeout(run,0));
+      else window.setTimeout(run,0);
+    };
+    if (requestedCourse) { renderLearn(); deferRoute(()=>restoreRoute({view:"course",detail:requestedCourse})); }
+    else if (requestedAcademy === "technical_analysis") { renderLearn(); deferRoute(()=>openMarkets()); }
+    else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) { renderLearn(); deferRoute(()=>openAcademyCategory(requestedAcademy)); }
+    else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") { renderBenefits(); deferRoute(()=>renderExclusiveBenefits()); }
     else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
     else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
-    else if(requestedView === "area" && params.get("panel"))await restoreRoute({view:"area",detail:params.get("panel")});
-    else if (requestedView === "tools") await restoreRoute({view:"tools",detail:params.get("tool")||""});
+    else if(requestedView === "area" && params.get("panel")) { renderArea(); deferRoute(()=>restoreRoute({view:"area",detail:params.get("panel")})); }
+    else if (requestedView === "tools") { void renderTools(); if(params.get("tool"))deferRoute(()=>restoreRoute({view:"tools",detail:params.get("tool")||""})); }
     else if (requestedView === "presentation") renderPresentation();
     else if (["learn", "explore", "benefits", "area"].includes(requestedView)) await Promise.resolve(setView(requestedView));
     else {
       const rememberedRoute = restoreRemembered ? readRememberedRoute() : null;
-      if (rememberedRoute) await restoreRoute(rememberedRoute);
-      else renderHome();
+      if (rememberedRoute) { 
+        if(["area","learn","benefits"].includes(rememberedRoute.view))setView(rememberedRoute.view);
+        else renderHome();
+        deferRoute(()=>restoreRoute(rememberedRoute));
+      } else renderHome();
     }
     return true;
   }
@@ -1235,8 +1243,14 @@
     rememberRoute("learn","technical_analysis");
     const marketTicket=window.EduCashProNavigation?.stamp?.();
     syncExternalSession();
+    state.view = "learn";
+    rememberRoute("learn", "technical_analysis");
+    updateNav();
+    content.innerHTML=loadingCard();
+    const accessPromise=Promise.resolve(window.EduCashProAccess?.refresh?.()).catch(()=>null);
+    const marketsPromise=window.EduCashProResources?.loadMarkets?.();
     try {
-      const access = await window.EduCashProAccess?.refresh?.();
+      const access = await accessPromise;
       if (access?.known === true) {
         const active = access.active === true;
         state.profile = normalizeProfile({
@@ -1250,10 +1264,7 @@
       }
     } catch {}
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(marketTicket))return;
-    state.view = "learn";
-    rememberRoute("learn", "technical_analysis");
-    updateNav();
-    await window.EduCashProResources?.loadMarkets?.();
+    await marketsPromise;
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(marketTicket))return;
     const active = window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true;
     return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
@@ -1314,9 +1325,9 @@
     rememberRoute("course", courseId);
     updateNav();
     const courseTicket=window.EduCashProNavigation?.stamp?.();
+    content.innerHTML = loadingCard();
     await window.EduCashProResources?.loadCourses?.();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
-    content.innerHTML = loadingCard();
     try {
       const localTechnicalCourse = window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
       if (courseId === localTechnicalCourse?.id) {
@@ -1613,6 +1624,7 @@
   async function openAreaLinks(kind = "page") {
     try {
       rememberRoute("area", kind === "short" ? "smart-link" : "links");
+      content.innerHTML=loadingCard();
       const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadLinks?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
@@ -1627,6 +1639,7 @@
   async function openAreaProfessional() {
     try {
       rememberRoute("area", "professional");
+      content.innerHTML=loadingCard();
       const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadProfessional?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
