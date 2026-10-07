@@ -72,8 +72,8 @@ assert(app.includes("Bolsa de Valores, Análise Técnica e Price Action")&&marke
 assert(technicalCourse.includes('title: "Análise Técnica e Price Action"'),"Technical Analysis and Price Action course is missing");
 assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
 assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
-assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("financeKeypad")&&financeControl.includes("exportHistory"),"Monthly finance history is incomplete");
-assert(financeControl.includes("editExpense")&&financeControl.includes("removeExpense")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
+assert(financeControl.includes("educashpro:monthly-finance:")&&financeControl.includes("function history(")&&financeControl.includes("financeHistoryList")&&financeControl.includes("financePdfAction"),"Monthly finance history is incomplete");
+assert(financeControl.includes("data-edit")&&financeControl.includes("data-remove")&&financeControl.includes("localStorage"),"Finance history management is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(financeControl.includes(language),`Missing finance translation: ${language}`);
 assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate lead-magnet guidance is incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(help.includes(language),`Missing help translation: ${language}`);
