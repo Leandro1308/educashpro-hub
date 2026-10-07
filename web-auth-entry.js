@@ -98,7 +98,7 @@
     platform?.writeWebSession?.(next);
     return next;
   }
-  function requiredReauthMode(value){return window.EduCashProSessionPolicy?.walletLinked(value)?"wallet":"email"}
+  function requiredReauthMode(value){return profileIsActive(value?.profile)?"wallet":"email"}
 
   let tonConnectLoadPromise=null;
   async function ensureTonConnectUi(){
@@ -211,7 +211,7 @@
     };
   }
 
-  async function openWallet(){if(!state.session?.profile?.userId||!window.EduCashProSessionPolicy?.walletLinked(state.session))return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();else layer.querySelector("#webPairInstead").onclick=openPairLogin;
+  async function openWallet(){if(!state.session?.profile?.userId||!profileIsActive(state.session?.profile))return false;injectStyles();closeLayer();const layer=document.createElement("div");layer.className="webAuthLayer";layer.innerHTML=`<section class="webAuthSheet"><button class="webAuthClose" type="button" aria-label="${esc(t("close"))}">✕</button><span class="webMemberBadge">${esc(t("accountBadge"))}</span><h2>${esc(t("connectWallet"))}</h2><p>${esc(t("walletLoginText"))}</p><div id="webAuthTonConnect"></div><button id="webPairInstead" class="webAuthSecondary webAuthGhost" type="button">📱 ${esc(t("phoneLogin"))}</button><div id="webAuthError" class="webAuthError"></div></section>`;document.body.appendChild(layer);layer.querySelector(".webAuthClose").onclick=closeLayer;if(state.reauthRequired)layer.querySelector("#webPairInstead")?.remove();else layer.querySelector("#webPairInstead").onclick=openPairLogin;
     try{await ensureTonConnectUi();state.unsubscribe?.();state.ui=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:MANIFEST_URL,buttonRootId:"webAuthTonConnect"});state.unsubscribeModal?.();state.unsubscribeModal=state.ui.onModalStateChange?.(syncWalletPickerLayer)||null;state.challenge=await auth.prepareWalletAuthentication(state.ui);state.unsubscribe=auth.watchWalletAuthentication(state.ui,{getChallenge:()=>state.challenge});window.addEventListener("educashpro:web-authenticated",()=>{state.reauthRequired=false;state.reauthMode="";state.session=touchLocalSession(platform.readWebSession?.());closeLayer();renderAuthenticated()},{once:true});window.addEventListener("educashpro:web-auth-error",event=>setError(event.detail?.message||t("authError")),{once:true});if(state.ui.wallet)await finishWallet(state.ui.wallet)}catch(error){setError(error?.message||t("webUnavailable"))}
   }
 
@@ -419,7 +419,7 @@
     state.checking=false;
     enhancePublic();
     const observer=new MutationObserver(enhancePublic);
-    observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:true});
+    observer.observe(document.getElementById("content")||document.body,{childList:true,subtree:false});
     document.addEventListener("visibilitychange",()=>{
       if(!state.session?.profile?.userId||state.reauthRequired)return;
       if(document.visibilityState==="hidden"){
