@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261006.9";
+  const VERSION="20261006.10";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -151,7 +151,7 @@
       return true;
     })().catch(error=>{financialToolsPromise=null;throw error}));
   }
-  function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=script("./link-tools.js").then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
+  function loadLinks(){if(window.EduCashProLinks)return Promise.resolve(true);return linksPromise||(linksPromise=Promise.all([style("./link-campaigns.css"),script("./link-tools.js")]).then(()=>{const value=currentSession();if(value)window.EduCashProLinks?.setSession?.(value);return true}).catch(error=>{linksPromise=null;throw error}))}
   function loadProfessional(){
     return professionalPromise||(professionalPromise=(async()=>{
       await loadLinks();

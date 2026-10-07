@@ -368,6 +368,8 @@
     landing.insertBefore(primary,hint||null);
   }
   async function boot(){
+    const publicLinkParams=new URL(location.href).searchParams;
+    if(publicLinkParams.get("page")||publicLinkParams.get("go"))return;
     if(window.__EDUCASHPRO_TELEGRAM_HINT__){
       const sdk=window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__;
       if(sdk)await Promise.resolve(sdk).catch(()=>false);

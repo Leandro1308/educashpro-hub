@@ -2407,10 +2407,11 @@
       renderPublicLanding();
       return;
     }
+    if (publicParams.get("page") || publicParams.get("go")) await window.EduCashProResources?.loadLinks?.();
+    if (await window.EduCashProLinks?.bootPublic?.(publicParams)) { markAppReady("public-link"); return; }
     const scheduleContractConfig = () => void loadPublicContractConfig();
     if (window.EduCashProResources?.idle) window.EduCashProResources.idle(scheduleContractConfig, 1500);
     else window.setTimeout(scheduleContractConfig, 1100);
-    if (await window.EduCashProLinks?.bootPublic?.(publicParams)) { markAppReady("public-link"); return; }
     if (!tg?.initData && (publicParams.get("game") || publicParams.get("raffle"))) {
       await window.EduCashProResources?.loadGames?.();
       if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) { markAppReady("public-game"); return; }
