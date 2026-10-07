@@ -171,7 +171,7 @@
   }
 
   const validations=new Map();
-  async function validateStoredSession({apiBase=DEFAULT_API_BASE,force=false}={}){
+  async function validateStoredSession({apiBase=DEFAULT_API_BASE,force=false,preserveOnNetworkError=true}={}){
     const session=platform?.readWebSession?.();
     if(!session?.token)return null;
     const policy=window.EduCashProSessionPolicy;
@@ -192,7 +192,14 @@
         platform?.writeWebSession?.(updated);
         return updated;
       }catch(error){
-        if(Number(error?.status)===401)policy?.reject(session.token);
+        if(Number(error?.status)===401){
+          policy?.reject(session.token);
+          return null;
+        }
+        if(preserveOnNetworkError){
+          const current=platform?.readWebSession?.();
+          return current?.token===session.token?current:session;
+        }
         return null;
       }
     })();
