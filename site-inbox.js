@@ -111,7 +111,7 @@
   window.addEventListener("educashpro:web-session-ready",()=>void refresh());
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refresh({cached:true});});
   window.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
-  let scheduled=false;new MutationObserver(()=>{if(scheduled||document.getElementById("siteInboxButton")||!session()?.token)return;scheduled=true;setTimeout(()=>{scheduled=false;void refresh();},200);}).observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(()=>void refresh(),2000);
+  window.addEventListener("educashpro:app-ready",()=>void refresh({cached:true}));
+  setTimeout(()=>void refresh(),1200);
   setInterval(()=>{if(!document.hidden)void refresh({cached:true});},300000);
 })();
