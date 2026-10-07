@@ -72,6 +72,10 @@
   Object.assign(LC.en,{statistics:"Enable statistics",statisticsOn:"Statistics enabled",statisticsOff:"Statistics disabled",statisticsHint:"When enabled, record clicks and approximate locations of new visits.",previousResults:"Previously recorded results"});
   Object.assign(LC.es,{statistics:"Activar estadísticas",statisticsOn:"Estadísticas activadas",statisticsOff:"Estadísticas desactivadas",statisticsHint:"Al activarlas se registran clics y ubicación aproximada de nuevas visitas.",previousResults:"Resultados registrados anteriormente"});
   Object.assign(LC.ru,{statistics:"Включить статистику",statisticsOn:"Статистика включена",statisticsOff:"Статистика отключена",statisticsHint:"При включении записываются переходы и примерное местоположение новых посещений.",previousResults:"Ранее записанные результаты"});
+  Object.assign(LC.pt,{pageAddressHint:"Escolha um nome curto para seu endereço. Exemplo: leandro ou minha-empresa. Use letras, números e hífens. Salve para publicar a alteração."});
+  Object.assign(LC.en,{pageAddressHint:"Choose a short address name, such as leandro or my-business. Use letters, numbers and hyphens. Save to publish the change."});
+  Object.assign(LC.es,{pageAddressHint:"Elige un nombre corto, como leandro o mi-empresa. Usa letras, números y guiones. Guarda para publicar el cambio."});
+  Object.assign(LC.ru,{pageAddressHint:"Выберите короткое имя, например leandro или my-business. Используйте латинские буквы, цифры и дефисы. Сохраните для публикации изменений."});
   const lc = key => LC[language()][key] || LC.pt[key] || key;
   const campaignsUrl = slug => `https://go.educashpro.vip/c/${encodeURIComponent(slug)}`;
   const number = n => Number(n||0).toLocaleString({pt:'pt-BR',en:'en-US',es:'es-ES',ru:'ru-RU'}[language()]);
@@ -137,8 +141,16 @@
   function validUrl(value) { try { const url = new URL(String(value)); return url.protocol === "https:"; } catch { return false; } }
   function slugify(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40); }
   function pageSlug(value, pageName) {
-    const raw = String(value || "").trim().replace(/[\u0000-\u001f\u007f]/g, "").slice(0, 160);
-    return (raw || slugify(pageName)).normalize("NFC");
+    let raw = String(value || pageName || "").trim().slice(0, 500);
+    try { raw = decodeURIComponent(raw); } catch {}
+    if (/^(?:https?:\/\/|www\.)/i.test(raw)) {
+      try {
+        const url = new URL(/^www\./i.test(raw) ? `https://${raw}` : raw);
+        raw = url.searchParams.get("page") || url.pathname.split("/").filter(Boolean).pop() || url.hostname.replace(/^www\./i, "").split(".")[0];
+      } catch { raw = ""; }
+    }
+    return raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40).replace(/-+$/g, "");
   }
   function requestMessage(error) {
     const reason = String(error?.message || "");
@@ -263,9 +275,14 @@
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
-    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${esc(text("referralTitle"))}</h2><p>${esc(text("referralText"))}</p></div></section><article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug || "", 'maxlength="48" inputmode="url" autocomplete="off" spellcheck="false"'+(!active()?' readonly':''))}${active()?`<label>${esc(lc("theme"))}<select id="lcTheme">${["midnight","light","forest"].map(x=>`<option value="${x}" ${page.appearance?.theme===x?"selected":""}>${esc(lc(x))}</option>`).join("")}</select></label>`:""}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${active()?`<label>${esc(lc("featured"))}<select id="lcFeatured"><option value="-1">${esc(lc("none"))}</option>${visibleLinks.map((l,i)=>`<option value="${i}" ${Number(page.appearance?.featured)===i?"selected":""}>${i+1}. ${esc(l.title||text("linkTitle"))}</option>`).join("")}</select></label>`:""}<h3>${esc(lc("preview"))}</h3><div id="lcPreview" class="lcPreview"></div><div class="lcActions"><button id="lcCampaigns" type="button" class="secondaryButton">${esc(lc("title"))}</button></div>${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
+    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(active() ? text("proLimit") : text("freeLimit"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${esc(text("referralTitle"))}</h2><p>${esc(text("referralText"))}</p></div></section><article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug ? pageSlug(page.slug,page.name) : "", 'maxlength="160" autocomplete="off" spellcheck="false" placeholder="leandro"')}<p class="notice">${esc(lc("pageAddressHint"))}</p><p id="lcAddressPreview" class="publishedUrl"></p>${active()?`<label>${esc(lc("theme"))}<select id="lcTheme">${["midnight","light","forest"].map(x=>`<option value="${x}" ${page.appearance?.theme===x?"selected":""}>${esc(lc(x))}</option>`).join("")}</select></label>`:""}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${!active() && storedLinks.length > 3 ? `<p class="notice">${esc(text("hidden", { count: storedLinks.length - 3 }))}</p>` : ""}${active()?`<label>${esc(lc("featured"))}<select id="lcFeatured"><option value="-1">${esc(lc("none"))}</option>${visibleLinks.map((l,i)=>`<option value="${i}" ${Number(page.appearance?.featured)===i?"selected":""}>${i+1}. ${esc(l.title||text("linkTitle"))}</option>`).join("")}</select></label>`:""}<h3>${esc(lc("preview"))}</h3><div id="lcPreview" class="lcPreview"></div><div class="lcActions"><button id="lcCampaigns" type="button" class="secondaryButton">${esc(lc("title"))}</button></div>${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
     document.getElementById("linkBack").onclick = backToOrigin;
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return showUpgrade(); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); document.getElementById("linkRows").dispatchEvent(new Event("input",{bubbles:true})); };
+    const addressInput=document.getElementById("linkSlug");
+    const addressPreview=()=>{const slug=pageSlug(addressInput.value,document.getElementById("linkName").value);document.getElementById("lcAddressPreview").textContent=slug ? `go.educashpro.vip/p/${slug}` : "";};
+    addressInput.addEventListener("input",addressPreview);
+    addressInput.addEventListener("blur",()=>{addressInput.value=pageSlug(addressInput.value,document.getElementById("linkName").value);addressPreview();});
+    document.getElementById("linkName").addEventListener("input",addressPreview);addressPreview();
     document.getElementById("lcCampaigns").onclick=()=>renderCampaigns(page);
     const preview=()=>{const theme=document.getElementById("lcTheme")?.value||page.appearance?.theme||"midnight";const host=document.getElementById("lcPreview");if(!host)return;const featured=document.getElementById("lcFeatured");if(featured){const value=featured.value;featured.innerHTML=`<option value="-1">${esc(lc("none"))}</option>${[...document.querySelectorAll("[data-link-title]")].map((field,index)=>`<option value="${index}">${index+1}. ${esc(field.value||text("linkTitle"))}</option>`).join("")}`;featured.value=[...featured.options].some(o=>o.value===value)?value:"-1";}host.className=`lcPreview lcTheme-${theme}`;host.innerHTML=`${document.querySelector('[data-image-kind="profile"] .imagePreview img')?.src?`<div class="publicAvatar"><img src="${esc(document.querySelector('[data-image-kind="profile"] .imagePreview img').src)}" alt=""></div>`:""}<strong>${esc(document.getElementById("linkName").value)}</strong><p>${esc(document.getElementById("linkBio").value)}</p>${[...document.querySelectorAll("[data-link-title]")].map(i=>`<span class="lcPreviewButton">${esc(i.value||text("linkTitle"))}</span>`).join("")}`};
     document.querySelector(".linkEditor").addEventListener("input",preview); preview();
@@ -354,6 +371,6 @@
   }
 
   window.fetch = async function (...args) { const response = await originalFetch(...args); try { const url = typeof args[0] === "string" ? args[0] : args[0]?.url || ""; if (/\/api\/hub\/session$/.test(url)) { const data = await response.clone().json(); if (data?.ok) session = data; } } catch {} return response; };
-  window.EduCashProLinks = { text, renderPageEditor, renderShortener, bootPublic, setSession(value){ session = value || session; } };
+  window.EduCashProLinks = { normalizePageAddress:pageSlug, text, renderPageEditor, renderShortener, bootPublic, setSession(value){ session = value || session; } };
 })();
 
