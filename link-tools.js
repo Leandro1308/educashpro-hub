@@ -370,7 +370,6 @@
     document.getElementById("shortDestinationButton").onclick = () => openUrl(link.destination); document.getElementById("shortAffiliateButton").onclick = () => openUrl(link.affiliateUrl || link.officialUrl);
   }
 
-  window.fetch = async function (...args) { const response = await originalFetch(...args); try { const url = typeof args[0] === "string" ? args[0] : args[0]?.url || ""; if (/\/api\/hub\/session$/.test(url)) { const data = await response.clone().json(); if (data?.ok) session = data; } } catch {} return response; };
   window.EduCashProLinks = { normalizePageAddress:pageSlug, text, renderPageEditor, renderShortener, bootPublic, setSession(value){ session = value || session; } };
 })();
 
