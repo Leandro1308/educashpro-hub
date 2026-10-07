@@ -80,7 +80,7 @@ for(const language of ["pt:","en:","es:","ru:"])assert(help.includes(language),`
 assert(!courses.includes('"id": "negocio_seculo_xxi"')&&!courses.includes('"id": "apresentacao"'),"Retired duplicate courses remain in catalog");
 assert(professional.includes('id="recommendedProfessionalAction"'),"Recommended action must have a contextual button");
 assert(professional.includes('step("configureServices"')&&professional.includes('step("configureAppearance"'),"Professional setup steps are incomplete");
-assert(app.includes('query.set("view", view)')&&agenda.includes('p.get("view")'),"Professional setup cannot open the requested agenda section");
+assert(app.includes('query.set("view", view)')&&agenda.includes('query.get("view")'),"Professional setup cannot open the requested agenda section");
 for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(language),`Missing professional translation: ${language}`);
 
 assert(index.includes("account-center.js"),"Web account center is not loaded");
