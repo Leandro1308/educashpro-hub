@@ -33,7 +33,7 @@ assert(index.includes(`__EDUCASHPRO_PAGE_BUILD__="${publishedBuild}"`),"HTML boo
 assert(loader.includes(`const VERSION="${assetBuild}"`),"Lazy asset version is not synchronized with version.json");
 const localAssetVersions=[...index.matchAll(/\.\/[^"'?]+\.(?:js|css|webmanifest)\?v=([^"'&<>\s]+)/g)].map(match=>match[1]);
 assert(localAssetVersions.length>0&&localAssetVersions.every(version=>version===assetBuild),"Index contains mixed local asset versions");
-assert(serviceWorker.includes(`BUILD="${publishedBuild}"`)&&serviceWorker.includes("client.navigate")&&serviceWorker.includes('cache:"no-store"'),"Service worker does not force fresh clients and core assets");
+assert(serviceWorker.includes(`BUILD="${publishedBuild}"`)&&serviceWorker.includes("skipWaiting")&&serviceWorker.includes("clients.claim")&&!serviceWorker.includes("client.navigate")&&!serviceWorker.includes('addEventListener("fetch"'),"Service worker must refresh safely without intercepting or forcing client navigation");
 assert(pwaInstall.includes('updateViaCache:"none"')&&pwaInstall.includes("registration.update()"),"PWA registration does not explicitly refresh the service worker");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
@@ -187,7 +187,7 @@ assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.inclu
 assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
 
 const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
-assert(index.includes('local-games-bootstrap-v13.js?v=20260929.9'),"Direct local-games bootstrap is not loaded by index.html");
+assert(index.includes(`local-games-bootstrap-v13.js?v=${assetBuild}`),"Direct local-games bootstrap is not loaded by index.html");
 assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
 for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
   assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);

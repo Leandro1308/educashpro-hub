@@ -136,7 +136,8 @@
     window.addEventListener("load",()=>{
       const register=async()=>{
         try{
-          await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
+          const registration=await navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"});
+          await registration.update().catch(()=>{});
         }catch(error){
           console.warn("[EduCashPro] Service Worker:",error);
         }

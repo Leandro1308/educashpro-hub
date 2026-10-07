@@ -325,13 +325,21 @@
     const p=profile();
     if(!p?.userId)return false;
     try{
-      const pending=JSON.parse(sessionStorage.getItem("educashpro:agenda-return")||"null");
+      const key="educashpro:agenda-return";
+      const pending=JSON.parse(sessionStorage.getItem(key)||"null");
       if(pending){
-        sessionStorage.removeItem("educashpro:agenda-return");
         const next=new URL(pending.path,location.origin);
-        if(next.origin===location.origin&&/(^|\/)agenda\.html$/.test(next.pathname)&&next.searchParams.has("invite")&&Date.now()-Number(pending.createdAt)<60*60*1000){location.assign(next.href);return true;}
+        const age=Date.now()-Number(pending.createdAt||0);
+        const attempts=Math.max(1,Number(pending.attempts||1));
+        const valid=next.origin===location.origin&&/(^|\/)agenda\.html$/.test(next.pathname)&&next.searchParams.has("invite")&&age>=0&&age<60*60*1000;
+        if(valid&&attempts<=1){
+          sessionStorage.setItem(key,JSON.stringify({...pending,attempts,redirectedAt:Date.now()}));
+          location.assign(next.href);
+          return true;
+        }
+        sessionStorage.removeItem(key);
       }
-    }catch{}
+    }catch{try{sessionStorage.removeItem("educashpro:agenda-return")}catch{}}
     document.querySelector(".growthQuickActions")?.classList.remove("hidden");
     document.getElementById("bottomNav")?.classList.remove("hidden");
     void window.EduCashProApp?.setSession?.(state.session);

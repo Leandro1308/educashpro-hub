@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261007.1";
+  const VERSION="20261007.2";
   const ASSET_TIMEOUT_MS=8000;
   const scripts=new Map();
   const styles=new Map();
@@ -174,3 +174,4 @@
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
   window.EduCashProResources={version:VERSION,script,style,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
+

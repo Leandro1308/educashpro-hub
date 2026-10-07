@@ -1,4 +1,4 @@
-import { COPY } from "./agenda-copy.js?v=20261007.1";
+import { COPY } from "./agenda-copy.js?v=20261007.2";
 import {
   CURRENCIES,
   defaultWeekly,
@@ -8,8 +8,8 @@ import {
   dateKey,
   minorDigits,
   paymentSummary,
-} from "./agenda-model.js?v=20261007.1";
-import { encryptNote, decryptNote } from "./agenda-crypto.js?v=20261007.1";
+} from "./agenda-model.js?v=20261007.2";
+import { encryptNote, decryptNote } from "./agenda-crypto.js?v=20261007.2";
 const root = document.getElementById("content"),
   toast = document.getElementById("toast"),
   escape = (v) =>
@@ -1285,6 +1285,7 @@ async function init() {
       state.token = stored.token;
       state.profile = stored.profile;
       state.language = stored.profile?.language || state.language;
+      try { sessionStorage.removeItem("educashpro:agenda-return"); } catch {}
     }
     if (!COPY[state.language]) state.language = "pt";
     $("subtitle").textContent = t("title");
@@ -1309,11 +1310,24 @@ async function init() {
       if (!initData) {
         if (query.get("invite"))
           try {
+            const key = "educashpro:agenda-return";
+            const path = location.pathname + location.search;
+            const now = Date.now();
+            let previous = null;
+            try { previous = JSON.parse(sessionStorage.getItem(key) || "null"); } catch {}
+            const same =
+              previous?.path === path &&
+              now - Number(previous?.createdAt || 0) >= 0 &&
+              now - Number(previous?.createdAt || 0) < 60 * 60 * 1000;
+            const attempts = same
+              ? Math.max(1, Number(previous?.attempts || 1)) + 1
+              : 1;
             sessionStorage.setItem(
-              "educashpro:agenda-return",
+              key,
               JSON.stringify({
-                path: location.pathname + location.search,
-                createdAt: Date.now(),
+                path,
+                createdAt: same ? Number(previous.createdAt) : now,
+                attempts,
               }),
             );
           } catch {}
