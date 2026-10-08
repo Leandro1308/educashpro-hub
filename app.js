@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.07.3";
+  const APP_RUNTIME_BUILD = "2026.10.07.4";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -670,7 +670,7 @@
   async function api(path, payload = {}, options = {}) {
     const requestKey = path + JSON.stringify(payload);
     if (pendingApiRequests.has(requestKey)) return pendingApiRequests.get(requestKey);
-    const blocking = options.blocking !== false;
+    const blocking = options.blocking === true;
     const request = (async () => {
       const controller = new AbortController();
       const timeoutMs = Math.max(2500, Math.min(30000, Number(options.timeoutMs || (path === "/api/hub/session" ? 6000 : 15000)) || 15000));
@@ -1246,7 +1246,7 @@
     state.view = "learn";
     rememberRoute("learn", "technical_analysis");
     updateNav();
-    content.innerHTML=loadingCard();
+    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Análise Técnica e Price Action");
     const accessPromise=Promise.resolve(window.EduCashProAccess?.refresh?.()).catch(()=>null);
     const marketsPromise=window.EduCashProResources?.loadMarkets?.();
     try {
@@ -1325,7 +1325,7 @@
     rememberRoute("course", courseId);
     updateNav();
     const courseTicket=window.EduCashProNavigation?.stamp?.();
-    content.innerHTML = loadingCard();
+    content.innerHTML = navigationShell("🎓", t("courses"));
     await window.EduCashProResources?.loadCourses?.();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
     try {
@@ -1624,7 +1624,7 @@
   async function openAreaLinks(kind = "page") {
     try {
       rememberRoute("area", kind === "short" ? "smart-link" : "links");
-      content.innerHTML=loadingCard();
+      content.innerHTML = navigationShell(kind === "short" ? "✂️" : "🔗", kind === "short" ? localizedNavTitle("smart") : localizedNavTitle("links"));
       const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadLinks?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
@@ -1639,7 +1639,7 @@
   async function openAreaProfessional() {
     try {
       rememberRoute("area", "professional");
-      content.innerHTML=loadingCard();
+      content.innerHTML = navigationShell("💼", localizedNavTitle("professional"));
       const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadProfessional?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
@@ -1652,6 +1652,7 @@
 
   async function openAccountCenter(method){
     try{
+      content.innerHTML = navigationShell("👤", localizedNavTitle("account"));
       await window.EduCashProResources?.loadAccountCenter?.();
       return window.EduCashProAccountCenter?.[method]?.();
     }catch(error){
@@ -1872,7 +1873,7 @@
     updateNav();
     const ticket=window.EduCashProNavigation?.stamp?.();
     if(window.EduCashProLocal?.renderToolsHub){window.EduCashProLocal.renderToolsHub();return;}
-    content.innerHTML=loadingCard();
+    content.innerHTML = navigationShell("🧰", t("tools"));
     try{
       await window.EduCashProResources?.loadToolsHub?.();
       if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
@@ -2316,6 +2317,33 @@
   }
 
   function loadingCard() { return `<div class="empty"><div class="loader" style="margin:auto"><span></span></div></div>`; }
+  function localizedNavTitle(kind) {
+    const labels = {
+      pt:{professional:"Perfil Profissional",links:"Página de links",smart:"Link Inteligente",account:"Minha conta"},
+      en:{professional:"Professional Profile",links:"Link page",smart:"Smart Link",account:"My account"},
+      es:{professional:"Perfil Profesional",links:"Página de enlaces",smart:"Enlace Inteligente",account:"Mi cuenta"},
+      ru:{professional:"Профессиональный профиль",links:"Страница ссылок",smart:"Умная ссылка",account:"Мой аккаунт"}
+    };
+    return labels[state.language]?.[kind] || labels.pt[kind] || "EduCashPro";
+  }
+  function navigationShell(icon, title) {
+    hideGlobalLoading(true);
+    return `<section class="hero navigationShell"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(icon)} ${escapeHtml(title)}</h1><p>${escapeHtml(t("loading"))}</p></section><div class="empty"><div class="loader" style="margin:auto"><span></span></div></div>`;
+  }
+  function scheduleNavigationWarmup() {
+    const resources = window.EduCashProResources;
+    if (!resources?.prefetch) return;
+    const warm = () => {
+      ["./professional-profile.js","./link-tools.js","./local-tools-and-games.js","./account-center.js","./technical-analysis-course.js","./market-learning-center.js"].forEach((src) => {
+        try { resources.prefetch(src); } catch {}
+      });
+      ["./link-campaigns.css","./tools-hub-v2.css"].forEach((href) => {
+        try { resources.prefetch(href,{as:"style"}); } catch {}
+      });
+    };
+    if (resources.idle) resources.idle(warm, 900);
+    else window.setTimeout(warm, 350);
+  }
   function handleError(error, target = content) { const message = error?.message === "SESSION" ? t("expires") : t("error"); target.innerHTML = `<div class="empty error">${escapeHtml(message)}</div>`; }
 
   function applyLanguage() {
@@ -2446,11 +2474,21 @@
     if (window.__EDUCASHPRO_WEB_HUB__?.active) {
       const cachedSession = window.EduCashProPlatform?.readWebSession?.();
       if (cachedSession?.profile?.userId) {
-        syncExternalSession(cachedSession);
+        try { syncExternalSession(cachedSession); }
+        catch (error) {
+          console.warn("[EduCashPro] sessão local:", error?.message || error);
+          state.profile = normalizeProfile(cachedSession.profile || {});
+        }
         window.__EDUCASHPRO_FAST_RENDERED__ = true;
-        markAppReady("web-route-loading");
-        await resumeAuthenticatedExperience({restoreNavigation:false});
+        try {
+          const resumed = await resumeAuthenticatedExperience({restoreNavigation:false});
+          if (!resumed || content.querySelector(".splash")) renderHome();
+        } catch (error) {
+          console.warn("[EduCashPro] restauração local:", error?.message || error);
+          renderHome();
+        }
         markAppReady("web-cached-shell");
+        scheduleNavigationWarmup();
         void refreshHubSessionInBackground();
         return;
       }
@@ -2520,6 +2558,7 @@
         else renderHome();
       }
       markAppReady("authenticated-session");
+      scheduleNavigationWarmup();
       window.setTimeout(() => window.EduCashProProfessional?.maybeOnboard?.(), 450);
       if (window.EduCashProResources?.idle) window.EduCashProResources.idle(() => void checkForUpdates(), 9000);
       else window.setTimeout(() => void checkForUpdates(), 9000);
@@ -2569,6 +2608,12 @@
   window.addEventListener("educashpro:web-hub-ready",()=>{
     tg=window.Telegram?.WebApp||tg;
     void refreshHubSessionInBackground();
+  });
+  window.addEventListener("educashpro:web-session-ready",()=>{
+    if (content.querySelector(".splash") && state.profile) {
+      void resumeAuthenticatedExperience({restoreNavigation:false}).catch(()=>renderHome());
+    }
+    scheduleNavigationWarmup();
   });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();

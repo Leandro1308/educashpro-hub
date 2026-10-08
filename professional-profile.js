@@ -35,7 +35,7 @@
   async function api(path, body = {}) {
     if (!session?.token) throw new Error("session");
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 7000);
+    const timer = setTimeout(() => controller.abort(), 4500);
     try {
       const response = await fetch(API_BASE + path, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:session.token,...body}),cache:"no-store",signal:controller.signal});
       const data = await response.json().catch(() => ({}));
@@ -83,11 +83,12 @@
   async function render(options = {}) {
     if (typeof options?.back === "function") returnTo = options.back;
     injectStyles();
-    document.getElementById("bottomNav")?.classList.add("hidden");
-    content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><section class="hero"><span class="eyebrow">${esc(t("eyebrow"))}</span><h1>💼 ${esc(t("title"))}</h1><p>${esc(t("lead"))}</p></section><section class="profileCard"><h2>${esc(t("setup"))}</h2><p>${esc(t("loading"))}</p></section>`;
-    document.getElementById("professionalBack").onclick=()=>{document.getElementById("bottomNav")?.classList.remove("hidden");const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
+    content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><section class="hero"><span class="eyebrow">${esc(t("eyebrow"))}</span><h1>💼 ${esc(t("title"))}</h1><p>${esc(t("lead"))}</p></section><section class="profileCard professionalQuickActions"><h2>${esc(t("quickActions"))}</h2><div class="profileActions"><button id="fastProfessionalPage" class="wideButton">⚙️ ${esc(t("editPage"))}</button><button id="fastProfessionalAgenda" class="secondaryButton">📅 ${esc(t("openAgenda"))}</button></div></section><section class="profileCard"><h2>${esc(t("setup"))}</h2><p>${esc(t("loading"))}</p><div class="professionalProgress"><span style="width:20%"></span></div></section>`;
+    document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
+    document.getElementById("fastProfessionalAgenda").onclick=()=>window.EduCashProApp?.openAgenda?.("","appointments");
+    document.getElementById("fastProfessionalPage").onclick=async()=>{try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.setSession?.(session);window.EduCashProLinks?.renderPageEditor?.({back:render})}catch{toast(t("error"))}};
     try {
-      const [pageResult, agendaResult]=await Promise.all([api("/api/hub/link-page").catch(()=>({page:null})),api("/api/agenda/bootstrap",{appointmentOffset:0,appointmentLimit:100}).catch(()=>({access:null,services:[],appointments:[]}))]);
+      const [pageResult, agendaResult]=await Promise.all([api("/api/hub/link-page").catch(()=>({page:null})),api("/api/agenda/bootstrap",{appointmentOffset:0,appointmentLimit:20}).catch(()=>({access:null,services:[],appointments:[]}))]);
       const page=pageResult.page || null, agenda=agendaResult.access?.agenda || null, services=agendaResult.services || [], appointments=agendaResult.appointments || [];
       const checks=[!!page,!!page?.profileImage,(page?.links||[]).length>0,!!agenda,services.length>0], done=checks.filter(Boolean).length, percent=Math.round(done/checks.length*100);
       const needsPage=!page||!page?.profileImage||!(page?.links||[]).length;
@@ -106,7 +107,7 @@
         }catch{return render()}
       };
       const openAgendaView=view=>window.EduCashProApp?.openAgenda?.("",view);
-      document.getElementById("professionalBack").onclick=()=>{document.getElementById("bottomNav")?.classList.remove("hidden");const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
+      document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
       document.getElementById("recommendedProfessionalAction").onclick=needsPage?openPageEditor:needsAgenda?()=>openAgendaView(!agenda?"settings":"services"):()=>renderCard(page,agendaResult);
       document.getElementById("editProfessionalPage").onclick=openPageEditor;
       document.getElementById("configureInfo").onclick=openPageEditor;document.getElementById("configureContacts").onclick=openPageEditor;
