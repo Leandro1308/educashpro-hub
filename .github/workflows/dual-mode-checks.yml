@@ -43,3 +43,5 @@ jobs:
         run: node tests/dual-mode-audit.mjs
       - name: Run static audit
         run: node tests/static-audit.mjs
+      - name: Verify HttpOnly transport fallback
+        run: node tests/cookie-transport.test.mjs
