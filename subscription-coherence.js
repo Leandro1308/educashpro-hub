@@ -138,7 +138,7 @@
     const original = markets.render.bind(markets);
     markets.render = function (args = {}) {
       const canonicalActive = isActive();
-      return original({ ...args, active: canonicalActive || args.active === true });
+      return original({ ...args, active: canonicalActive });
     };
     markets.__subscriptionCoherencePatched = true;
     return true;
