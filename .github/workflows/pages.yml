@@ -36,6 +36,9 @@ jobs:
             --exclude 'README.md' \
             --exclude 'LINKS_API_CONTRACT.md' \
             --exclude '_site/'
+          test -s _site/index.html
+          test -s _site/resource-loader.js
+          test -s _site/subscription-coherence.js
       - name: Preparar arquivos
         uses: actions/upload-pages-artifact@v3
         with:
@@ -43,40 +46,16 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Diagnosticar origem pública
+      - name: Verificar publicação sem expor conteúdo e infraestrutura
         shell: bash
         run: |
-          set +e
-          echo "=== HTTPS HEADERS ==="
-          curl -sSIL --connect-timeout 10 https://go.educashpro.vip/ | sed -n '1,80p'
-          echo "=== HTTP HEADERS ==="
-          curl -sSIL --connect-timeout 10 http://go.educashpro.vip/ | sed -n '1,80p'
-          echo "=== HTTPS ROOT HTML ==="
-          curl -sSL --connect-timeout 10 https://go.educashpro.vip/ | sed -n '1,140p'
-          echo "=== LIVE APP ROUTE ==="
-          echo "--- HEAD /app/ ---"
-          curl -sSIL --connect-timeout 10 https://go.educashpro.vip/app/ | sed -n '1,100p'
-          echo "--- BODY /app/ ---"
-          curl -sSL --connect-timeout 10 https://go.educashpro.vip/app/ | sed -n '1,220p'
-          echo "--- HEAD /app/index.html ---"
-          curl -sSIL --connect-timeout 10 https://go.educashpro.vip/app/index.html | sed -n '1,100p'
-          echo "--- BODY /app/version.json ---"
-          curl -sS -D - --connect-timeout 10 https://go.educashpro.vip/app/version.json -o /tmp/app-version.json | sed -n '1,80p'
-          cat /tmp/app-version.json 2>/dev/null
-          echo
-          echo "--- SITE JS/CSS PROBES ---"
-          for path in site/site.js site/site.css; do
-            echo "--- /$path ---"
-            curl -sS -D - --connect-timeout 10 "https://go.educashpro.vip/$path?probe=$GITHUB_SHA" -o "/tmp/${path//\//_}" | sed -n '1,60p'
-            head -c 1600 "/tmp/${path//\//_}" 2>/dev/null
-            echo
+          set -uo pipefail
+          failed=0
+          for path in "" "version.json" "resource-loader.js"; do
+            code="$(curl -L -sS --connect-timeout 10 --max-time 20 -o /dev/null -w '%{http_code}' "https://go.educashpro.vip/${path}?probe=${GITHUB_SHA}" || true)"
+            echo "Resource /${path} HTTP ${code}"
+            if [[ "${code}" != "200" ]]; then failed=1; fi
           done
-          echo "=== HTTPS FILE PROBES ==="
-          for path in version.json game-suite.js educash-empire-v12.js resource-loader.js; do
-            echo "--- /${path} ---"
-            curl -sS -D - --connect-timeout 10 "https://go.educashpro.vip/${path}?probe=${GITHUB_SHA}" -o "/tmp/${path//\//_}" | sed -n '1,40p'
-            head -c 500 "/tmp/${path//\//_}" 2>/dev/null
-            echo
-          done
-          echo "=== DNS / CONNECT TRACE ==="
-          curl -svI --connect-timeout 10 https://go.educashpro.vip/ 2>&1 | sed -n '1,120p'
+          if [[ "${failed}" != "0" ]]; then
+            echo "::warning::Domínio ainda não serve todos os recursos; verifique DNS/Render. Nenhum corpo HTML, cookie ou cabeçalho sensível será registrado."
+          fi
