@@ -112,7 +112,7 @@ assert(app.includes("setSession")&&webAuthEntry.includes("EduCashProApp?.setSess
 
 assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["network_marketing", "financial_education", "telegram"])'),"The three Academy learning paths must use the central route");
 assert(app.includes('closest?.("[data-academy-category]")')&&app.includes("void openAcademyCategory(category)"),"Academy cards need a delegated click handler that survives later modules");
-assert(app.includes("setSession, openAcademyCategory, rememberRoute"),"The Academy category route must be available in both Web and Telegram modes");
+assert(app.includes("window.EduCashProApp = {")&&app.includes("setSession")&&app.includes("openAcademyCategory")&&app.includes("rememberRoute"),"The Academy category route must be available in both Web and Telegram modes");
 
 assert(affiliatePage.includes('setLink("",contextReferral())')&&affiliatePage.includes("copyCurrentLink")&&affiliatePage.includes("shareCurrentLink"),"Affiliate link must be actionable before status APIs finish");
 assert(affiliatePage.includes("location.origin")&&affiliatePage.includes("/?ref="),"Affiliate page must generate the canonical website referral URL");
