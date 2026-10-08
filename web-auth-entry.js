@@ -316,7 +316,21 @@
     enhancePublic();
   }
 
-  function logout(){platform.writeWebSession?.(null);state.session=null;window.EduCashProApp?.clearSession?.();location.reload()}
+  async function logout(){
+    // Clear the HttpOnly cookie as well as local UI metadata.
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),2000);
+    try{
+      await fetch(location.origin+"/api/platform-auth/logout",{
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"X-EduCashPro-Cookie-Session":"1"},signal:controller.signal
+      });
+    }catch{}finally{clearTimeout(timer);}
+    platform.writeWebSession?.(null);
+    state.session=null;
+    window.EduCashProApp?.clearSession?.();
+    location.reload();
+  }
   function referralUrl(){const code=profile()?.referralCode;if(!code)return"";return `${location.origin}/?ref=${encodeURIComponent(code)}`}
   async function copyReferral(){const value=referralUrl();if(!value)return;try{await navigator.clipboard.writeText(value)}catch{}const button=document.getElementById("webReferralCopy");if(button){const old=button.textContent;button.textContent=t("copied");setTimeout(()=>button.textContent=old,1200)}}
   async function approvePair(){const input=document.getElementById("webPairApproveCode");const status=document.getElementById("webPairApproveStatus");const code=String(input?.value||"").replace(/\D/g,"").slice(0,6);if(code.length!==6){if(status)status.textContent=t("invalidCode");return}try{await auth.approveDevicePairing(code);if(status)status.textContent=t("approved");if(input)input.value=""}catch{if(status)status.textContent=t("invalidCode")}}
