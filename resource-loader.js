@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261008.5";
+  const VERSION="20261008.6";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -81,10 +81,13 @@
       ]);
       await script("./local-arcade-core.js");
       await Promise.allSettled([
-        script("./speed-race-game.js"),
-        script("./air-defense-game.js"),
-        script("./math-learning-game.js")
+        script("./math-learning-game.js"),
+        style("./book-quiz.css")
       ]);
+      try{
+        await script("./book-quiz-engine.js");
+        await script("./book-quiz-business-21.js");
+      }catch(error){console.warn("[EduCashPro] quiz de livro:",error?.message||error)}
       await script("./local-games-bootstrap-v13.js");
       try{await script("./game-local-storage-v8.js")}catch(_){}
       try{await script("./social-play.js")}catch(_){}
