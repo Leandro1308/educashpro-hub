@@ -1,5 +1,12 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07111f"><title>Suporte | EduCashPro</title><script>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>Suporte | EduCashPro</title>
+  <script>
+    window.__EDUCASHPRO_SUPPORT_BUILD__="2026.10.08.1";
     (function(){
       var launchText=String(location.search||"")+" "+String(location.hash||"");
       var hint=/tgWebApp(?:Data|Version|Platform|ThemeParams)/i.test(launchText);
@@ -16,8 +23,27 @@
         setTimeout(function(){finish(Boolean(window.Telegram&&window.Telegram.WebApp))},3000);
       });
     })();
-  </script><link rel="stylesheet" href="./support.css?v=20261007.3"><link rel="stylesheet" href="./common-ui.css?v=20261007.3"></head><body><div class="app"><header><button id="back" aria-label="Voltar">←</button><div><strong>EduCashPro</strong><span id="subtitle">Fale com o administrador</span></div><button id="close" aria-label="Fechar">✕</button></header><main id="content"><div class="empty">Carregando…</div></main></div><div id="toast" role="status"></div><script defer src="./platform-adapter.js?v=20261007.3"></script><script defer src="./locale-resolver.js?v=20261007.3"></script><script defer src="./web-hub-bridge.js?v=20261007.3"></script>
-  <script defer src="./navigation-state.js?v=20261007.3"></script><script defer src="./support.js?v=20261007.3"></script>  <script defer src="./cross-platform-nav.js?v=20261007.3"></script>
-<script defer src="./site-inbox.js?v=20261007.3"></script>
-</body></html>
-
+  </script>
+  <link rel="stylesheet" href="./support.css?v=20261008.1">
+  <link rel="stylesheet" href="./common-ui.css?v=20261007.4">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <button id="back" aria-label="Voltar">←</button>
+      <div><strong>EduCashPro</strong><span id="subtitle">Central de Ajuda</span></div>
+      <button id="close" aria-label="Fechar">✕</button>
+    </header>
+    <main id="content"><div class="empty">Carregando…</div></main>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script defer src="./platform-adapter.js?v=20261007.4"></script>
+  <script defer src="./locale-resolver.js?v=20261007.4"></script>
+  <script defer src="./web-hub-bridge.js?v=20261007.4"></script>
+  <script defer src="./navigation-state.js?v=20261007.4"></script>
+  <script defer src="./support-manual.js?v=20261008.1"></script>
+  <script defer src="./support.js?v=20261008.1"></script>
+  <script defer src="./cross-platform-nav.js?v=20261007.4"></script>
+  <script defer src="./site-inbox.js?v=20261007.4"></script>
+</body>
+</html>
