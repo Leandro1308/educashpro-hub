@@ -379,7 +379,7 @@
     const style = document.createElement("style");
     style.id = "accountCenterStyles";
     style.textContent = `
-      .accountCenterBtn{min-width:42px;height:42px;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:#102238;color:#fff;font-size:20px;cursor:pointer}
+      .accountCenterBtn{display:inline-flex;align-items:center;justify-content:center;min-width:42px;max-width:180px;height:42px;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:13px;background:#102238;color:#fff;font-size:20px;cursor:pointer}.accountCenterBtn .accountHeaderAvatar{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;overflow:hidden;border-radius:50%}.accountCenterBtn .accountHeaderAvatar img{display:block!important;width:100%!important;height:100%!important;max-width:30px!important;max-height:30px!important;object-fit:cover!important}
       .accountCenterLayer{position:fixed;z-index:12000;inset:0;background:rgba(1,7,15,.72);backdrop-filter:blur(8px);display:grid;place-items:end center;padding:14px}
       .accountCenterSheet{width:min(100%,680px);max-height:90vh;overflow:auto;background:#0d1b2d;border:1px solid rgba(255,255,255,.1);border-radius:24px 24px 18px 18px;padding:18px;color:#f7fbff;box-shadow:0 25px 80px rgba(0,0,0,.5)}
       .accountCenterHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
