@@ -123,7 +123,7 @@ assert(accountCenter.includes("affiliatePage()")&&accountCenter.includes('url.se
 
 assert(app.includes("hubSessionReady")&&app.includes("const hubToken = state.hubSessionReady ? state.token"),"Web authentication must not overwrite the Hub token used by course APIs");
 assert(app.includes("source.subscription?.active")&&app.includes("normalizeProfile(session.profile"),"Subscription activity must be normalized across Web and Telegram profiles");
-assert(webAuthEntry.includes("window.__EDUCASHPRO_WEB_HUB__?.active")&&webAuthEntry.includes("authenticatedLanding&&!member"),"Web authentication must not redraw the selected Hub view");
+assert(webAuthEntry.includes("const chosen=window.EduCashProNavigation?.current?.()")&&webAuthEntry.includes("restoreRoute?.(chosen)"),"Web authentication must not redraw the selected Hub view");
 assert(app.includes("rememberRoute(view")&&app.includes('publicParams.get("academy")')&&app.includes('publicParams.get("course")'),"Selected navigation and learning routes must survive reloads and tab changes");
 
 assert(accountCenter.includes('data-action="pair-device"')&&accountCenter.includes("openDevicePairing")&&accountCenter.includes("approveDevicePairing(code)"),"Logged-in mobile account must expose device pairing approval");
@@ -131,7 +131,7 @@ assert(webAuthEntry.includes("resolvePairExpiry")&&webAuthEntry.includes("webPai
 
 assert(accountCenter.includes("openDevicePairing")&&accountCenter.includes("approveDevicePairing"),"Device pairing must remain available in the authenticated account center");
 
-assert(index.includes('classList.add(initData?"educashproTelegram":"educashproWeb")'),"The site and Telegram Mini App must receive separate layout classes");
+assert(index.includes('classList.toggle("educashproTelegram",Boolean(initData))')&&index.includes('classList.toggle("educashproWeb",!initData)'),"The site and Telegram Mini App must receive separate layout classes");
 assert(style.includes("html.educashproWeb #app")&&style.includes("@media (min-width:900px)"),"Desktop web layout must expand responsively");
 assert(!style.includes("html.educashproTelegram #app"),"Desktop expansion must not change the Telegram Mini App layout");
 
@@ -160,7 +160,7 @@ assert(app.includes('bottomNav.querySelectorAll("button[data-view]")')&&app.incl
 assert(!runtimeStability.includes('target.id==="areaLinkPage"')&&!runtimeStability.includes('target.id==="areaSmartLink"'),"My Area buttons must not be intercepted by the generic lazy replay");
 assert(app.includes('actionCard("areaProfessional"')&&app.includes('actionCard("editProfilePhoto"')&&app.includes('actionCard("areaLinkPage"')&&app.includes('actionCard("areaAgenda"'),"My Area must expose the complete editable profile hub");
 assert(app.includes('actionCard("areaAccountSettings"')&&app.includes('actionCard("areaLanguage"')&&app.includes('actionCard("areaPreferences"')&&app.includes('actionCard("areaNetwork"')&&app.includes('actionCard("areaSubscription"'),"My Area account controls are incomplete");
-assert(loader.includes("await loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
+assert(loader.includes("function loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
 
 assert(!experienceV2.includes(".bottomNav{display:none!important}"),"Production theme must never hide the primary footer navigation");
 assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&&loader.includes("Promise.allSettled"),"Games catalog must load independently from optional enhancements");
