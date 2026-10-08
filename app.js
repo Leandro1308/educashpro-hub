@@ -814,6 +814,13 @@
       restoreRememberedScroll(route);
       return true;
     }
+    if(route.view === "area" && route.detail === "agenda"){rememberRoute("area","agenda");openAgenda("","settings");return true;}
+    if(route.view === "area" && ["account","subscription","network","pair","language","preferences","documents"].includes(route.detail)){
+      const method={account:"open",subscription:"openSubscription",network:"openNetwork",pair:"openDevicePairing",language:"openLanguage",preferences:"openPreferences",documents:"openDocuments"}[route.detail];
+      rememberRoute("area",route.detail);
+      await openAccountCenter(method);
+      return true;
+    }
     if(route.view === "area" && route.detail === "photo"){renderProfilePhotoEditor();return true;}
     if(route.view === "area" && route.detail === "membership"){await renderMembershipProof();return true;}
     if(["area","benefits"].includes(route.view) && route.detail?.startsWith("form-")){renderSubmissionForm(route.detail.slice(5));return true;}
@@ -838,9 +845,9 @@
 
     const restoreNavigation = options.restoreNavigation !== false;
     const restoreRemembered = options.restoreRemembered !== false;
-    if (restoreNavigation && window.EduCashProNavigationState?.restoreLastPage?.()) return true;
-
     const params = new URL(window.location.href).searchParams;
+    const hasExplicitRoute = ["course","academy","view","section"].some((key)=>params.has(key));
+    if (restoreNavigation && !hasExplicitRoute && window.EduCashProNavigationState?.restoreLastPage?.()) return true;
     const requestedCourse = String(params.get("course") || "");
     const requestedAcademy = String(params.get("academy") || "");
     const requestedView = String(params.get("view") || "");
@@ -2537,7 +2544,8 @@
       applyLanguage();
       bottomNav.classList.remove("hidden");
       refreshCourseCatalogLater();
-      if (window.EduCashProNavigationState?.restoreLastPage?.()) { markAppReady("navigation-restore"); return; }
+      const hasExplicitRoute = ["course","academy","view","section"].some((key)=>publicParams.has(key));
+      if (!hasExplicitRoute && window.EduCashProNavigationState?.restoreLastPage?.()) { markAppReady("navigation-restore"); return; }
       const requestedCourse = String(publicParams.get("course") || "");
       const requestedAcademy = String(publicParams.get("academy") || "");
       const requestedView = String(publicParams.get("view") || "");

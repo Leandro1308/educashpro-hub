@@ -114,11 +114,35 @@
     es:{access:"Acceso y cuenta",subscription:"Suscripción",agenda:"Agenda",affiliates:"Afiliados",tools:"Herramientas",games:"Juegos",links:"Página de enlaces",payment:"Pago",other:"Otro"},
     ru:{access:"Доступ и аккаунт",subscription:"Подписка",agenda:"Календарь",affiliates:"Партнёры",tools:"Инструменты",games:"Игры",links:"Страница ссылок",payment:"Оплата",other:"Другое"}
   };
+  const FEATURE_LABELS={
+    pt:{area:"Minha área",account:"Minha conta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Assinatura",affiliate:"Meu link de afiliado",network:"Minha rede",professional:"Perfil Profissional",agenda:"Agenda Profissional",linkPage:"Página de links",smartLink:"Link Inteligente",finance:"Controle financeiro",tools:"Ferramentas",academy:"Academy",games:"Jogos",explore:"Explorar",benefits:"Benefícios",marketplace:"Marketing Place"},
+    en:{area:"My area",account:"My account",language:"Language",pair:"Connect device",subscription:"Subscription",affiliate:"My affiliate link",network:"My network",professional:"Professional Profile",agenda:"Professional Schedule",linkPage:"Link Page",smartLink:"Smart Link",finance:"Financial control",tools:"Tools",academy:"Academy",games:"Games",explore:"Explore",benefits:"Benefits",marketplace:"Marketing Place"},
+    es:{area:"Mi área",account:"Mi cuenta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Suscripción",affiliate:"Mi enlace de afiliado",network:"Mi red",professional:"Perfil Profesional",agenda:"Agenda Profesional",linkPage:"Página de enlaces",smartLink:"Enlace Inteligente",finance:"Control financiero",tools:"Herramientas",academy:"Academy",games:"Juegos",explore:"Explorar",benefits:"Beneficios",marketplace:"Marketing Place"},
+    ru:{area:"Мой раздел",account:"Мой аккаунт",language:"Язык",pair:"Подключить устройство",subscription:"Подписка",affiliate:"Моя партнёрская ссылка",network:"Моя сеть",professional:"Профессиональный профиль",agenda:"Профессиональный календарь",linkPage:"Страница ссылок",smartLink:"Умная ссылка",finance:"Финансовый учёт",tools:"Инструменты",academy:"Academy",games:"Игры",explore:"Поиск",benefits:"Преимущества",marketplace:"Marketing Place"}
+  };
+  const FEATURE_ACTIONS={
+    start:[["area","./?view=area"]],
+    account:[["account","./?view=area&panel=account"],["language","./?view=area&panel=language"],["pair","./?view=area&panel=pair"]],
+    subscription:[["subscription","./?view=area&panel=subscription"]],
+    affiliate:[["affiliate","./affiliate.html"],["network","./?view=area&panel=network"]],
+    professional:[["professional","./?view=area&panel=professional"]],
+    agenda:[["agenda","./?view=area&panel=agenda"]],
+    links:[["linkPage","./?view=area&panel=links"],["smartLink","./?view=area&panel=smart-link"]],
+    finance:[["finance","./?view=tools&tool=monthly-finance"]],
+    tools:[["tools","./?view=tools"]],
+    academy:[["academy","./?view=learn"]],
+    games:[["games","./?view=tools&tool=games"]],
+    explore:[["explore","./?view=explore"]],
+    benefits:[["benefits","./?view=benefits"],["marketplace","./?view=benefits&section=partner-stores"]],
+    telegram:[["pair","./?view=area&panel=pair"]],
+    troubleshoot:[]
+  };
 
   const t=(key)=>COPY[lang]?.[key]||COPY.pt[key]||key;
   const esc=(value)=>String(value??"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const show=(message)=>{if(!toast)return;toast.textContent=message;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2400)};
   const categoryLabel=(value)=>CATEGORY[lang]?.[value]||CATEGORY.pt[value]||value;
+  const featureLabel=(value)=>FEATURE_LABELS[lang]?.[value]||FEATURE_LABELS.pt[value]||value;
   const statusLabel=(value)=>t(`status_${value}`);
   const ticketLabel=(item)=>item?.ticketNumber?`#${String(item.ticketNumber).padStart(6,"0")}`:`#${String(item?.id||"").slice(-6).toUpperCase()}`;
   const locale=()=>lang==="pt"?"pt-BR":lang==="en"?"en-US":lang==="es"?"es-ES":"ru-RU";
@@ -199,18 +223,20 @@
     activeTab="help";
     const article=manualArticles().find((a)=>a.id===id);
     if(!article)return renderHelp();
+    const directActions=FEATURE_ACTIONS[article.id]||[];
     shell(`
       <button class="textBack" id="articleBack">← ${esc(t("back"))}</button>
       <article class="manualArticle">
         <header><span class="manualIcon">${article.icon}</span><div><small>${esc(article.group)}</small><h1>${esc(article.title)}</h1><p>${esc(article.summary)}</p></div></header>
         <section><h2>🎯 ${esc(t("purpose"))}</h2><p>${esc(article.purpose)}</p></section>
-        <section><h2>📍 ${esc(t("where"))}</h2><p class="manualPath">${esc(article.where)}</p></section>
+        <section><h2>📍 ${esc(t("where"))}</h2><p class="manualPath">${esc(article.where)}</p>${directActions.length?`<div class="manualDirectActions">${directActions.map(([key,href])=>`<button type="button" data-feature-href="${esc(href)}">↗ ${esc(featureLabel(key))}</button>`).join("")}</div>`:""}</section>
         <section><h2>🧭 ${esc(t("steps"))}</h2><ol>${(article.steps||[]).map((step)=>`<li>${esc(step)}</li>`).join("")}</ol></section>
         <aside><b>💡 ${esc(t("tip"))}</b><p>${esc(article.tip)}</p></aside>
         <div class="manualSupport"><strong>${esc(t("stillHelp"))}</strong><button id="reportArticle" class="primary">🚨 ${esc(t("reportThis"))}</button></div>
       </article>
     `);
     document.getElementById("articleBack").onclick=()=>renderHelp();
+    content.querySelectorAll("[data-feature-href]").forEach((button)=>button.onclick=()=>location.assign(button.dataset.featureHref));
     document.getElementById("reportArticle").onclick=()=>{activeTab="report";renderReport(article.id)};
   }
   function categoryOptions(selected="other"){
