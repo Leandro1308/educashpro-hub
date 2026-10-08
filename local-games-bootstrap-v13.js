@@ -2,7 +2,7 @@
   "use strict";
 
   const VERSION="20260929.9";
-  const IDS=["car-rush","air-defense","air-defense-2","math-academy"];
+  const IDS=["math-academy"];
   const COPY={
     pt:{
       carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta.",
@@ -30,9 +30,6 @@
     }
   };
   const META={
-    "car-rush":["🏎️","carRush","carRushSub"],
-    "air-defense":["✈️","airDefense","airDefenseSub"],
-    "air-defense-2":["🛩️","airDefense2","airDefense2Sub"],
     "math-academy":["🧠","mathAcademy","mathAcademySub"]
   };
 
@@ -81,9 +78,7 @@
           const arcade=window.EduCashProLocalArcade;
           if(
             (normalized==="local-arcade-core.js"&&arcade) ||
-            (normalized==="speed-race-game.js"&&arcade?.has?.("car-rush")) ||
-            (normalized==="air-defense-game.js"&&arcade?.has?.("air-defense")&&arcade?.has?.("air-defense-2")) ||
-            (normalized==="math-learning-game.js"&&arcade?.has?.("math-academy"))
+(normalized==="math-learning-game.js"&&arcade?.has?.("math-academy"))
           ) done();
         },80);
         window.setTimeout(fail,6000);
@@ -161,8 +156,6 @@
     const arcade=window.EduCashProLocalArcade;
     if(!arcade)throw new Error("local_arcade_not_ready");
 
-    if(!arcade.has?.("car-rush"))await loadScript("./speed-race-game.js");
-    if(!arcade.has?.("air-defense")||!arcade.has?.("air-defense-2"))await loadScript("./air-defense-game.js");
     if(!arcade.has?.("math-academy"))await loadScript("./math-learning-game.js");
 
     if(!window.EduCashProAdvancedGames?.launch)throw new Error("advanced_games_not_ready");
