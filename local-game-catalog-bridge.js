@@ -1,26 +1,8 @@
 (function(){
   "use strict";
 
-  const IDS=["car-rush","air-defense","air-defense-2","math-academy"];
+  const IDS=["math-academy"];
   const META={
-    "car-rush":{
-      icon:"🏎️",
-      title:{pt:"Corrida de Velocidade",en:"Speed Race",es:"Carrera de Velocidad",ru:"Скоростная гонка"},
-      sub:{pt:"Desvie dos obstáculos enquanto a velocidade aumenta a cada 30 segundos.",en:"Dodge obstacles while speed increases every 30 seconds.",es:"Esquiva obstáculos mientras aumenta la velocidad cada 30 segundos.",ru:"Объезжайте препятствия: каждые 30 секунд скорость растёт."},
-      badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
-    },
-    "air-defense":{
-      icon:"✈️",
-      title:{pt:"Defesa Aérea",en:"Air Defense",es:"Defensa Aérea",ru:"Воздушная оборона"},
-      sub:{pt:"Defesa clássica: destrua as bolinhas antes que atravessem a base.",en:"Classic defense: destroy the balls before they cross the base.",es:"Defensa clásica: destruye las bolas antes de que crucen la base.",ru:"Классическая защита: уничтожайте шары до линии базы."},
-      badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
-    },
-    "air-defense-2":{
-      icon:"🛩️",
-      title:{pt:"Defesa Aérea 2",en:"Air Defense 2",es:"Defensa Aérea 2",ru:"Воздушная оборона 2"},
-      sub:{pt:"Combate aéreo: desvie dos tiros e abata aviões inimigos.",en:"Air combat: dodge fire and destroy enemy aircraft.",es:"Combate aéreo: esquiva disparos y derriba aviones enemigos.",ru:"Воздушный бой: уклоняйтесь и сбивайте самолёты."},
-      badge:{pt:"PROCESSAMENTO LOCAL",en:"LOCAL PROCESSING",es:"PROCESAMIENTO LOCAL",ru:"ЛОКАЛЬНО"}
-    },
     "math-academy":{
       icon:"🧠",
       title:{pt:"Aprenda Matemática",en:"Learn Mathematics",es:"Aprende Matemáticas",ru:"Изучайте математику"},
@@ -64,9 +46,6 @@
     const suite=window.EduCashProGameSuite;
     if(!suite)return;
     suite.GAME_META=suite.GAME_META||{};
-    if(!suite.GAME_META["car-rush"])suite.GAME_META["car-rush"]=["🏎️","carRush","carRushSub"];
-    if(!suite.GAME_META["air-defense"])suite.GAME_META["air-defense"]=["✈️","airDefense","airDefenseSub"];
-    if(!suite.GAME_META["air-defense-2"])suite.GAME_META["air-defense-2"]=["🛩️","airDefense2","airDefense2Sub"];
     if(!suite.GAME_META["math-academy"])suite.GAME_META["math-academy"]=["🧠","mathAcademy","mathAcademySub"];
   }
 
