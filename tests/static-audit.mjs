@@ -170,54 +170,57 @@ assert(!experienceV2.includes(".bottomNav{display:none!important}"),"Production 
 assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&&loader.includes("Promise.allSettled"),"Games catalog must load independently from optional enhancements");
 
 const localArcade=await read("local-arcade-core.js");
-const speedRace=await read("speed-race-game.js");
-const airDefense=await read("air-defense-game.js");
 const mathLearning=await read("math-learning-game.js");
 const gameUsageLimit=await read("game-usage-limit-v14.js");
-for(const file of ["local-arcade-core.js","speed-race-game.js","air-defense-game.js","math-learning-game.js"]){
-  assert(loader.includes(file),`Local game module is not lazy-loaded: ${file}`);
+const bookEngine=await read("book-quiz-engine.js");
+const bookData=await read("book-quiz-business-21.js");
+const bookCss=await read("book-quiz.css");
+
+for(const file of ["local-arcade-core.js","math-learning-game.js","book-quiz-engine.js","book-quiz-business-21.js"]){
+  assert(loader.includes(file),`Active local/educational module is not lazy-loaded: ${file}`);
 }
-for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
-  assert(games.includes(`"${gameId}"`),`New game is missing from catalog: ${gameId}`);
+assert(loader.includes('style("./book-quiz.css")'),"Book quiz stylesheet must be lazy-loaded");
+assert(!loader.includes('script("./speed-race-game.js")')&&!loader.includes('script("./air-defense-game.js")'),"Removed arcade games must not be downloaded");
+for(const gameId of ["book-business-21","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy"]){
+  assert(games.includes(`"${gameId}"`),`Active pastime is missing from catalog: ${gameId}`);
 }
-assert(games.includes("TOURNAMENT_GAMES")&&!games.includes('TOURNAMENT_GAMES = new Set(["math-space","peg-solitaire","sliding-puzzle","word-search","math-cross","car-rush"'),"Local arcade games must not use tournament/server synchronization");
-for(const source of [speedRace,airDefense,mathLearning]){
-  assert(!source.includes("fetch("),"Local games must not call backend during gameplay");
+for(const gameId of ["car-rush","air-defense","air-defense-2","math-cross"]){
+  assert(!games.includes(`"${gameId}": [`),`Removed pastime must not remain in active catalog: ${gameId}`);
 }
+assert(games.includes("TOURNAMENT_GAMES")&&!games.includes('"math-cross"']),"Math Cross must be removed from active tournament/catalog wiring");
+assert(!mathLearning.includes("fetch("),"Math Academy gameplay must remain local");
 assert(localArcade.includes("localStorage")&&localArcade.includes("educashpro:local-arcade:v1"),"Local arcade progress storage is missing");
-assert(speedRace.includes("30000")&&speedRace.includes("raceMinus")&&speedRace.includes("racePlus")&&speedRace.includes("carHow"),"Speed Race progression, controls or how-to card is incomplete");
-assert(airDefense.includes("30000")&&airDefense.includes("airMinus")&&airDefense.includes("airPlus")&&airDefense.includes("airHow"),"Air Defense progression, controls or how-to card is incomplete");
-assert(airDefense.includes('A.register("air-defense-2"')&&games.includes('"air-defense-2": ["🛩️"'),"Air Defense 2 must be a separate visible game");
-assert(loader.includes('script("./game-usage-limit-v14.js")')&&gameUsageLimit.includes("const PLAY_MS=60*60*1000")&&gameUsageLimit.includes("const COOLDOWN_MS=8*60*60*1000")&&gameUsageLimit.includes("localStorage"),"Non-subscriber local game usage limit must remain 1 hour followed by 8 hour cooldown");
-assert(gameUsageLimit.includes('game:"air-defense-2"')&&gameUsageLimit.includes('game:"air-defense"'),"Air Defense games must keep independent usage keys");
+assert(loader.includes('script("./game-usage-limit-v14.js")')&&gameUsageLimit.includes("const PLAY_MS=60*60*1000")&&gameUsageLimit.includes("const COOLDOWN_MS=8*60*60*1000")&&gameUsageLimit.includes("localStorage"),"Non-subscriber pastime usage control changed unexpectedly");
+assert(gameUsageLimit.includes('"book-business-21"'),"Book learning quiz must be exempt from the one-hour pastime timer");
 assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
 assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
+
+assert(bookEngine.includes("localStorage")&&bookEngine.includes("educashpro:book-quiz:v1:"),"Book quiz must store progress on the current device");
+assert(bookEngine.includes("state.index")&&bookEngine.includes("state.answers")&&bookEngine.includes("state.score"),"Book quiz must persist exact resume position, answers and score");
+assert(!bookEngine.includes("fetch(")&&!bookEngine.includes("/api/"),"Book quiz gameplay must not consume Render or MongoDB");
+assert(bookData.includes('id:"book-business-21"')&&bookData.includes("100 perguntas"),"O Negócio do Século XXI quiz dataset is missing");
+assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFeedback"),"Book quiz UI styles are incomplete");
 
 const localCatalogBridge=await read("local-game-catalog-bridge.js");
 assert(loader.includes('script("./local-game-catalog-bridge.js")'),"Runtime local-game catalog bridge is not loaded after game patches");
 assert(loader.includes("EduCashProLocalCatalogBridge?.ensure"),"Game loader does not finalize the local-game catalog bridge");
-for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
-  assert(localCatalogBridge.includes(gameId),`Catalog bridge does not guarantee card visibility: ${gameId}`);
-}
+assert(localCatalogBridge.includes('const IDS=["math-academy"]'),"Catalog bridge must not restore removed arcade games");
 assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.includes("insertAdjacentHTML"),"Catalog bridge does not self-heal a stale rendered catalog");
-assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route local game clicks directly");
+assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route remaining local game clicks directly");
 
 const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
 assert(!index.includes("local-games-bootstrap-v13.js"),"Local game bootstrap must stay out of the critical HTML path");
 assert(loader.includes('script("./local-games-bootstrap-v13.js")'),"Local game bootstrap must be lazy-loaded by the resource loader");
-assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register games in the same catalog used by visible games");
-for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
-  assert(directLocalBootstrap.includes(`"${gameId}"`),`Direct bootstrap is missing ${gameId}`);
-}
-assert(directLocalBootstrap.includes('loadScript("./local-arcade-core.js")')&&directLocalBootstrap.includes('loadScript("./speed-race-game.js")')&&directLocalBootstrap.includes('loadScript("./air-defense-game.js")')&&directLocalBootstrap.includes('loadScript("./math-learning-game.js")'),"Direct bootstrap cannot recover missing local game modules");
+assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register remaining local games in the visible catalog");
+assert(directLocalBootstrap.includes('const IDS=["math-academy"]'),"Direct bootstrap must not restore removed arcade games");
+assert(directLocalBootstrap.includes('loadScript("./local-arcade-core.js")')&&directLocalBootstrap.includes('loadScript("./math-learning-game.js")')&&!directLocalBootstrap.includes('loadScript("./speed-race-game.js")')&&!directLocalBootstrap.includes('loadScript("./air-defense-game.js")'),"Direct bootstrap must recover only the remaining local learning game");
 assert(directLocalBootstrap.includes("MutationObserver")&&directLocalBootstrap.includes("setInterval"),"Direct bootstrap does not survive a stale/rebuilt lazy catalog");
 assert(localArcade.includes('has:(id)=>typeof games[id]==="function"'),"Local arcade does not expose game-registration state to bootstrap");
 
 const empireRegistrar=await read("educash-empire-v12.js");
-for(const gameId of ["car-rush","air-defense","air-defense-2","math-academy"]){
-  assert(empireRegistrar.includes(`"${gameId}"`),`Empire registrar is missing ${gameId}`);
-}
-assert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch local games");
+assert(empireRegistrar.includes('const LOCAL_IDS=["math-academy"]'),"Empire extension must not restore removed arcade games");
+assert(!empireRegistrar.includes('"car-rush"')&&!empireRegistrar.includes('"air-defense"')&&!empireRegistrar.includes('"air-defense-2"'),"Empire extension still contains removed arcade registrations");
+assert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch remaining local games");
 assert(empireRegistrar.includes('node.src="./"+file+"?v=20260929.9"'),"Empire local-game recovery does not bypass stale lazy-loader cache");
 assert(empireRegistrar.includes("MutationObserver")&&empireRegistrar.includes("base.renderCatalog"),"Empire extension does not repair every catalog render");
 assert(empireRegistrar.includes('if(k==="empire")return t("title",l)')&&empireRegistrar.includes("setTextIfChanged"),"Empire title/subtitle repair is missing");
