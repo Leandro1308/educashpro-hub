@@ -48,18 +48,15 @@
   }
   function showKnowledge(l,level,next){const lesson=LESSONS[(Math.max(1,level)-1)%LESSONS.length];content().innerHTML=`<main class="gamePage empirePage"><section class="empireKnowledge"><span class="cardRarity">${esc(t("knowledge",l))} · #${level}</span><h2>🧠 ${esc(lesson[0])}</h2><p>${esc(lesson[1])}</p><button id="emKnowledgeNext" class="wideButton">${esc(t("understood",l))}</button></section></main>`;$("#emKnowledgeNext").onclick=next}
   function showPro(l){content().innerHTML=`<main class="gamePage empirePage"><button class="textButton empireBack">←</button><section class="empireProGate"><span class="eyebrow">🔐 ${esc(t("pro",l))}</span><h2>${esc(t("proTitle",l))}</h2><p>${esc(t("proText",l))}</p><button id="emSubscribe" class="wideButton">🚀 ${esc(t("subscribe",l))}</button><button id="emClassic" class="secondaryButton">${esc(t("classic",l))}</button></section></main>`;$(".empireBack").onclick=()=>showHub(l);$("#emClassic").onclick=()=>showHub(l);$("#emSubscribe").onclick=()=>{const url=bridge.session?.subscribeUrl||bridge.session?.botUrl;if(url)window.Telegram?.WebApp?.openLink?window.Telegram.WebApp.openLink(url):window.open(url,"_blank","noopener");else suite.paywall?.("advanced",l)}}
-  const LOCAL_IDS=["car-rush","air-defense","air-defense-2","math-academy"];
+  const LOCAL_IDS=["math-academy"];
   const LOCAL_META={
-    "car-rush":["🏎️","carRush","carRushSub"],
-    "air-defense":["✈️","airDefense","airDefenseSub"],
-    "air-defense-2":["🛩️","airDefense2","airDefense2Sub"],
     "math-academy":["🧠","mathAcademy","mathAcademySub"]
   };
   const LOCAL_COPY={
-    pt:{carRush:"Corrida de Velocidade",carRushSub:"Desvie dos obstáculos enquanto a velocidade aumenta a cada 30 segundos.",airDefense:"Defesa Aérea",airDefenseSub:"Defesa clássica: destrua as bolinhas antes que atravessem a base.",airDefense2:"Defesa Aérea 2",airDefense2Sub:"Combate aéreo: desvie dos tiros e abata aviões inimigos.",mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"},
-    en:{carRush:"Speed Race",carRushSub:"Dodge obstacles while speed increases every 30 seconds.",airDefense:"Air Defense",airDefenseSub:"Classic defense: destroy the balls before they cross the base.",airDefense2:"Air Defense 2",airDefense2Sub:"Air combat: dodge fire and destroy enemy aircraft.",mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"},
-    es:{carRush:"Carrera de Velocidad",carRushSub:"Esquiva obstáculos mientras aumenta la velocidad cada 30 segundos.",airDefense:"Defensa Aérea",airDefenseSub:"Defensa clásica: destruye las bolas antes de que crucen la base.",airDefense2:"Defensa Aérea 2",airDefense2Sub:"Combate aéreo: esquiva disparos y derriba aviones enemigos.",mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"},
-    ru:{carRush:"Скоростная гонка",carRushSub:"Объезжайте препятствия: каждые 30 секунд скорость растёт.",airDefense:"Воздушная оборона",airDefenseSub:"Классическая защита: уничтожайте шары до линии базы.",airDefense2:"Воздушная оборона 2",airDefense2Sub:"Воздушный бой: уклоняйтесь и сбивайте самолёты.",mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"}
+    pt:{mathAcademy:"Aprenda Matemática",mathAcademySub:"Leia, aprenda e pratique matemática e tabuada.",play:"Jogar",free:"LIVRE",local:"PROCESSAMENTO LOCAL",learning:"EDUCATIVO"},
+    en:{mathAcademy:"Learn Mathematics",mathAcademySub:"Read, learn and practice mathematics and multiplication tables.",play:"Play",free:"FREE",local:"LOCAL PROCESSING",learning:"LEARNING"},
+    es:{mathAcademy:"Aprende Matemáticas",mathAcademySub:"Lee, aprende y practica matemáticas y tablas.",play:"Jugar",free:"LIBRE",local:"PROCESAMIENTO LOCAL",learning:"EDUCATIVO"},
+    ru:{mathAcademy:"Изучайте математику",mathAcademySub:"Читайте, изучайте и тренируйте математику и таблицу умножения.",play:"Играть",free:"СВОБОДНО",local:"ЛОКАЛЬНО",learning:"ОБУЧЕНИЕ"}
   };
   const localText=(k,l)=>LOCAL_COPY[lang(l)]?.[k]||LOCAL_COPY.pt[k]||k;
   function registerLocalMeta(){
@@ -84,8 +81,6 @@
     let arcade=window.EduCashProLocalArcade;
     if(!arcade?.has)await loadLocalScript("local-arcade-core.js");
     arcade=window.EduCashProLocalArcade;
-    if(!arcade?.has?.("car-rush"))await loadLocalScript("speed-race-game.js");
-    if(!arcade?.has?.("air-defense")||!arcade?.has?.("air-defense-2"))await loadLocalScript("air-defense-game.js");
     if(!arcade?.has?.("math-academy"))await loadLocalScript("math-learning-game.js");
     return Boolean(window.EduCashProAdvancedGames?.launch);
   }
@@ -124,7 +119,7 @@
   const oldText=suite.text?.bind(suite);suite.text=function(k,l){
     if(k==="empire")return t("title",l);
     if(k==="empireSub")return t("sub",l);
-    if(["carRush","carRushSub","airDefense","airDefenseSub","airDefense2","airDefense2Sub","mathAcademy","mathAcademySub"].includes(k))return localText(k,l);
+    if(["mathAcademy","mathAcademySub"].includes(k))return localText(k,l);
     return oldText?oldText(k,l):k;
   };
   const oldLaunch=suite.launchGame.bind(suite);suite.launchGame=function(id,o={}){
