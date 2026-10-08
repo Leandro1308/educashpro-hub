@@ -187,7 +187,7 @@ for(const gameId of ["book-business-21","math-space","peg-solitaire","sliding-pu
 for(const gameId of ["car-rush","air-defense","air-defense-2","math-cross"]){
   assert(!games.includes(`"${gameId}": [`),`Removed pastime must not remain in active catalog: ${gameId}`);
 }
-assert(games.includes("TOURNAMENT_GAMES")&&!games.includes('"math-cross"']),"Math Cross must be removed from active tournament/catalog wiring");
+assert(games.includes("TOURNAMENT_GAMES")&&!games.includes('"math-cross"'),"Math Cross must be removed from active tournament/catalog wiring");
 assert(!mathLearning.includes("fetch("),"Math Academy gameplay must remain local");
 assert(localArcade.includes("localStorage")&&localArcade.includes("educashpro:local-arcade:v1"),"Local arcade progress storage is missing");
 assert(loader.includes('script("./game-usage-limit-v14.js")')&&gameUsageLimit.includes("const PLAY_MS=60*60*1000")&&gameUsageLimit.includes("const COOLDOWN_MS=8*60*60*1000")&&gameUsageLimit.includes("localStorage"),"Non-subscriber pastime usage control changed unexpectedly");
