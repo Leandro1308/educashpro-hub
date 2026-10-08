@@ -96,7 +96,8 @@ console.log("EduCashPro static audit: OK");
 const crossPlatformNav=await read("cross-platform-nav.js");
 for(const page of ["index.html","agenda.html","affiliate.html","marketplace.html","publish.html","support.html"]){
   const source=await read(page);
-  assert(source.includes("cross-platform-nav.js"),`Cross-platform navigation missing from ${page}`);
+  if(page==="index.html")assert(idleFeatures.includes("cross-platform-nav.js"),"Cross-platform navigation is not scheduled for the main app");
+  else assert(source.includes("cross-platform-nav.js"),`Cross-platform navigation missing from ${page}`);
 }
 assert(crossPlatformNav.includes("EduCashProBot")&&crossPlatformNav.includes("go.educashpro.vip"),"Site and bot cross-navigation is incomplete");
 assert(crossPlatformNav.includes("searchParams.set(\"ref\"")&&crossPlatformNav.includes("ref_"),"Cross-navigation must preserve affiliate attribution");
