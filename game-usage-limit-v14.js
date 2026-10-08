@@ -6,7 +6,7 @@
   const COOLDOWN_MS=8*60*60*1000;
   const PREFIX="ecp:game-usage:v1";
   const bridge=window.EduCashProGameBridge||(window.EduCashProGameBridge={session:null,catalogContext:{},currentGame:null});
-  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","math-cross","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines","math-academy"]);
+  const MODE_GAMES=new Set(["math-space","sliding-puzzle","word-search","peg-solitaire","block-grid","nut-sort","falling-blocks","color-lines","math-academy","book-business-21"]);
   let current=null,timer=0;
 
   const COPY={
