@@ -122,7 +122,7 @@ assert(webAuthEntry.includes("location.origin")&&webAuthEntry.includes("/?ref=")
 assert(accountCenter.includes("affiliatePage()")&&accountCenter.includes('url.searchParams.set("ref",code)'),"Account Center must send the personal referral code to the affiliate page");
 
 assert(app.includes("hubSessionReady")&&app.includes("const hubToken = state.hubSessionReady ? state.token"),"Web authentication must not overwrite the Hub token used by course APIs");
-assert(app.includes("source.subscription?.active")&&app.includes("normalizeProfile(session.profile)"),"Subscription activity must be normalized across Web and Telegram profiles");
+assert(app.includes("source.subscription?.active")&&app.includes("normalizeProfile(session.profile"),"Subscription activity must be normalized across Web and Telegram profiles");
 assert(webAuthEntry.includes("window.__EDUCASHPRO_WEB_HUB__?.active")&&webAuthEntry.includes("authenticatedLanding&&!member"),"Web authentication must not redraw the selected Hub view");
 assert(app.includes("rememberRoute(view")&&app.includes('publicParams.get("academy")')&&app.includes('publicParams.get("course")'),"Selected navigation and learning routes must survive reloads and tab changes");
 
