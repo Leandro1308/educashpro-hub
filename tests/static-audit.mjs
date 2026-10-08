@@ -44,7 +44,7 @@ assert(!idleFeatures.includes('load("./visitor-experience.js")')&&!idleFeatures.
 assert(!links.includes("window.fetch =")&&!localTools.includes("window.fetch =")&&!visitorExperience.includes("window.fetch =")&&!subscriptionCoherence.includes("window.fetch ="),"Feature modules must not stack global fetch interceptors");
 assert(!siteInbox.includes("observe(document.documentElement")&&webAuthEntry.includes("{childList:true,subtree:false}"),"Critical-page observers are still too broad");
 assert(app.includes("const deferRoute=")&&app.includes('renderArea(); deferRoute(()=>restoreRoute({view:"area",detail:params.get("panel")}))'),"Deep Web routes must paint their parent page before lazy restoration");
-assert(professional.includes('id="professionalBack"')&&professional.includes('const timer = setTimeout(() => controller.abort(), 7000)'),"Professional profile does not paint immediately or still waits too long for APIs");
+assert(professional.includes('id="professionalBack"')&&professional.includes('id="fastProfessionalPage"')&&professional.includes('controller.abort(), 4500'),"Professional profile does not paint immediately or still waits too long for APIs");
 assert(loader.includes("function loadProfessional()")&&!loader.includes("await loadLinks();\n      await script(\"./professional-profile.js\")"),"Professional profile still blocks on the link editor bundle");
 JSON.parse(courses);
 assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
