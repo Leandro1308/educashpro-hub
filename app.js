@@ -168,7 +168,7 @@
       included: [
         ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
         ["🔎", "Descoberta organizada", "Grupos, canais, bots, páginas e projetos selecionados."],
-        ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras, sorteadores e jogos no celular."],
+        ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras, sorteadores e passatempos no celular."],
         ["📅", "Organização profissional", "Agenda para atendimentos, reuniões, aulas, serviços e outros compromissos."],
         ["🎁", "Benefícios exclusivos", "Vantagens e parcerias disponibilizadas aos assinantes ativos."],
         ["❤️", "Minha Área", "Assinatura, credencial, suporte, comunidade, links e projetos reunidos no mesmo espaço."],
@@ -207,7 +207,7 @@
       included: [
         ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
         ["🔎", "Organized discovery", "Selected groups, channels, bots, pages and projects."],
-        ["🧰", "Digital tools", "Link page, Smart Link, calculators, randomizers and mobile games."],
+        ["🧰", "Digital tools", "Link page, Smart Link, calculators, randomizers and pastimes on mobile."],
         ["📅", "Professional organization", "A schedule for appointments, meetings, classes, services and other commitments."],
         ["🎁", "Exclusive benefits", "Advantages and partnerships available to active subscribers."],
         ["❤️", "My Area", "Subscription, credential, support, community, links and projects in one place."],
@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.08.4";
+  const APP_RUNTIME_BUILD = "2026.10.08.5";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -928,10 +928,10 @@
       ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
     }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
     const gamesLabels = {
-      pt: ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"],
-      en: ["Games and challenges", "Play, create tournaments and organize raffles"],
-      es: ["Juegos y desafíos", "Juega, crea torneos y organiza sorteos"],
-      ru: ["Игры и задания", "Играйте, создавайте турниры и розыгрыши"],
+      pt: ["Passatempo", "Atividades, campeonatos e sorteios para seus momentos livres"],
+      en: ["Pastime", "Activities, tournaments and raffles for your free time"],
+      es: ["Pasatiempo", "Actividades, campeonatos y sorteos para tus momentos libres"],
+      ru: ["Досуг", "Занятия, турниры и розыгрыши для свободного времени"],
     }[state.language] || ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"];
     const groups = ({
       pt: {
@@ -2368,10 +2368,10 @@
     state.language = ["pt", "en", "es", "ru"].includes(browserLanguage) ? browserLanguage : "pt";
     applyLanguage();
     const copies = {
-      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Jogos gratuitos", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
-      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Free games", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
-      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Juegos gratuitos", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo.", "Marketplace", "Encuentra empresas, beneficios y proyectos.", "Abrir App en Telegram", "Accede a EduCashPro directamente en Telegram.", "Credencial del suscriptor", "Muestra este QR a la tienda acreditada.", "Escanear QR", "Abre la cámara y comprueba titular, estado y validez."],
-      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Бесплатные игры", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
+      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Passatempo", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
+      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Pastime", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
+      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Pasatiempo", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo.", "Marketplace", "Encuentra empresas, beneficios y proyectos.", "Abrir App en Telegram", "Accede a EduCashPro directamente en Telegram.", "Credencial del suscriptor", "Muestra este QR a la tienda acreditada.", "Escanear QR", "Abre la cámara y comprueba titular, estado y validez."],
+      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Досуг", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
     };
     const value = copies[browserLanguage] || copies.pt;
     const entryCopy = ({
