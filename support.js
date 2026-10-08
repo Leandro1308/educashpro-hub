@@ -257,16 +257,20 @@
   async function optimizeImage(file){
     const url=URL.createObjectURL(file);
     try{
-      const image=new Image();
-      image.decoding="async";
-      await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url});
-      const width=image.naturalWidth||image.width,height=image.naturalHeight||image.height;
-      const max=1440,scale=Math.min(1,max/Math.max(width,height));
-      const canvas=document.createElement("canvas");
-      canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
-      const ctx=canvas.getContext("2d",{alpha:false});ctx.drawImage(image,0,0,canvas.width,canvas.height);
-      const blob=await new Promise((resolve)=>canvas.toBlob(resolve,"image/webp",.82))||await new Promise((resolve)=>canvas.toBlob(resolve,"image/jpeg",.84))||file;
-      return {blob,filename:blob===file?file.name:"support.webp",width:canvas.width,height:canvas.height};
+      try{
+        const image=new Image();
+        image.decoding="async";
+        await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=reject;image.src=url});
+        const width=image.naturalWidth||image.width,height=image.naturalHeight||image.height;
+        const max=1440,scale=Math.min(1,max/Math.max(width,height));
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
+        const ctx=canvas.getContext("2d",{alpha:false});ctx.drawImage(image,0,0,canvas.width,canvas.height);
+        const blob=await new Promise((resolve)=>canvas.toBlob(resolve,"image/webp",.82))||await new Promise((resolve)=>canvas.toBlob(resolve,"image/jpeg",.84))||file;
+        return {blob,filename:blob===file?file.name:"support.webp",width:canvas.width,height:canvas.height};
+      }catch{
+        return {blob:file,filename:file.name,width:0,height:0};
+      }
     }finally{URL.revokeObjectURL(url)}
   }
   async function uploadReportImages(){
