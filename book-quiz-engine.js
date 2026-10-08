@@ -6,10 +6,10 @@
   const contentNode=()=>document.getElementById("content");
   const esc=(value)=>String(value??"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const COPY={
-    pt:{back:"Voltar",start:"Começar",continue:"Continuar de onde parei",restart:"Recomeçar",progress:"Progresso",question:"Pergunta",of:"de",chapter:"Capítulo",score:"Acertos",local:"Seu progresso fica salvo somente neste aparelho.",comment:"Resposta comentada",correct:"Resposta correta!",wrong:"Não foi desta vez",next:"Próxima pergunta",finish:"Ver resultado",completed:"Desafio concluído",result:"Seu resultado",review:"Você percorreu os 100 conceitos sem repetição.",again:"Recomeçar do início",confirm:"Recomeçar apaga o progresso salvo neste aparelho. Continuar?",saved:"Progresso salvo neste aparelho",contentPt:"Conteúdo das perguntas em português",questions:"100 perguntas comentadas"},
-    en:{back:"Back",start:"Start",continue:"Continue where I stopped",restart:"Restart",progress:"Progress",question:"Question",of:"of",chapter:"Chapter",score:"Correct",local:"Your progress is stored only on this device.",comment:"Commented answer",correct:"Correct answer!",wrong:"Not this time",next:"Next question",finish:"View result",completed:"Challenge completed",result:"Your result",review:"You completed all 100 concepts without repeated questions.",again:"Restart from the beginning",confirm:"Restarting clears progress stored on this device. Continue?",saved:"Progress saved on this device",contentPt:"Question content is in Portuguese",questions:"100 commented questions"},
-    es:{back:"Volver",start:"Comenzar",continue:"Continuar donde quedé",restart:"Reiniciar",progress:"Progreso",question:"Pregunta",of:"de",chapter:"Capítulo",score:"Aciertos",local:"Tu progreso se guarda solamente en este dispositivo.",comment:"Respuesta comentada",correct:"¡Respuesta correcta!",wrong:"Esta vez no",next:"Siguiente pregunta",finish:"Ver resultado",completed:"Desafío completado",result:"Tu resultado",review:"Recorriste los 100 conceptos sin preguntas repetidas.",again:"Reiniciar desde el principio",confirm:"Reiniciar borra el progreso guardado en este dispositivo. ¿Continuar?",saved:"Progreso guardado en este dispositivo",contentPt:"El contenido de las preguntas está en portugués",questions:"100 preguntas comentadas"},
-    ru:{back:"Назад",start:"Начать",continue:"Продолжить с места остановки",restart:"Начать заново",progress:"Прогресс",question:"Вопрос",of:"из",chapter:"Глава",score:"Верно",local:"Прогресс хранится только на этом устройстве.",comment:"Комментарий к ответу",correct:"Правильный ответ!",wrong:"В этот раз неверно",next:"Следующий вопрос",finish:"Результат",completed:"Задание завершено",result:"Ваш результат",review:"Вы прошли все 100 тем без повторяющихся вопросов.",again:"Начать сначала",confirm:"Перезапуск удалит прогресс на этом устройстве. Продолжить?",saved:"Прогресс сохранён на устройстве",contentPt:"Вопросы доступны на португальском",questions:"100 вопросов с комментариями"}
+    pt:{back:"Voltar",start:"Começar",continue:"Continuar de onde parei",restart:"Recomeçar",progress:"Progresso",question:"Pergunta",of:"de",chapter:"Capítulo",score:"Acertos",local:"Seu progresso fica salvo somente neste aparelho.",comment:"Comentário da resposta correta",selected:"Sobre a alternativa escolhida",correctAnswer:"Resposta correta",correct:"Resposta correta!",wrong:"Não foi desta vez",next:"Próxima pergunta",finish:"Ver resultado",completed:"Desafio concluído",result:"Seu resultado",review:"Você percorreu as principais lições do conteúdo em perguntas de síntese.",again:"Recomeçar do início",confirm:"Recomeçar apaga o progresso salvo neste aparelho. Continuar?",saved:"Progresso salvo neste aparelho",contentPt:"Conteúdo das perguntas em português",questions:"perguntas comentadas"},
+    en:{back:"Back",start:"Start",continue:"Continue where I stopped",restart:"Restart",progress:"Progress",question:"Question",of:"of",chapter:"Chapter",score:"Correct",local:"Your progress is stored only on this device.",comment:"Correct answer explanation",selected:"About the option you chose",correctAnswer:"Correct answer",correct:"Correct answer!",wrong:"Not this time",next:"Next question",finish:"View result",completed:"Challenge completed",result:"Your result",review:"You completed the main lessons through synthesis questions.",again:"Restart from the beginning",confirm:"Restarting clears progress stored on this device. Continue?",saved:"Progress saved on this device",contentPt:"Question content is in Portuguese",questions:"commented questions"},
+    es:{back:"Volver",start:"Comenzar",continue:"Continuar donde quedé",restart:"Reiniciar",progress:"Progreso",question:"Pregunta",of:"de",chapter:"Capítulo",score:"Aciertos",local:"Tu progreso se guarda solamente en este dispositivo.",comment:"Comentario de la respuesta correcta",selected:"Sobre la alternativa elegida",correctAnswer:"Respuesta correcta",correct:"¡Respuesta correcta!",wrong:"Esta vez no",next:"Siguiente pregunta",finish:"Ver resultado",completed:"Desafío completado",result:"Tu resultado",review:"Recorriste las principales lecciones mediante preguntas de síntesis.",again:"Reiniciar desde el principio",confirm:"Reiniciar borra el progreso guardado en este dispositivo. ¿Continuar?",saved:"Progreso guardado en este dispositivo",contentPt:"El contenido de las preguntas está en portugués",questions:"preguntas comentadas"},
+    ru:{back:"Назад",start:"Начать",continue:"Продолжить с места остановки",restart:"Начать заново",progress:"Прогресс",question:"Вопрос",of:"из",chapter:"Глава",score:"Верно",local:"Прогресс хранится только на этом устройстве.",comment:"Комментарий к правильному ответу",selected:"О выбранном варианте",correctAnswer:"Правильный ответ",correct:"Правильный ответ!",wrong:"В этот раз неверно",next:"Следующий вопрос",finish:"Результат",completed:"Задание завершено",result:"Ваш результат",review:"Вы прошли основные идеи в формате обобщающих вопросов.",again:"Начать сначала",confirm:"Перезапуск удалит прогресс на этом устройстве. Продолжить?",saved:"Прогресс сохранён на устройстве",contentPt:"Вопросы доступны на португальском",questions:"вопросов с комментариями"}
   };
 
   function lang(value){
@@ -21,15 +21,15 @@
     const id=window.__EDUCASHPRO_SESSION__?.profile?.userId||window.__EDUCASHPRO_SESSION__?.profile?.telegramId||"device";
     return String(id).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,80)||"device";
   }
-  function storageKey(id){return "educashpro:book-quiz:v1:"+String(id)+":"+userKey()}
-  function fresh(){return{version:1,index:0,score:0,answers:[],completed:false,updatedAt:new Date().toISOString()}}
+  function storageKey(id){return "educashpro:book-quiz:v2:"+String(id)+":"+userKey()}
+  function fresh(){return{version:2,index:0,score:0,answers:[],completed:false,updatedAt:new Date().toISOString()}}
   function read(id,total){
     try{
       const value=JSON.parse(localStorage.getItem(storageKey(id))||"null");
-      if(!value||value.version!==1)return fresh();
+      if(!value||value.version!==2)return fresh();
       const answers=Array.isArray(value.answers)?value.answers.filter(Boolean).slice(0,total):[];
       const index=Math.max(0,Math.min(total,Number(value.index)||0));
-      return{version:1,index,score:Math.max(0,Math.min(total,Number(value.score)||0)),answers,completed:value.completed===true&&index>=total,updatedAt:value.updatedAt||null};
+      return{version:2,index,score:Math.max(0,Math.min(total,Number(value.score)||0)),answers,completed:value.completed===true&&index>=total,updatedAt:value.updatedAt||null};
     }catch{return fresh()}
   }
   function write(id,state){
@@ -38,6 +38,7 @@
   function reset(id){
     try{localStorage.removeItem(storageKey(id))}catch{}
   }
+  function paragraphs(value){return String(value||"").split(/\n\s*\n/).filter(Boolean).map(part=>`<p>${esc(part.trim())}</p>`).join("")}
   function top(){window.scrollTo({top:0,behavior:"smooth"})}
   function backToCatalog(){
     window.EduCashProGameSuite?.renderCatalog?.(window.EduCashProGameBridge?.catalogContext||{});
@@ -46,6 +47,11 @@
     if(!config?.id||!Array.isArray(config.questions)||!config.questions.length)throw new Error("invalid_book_quiz");
     const ids=new Set(config.questions.map(q=>q.id));
     if(ids.size!==config.questions.length)throw new Error("duplicate_book_quiz_question_id");
+    for(const item of config.questions){
+      if(!Array.isArray(item.options)||item.options.length!==4)throw new Error("invalid_book_quiz_options");
+      if(!Array.isArray(item.optionComments)||item.optionComments.length!==item.options.length)throw new Error("invalid_book_quiz_option_comments");
+      if(!String(item.comment||"").trim())throw new Error("invalid_book_quiz_comment");
+    }
     registry.set(String(config.id),config);
     return true;
   }
@@ -86,7 +92,7 @@
     target.innerHTML=`<main class="bookQuizPage">
       <div class="bookQuizTopbar"><button class="textButton bookQuizBack" type="button">← ${esc(text("back",l))}</button><span>💾 ${esc(text("saved",l))}</span></div>
       <section class="bookQuizQuestionCard">
-        <div class="bookQuizMeta"><span>${esc(text("chapter",l))} ${Number(q.chapter)||"—"}</span><span>${esc(text("question",l))} ${number} ${esc(text("of",l))} ${total}</span><span>⭐ ${state.score}</span></div>
+        <div class="bookQuizMeta"><span>${q.scope?esc(q.scope):`${esc(text("chapter",l))} ${Number(q.chapter)||"—"}`}</span><span>${esc(text("question",l))} ${number} ${esc(text("of",l))} ${total}</span><span>⭐ ${state.score}</span></div>
         <div class="bookQuizProgress"><span style="width:${pct}%"></span></div>
         <h2>${esc(q.question)}</h2>
         <div class="bookQuizOptions">${q.options.map((option,index)=>`<button type="button" data-book-option="${index}"><b>${String.fromCharCode(65+index)}</b><span>${esc(option)}</span></button>`).join("")}</div>
@@ -116,9 +122,12 @@
     write(config.id,state);
     const feedback=target.querySelector("#bookQuizFeedback");
     feedback.classList.remove("hidden");
+    const selectedExplanation=String(q.optionComments?.[selected]||"");
     feedback.innerHTML=`<div class="bookQuizFeedbackTitle">${isCorrect?"✅":"💡"} <b>${esc(isCorrect?text("correct",l):text("wrong",l))}</b></div>
-      ${!isCorrect?`<p class="bookQuizCorrectAnswer"><strong>${esc(text("correct",l))}</strong> ${esc(q.options[correct])}</p>`:""}
-      <h3>🧠 ${esc(text("comment",l))}</h3><p>${esc(q.comment)}</p>
+      ${isCorrect
+        ?`<div class="bookQuizCorrectExplanation"><h3>🧠 ${esc(text("comment",l))}</h3>${paragraphs(q.comment)}</div>`
+        :`<div class="bookQuizSelectedExplanation"><h3>🔎 ${esc(text("selected",l))}</h3><p class="bookQuizSelectedOption"><strong>${String.fromCharCode(65+selected)}.</strong> ${esc(q.options[selected])}</p>${paragraphs(selectedExplanation)}</div>
+          <div class="bookQuizCorrectExplanation"><h3>✅ ${esc(text("correctAnswer",l))}</h3><p class="bookQuizCorrectAnswer"><strong>${String.fromCharCode(65+correct)}.</strong> ${esc(q.options[correct])}</p><h3>🧠 ${esc(text("comment",l))}</h3>${paragraphs(q.comment)}</div>`}
       <button id="bookQuizNext" class="wideButton" type="button">${esc(state.completed?text("finish",l):text("next",l))} →</button>`;
     target.querySelector("#bookQuizNext").onclick=()=>state.completed?resultScreen(config,l,state):questionScreen(config,l,state);
     feedback.scrollIntoView({behavior:"smooth",block:"nearest"});
