@@ -83,7 +83,7 @@ assert(professional.includes('step("configureServices"')&&professional.includes(
 assert(app.includes('query.set("view", view)')&&agenda.includes('query.get("view")'),"Professional setup cannot open the requested agenda section");
 for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(language),`Missing professional translation: ${language}`);
 
-assert(index.includes("account-center.js"),"Web account center is not loaded");
+assert(loader.includes('script("./account-center.js")')&&idleFeatures.includes('prefetch("./account-center.js")'),"Web account center is not available through the lazy loader");
 assert(accountCenter.includes("/api/platform-account/overview")&&accountCenter.includes("/api/platform-account/network"),"Account overview or network parity is missing");
 assert(accountCenter.includes("/api/platform-account/preferences")&&accountCenter.includes("openPreferences"),"Bot notification preferences are not available on the Web account");
 assert(accountCenter.includes('data-action="subscription"')&&accountCenter.includes('data-action="pair-device"')&&accountCenter.includes('data-action="documents"')&&webSiteMenu.includes('action==="benefits"')&&webSiteMenu.includes('action==="explore"'),"Account and site menu parity shortcuts are incomplete");
