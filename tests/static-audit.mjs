@@ -195,10 +195,10 @@ assert(gameUsageLimit.includes('"book-business-21"'),"Book learning quiz must be
 assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
 assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
 
-assert(bookEngine.includes("localStorage")&&bookEngine.includes("educashpro:book-quiz:v1:"),"Book quiz must store progress on the current device");
+assert(bookEngine.includes("localStorage")&&bookEngine.includes("educashpro:book-quiz:v2:"),"Book quiz must store reformulated progress on the current device");
 assert(bookEngine.includes("state.index")&&bookEngine.includes("state.answers")&&bookEngine.includes("state.score"),"Book quiz must persist exact resume position, answers and score");
 assert(!bookEngine.includes("fetch(")&&!bookEngine.includes("/api/"),"Book quiz gameplay must not consume Render or MongoDB");
-assert(bookData.includes('id:"book-business-21"')&&bookData.includes("100 perguntas"),"O Negócio do Século XXI quiz dataset is missing");
+assert(bookData.includes('id:"book-business-21"')&&bookData.includes("10 perguntas de síntese")&&bookData.includes("21 capítulos")&&bookData.includes("8 ativos"),"O Negócio do Século XXI 10-question synthesis dataset is missing");
 assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFeedback"),"Book quiz UI styles are incomplete");
 
 const localCatalogBridge=await read("local-game-catalog-bridge.js");
