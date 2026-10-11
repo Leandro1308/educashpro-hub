@@ -28,9 +28,6 @@ def setup_translation(locale):
     package.update_package_index()
     available=package.get_available_packages()
     for src,dest in PAIRS[locale]:
-        installed=translate.get_installed_languages()
-        has_model=any(l.code==src and any(to.code==dest for to in l.translations_to) for l in installed)
-        if has_model:continue
         model=next((p for p in available if p.from_code==src and p.to_code==dest),None)
         if model is None:raise RuntimeError(f"Offline language model missing: {src}->{dest}")
         print(f"Installing {src}->{dest}",flush=True)
