@@ -176,10 +176,13 @@ const bookEngine=await read("book-quiz-engine-v3.js");
 const bookData=await read("book-quiz-business-21.js");
 const bookCss=await read("book-quiz.css");
 
-for(const file of ["local-arcade-core.js","math-learning-game.js","book-quiz-engine-v3.js","book-quiz-business-21.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js"]){
-  assert(loader.includes(file),`Active local/educational module is not lazy-loaded: ${file}`);
+for(const file of ["local-arcade-core.js","math-learning-game.js"]){
+  assert(loader.includes(file),`Active local educational module is missing: ${file}`);
 }
-assert(loader.includes('style("./book-quiz.css")'),"Book quiz stylesheet must be lazy-loaded");
+for(const file of ["book-quiz-engine-v3.js","book-quiz-business-21.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-v3.css","book-quiz.css"]){
+  assert(games.includes(file),`Guided book quiz module must load when selected: ${file}`);
+}
+assert(!loader.includes('script("./book-quiz-engine.js")')&&!loader.includes('script("./book-quiz-business-21.js")'),"Book quiz must not preload while unrelated pastime games run");
 assert(!loader.includes('script("./speed-race-game.js")')&&!loader.includes('script("./air-defense-game.js")'),"Removed arcade games must not be downloaded");
 for(const gameId of ["book-business-21","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy"]){
   assert(games.includes(`"${gameId}"`),`Active pastime is missing from catalog: ${gameId}`);
