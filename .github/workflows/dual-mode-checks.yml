@@ -45,3 +45,5 @@ jobs:
         run: node tests/static-audit.mjs
       - name: Verify HttpOnly transport fallback
         run: node tests/cookie-transport.test.mjs
+      - name: Verify guided book quiz content and chapter progress
+        run: node tests/book-quiz.test.mjs
