@@ -566,19 +566,26 @@
     if(gameId==="sliding-puzzle")return level?renderSliding(requested,tournament,level):levelSelector(gameId,requested,next=>renderSliding(requested,null,next));
     if(gameId==="word-search")return level?renderWordSearch(level,requested,tournament):levelSelector(gameId,requested,next=>renderWordSearch(next,requested));
     if(gameId==="book-business-21"){
-      const run=()=>window.EduCashProBookQuiz?.launch?.("book-business-21",{lang:requested}) ?? renderCatalog(bridge.catalogContext);
-      if(window.EduCashProBookQuiz?.version===3 && window.EduCashProBookQuiz?.has?.("book-business-21"))return run();
-      return Promise.all([
-        window.EduCashProResources?.style?.("./book-quiz.css"),
-        window.EduCashProResources?.style?.("./book-quiz-v3.css"),
-        window.EduCashProResources?.script?.("./book-quiz-engine-v3.js")
-      ]).then(()=>Promise.all([
+      const locale=String(requested||"pt").slice(0,2).toLowerCase();
+      const lang=["pt","en","es","ru"].includes(locale)?locale:"pt";
+      const run=()=>window.EduCashProBookQuiz?.launch?.("book-business-21",{lang}) ?? renderCatalog(bridge.catalogContext);
+      if(window.EduCashProBookQuiz?.version===4&&window.EduCashProBookQuiz?.has?.("book-business-21",lang))return run();
+      const content=lang==="pt"?Promise.all([
         window.EduCashProResources?.script?.("./book-quiz-content-part1.js"),
         window.EduCashProResources?.script?.("./book-quiz-content-part2.js"),
         window.EduCashProResources?.script?.("./book-quiz-content-part3.js"),
         window.EduCashProResources?.script?.("./book-quiz-content-part4.js")
-      ])).then(()=>window.EduCashProResources?.script?.("./book-quiz-business-21.js"))
-        .then(run).catch((error)=>{console.warn("EduCashPro book quiz unavailable",error);renderCatalog(bridge.catalogContext);});
+      ]):window.EduCashProResources?.script?.("./book-quiz-content-"+lang+".js");
+      return Promise.all([
+        window.EduCashProResources?.style?.("./book-quiz.css"),
+        window.EduCashProResources?.style?.("./book-quiz-v3.css"),
+        window.EduCashProResources?.script?.("./book-quiz-engine-v4.js"),
+        content,
+        window.EduCashProResources?.script?.("./book-quiz-business-21-i18n.js")
+      ]).then(()=>{
+        window.EduCashProBookQuizBooks?.build?.(lang);
+        return run();
+      }).catch(error=>{console.warn("EduCashPro book quiz locale unavailable",lang,error);renderCatalog(bridge.catalogContext);});
     }
     if(gameId==="math-academy") return window.EduCashProAdvancedGames?.launch?.(gameId,{lang:requested}) ?? renderCatalog(bridge.catalogContext);
     renderCatalog(bridge.catalogContext);
