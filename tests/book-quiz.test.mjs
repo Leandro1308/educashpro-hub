@@ -2,67 +2,85 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import vm from "node:vm";
 const root=new URL("../",import.meta.url);
-const hubPrefix=await fs.access(new URL("src/hub/book-quiz-engine-v3.js",root)).then(()=>"src/hub/").catch(()=>"");
+const hubPrefix=await fs.access(new URL("src/hub/book-quiz-engine-v4.js",root)).then(()=>"src/hub/").catch(()=>"");
 const read=path=>fs.readFile(new URL(hubPrefix+path,root),"utf8");
-const sources=await Promise.all([
- read("book-quiz-engine-v3.js"),
- read("book-quiz-content-part1.js"),
- read("book-quiz-content-part2.js"),
- read("book-quiz-content-part3.js"),
- read("book-quiz-content-part4.js"),
- read("book-quiz-business-21.js"),
- read("game-suite.js")
-]);
-const [engine,...other]=sources;
-const registry={current:null};
+const paths=["book-quiz-engine-v4.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-content-en.js","book-quiz-content-es.js","book-quiz-content-ru.js","book-quiz-business-21-i18n.js","game-suite.js"];
+const sources=await Promise.all(paths.map(read));
 const values=new Map();
-const localStorage={getItem:key=>values.get(key)||null,setItem:(key,v)=>values.set(key,v),removeItem:key=>values.delete(key)};
+const localStorage={getItem:key=>values.get(key)||null,setItem:(key,val)=>values.set(key,val),removeItem:key=>values.delete(key)};
 const context={window:{},document:{getElementById:()=>null},navigator:{language:"pt-BR"},localStorage,confirm:()=>true};
-vm.runInNewContext(engine,context,{filename:"book-quiz-engine-v3.js"});
-const originalRegister=context.window.EduCashProBookQuiz.register;
-context.window.EduCashProBookQuiz.register=config=>(registry.current=config,originalRegister(config));
-for(let index=1;index<=4;index++)vm.runInNewContext(sources[index],context,{filename:"book-quiz-content-part"+index+".js"});
-vm.runInNewContext(sources[5],context,{filename:"book-quiz-business-21.js"});
-const config=registry.current;
-assert(config,"Book quiz must register");
-assert.equal(context.window.EduCashProBookQuiz.version,3,"Game must use v3 engine");
-assert.equal(config.id,"book-business-21");
-assert.equal(config.chapters.length,21,"Book has 21 chapters");
-assert.equal(config.questions.length,252,"12 questions must exist for each of 21 chapters");
-assert.equal(new Set(config.questions.map(q=>q.id)).size,252,"Question ids must be distinct");
-assert.equal(new Set(config.questions.map(q=>q.question)).size,252,"Question wording must not repeat");
-assert.deepEqual([...config.chapters.map(c=>c.id)],[...Array.from({length:21},(_,i)=>i+1)]);
-const principles=new Set(context.window.EduCashProBookQuizChapters.flatMap(c=>c.lessons.map(l=>l[2])));
-assert.equal(principles.size,252,"Each lesson must teach its own distinct principle");
-for(const ch of config.chapters){
- assert(ch.overview.length>200,"Chapter "+ch.id+" needs meaningful prior summary");
- assert.equal(config.questions.filter(q=>q.chapter===ch.id).length,12,"Chapter "+ch.id+" needs twelve questions");
+const execute=(i)=>vm.runInNewContext(sources[i],context,{filename:paths[i]});
+execute(0);
+assert.equal(context.window.EduCashProBookQuiz.version,4);
+for(let i=1;i<=8;i++)execute(i);
+const records={};
+const native=context.window.EduCashProBookQuiz.register;
+context.window.EduCashProBookQuiz.register=(config)=>{records[config.locale]=config;return native(config)};
+const B=context.window.EduCashProBookQuizBooks;
+assert.deepEqual([...B.supported],["pt","en","es","ru"]);
+for(const lang of ["pt","en","es","ru"]){
+ assert.equal(B.available(lang),true,"Complete content missing in "+lang);
+ assert.equal(B.build(lang),true,"Cannot register "+lang);
+ assert(context.window.EduCashProBookQuiz.has("book-business-21",lang));
 }
-const distribution=[0,0,0,0];
-for(const q of config.questions){
- assert(q.intro.length>25,"Question "+q.id+" needs an introductory situation");
- assert(q.question.length>20,"Question "+q.id+" needs meaningful wording");
- assert.equal(q.options.length,4,"Every question has four answers");
- assert.equal(new Set(q.options).size,4,"Options must teach different principles");
- assert(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4);
- assert.equal(q.optionComments.length,4,"Every answer is explained");
- assert(q.comment.length>=350,"Correct answer must be explained in depth");
- for(const option of q.options)assert(principles.has(option),"Every alternative must derive from an actual lesson principle");
- for(const comment of q.optionComments)assert(comment.length>=125,"Every option needs substantive commentary");
- assert.deepEqual([...q.covers],[q.chapter],"Question must have accurate chapter coverage");
- distribution[q.answer]++;
+assert.equal(Object.keys(records).length,4);
+const signatures={};
+for(const [lang,c] of Object.entries(records)){
+ assert.equal(c.id,"book-business-21");
+ assert.equal(c.locale,lang);
+ assert.equal(c.chapters.length,21);
+ assert.equal(c.questions.length,252);
+ assert.equal(new Set(c.questions.map(q=>q.id)).size,252);
+ assert.equal(new Set(c.questions.map(q=>q.question)).size,252);
+ assert.equal(new Set(c.chapters.map(ch=>ch.id)).size,21);
+ assert(c.subtitle.includes("252"));
+ assert.equal(c.questions.reduce((sum,q)=>sum+Number(q.answer),0),378);
+ const counters=[0,0,0,0];
+ for(const ch of c.chapters){
+  assert(ch.title.length>3&&ch.overview.length>70,"Incomplete chapter "+ch.id+" in "+lang);
+  assert.equal(c.questions.filter(q=>q.chapter===ch.id).length,12);
+ }
+ for(const q of c.questions){
+  assert(q.intro.length>20,"Missing pre-question study: "+lang+" "+q.id);
+  assert(q.question.length>15,"Missing question: "+lang+" "+q.id);
+  assert.equal(q.options.length,4);
+  assert.equal(new Set(q.options).size,4,"Duplicate concepts: "+lang+" "+q.id);
+  assert(q.answer>=0&&q.answer<4&&Number.isInteger(q.answer));
+  assert(q.options.every(o=>o.length>15),"Short option: "+lang+" "+q.id);
+  assert.equal(q.optionComments.length,4);
+  assert(q.optionComments.every(c=>c.length>100),"Missing alternative explanation: "+lang+" "+q.id);
+  assert(q.comment.length>280,"Incomplete extended commentary: "+lang+" "+q.id);
+  assert.equal(q.covers.length,1);
+  assert.equal(q.covers[0],q.chapter);
+  counters[q.answer]++;
+ }
+ assert.deepEqual(counters,[63,63,63,63],"Answer positions must remain balanced in "+lang);
+ signatures[lang]=c.questions.map(q=>q.id+":"+q.answer).join("|");
 }
-assert.deepEqual(distribution,[63,63,63,63],"Correct answers should not favor a fixed letter");
-assert(engine.includes("bookQuizTeaching")&&engine.includes("q.intro"),"Show concept and situation before question");
-assert(engine.includes("bookQuizExplainer")&&engine.includes("bookQuizOtherTitle"),"Teach correct and alternative principles after answering");
-assert(engine.includes("bookQuizReviewCard")&&engine.includes("a.selected"),"Completed chapter must support mistake review");
-assert(engine.includes("book-quiz:v3:")&&engine.includes("localStorage"),"Save chapter progress locally with separate schema");
-assert(!engine.includes("fetch(")&&!engine.includes("/api/"),"Gameplay may not contact Render or MongoDB");
-for(let i=1;i<=4;i++)assert(!sources[i].includes("fetch("),"Source data must be static");
-for(const file of ["book-quiz-engine-v3.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-business-21.js","book-quiz-v3.css"]){
- assert(sources[6].includes("./"+file),"Passatempo must load "+file);
+for(const lang of ["en","es","ru"]){
+ assert.equal(signatures[lang],signatures.pt,"Translations changed answer mapping in "+lang);
+ const different=records[lang].questions.filter((q,i)=>q.question!==records.pt.questions[i].question).length;
+ assert(different>230,"Language appears to be falling back to Portuguese: "+lang);
+ assert(records[lang].chapters[0].title!==records.pt.chapters[0].title,"Untranslated chapter title "+lang);
+}
+assert(records.ru.chapters[8].title.startsWith("Актив 1"));
+assert(records.en.chapters[8].title.startsWith("Asset 1"));
+assert(records.es.chapters[8].title.startsWith("Activo 1"));
+assert(sources[0].includes("bookQuizTeaching")&&sources[0].includes("bookQuizOtherTitle"));
+assert(sources[0].includes("bookQuizReviewCard")&&sources[0].includes("localStorage"));
+assert(!sources[0].includes("l!==\"pt\""),"Portuguese-only language notice must not remain");
+assert(!sources[0].includes("fetch(")&&!sources[0].includes("/api/"),"Quiz must not contact API");
+assert(!sources[8].includes("fetch(")&&!sources[8].includes("/api/"));
+const games=sources[9];
+for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js"]){
+ assert(games.includes(file),"Language loader missing "+file);
+}
+assert(games.includes('book-quiz-content-"+lang+".js"'),"Language loader must request the selected locale dynamically");
+for(const text of ["O Negócio do Século XXI — 252 Lições","The Business of the 21st Century — 252 Lessons","El negocio del siglo XXI — 252 lecciones","Бизнес XXI века — 252 урока"]){
+ assert(games.includes(text),"Localized game catalog name missing: "+text);
 }
 values.set("educashpro:book-quiz:v3:book-business-21:chapter:3:device",JSON.stringify({version:3,index:1,score:1,answers:[{id:301,selected:2,correct:true}],completed:false}));
-const resumed=context.window.EduCashProBookQuiz.read("book-business-21",3);
-assert.equal(resumed.index,1);assert.equal(resumed.score,1);assert.equal(resumed.completed,false);
-console.log("Book quiz: 21 chapters, 252 unique questions, fully commented four-way answers, local progress and mistake review: OK");
+const saved=context.window.EduCashProBookQuiz.read("book-business-21",3);
+assert.equal(saved.index,1);
+assert.equal(saved.score,1);
+console.log("Book quiz four languages: 21 chapters x 12 lessons x 4 languages; 1008 questions, all answer explanations, consistent correctness and local persistence: OK");

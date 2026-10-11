@@ -172,15 +172,20 @@ assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&
 const localArcade=await read("local-arcade-core.js");
 const mathLearning=await read("math-learning-game.js");
 const gameUsageLimit=await read("game-usage-limit-v14.js");
-const bookEngine=await read("book-quiz-engine-v3.js");
-const bookData=await read("book-quiz-business-21.js");
+const bookEngine=await read("book-quiz-engine-v4.js");
+const bookData=await read("book-quiz-business-21-i18n.js");
 const bookCss=await read("book-quiz.css");
 
 for(const file of ["local-arcade-core.js","math-learning-game.js"]){
   assert(loader.includes(file),`Active local educational module is missing: ${file}`);
 }
-for(const file of ["book-quiz-engine-v3.js","book-quiz-business-21.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-v3.css","book-quiz.css"]){
+for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-v3.css","book-quiz.css"]){
   assert(games.includes(file),`Guided book quiz module must load when selected: ${file}`);
+}
+assert(games.includes('"./book-quiz-content-"+lang+".js"'),"Quiz must select the correct language asset on demand");
+for(const language of ["en","es","ru"]){
+  const source=await read(`book-quiz-content-${language}.js`);
+  assert(source.includes(`EduCashProBookQuizTranslations.${language}=`),`Translated course is incomplete: ${language}`);
 }
 assert(!loader.includes('script("./book-quiz-engine.js")')&&!loader.includes('script("./book-quiz-business-21.js")'),"Book quiz must not preload while unrelated pastime games run");
 assert(!loader.includes('script("./speed-race-game.js")')&&!loader.includes('script("./air-defense-game.js")'),"Removed arcade games must not be downloaded");
@@ -201,7 +206,8 @@ assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("b
 assert(bookEngine.includes("localStorage")&&bookEngine.includes("educashpro:book-quiz:v3:"),"Book quiz must store per-chapter progress on the current device");
 assert(bookEngine.includes("state.index")&&bookEngine.includes("state.answers")&&bookEngine.includes("state.score"),"Book quiz must persist exact resume position, answers and score");
 assert(!bookEngine.includes("fetch(")&&!bookEngine.includes("/api/"),"Book quiz gameplay must not consume Render or MongoDB");
-assert(bookData.includes('id:"book-business-21"')&&bookData.includes("21 capítulos")&&bookData.includes("252 perguntas")&&bookData.includes("questions:Q"),"O Negócio do Século XXI 252-question guided learning dataset is missing");
+assert(bookData.includes('id:"book-business-21"')&&bookData.includes("21 capítulos")&&bookData.includes("252 perguntas")&&bookData.includes("questions}"),"The four-language 252-question course builder is missing");
+assert(bookEngine.includes("version:4")&&!bookEngine.includes('l!=="pt"'),"The locale-aware quiz engine must not show a Portuguese-only warning");
 assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFeedback"),"Book quiz UI styles are incomplete");
 
 const localCatalogBridge=await read("local-game-catalog-bridge.js");
