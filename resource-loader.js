@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261008.7";
+  const VERSION="20261011.1";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -80,14 +80,9 @@
         style("./educash-empire-v12.css")
       ]);
       await script("./local-arcade-core.js");
-      await Promise.allSettled([
-        script("./math-learning-game.js"),
-        style("./book-quiz.css")
-      ]);
-      try{
-        await script("./book-quiz-engine.js");
-        await script("./book-quiz-business-21.js");
-      }catch(error){console.warn("[EduCashPro] quiz de livro:",error?.message||error)}
+      // O estudo do livro é carregado somente quando o usuário abre esse Passatempo.
+      // Evita executar os 252 exercícios enquanto outros jogos são iniciados.
+      await script("./math-learning-game.js");
       await script("./local-games-bootstrap-v13.js");
       try{await script("./game-local-storage-v8.js")}catch(_){}
       try{await script("./social-play.js")}catch(_){}
