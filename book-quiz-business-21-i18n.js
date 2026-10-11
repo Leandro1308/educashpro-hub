@@ -41,7 +41,7 @@ function build(language){
   });
  }));
  const cfg={id:"book-business-21",locale:lang,icon:"📘",title:strings.title,subtitle:strings.subtitle,
-  source:{title:strings.title,authors:"Robert T. Kiyosaki, John Fleming e Kim Kiyosaki"},
+  source:{title:strings.title,authors:"Robert T. Kiyosaki, John Fleming "+({pt:"e",en:"and",es:"y",ru:"и"}[lang])+" Kim Kiyosaki"},
   chapters:chapters.map(({id,title,part,overview})=>({id,title,part,overview})),questions};
  window.EduCashProBookQuiz.register(cfg);
  return true;
