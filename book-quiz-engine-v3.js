@@ -76,5 +76,5 @@ function review(config,l,ch,state){
  root.querySelector(".bookQuizBack").onclick=()=>result(config,l,ch,state);scrollTop();
 }
 function launch(id,options={}){const config=registry.get(String(id));if(!config)return false;outer(config,language(options.lang));return true}
-window.EduCashProBookQuiz={register,launch,read,reset,has:id=>registry.has(String(id)),ids:()=>[...registry.keys()]};
+window.EduCashProBookQuiz={version:3,register,launch,read,reset,has:id=>registry.has(String(id)),ids:()=>[...registry.keys()]};
 })();
