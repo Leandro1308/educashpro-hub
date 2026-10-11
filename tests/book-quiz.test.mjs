@@ -72,9 +72,10 @@ assert(!sources[0].includes("l!==\"pt\""),"Portuguese-only language notice must 
 assert(!sources[0].includes("fetch(")&&!sources[0].includes("/api/"),"Quiz must not contact API");
 assert(!sources[8].includes("fetch(")&&!sources[8].includes("/api/"));
 const games=sources[9];
-for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js","book-quiz-content-en.js","book-quiz-content-es.js","book-quiz-content-ru.js"]){
+for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js"]){
  assert(games.includes(file),"Language loader missing "+file);
 }
+assert(games.includes('book-quiz-content-"+lang+".js"'),"Language loader must request the selected locale dynamically");
 for(const text of ["O Negócio do Século XXI — 252 Lições","The Business of the 21st Century — 252 Lessons","El negocio del siglo XXI — 252 lecciones","Бизнес XXI века — 252 урока"]){
  assert(games.includes(text),"Localized game catalog name missing: "+text);
 }
