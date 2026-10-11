@@ -1,0 +1,58 @@
+name: Build static translations for book quiz
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  translate:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/book-quiz-four-languages'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [en, es, ru]
+    steps:
+      - name: Check out proposed branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline translation engine
+        run: python -m pip install --disable-pip-version-check 'argostranslate>=1.9,<2'
+      - name: Translate lesson content to ${{ matrix.language }}
+        run: python scripts/generate-book-quiz-i18n.py --language ${{ matrix.language }}
+      - name: Upload translated source
+        uses: actions/upload-artifact@v4
+        with:
+          name: book-quiz-translation-${{ matrix.language }}
+          path: book-quiz-content-${{ matrix.language }}.js
+          if-no-files-found: error
+  commit:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'feat/book-quiz-four-languages'
+    needs: [translate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: book-quiz-translation-*
+          merge-multiple: true
+      - name: Check outputs and commit to feature branch
+        run: |
+          test -s book-quiz-content-en.js
+          test -s book-quiz-content-es.js
+          test -s book-quiz-content-ru.js
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add book-quiz-content-en.js book-quiz-content-es.js book-quiz-content-ru.js
+          git diff --cached --quiet || (git commit -m "chore(i18n): generate offline static translations for 252 lessons" && git push origin HEAD:${{ github.event.pull_request.head.ref }})
