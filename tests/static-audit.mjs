@@ -114,7 +114,7 @@ assert(app.includes("const active = state.profile?.active === true"),"Academy ca
 assert(app.includes("if (!state.courseCatalog.length) hydrateCourseCatalogFromCache()")&&app.includes("refreshCourseCatalogLater()")&&app.includes("void loadCourseCatalog().then"),"Academy must use cached catalog immediately and refresh it in the background");
 assert(app.includes("setSession")&&webAuthEntry.includes("EduCashProApp?.setSession?.(state.session)"),"Web authentication must share the subscription session with the Academy");
 
-assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["network_marketing", "financial_education", "telegram"])'),"The three Academy learning paths must use the central route");
+assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["free_courses", "network_marketing", "financial_education", "telegram"])'),"All four Academy learning paths must use the central route");
 assert(app.includes('closest?.("[data-academy-category]")')&&app.includes("void openAcademyCategory(category)"),"Academy cards need a delegated click handler that survives later modules");
 assert(app.includes("window.EduCashProApp = {")&&app.includes("setSession")&&app.includes("openAcademyCategory")&&app.includes("rememberRoute"),"The Academy category route must be available in both Web and Telegram modes");
 
@@ -180,16 +180,16 @@ for(const file of ["local-arcade-core.js","math-learning-game.js"]){
   assert(loader.includes(file),`Active local educational module is missing: ${file}`);
 }
 for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-v3.css","book-quiz.css"]){
-  assert(games.includes(file),`Guided book quiz module must load when selected: ${file}`);
+  assert(loader.includes(file),`Free Academy course must load independently of pastime: ${file}`);
 }
-assert(games.includes('"./book-quiz-content-"+lang+".js"'),"Quiz must select the correct language asset on demand");
+assert(loader.includes('"./book-quiz-content-"+selected+".js"'),"Academy book course must load locale on demand");
 for(const language of ["en","es","ru"]){
   const source=await read(`book-quiz-content-${language}.js`);
   assert(source.includes(`EduCashProBookQuizTranslations.${language}=`),`Translated course is incomplete: ${language}`);
 }
 assert(!loader.includes('script("./book-quiz-engine.js")')&&!loader.includes('script("./book-quiz-business-21.js")'),"Book quiz must not preload while unrelated pastime games run");
 assert(!loader.includes('script("./speed-race-game.js")')&&!loader.includes('script("./air-defense-game.js")'),"Removed arcade games must not be downloaded");
-for(const gameId of ["book-business-21","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy"]){
+for(const gameId of ["math-space","peg-solitaire","sliding-puzzle","word-search","math-academy"]){
   assert(games.includes(`"${gameId}"`),`Active pastime is missing from catalog: ${gameId}`);
 }
 for(const gameId of ["car-rush","air-defense","air-defense-2","math-cross"]){
@@ -199,7 +199,7 @@ assert(games.includes('const TOURNAMENT_GAMES = new Set(["math-space","peg-solit
 assert(!mathLearning.includes("fetch("),"Math Academy gameplay must remain local");
 assert(localArcade.includes("localStorage")&&localArcade.includes("educashpro:local-arcade:v1"),"Local arcade progress storage is missing");
 assert(loader.includes('script("./game-usage-limit-v14.js")')&&gameUsageLimit.includes("const PLAY_MS=60*60*1000")&&gameUsageLimit.includes("const COOLDOWN_MS=8*60*60*1000")&&gameUsageLimit.includes("localStorage"),"Non-subscriber pastime usage control changed unexpectedly");
-assert(gameUsageLimit.includes('"book-business-21"'),"Book learning quiz must be exempt from the one-hour pastime timer");
+assert(!games.includes("book-business-21")&&!gameUsageLimit.includes("book-business-21"),"Book course must not appear in pastime catalog or play timers");
 assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
 assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
 
@@ -208,6 +208,9 @@ assert(bookEngine.includes("state.index")&&bookEngine.includes("state.answers")&
 assert(!bookEngine.includes("fetch(")&&!bookEngine.includes("/api/"),"Book quiz gameplay must not consume Render or MongoDB");
 assert(bookData.includes('id:"book-business-21"')&&bookData.includes("21 capítulos")&&bookData.includes("252 perguntas")&&bookData.includes("questions}"),"The four-language 252-question course builder is missing");
 assert(bookEngine.includes("version:4")&&!bookEngine.includes('l!=="pt"'),"The locale-aware quiz engine must not show a Portuguese-only warning");
+assert(bookEngine.includes("bookQuizConcepts")&&!bookEngine.includes("EDUCASHPRO · ${esc"),"Book course must teach all chapter concepts and omit the malformed green heading");
+assert(app.includes('loadBookCourse?.(state.language)')&&app.includes('courseId === "book-business-21"'),"Academy must open the free local book course without API");
+assert(JSON.parse(courses).courses.some(c=>c.id==="book-business-21"&&c.access==="free"&&c.category==="free_courses"),"Free course must appear in the Academy catalog");
 assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFeedback"),"Book quiz UI styles are incomplete");
 
 const localCatalogBridge=await read("local-game-catalog-bridge.js");

@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.11.2";
+  const APP_RUNTIME_BUILD = "2026.10.12.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -788,7 +788,7 @@
       restoreRememberedScroll(route);
       return true;
     }
-    if (route.view === "learn" && ["network_marketing", "financial_education", "telegram"].includes(route.detail)) {
+    if (route.view === "learn" && ["free_courses", "network_marketing", "financial_education", "telegram"].includes(route.detail)) {
       await openAcademyCategory(route.detail);
       restoreRememberedScroll(route);
       return true;
@@ -860,7 +860,7 @@
     };
     if (requestedCourse) { renderLearn(); deferRoute(()=>restoreRoute({view:"course",detail:requestedCourse})); }
     else if (requestedAcademy === "technical_analysis") { renderLearn(); deferRoute(()=>openMarkets()); }
-    else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) { renderLearn(); deferRoute(()=>openAcademyCategory(requestedAcademy)); }
+    else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) { renderLearn(); deferRoute(()=>openAcademyCategory(requestedAcademy)); }
     else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") { renderBenefits(); deferRoute(()=>renderExclusiveBenefits()); }
     else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
     else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
@@ -1167,6 +1167,7 @@
         choose: "Escolha uma área",
         chooseSub: "Conteúdos separados por assunto para você encontrar o que precisa.",
         categories: [
+          ["free_courses", "📘", "Continuar Aprendendo · Cursos Livres", "Cursos gratuitos com aulas sequenciais, exemplos e perguntas comentadas."],
           ["network_marketing", "🤝", "Marketing, Relacionamento e Afiliados", "Produto, comunicação, indicação, profissão afiliado e desenvolvimento de rede."],
           ["technical_analysis", "📈", "Bolsa de Valores, Análise Técnica e Price Action", "Ações e índices, gráfico avançado, resumo técnico, mapa de calor, calendário econômico, tendências, Fibonacci e curso completo de Price Action."],
           ["financial_education", "💰", "Educação Financeira e Negócios", "Renda, organização financeira, negócios digitais e construção de novas fontes de renda."],
@@ -1178,6 +1179,7 @@
         choose: "Choose an area",
         chooseSub: "Content separated by topic so you can quickly find what you need.",
         categories: [
+          ["free_courses", "📘", "Continue Learning · Free Courses", "Free courses with sequential lessons, examples and explained questions."],
           ["network_marketing", "🤝", "Marketing, Relationships and Affiliates", "Product, communication, referrals, affiliate work and network development."],
           ["technical_analysis", "📈", "Stocks, Technical Analysis and Price Action", "Stocks and indices, advanced charts, technical summary, heatmap, economic calendar, trends, Fibonacci and the full Price Action course."],
           ["financial_education", "💰", "Financial Education and Business", "Income, financial organization, digital business and new income sources."],
@@ -1189,6 +1191,7 @@
         choose: "Elige un área",
         chooseSub: "Contenidos separados por tema para encontrar rápidamente lo que necesitas.",
         categories: [
+          ["free_courses", "📘", "Seguir Aprendiendo · Cursos Gratuitos", "Cursos gratuitos con lecciones, ejemplos y preguntas comentadas."],
           ["network_marketing", "🤝", "Marketing, Relaciones y Afiliados", "Producto, comunicación, indicación, profesión afiliado y desarrollo de red."],
           ["technical_analysis", "📈", "Bolsa, Análisis Técnico y Price Action", "Acciones e índices, gráfico avanzado, resumen técnico, mapa de calor, calendario económico, tendencias, Fibonacci y curso completo de Price Action."],
           ["financial_education", "💰", "Educación Financiera y Negocios", "Ingresos, organización financiera, negocios digitales y nuevas fuentes de ingresos."],
@@ -1200,6 +1203,7 @@
         choose: "Выберите направление",
         chooseSub: "Материалы разделены по темам, чтобы быстро найти нужное.",
         categories: [
+          ["free_courses", "📘", "Продолжить обучение · Бесплатные курсы", "Бесплатные курсы с последовательными уроками, примерами и пояснениями."],
           ["network_marketing", "🤝", "Маркетинг, отношения и партнёрство", "Продукт, коммуникация, рекомендации, работа партнёра и развитие сети."],
           ["technical_analysis", "📈", "Акции, технический анализ и Price Action", "Акции и индексы, расширенный график, техническая сводка, тепловая карта, экономический календарь, тренды, Фибоначчи и полный курс Price Action."],
           ["financial_education", "💰", "Финансовая грамотность и бизнес", "Доход, финансовая организация, цифровой бизнес и новые источники дохода."],
@@ -1278,7 +1282,7 @@
   }
 
   async function openAcademyCategory(category) {
-    const supported = new Set(["network_marketing", "financial_education", "telegram"]);
+    const supported = new Set(["free_courses", "network_marketing", "financial_education", "telegram"]);
     if (!supported.has(category)) return false;
     try {
       await renderCourseCategory(category);
@@ -1333,6 +1337,18 @@
     updateNav();
     const courseTicket=window.EduCashProNavigation?.stamp?.();
     content.innerHTML = navigationShell("🎓", t("courses"));
+    if (courseId === "book-business-21") {
+      try {
+        await window.EduCashProResources?.loadBookCourse?.(state.language);
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
+        const back=()=>void renderCourseCategory("free_courses");
+        if(window.EduCashProBookQuiz?.launch?.("book-business-21",{lang:state.language,back})!==true)throw new Error("book_course_not_registered");
+      } catch(error) {
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
+        handleError(error);
+      }
+      return;
+    }
     await window.EduCashProResources?.loadCourses?.();
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
     try {
@@ -2552,7 +2568,7 @@
       const requestedSection = String(publicParams.get("section") || "");
       if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
       else if (requestedAcademy === "technical_analysis") await openMarkets();
-      else if (["network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
+      else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
       else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
       else if (requestedView === "benefits" && requestedSection === "partner-stores") location.assign("./marketplace.html");
       else if (requestedView === "benefits" && requestedSection === "company-register") renderSubmissionForm("partner");
@@ -2597,7 +2613,7 @@
   document.addEventListener("click", (event) => {
     const button = event.target?.closest?.("[data-academy-category]");
     const category = button?.dataset?.academyCategory;
-    if (!["network_marketing", "financial_education", "telegram"].includes(category)) return;
+    if (!["free_courses", "network_marketing", "financial_education", "telegram"].includes(category)) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     void openAcademyCategory(category);

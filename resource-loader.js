@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261011.2";
+  const VERSION="20261012.1";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -126,6 +126,27 @@
   }
 
 
+  const bookLanguageLoads=new Map();
+  function loadBookCourse(lang="pt"){
+    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"pt";
+    if(bookLanguageLoads.has(selected))return bookLanguageLoads.get(selected);
+    const task=(async()=>{
+      await Promise.all([style("./book-quiz.css"),style("./book-quiz-v3.css"),script("./book-quiz-engine-v4.js")]);
+      if(selected==="pt")await Promise.all([
+        script("./book-quiz-content-part1.js"),
+        script("./book-quiz-content-part2.js"),
+        script("./book-quiz-content-part3.js"),
+        script("./book-quiz-content-part4.js")
+      ]);
+      else await script("./book-quiz-content-"+selected+".js");
+      await script("./book-quiz-business-21-i18n.js");
+      window.EduCashProBookQuizBooks?.build?.(selected);
+      if(!window.EduCashProBookQuiz?.has?.("book-business-21",selected))throw new Error("book_course_locale_unavailable_"+selected);
+      return true;
+    })().catch(error=>{bookLanguageLoads.delete(selected);throw error});
+    bookLanguageLoads.set(selected,task);
+    return task;
+  }
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadToolsHub(){
     if(window.EduCashProLocal?.renderToolsHub)return Promise.resolve(true);
@@ -189,6 +210,6 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
 
