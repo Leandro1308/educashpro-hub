@@ -72,12 +72,25 @@ assert(!sources[0].includes("l!==\"pt\""),"Portuguese-only language notice must 
 assert(!sources[0].includes("fetch(")&&!sources[0].includes("/api/"),"Quiz must not contact API");
 assert(!sources[8].includes("fetch(")&&!sources[8].includes("/api/"));
 const games=sources[9];
+const academyApp=await read("app.js");
+const academyLoader=await read("resource-loader.js");
+const academyCatalog=JSON.parse(await read("courses.json"));
+const freeCourse=academyCatalog.courses.find(c=>c.id==="book-business-21");
+assert(freeCourse && freeCourse.access==="free" && freeCourse.category==="free_courses","Book course must be free in Academy");
+assert(["pt","en","es","ru"].every(lang=>freeCourse.title[lang]&&freeCourse.description[lang]),"Course metadata must support every language");
+assert(academyApp.includes('courseId === "book-business-21"')&&academyApp.includes('loadBookCourse?.(state.language)'),"Academy must launch the local course");
+assert(academyApp.includes('new Set(["free_courses", "network_marketing", "financial_education", "telegram"])'),"Free courses must be an Academy learning path");
+assert(academyLoader.includes("function loadBookCourse(")&&academyLoader.includes("book-quiz-engine-v4.js"),"Book course must load only in Academy");
+assert(!games.includes("book-business-21"),"Book must not appear in any pastime code or routing");
+assert(sources[0].includes("bookQuizConcepts")&&sources[0].includes("conceptCards"),"12 concepts must be taught before quiz");
+assert(!sources[0].includes('EDUCASHPRO · ${esc'),"Malformed green header must not render");
+
 for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js"]){
- assert(games.includes(file),"Language loader missing "+file);
+ assert(academyLoader.includes(file),"Academy resource loader missing "+file);
 }
-assert(games.includes('book-quiz-content-"+lang+".js"'),"Language loader must request the selected locale dynamically");
-for(const text of ["O Negócio do Século XXI — 252 Lições","The Business of the 21st Century — 252 Lessons","El negocio del siglo XXI — 252 lecciones","Бизнес XXI века — 252 урока"]){
- assert(games.includes(text),"Localized game catalog name missing: "+text);
+assert(academyLoader.includes('book-quiz-content-"+selected+".js"'),"Book course must load locale content dynamically");
+for(const lang of ["pt","en","es","ru"]){
+ assert(academyApp.includes(["Continuar Aprendendo","Continue Learning","Seguir Aprendiendo","Продолжить обучение"][["pt","en","es","ru"].indexOf(lang)]));
 }
 values.set("educashpro:book-quiz:v3:book-business-21:chapter:3:device",JSON.stringify({version:3,index:1,score:1,answers:[{id:301,selected:2,correct:true}],completed:false}));
 const saved=context.window.EduCashProBookQuiz.read("book-business-21",3);
