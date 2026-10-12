@@ -15,7 +15,7 @@ for(const source of [manual,pt,en,es,ru])vm.runInNewContext(source,{window});
 const localizations=window.EduCashProGuideTranslations;
 assert(localizations,"Contextual guide translations not loaded");
 const keys=Object.keys(localizations.pt);
-assert.equal(keys.length,42);
+assert.equal(keys.length,43);
 for(const lang of ["pt","en","es","ru"]){
  const docs=localizations[lang];
  assert(docs,"Guide language missing: "+lang);
@@ -38,7 +38,7 @@ const guides=window.EduCashProContextGuide;assert(guides?.open && guides?.close)
 const registryIDs=[...registry.matchAll(/\{ id:"([^"]+)", group:/g)].map(x=>x[1]);
 assert(registryIDs.length>=20);
 for(const id of registryIDs){assert(guides.available(id),"Registry function has no guide: "+id)}
-for(const id of ["book-business-21","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy","agenda-team","agenda-finance","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
+for(const id of ["book-business-21","set-for-life","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy","agenda-team","agenda-finance","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
  assert(guides.available(id),"Public function has no instructions: "+id);
 }
 for(const path of [html,agenda,marketplace,affiliate,support,publish]){
