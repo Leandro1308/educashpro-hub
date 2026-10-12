@@ -147,6 +147,26 @@
     bookLanguageLoads.set(selected,task);
     return task;
   }
+  const setForLifeLanguageLoads=new Map();
+  function loadSetForLifeCourse(lang="pt"){
+    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"pt";
+    if(setForLifeLanguageLoads.has(selected))return setForLifeLanguageLoads.get(selected);
+    const task=(async()=>{
+      await Promise.all([style("./book-quiz.css"),style("./book-quiz-v3.css"),script("./book-quiz-engine-v4.js")]);
+      if(selected==="pt")await Promise.all([
+        script("./set-for-life-part1.js"),
+        script("./set-for-life-part2.js"),
+        script("./set-for-life-part3.js"),
+        script("./set-for-life-part4.js")
+      ]);
+      else await script("./set-for-life-"+selected+".js");
+      await script("./set-for-life-course.js");
+      window.EduCashProSetForLife?.build?.(selected);
+      if(!window.EduCashProBookQuiz?.has?.("set-for-life",selected))throw new Error("set_for_life_locale_unavailable_"+selected);
+      return true;
+    })().catch(error=>{setForLifeLanguageLoads.delete(selected);throw error});
+    setForLifeLanguageLoads.set(selected,task);return task;
+  }
   function loadCourses(){return coursesPromise||(coursesPromise=script("./technical-analysis-course.js").catch(error=>{coursesPromise=null;throw error}))}
   function loadToolsHub(){
     if(window.EduCashProLocal?.renderToolsHub)return Promise.resolve(true);
@@ -210,6 +230,6 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
 
