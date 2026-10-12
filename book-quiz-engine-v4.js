@@ -1,6 +1,7 @@
 (function(){
 "use strict";
 const registry=new Map();
+let courseExit=null;
 const $=()=>document.getElementById("content");
 const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const paragraph=value=>String(value||"").split(/\n\s*\n/).filter(Boolean).map(p=>"<p>"+esc(p.trim())+"</p>").join("");
@@ -10,6 +11,8 @@ en:{back:"Back",begin:"Start chapter",resume:"Continue chapter",restart:"Restart
 es:{back:"Volver",begin:"Comenzar capítulo",resume:"Continuar capítulo",restart:"Reiniciar capítulo",chapter:"Capítulo",question:"Pregunta",of:"de",correct:"Aciertos",progress:"Progreso",learn:"Antes de responder, lee el concepto",reflect:"Situación para reflexionar",right:"Respuesta correcta",wrong:"Esta vez no",rightTitle:"¡Correcto!",selected:"El principio de tu elección",correctExplain:"Comprende la respuesta correcta",other:"Otros principios para aprender",next:"Siguiente pregunta",finish:"Finalizar capítulo",chapters:"Elige un capítulo",overall:"Tu recorrido de aprendizaje",completed:"¡Capítulo terminado!",review:"Revisar errores",retry:"Repetir este capítulo",home:"Ver todos los capítulos",nextChapter:"Ir al siguiente capítulo",score:"Resultado",local:"El progreso se guarda en este dispositivo sin enviar respuestas al servidor.",language:"El contenido de las lecciones está disponible actualmente en portugués.",confirm:"¿Borrar el progreso de este capítulo en este dispositivo?",source:"Estudio interactivo basado en las ideas del libro, con explicaciones originales.",reviewTitle:"Revisión de respuestas",noErrors:"¡Excelente! No hubo errores en este capítulo.",answered:"respondidas",lessons:"lecciones comentadas",open:"Abrir capítulo",readMore:"Leer resumen",learned:"Has visto lo que enseña cada opción. Sigue adelante."},
 ru:{back:"Назад",begin:"Начать главу",resume:"Продолжить главу",restart:"Начать главу заново",chapter:"Глава",question:"Вопрос",of:"из",correct:"Верно",progress:"Прогресс",learn:"Прочитайте объяснение перед ответом",reflect:"Ситуация для размышления",right:"Правильный ответ",wrong:"В этот раз неверно",rightTitle:"Правильно!",selected:"Принцип выбранного ответа",correctExplain:"Разбор правильного ответа",other:"Другие полезные принципы",next:"Следующий вопрос",finish:"Завершить главу",chapters:"Выберите главу",overall:"Ваш учебный путь",completed:"Глава завершена!",review:"Разбор ошибок",retry:"Повторить главу",home:"Все главы",nextChapter:"К следующей главе",score:"Результат",local:"Прогресс сохраняется на этом устройстве; ответы не отправляются на сервер.",language:"Учебные тексты пока доступны на португальском языке.",confirm:"Удалить прогресс этой главы на данном устройстве?",source:"Интерактивное изучение идей книги с авторскими пояснениями.",reviewTitle:"Разбор ответов",noErrors:"Отлично! В этой главе нет ошибок.",answered:"отвечено",lessons:"вопросов с пояснениями",open:"Открыть главу",readMore:"О главе",learned:"Вы изучили пояснения ко всем вариантам."}
 };
+const COURSE_COPY={"pt":{"concepts":"Conceitos e princípios deste capítulo","study":"Estude primeiro os 12 conceitos. As perguntas de fixação vêm ao final.","concept":"Conceito","practice":"Exemplo prático","summary":"Síntese do capítulo","fixation":"Atividade de fixação · 12 perguntas"},"en":{"concepts":"Concepts and principles in this chapter","study":"Study the 12 concepts before starting the revision questions.","concept":"Concept","practice":"Practical example","summary":"Chapter summary","fixation":"Knowledge check · 12 questions"},"es":{"concepts":"Conceptos y principios de este capítulo","study":"Estudia los 12 conceptos antes de comenzar las preguntas de repaso.","concept":"Concepto","practice":"Ejemplo práctico","summary":"Síntesis del capítulo","fixation":"Preguntas de repaso · 12 preguntas"},"ru":{"concepts":"Понятия и принципы этой главы","study":"Сначала изучите 12 понятий, а затем переходите к вопросам на закрепление.","concept":"Понятие","practice":"Практический пример","summary":"Итог главы","fixation":"Закрепление знаний · 12 вопросов"}};
+function ct(k,l){return (COURSE_COPY[language(l)]||COURSE_COPY.pt)[k]||COURSE_COPY.pt[k]||k}
 function language(value){const l=String(value||window.__EDUCASHPRO_SESSION__?.profile?.language||navigator.language||"pt").slice(0,2).toLowerCase();return COPY[l]?l:"pt"}
 function t(k,l){return COPY[language(l)][k]||COPY.pt[k]||k}
 function getUser(){const profile=window.__EDUCASHPRO_SESSION__?.profile||{};return String(profile.userId||profile.telegramId||"device").replace(/[^a-zA-Z0-9_-]/g,"").slice(0,72)||"device"}
@@ -20,7 +23,7 @@ function write(id,ch,state){try{localStorage.setItem(key(id,ch),JSON.stringify({
 function reset(id,ch){try{localStorage.removeItem(key(id,ch))}catch{}}
 function progress(value,total){const p=Math.max(0,Math.min(100,Math.round(100*value/total)));return '<div class="bookQuizProgress" role="progressbar" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+value+'"><span style="width:'+p+'%"></span></div>'}
 function scrollTop(){try{window.scrollTo({top:0,behavior:"smooth"})}catch{}}
-function back(){window.EduCashProGameSuite?.renderCatalog?.(window.EduCashProGameBridge?.catalogContext||{})}
+function back(){if(typeof courseExit==="function")return courseExit();return window.EduCashProApp?.renderLearn?.()}
 function register(config){
  if(!config||!config.id||!Array.isArray(config.chapters)||config.chapters.length!==21||!Array.isArray(config.questions)||config.questions.length!==252)throw Error("invalid_book_quiz_config");
  const ids=new Set();
@@ -31,15 +34,30 @@ function register(config){
 function chapterQuestions(config,ch){return config.questions.filter(q=>q.chapter===ch.id)}
 function outer(config,l){const list=config.chapters.map(ch=>({ch,state:read(config.id,ch.id)})),total=list.reduce((sum,a)=>sum+a.state.index,0),completed=list.filter(a=>a.state.completed).length;const root=$();if(!root)return;
  root.innerHTML='<main class="bookQuizPage"><button class="textButton bookQuizBack" type="button">← '+esc(t("back",l))+'</button>'+
- '<section class="bookQuizHero"><div class="bookQuizCover">📘</div><div><span class="eyebrow">EDUCASHPRO · ${esc(({pt:"APRENDER NA PRÁTICA",en:"LEARN BY DOING",es:"APRENDER PRACTICANDO",ru:"ОБУЧЕНИЕ НА ПРАКТИКЕ"})[l]||"APRENDER NA PRÁTICA")}</span><h1>'+esc(config.title)+'</h1><p>'+esc(config.subtitle)+'</p></div></section>'+
+ '<section class="bookQuizHero"><div class="bookQuizCover">📘</div><div><h1>'+esc(config.title)+'</h1><p>'+esc(config.subtitle)+'</p></div></section>'+
  '<section class="bookQuizIntro"><h2>'+esc(t("overall",l))+'</h2><div class="bookQuizStats"><span><b>'+completed+'/21</b><small>'+esc(t("chapters",l))+'</small></span><span><b>'+total+'/252</b><small>'+esc(t("answered",l))+'</small></span><span><b>'+Math.round(total/252*100)+'%</b><small>'+esc(t("progress",l))+'</small></span></div>'+progress(total,252)+'<p class="bookQuizLocal">💾 '+esc(t("local",l))+'</p>'+'<p class="bookQuizLocal">'+esc(t("source",l))+'</p></section>'+
  '<h2 class="bookQuizSectionTitle">'+esc(t("chapters",l))+'</h2><div class="bookQuizChapterGrid">'+list.map(({ch,state})=>'<button class="bookQuizChapterTile" type="button" data-book-chapter="'+ch.id+'"><span class="bookQuizChapterTag">'+esc(t("chapter",l))+' '+ch.id+' · '+(ch.part===1?"I":ch.part===2?"II":"III")+'</span><strong>'+esc(ch.title)+'</strong><small>12 '+esc(t("lessons",l))+' · '+state.index+'/12 '+esc(t("answered",l))+'</small>'+progress(state.index,12)+'</button>').join("")+'</div></main>';
  root.querySelector(".bookQuizBack").onclick=back;root.querySelectorAll("[data-book-chapter]").forEach(b=>b.onclick=()=>chapterIntro(config,l,Number(b.dataset.bookChapter)));scrollTop();
 }
 function chapterIntro(config,l,chId){
- const ch=config.chapters.find(x=>x.id===chId);if(!ch)return outer(config,l);const s=read(config.id,ch.id),root=$();if(!root)return;
- root.innerHTML='<main class="bookQuizPage"><button class="textButton bookQuizBack" type="button">← '+esc(t("chapters",l))+'</button><section class="bookQuizHero bookQuizChapterHero"><div class="bookQuizCover">📚</div><div><span class="eyebrow">'+esc(t("chapter",l))+' '+ch.id+' · '+(ch.part===1?"I":ch.part===2?"II":"III")+'</span><h1>'+esc(ch.title)+'</h1><p>12 '+esc(t("lessons",l))+'</p></div></section><section class="bookQuizIntro"><h2>📖 '+esc(t("readMore",l))+'</h2>'+paragraph(ch.overview)+'<div class="bookQuizStats"><span><b>'+s.index+'/12</b><small>'+esc(t("answered",l))+'</small></span><span><b>'+s.score+'</b><small>'+esc(t("correct",l))+'</small></span><span><b>'+Math.round(s.index/12*100)+'%</b><small>'+esc(t("progress",l))+'</small></span></div>'+progress(s.index,12)+'<p class="bookQuizLocal">💾 '+esc(t("local",l))+'</p><div class="bookQuizActions"><button class="wideButton" id="bookQuizBegin" type="button">'+esc(s.completed?t("score",l):s.index?t("resume",l):t("begin",l))+'</button>'+(s.index?'<button class="secondaryButton" id="bookQuizReset" type="button">↻ '+esc(t("restart",l))+'</button>':"")+'</div></section></main>';
- root.querySelector(".bookQuizBack").onclick=()=>outer(config,l);root.querySelector("#bookQuizBegin").onclick=()=>s.completed?result(config,l,ch,s):question(config,l,ch,s);root.querySelector("#bookQuizReset")?.addEventListener("click",()=>{if(confirm(t("confirm",l))){reset(config.id,ch.id);chapterIntro(config,l,ch.id)}});scrollTop();
+ const ch=config.chapters.find(x=>x.id===chId);if(!ch)return outer(config,l);
+ const state=read(config.id,ch.id),root=$();if(!root)return;
+ const concepts=chapterQuestions(config,ch);
+ const conceptCards=concepts.map((q,i)=>'<article class="bookQuizConcept" id="book-concept-'+ch.id+'-'+(i+1)+'"><div class="bookQuizChapterTag">'+esc(ct("concept",l))+' '+(i+1)+' / 12</div><h3>'+esc(q.options[q.answer])+'</h3>'+paragraph(q.optionComments[q.answer])+'<div class="bookQuizSituation"><strong>🔎 '+esc(ct("practice",l))+'</strong><p>'+esc(q.intro)+'</p></div></article>').join("");
+ root.innerHTML='<main class="bookQuizPage"><button class="textButton bookQuizBack" type="button">← '+esc(t("chapters",l))+'</button>'+
+ '<section class="bookQuizHero bookQuizChapterHero"><div class="bookQuizCover">📚</div><div><span class="eyebrow">'+esc(t("chapter",l))+' '+ch.id+' · '+(ch.part===1?"I":ch.part===2?"II":"III")+'</span><h1>'+esc(ch.title)+'</h1><p>'+esc(ct("study",l))+'</p></div></section>'+
+ '<section class="bookQuizIntro"><h2>📖 '+esc(t("readMore",l))+'</h2>'+paragraph(ch.overview)+'</section>'+
+ '<section class="bookQuizConcepts"><h2>'+esc(ct("concepts",l))+'</h2><p>'+esc(ct("study",l))+'</p>'+conceptCards+'</section>'+
+ '<section class="bookQuizIntro"><h2>🧠 '+esc(ct("summary",l))+'</h2>'+paragraph(ch.overview)+
+ '<div class="bookQuizStats"><span><b>'+state.index+'/12</b><small>'+esc(t("answered",l))+'</small></span><span><b>'+state.score+'</b><small>'+esc(t("correct",l))+'</small></span><span><b>'+Math.round(state.index/12*100)+'%</b><small>'+esc(t("progress",l))+'</small></span></div>'+progress(state.index,12)+
+ '<p class="bookQuizLocal">💾 '+esc(t("local",l))+'</p><h3>'+esc(ct("fixation",l))+'</h3>'+
+ '<div class="bookQuizActions"><button class="wideButton" id="bookQuizBegin" type="button">'+esc(state.completed?t("score",l):state.index?t("resume",l):t("begin",l))+'</button>'+
+ (state.index?'<button class="secondaryButton" id="bookQuizReset" type="button">↻ '+esc(t("restart",l))+'</button>':"")+
+ '</div></section></main>';
+ root.querySelector(".bookQuizBack").onclick=()=>outer(config,l);
+ root.querySelector("#bookQuizBegin").onclick=()=>state.completed?result(config,l,ch,state):question(config,l,ch,state);
+ root.querySelector("#bookQuizReset")?.addEventListener("click",()=>{if(confirm(t("confirm",l))){reset(config.id,ch.id);chapterIntro(config,l,ch.id)}});
+ scrollTop();
 }
 function question(config,l,ch,state){
  const qq=chapterQuestions(config,ch);if(state.index>=12)return result(config,l,ch,state);
@@ -75,6 +93,6 @@ function review(config,l,ch,state){
  root.innerHTML='<main class="bookQuizPage"><button class="textButton bookQuizBack" type="button">← '+esc(t("score",l))+'</button><h1 class="bookQuizSectionTitle">'+esc(t("reviewTitle",l))+'</h1>'+items.map(({q,a},i)=>'<article class="bookQuizIntro bookQuizReviewCard"><div class="bookQuizMeta"><span>'+esc(t("question",l))+' '+(i+1)+' '+esc(t("of",l))+' '+items.length+'</span></div><h2>'+esc(q.question)+'</h2><p class="bookQuizReviewSituation">'+esc(q.intro)+'</p><h3>🔎 '+esc(t("selected",l))+'</h3><p>'+esc(q.options[a.selected])+'</p>'+paragraph(q.optionComments[a.selected])+'<h3>✅ '+esc(t("right",l))+'</h3><p>'+esc(q.options[q.answer])+'</p>'+paragraph(q.comment)+'</article>').join("")+'</main>';
  root.querySelector(".bookQuizBack").onclick=()=>result(config,l,ch,state);scrollTop();
 }
-function launch(id,options={}){const config=registry.get(String(id));if(!config)return false;outer(config,language(options.lang));return true}
+function launch(id,options={}){const config=registry.get(String(id));if(!config)return false;courseExit=typeof options.back==="function"?options.back:null;outer(config,language(options.lang));return true}
 window.EduCashProBookQuiz={version:4,register,launch,read,reset,has:(id,locale)=>registry.has(String(id))&&(!locale||registry.get(String(id)).locale===String(locale).slice(0,2).toLowerCase()),ids:()=>[...registry.keys()]};
 })();
