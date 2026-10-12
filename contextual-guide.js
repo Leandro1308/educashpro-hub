@@ -151,7 +151,7 @@ function resolve(target){
  const onAgenda=/\/agenda\.html$/i.test(location.pathname);
  if(d.view)return onAgenda?(FEATURE[d.view]||"agenda"):(SITE_KEYS.has(d.view)?({learn:"academy",explore:"explore",benefits:"benefits",area:"account",tools:"tools",home:"home",presentation:"start"}[d.view]):"");
  if(d.target)return FEATURE[d.target]||MANUAL[d.target]||"";
- if(d.action)return FEATURE[d.action]||"";
+ if(d.action){if(d.action==="settings")return"account";return FEATURE[d.action]||"";}
  if(matched.id&&IDS[matched.id])return IDS[matched.id];
  if(matched.tagName==="A"){const href=matched.getAttribute("href")||"";if(href.includes("marketplace.html"))return"marketplace";if(href.includes("agenda.html"))return"agenda";if(href.includes("support.html"))return"troubleshoot"}
  if(d.bookChapter!==undefined)return "book-business-21";
@@ -169,12 +169,28 @@ document.addEventListener("click",event=>{
 },true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&root)close()});
 document.addEventListener("DOMContentLoaded",()=>{
+ let target="";
  try{
-   const pending=sessionStorage.getItem("educashpro:context-guide-next");
+   target=sessionStorage.getItem("educashpro:context-guide-next")||"";
    sessionStorage.removeItem("educashpro:context-guide-next");
-   if(pending)setTimeout(()=>open(pending),180);
  }catch{}
+ const page=String(location.pathname||"");
+ if(!target){
+   if(/\/agenda\.html$/i.test(page))target="agenda";
+   else if(/\/marketplace\.html$/i.test(page))target="marketplace";
+   else if(/\/affiliate\.html$/i.test(page))target="affiliate";
+   else if(/\/publish\.html$/i.test(page))target="project-register";
+   else if(/\/support\.html$/i.test(page))target="troubleshoot";
+ }
+ if(!target){
+   try{
+     const query=new URL(location.href).searchParams;
+     const direct=query.get("course")||query.get("academy")||"";
+     if(direct){current=FEATURE[direct]||direct.split(":")[0];}
+   }catch{}
+ }
  updateButton();
+ if(target)setTimeout(()=>open(target),280);
 });
 window.EduCashProContextGuide={open,close,available:id=>Boolean(ACCESS[id]||MANUAL[id]||FEATURE[id]||IDS[id]),keys:{features:FEATURE,ids:IDS,access:ACCESS}};
 })();
