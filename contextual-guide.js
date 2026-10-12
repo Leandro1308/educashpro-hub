@@ -53,11 +53,11 @@ const ACCESS={
 "sliding-puzzle":"mixed","word-search":"mixed","math-academy":"mixed",
 "agenda":"subscriber","agenda-settings":"subscriber","agenda-services":"subscriber",
 "agenda-clients":"subscriber","agenda-team":"subscriber","agenda-finance":"subscriber",
-"market-chart":"mixed","market-technical":"subscriber",
+"market-chart":"subscriber","market-technical":"subscriber",
 "market-fibonacci":"free","market-calendar":"free","market-heatmap":"free",
-"marketplace":"free","company-register":"account","project-register":"subscriber",
+"marketplace":"free","company-register":"subscriber","project-register":"subscriber",
 "benefit-offer":"subscriber","profile-photo":"account","device-pairing":"account",
-"notifications":"account","credential":"account","finance-share":"mixed",
+"notifications":"account","credential":"account","professional":"subscriber","finance-share":"mixed",
 "finance-pdf":"mixed","wallet":"account"
 };
 const COPY={
