@@ -1337,6 +1337,18 @@
     updateNav();
     const courseTicket=window.EduCashProNavigation?.stamp?.();
     content.innerHTML = navigationShell("🎓", t("courses"));
+    if (courseId === "set-for-life") {
+      try {
+        await window.EduCashProResources?.loadSetForLifeCourse?.(state.language);
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
+        const back=()=>void renderCourseCategory("free_courses");
+        if(window.EduCashProBookQuiz?.launch?.("set-for-life",{lang:state.language,back})!==true)throw new Error("set_for_life_not_registered");
+      } catch(error) {
+        if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(courseTicket))return;
+        handleError(error);
+      }
+      return;
+    }
     if (courseId === "book-business-21") {
       try {
         await window.EduCashProResources?.loadBookCourse?.(state.language);
