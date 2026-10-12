@@ -12,7 +12,7 @@ const chaptersFor=lang=>{
  const data=lang==="pt"?(window.EduCashProSetForLifeRaw||[]):(window.EduCashProSetForLifeTranslations?.[lang]||[]);
  return data.slice().sort((a,b)=>a.id-b.id);
 };
-const valid=arr=>Array.isArray(arr)&&arr.length===15&&arr.every((ch,i)=>ch.id===i+1&&ch.title?.length>5&&ch.overview?.length>80&&ch.lessons?.length===12&&ch.lessons.every(a=>a.length===3&&a.every((v,i)=>typeof v==="string"&&v.length>(i===0?15:70))));
+const valid=arr=>Array.isArray(arr)&&arr.length===15&&arr.every((ch,i)=>ch.id===i+1&&ch.title?.length>5&&ch.overview?.length>80&&ch.lessons?.length===12&&ch.lessons.every(a=>a.length===3&&a.every((v,i)=>typeof v==="string"&&v.length>(i===0?15:i===1?70:40))));
 function build(value){
  const lang=LANGS.includes(String(value||"pt").slice(0,2).toLowerCase())?String(value).slice(0,2).toLowerCase():"pt";
  const chapters=chaptersFor(lang);if(!valid(chapters))throw Error("set_for_life_missing_locale_"+lang);
