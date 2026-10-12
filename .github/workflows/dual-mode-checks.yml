@@ -47,3 +47,5 @@ jobs:
         run: node tests/cookie-transport.test.mjs
       - name: Verify guided book quiz content and chapter progress
         run: node tests/book-quiz.test.mjs
+      - name: Verify contextual function guides in four languages
+        run: node tests/contextual-guides.test.mjs
