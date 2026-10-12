@@ -114,7 +114,7 @@ assert(app.includes("const active = state.profile?.active === true"),"Academy ca
 assert(app.includes("if (!state.courseCatalog.length) hydrateCourseCatalogFromCache()")&&app.includes("refreshCourseCatalogLater()")&&app.includes("void loadCourseCatalog().then"),"Academy must use cached catalog immediately and refresh it in the background");
 assert(app.includes("setSession")&&webAuthEntry.includes("EduCashProApp?.setSession?.(state.session)"),"Web authentication must share the subscription session with the Academy");
 
-assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["network_marketing", "financial_education", "telegram"])'),"The three Academy learning paths must use the central route");
+assert(app.includes("async function openAcademyCategory(category)")&&app.includes('new Set(["free_courses", "network_marketing", "financial_education", "telegram"])'),"All four Academy learning paths must use the central route");
 assert(app.includes('closest?.("[data-academy-category]")')&&app.includes("void openAcademyCategory(category)"),"Academy cards need a delegated click handler that survives later modules");
 assert(app.includes("window.EduCashProApp = {")&&app.includes("setSession")&&app.includes("openAcademyCategory")&&app.includes("rememberRoute"),"The Academy category route must be available in both Web and Telegram modes");
 
