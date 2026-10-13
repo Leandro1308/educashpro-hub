@@ -48,6 +48,52 @@
       }
     },
     {
+      "id": "set-for-life",
+      "icon": "📗",
+      "category": "free_courses",
+      "access": "free",
+      "link": "",
+      "order": 1,
+      "title": {
+        "pt": "Set for Life — Construa sua liberdade financeira",
+        "en": "Set for Life — Build Your Financial Freedom",
+        "es": "Set for Life — Construye tu libertad financiera",
+        "ru": "Set for Life — Путь к финансовой свободе"
+      },
+      "description": {
+        "pt": "Curso gratuito sobre poupança, renda, moradia e investimentos. 14 capítulos e um apêndice, com 12 conceitos e 12 questões por módulo.",
+        "en": "Free course on saving, income, housing and investing. 14 chapters and an appendix with 12 concepts and 12 questions per module.",
+        "es": "Curso gratuito sobre ahorro, ingresos, vivienda e inversión. 14 capítulos y un apéndice con 12 conceptos y 12 preguntas por módulo.",
+        "ru": "Бесплатный курс о сбережениях, доходах, жилье и инвестициях. 14 глав и приложение: 12 понятий и 12 вопросов в каждом модуле."
+      },
+      "preview": {
+        "pt": [
+          "180 questões comentadas depois das explicações",
+          "Reserva financeira, carreira, imóveis e ações",
+          "Apêndice com contexto previdenciário dos Estados Unidos",
+          "Livre para todos os usuários, ativos ou inativos"
+        ],
+        "en": [
+          "180 explained questions after the lessons",
+          "Financial reserves, careers, real estate and stocks",
+          "Appendix on the US retirement system",
+          "Free for active and inactive users"
+        ],
+        "es": [
+          "180 preguntas comentadas después de las lecciones",
+          "Reserva financiera, carrera, inmuebles y acciones",
+          "Apéndice sobre el sistema de jubilación de EE. UU.",
+          "Gratis para usuarios activos e inactivos"
+        ],
+        "ru": [
+          "180 вопросов с подробными разъяснениями",
+          "Финансовый резерв, карьера, недвижимость и акции",
+          "Приложение о пенсионной системе США",
+          "Бесплатно для активных и неактивных пользователей"
+        ]
+      }
+    },
+    {
       "id": "fundamentos_marketing_rede",
       "icon": "🌱",
       "category": "network_marketing",

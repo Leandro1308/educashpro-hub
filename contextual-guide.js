@@ -44,7 +44,7 @@ explore:"explore",benefits:"benefits",telegram:"telegram",admin:"account",
 "troubleshoot":"troubleshoot","financial_education":"academy"
 };
 const ACCESS={
-"free_courses":"free","book-business-21":"free","fundamentos_marketing_rede":"free",
+"free_courses":"free","book-business-21":"free","set-for-life":"free","fundamentos_marketing_rede":"free",
 "marketing_rede_educashpro":"subscriber","profissionalize_telegram":"subscriber",
 "analise_tecnica_completa":"free","liberdade_financeira_assinantes":"subscriber",
 "monthly-finance":"mixed","receivables":"limited","quote":"limited",

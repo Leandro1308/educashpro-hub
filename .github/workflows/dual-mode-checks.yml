@@ -49,3 +49,5 @@ jobs:
         run: node tests/book-quiz.test.mjs
       - name: Verify contextual function guides in four languages
         run: node tests/contextual-guides.test.mjs
+      - name: Verify Set for Life curriculum in all four languages
+        run: node tests/set-for-life.test.mjs
