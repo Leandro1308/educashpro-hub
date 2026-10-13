@@ -61,10 +61,10 @@ const ACCESS={
 "finance-pdf":"mixed","wallet":"account"
 };
 const COPY={
-pt:{title:"Como usar esta função",steps:"Passo a passo para começar",tip:"Importante",close:"Entendi, continuar",reopen:"Como usar",loading:"Preparando a explicação…",error:"Não foi possível abrir a orientação completa. Consulte a Central de Ajuda.",free:"Gratuito",mixed:"Livre com recursos adicionais",limited:"Gratuito com limites",subscriber:"Assinatura ativa",account:"Conta necessária",admin:"Administrador",more:"Orientações detalhadas em quatro idiomas"},
-en:{title:"How to use this feature",steps:"Step-by-step instructions",tip:"Important",close:"Got it, continue",reopen:"How to use",loading:"Preparing your guide…",error:"The full guide could not be opened. Please use the Help Center.",free:"Free",mixed:"Free with extra features",limited:"Free with limits",subscriber:"Active subscription",account:"Account required",admin:"Administrator",more:"Detailed guidance in four languages"},
-es:{title:"Cómo usar esta función",steps:"Instrucciones paso a paso",tip:"Importante",close:"Entendido, continuar",reopen:"Cómo usar",loading:"Preparando la explicación…",error:"No se pudo abrir la guía completa. Consulta el Centro de Ayuda.",free:"Gratis",mixed:"Gratis con funciones adicionales",limited:"Gratis con límites",subscriber:"Suscripción activa",account:"Cuenta necesaria",admin:"Administrador",more:"Instrucciones detalladas en cuatro idiomas"},
-ru:{title:"Как пользоваться функцией",steps:"Пошаговая инструкция",tip:"Важно",close:"Понятно, продолжить",reopen:"Как пользоваться",loading:"Подготавливаем инструкцию…",error:"Не удалось открыть полное руководство. Используйте Справочный центр.",free:"Бесплатно",mixed:"Бесплатно с дополнительными функциями",limited:"Бесплатно с ограничениями",subscriber:"Активная подписка",account:"Нужен аккаунт",admin:"Администратор",more:"Подробные инструкции на четырёх языках"}
+pt:{title:"Como usar esta função",steps:"Passo a passo para começar",tip:"Importante",close:"Entendi, continuar",reopen:"Como usar",loading:"Preparando a explicação…",error:"Não foi possível abrir a orientação completa. Consulte a Central de Ajuda.",free:"Gratuito",mixed:"Livre com recursos adicionais",limited:"Gratuito com limites",subscriber:"Assinatura ativa",account:"Conta necessária",admin:"Administrador",more:"Orientações detalhadas em quatro idiomas",hide:"Fechar botão de ajuda"},
+en:{title:"How to use this feature",steps:"Step-by-step instructions",tip:"Important",close:"Got it, continue",reopen:"How to use",loading:"Preparing your guide…",error:"The full guide could not be opened. Please use the Help Center.",free:"Free",mixed:"Free with extra features",limited:"Free with limits",subscriber:"Active subscription",account:"Account required",admin:"Administrator",more:"Detailed guidance in four languages",hide:"Hide help button"},
+es:{title:"Cómo usar esta función",steps:"Instrucciones paso a paso",tip:"Importante",close:"Entendido, continuar",reopen:"Cómo usar",loading:"Preparando la explicación…",error:"No se pudo abrir la guía completa. Consulta el Centro de Ayuda.",free:"Gratis",mixed:"Gratis con funciones adicionales",limited:"Gratis con límites",subscriber:"Suscripción activa",account:"Cuenta necesaria",admin:"Administrador",more:"Instrucciones detalladas en cuatro idiomas",hide:"Ocultar botón de ayuda"},
+ru:{title:"Как пользоваться функцией",steps:"Пошаговая инструкция",tip:"Важно",close:"Понятно, продолжить",reopen:"Как пользоваться",loading:"Подготавливаем инструкцию…",error:"Не удалось открыть полное руководство. Используйте Справочный центр.",free:"Бесплатно",mixed:"Бесплатно с дополнительными функциями",limited:"Бесплатно с ограничениями",subscriber:"Активная подписка",account:"Нужен аккаунт",admin:"Администратор",more:"Подробные инструкции на четырёх языках",hide:"Скрыть кнопку справки"}
 };
 const SITE_KEYS=new Set(["home","learn","explore","benefits","area","tools","presentation"]);
 const I={
@@ -72,7 +72,7 @@ const I={
 "monthly-finance:overview":"monthly-finance",
 "monthly-finance:share":"finance-share"
 };
-let current="",openId="",generation=0,root=null;
+let current="",openId="",generation=0,root=null,dismissedFor="";
 const loaded=new Map();
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function lang(){
@@ -100,6 +100,7 @@ function close(){
  generation++;
  if(root){root.remove();root=null}
  openId="";
+ updateButton();
 }
 function render(id,doc,l){
  if(!root||openId!==id)return;
@@ -124,16 +125,48 @@ function open(id){
  root=document.createElement("div");root.id="ecpGuideOverlay";root.className="ecpGuideOverlay";root.setAttribute("role","presentation");
  root.innerHTML='<div class="ecpGuideBackdrop" data-ecp-guide-dismiss></div><section class="ecpGuideCard" role="dialog" aria-modal="true" aria-labelledby="ecpGuideTitle"><div class="ecpGuideLoading" id="ecpGuideTitle">'+esc(ui("loading",l))+'</div><button class="ecpGuideDone" type="button">'+esc(ui("close",l))+'</button></section>';
  document.body.appendChild(root);
+ updateButton();
  root.querySelector("[data-ecp-guide-dismiss]").onclick=close;
  root.querySelector(".ecpGuideDone").onclick=close;
  data(id,l).then(doc=>{if(serial===generation&&openId===id)render(id,doc,l)}).catch(()=>{if(serial!==generation||!root)return;render(id,{title:ui("title",l),summary:ui("error",l),steps:[],tip:""},l)});
 }
 function updateButton(){
  if(!document.body)return;
- let button=document.getElementById("ecpContextGuideButton");
- if(!button){button=document.createElement("button");button.type="button";button.id="ecpContextGuideButton";button.className="ecpContextGuideButton";document.body.appendChild(button);button.onclick=()=>open(current)}
+ let launcher=document.getElementById("ecpContextGuideLauncher");
+ if(!launcher){
+  launcher=document.createElement("div");
+  launcher.id="ecpContextGuideLauncher";
+  launcher.className="ecpContextGuideLauncher";
+  launcher.innerHTML='<button type="button" id="ecpContextGuideButton" class="ecpContextGuideButton"></button>'+
+    '<button type="button" id="ecpContextGuideDismiss" class="ecpContextGuideDismiss" aria-label="Hide help button">✕</button>';
+  document.body.appendChild(launcher);
+  launcher.querySelector("#ecpContextGuideButton").onclick=()=>root?close():open(current);
+  launcher.querySelector("#ecpContextGuideDismiss").onclick=()=>{
+    dismissedFor=current;
+    close();
+  };
+ }
+ const button=launcher.querySelector("#ecpContextGuideButton");
  button.textContent="❔ "+ui("reopen");
- button.hidden=!current||current==="home";
+ button.setAttribute("aria-expanded",root?"true":"false");
+ const hide=launcher.querySelector("#ecpContextGuideDismiss");
+ hide.title=ui("hide");
+ hide.setAttribute("aria-label",ui("hide"));
+ launcher.hidden=!current||current==="home"||dismissedFor===current;
+}
+function setContext(id){
+ if(!id||id==="home"){
+   current="";
+   dismissedFor="";
+   close();
+   return;
+ }
+ if(current!==id){
+   current=id;
+   dismissedFor="";
+   close();
+ }
+ updateButton();
 }
 function resolve(target){
  if(!(target instanceof Element)||target.closest("#ecpGuideOverlay")||target.closest("#ecpContextGuideButton"))return"";
@@ -159,13 +192,15 @@ function resolve(target){
 }
 document.addEventListener("click",event=>{
  const id=resolve(event.target);
- if(!id||id==="home"){if(id==="home"){current="";updateButton()}return}
+ if(!id)return;
+ if(id==="home"){setContext("");return}
  const src=event.target?.closest?.("a[href]");
- if(src&&/\.(html)(\?|$)/i.test(src.getAttribute("href")||"")){
+ if(src&&/\\.(html)(\\?|$)/i.test(src.getAttribute("href")||"")){
    try{sessionStorage.setItem("educashpro:context-guide-next",id)}catch{}
    return;
  }
- setTimeout(()=>open(id),120);
+ // Navigation selects help context; only the small button opens instructions.
+ setTimeout(()=>setContext(id),120);
 },true);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&root)close()});
 document.addEventListener("DOMContentLoaded",()=>{
@@ -186,11 +221,11 @@ document.addEventListener("DOMContentLoaded",()=>{
    try{
      const query=new URL(location.href).searchParams;
      const direct=query.get("course")||query.get("academy")||"";
-     if(direct){current=FEATURE[direct]||direct.split(":")[0];}
+     if(direct){target=FEATURE[direct]||direct.split(":")[0];}
    }catch{}
  }
  updateButton();
- if(target)setTimeout(()=>open(target),280);
+ if(target)setTimeout(()=>setContext(target),280);
 });
-window.EduCashProContextGuide={open,close,available:id=>Boolean(ACCESS[id]||MANUAL[id]||FEATURE[id]||IDS[id]),keys:{features:FEATURE,ids:IDS,access:ACCESS}};
+window.EduCashProContextGuide={open,close,setContext,available:id=>Boolean(ACCESS[id]||MANUAL[id]||FEATURE[id]||IDS[id]),keys:{features:FEATURE,ids:IDS,access:ACCESS}};
 })();

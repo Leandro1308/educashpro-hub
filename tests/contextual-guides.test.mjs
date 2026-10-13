@@ -51,3 +51,78 @@ assert(app.includes("renderCourseCategory")&&loader.includes("loadBookCourse"),"
 assert(tools.includes('toolCard("receivables"')&&tools.includes('toolCard("quote"'),"Financial tools must remain intact");
 assert(en.length>5000&&es.length>5000&&ru.length>5000,"Guide translations must be static assets");
 console.log("EduCashPro guide audit OK:",registryIDs.length,"features;",keys.length,"detailed guides x 4 languages and 15 legacy help articles x 4; every entrypoint wired");
+
+ 
+// Regression: navigating between functions must not create a modal.
+class FakeElement {
+ constructor(tag="div"){
+  this.tagName=tag.toUpperCase();this.id="";this.hidden=false;this.dataset={};
+  this.children=new Map();this.attributes={};this._html="";this.removed=false;
+ }
+ set innerHTML(value){this._html=value;this.children.clear()}
+ get innerHTML(){return this._html}
+ querySelector(selector){
+  if(!this.children.has(selector))this.children.set(selector,new FakeElement("button"));
+  return this.children.get(selector);
+ }
+ setAttribute(k,v){this.attributes[k]=String(v)}
+ remove(){this.removed=true;mounted.delete(this.id)}
+ closest(){return null}
+}
+const mounted=new Map();
+const listeners2=new Map();
+let localLanguage="pt",assetRequests=0;
+const fakeBody={appendChild(el){mounted.set(el.id,el);return el}};
+const fakeDocument={
+ body:fakeBody,documentElement:{lang:"pt"},
+ createElement:tag=>new FakeElement(tag),
+ getElementById:id=>mounted.get(id)||null,
+ addEventListener:(type,fn)=>listeners2.set(type,fn)
+};
+const fakeWindow={
+ EduCashProLocale:{resolve:()=>localLanguage},
+ EduCashProResources:{script:()=>{assetRequests++;return Promise.resolve(true)}}
+};
+const fakeStorage={getItem:()=>null,removeItem:()=>{},setItem:()=>{}};
+const synthetic={window:fakeWindow,document:fakeDocument,navigator:{language:"pt-BR"},sessionStorage:fakeStorage,Element:FakeElement,location:{pathname:"/app/",href:"https://go.educashpro.vip/app/"},setTimeout:fn=>(fn(),1)};
+vm.runInNewContext(guide,synthetic,{filename:"contextual-guide.js"});
+listeners2.get("DOMContentLoaded")();
+assert(!mounted.has("ecpGuideOverlay"),"A tutorial must not appear when the page loads");
+let launcher=mounted.get("ecpContextGuideLauncher");
+assert(launcher&&launcher.hidden,"The help button should not cover the public home page");
+class ToolTarget extends FakeElement{
+ constructor(id){super("button");this.dataset.toolId=id}
+ closest(selector){return selector.includes("[data-tool-id]")?this:null}
+}
+listeners2.get("click")({target:new ToolTarget("receivables")});
+launcher=mounted.get("ecpContextGuideLauncher");
+assert.equal(launcher.hidden,false,"Each tool must show a small How to Use button");
+assert(!mounted.has("ecpGuideOverlay"),"Clicking a tool must NOT automatically open instructions");
+assert.equal(assetRequests,0,"Translated content should load only when the user asks for help");
+const howTo=launcher.querySelector("#ecpContextGuideButton");
+assert(howTo.textContent.includes("Como usar"),"The compact label must be visible in Portuguese");
+howTo.onclick();
+assert(mounted.has("ecpGuideOverlay"),"Help must open only when the user presses the button");
+fakeWindow.EduCashProContextGuide.close();
+assert(!mounted.has("ecpGuideOverlay"),"The instructional card must be closable without navigating away");
+assert.equal(launcher.hidden,false,"Help remains available after closing the tutorial");
+launcher.querySelector("#ecpContextGuideDismiss").onclick();
+assert.equal(launcher.hidden,true,"The X must dismiss the small button on this function");
+assert(!mounted.has("ecpGuideOverlay"),"The X must also close any open tutorial");
+listeners2.get("click")({target:new ToolTarget("qr-code")});
+assert.equal(launcher.hidden,false,"The help button must return on another function");
+assert(!mounted.has("ecpGuideOverlay"),"Switching tools must remain free of automatic cards");
+localLanguage="en";
+listeners2.get("click")({target:new ToolTarget("smart-link")});
+assert(howTo.textContent.includes("How to use"),"Help control must follow the selected language");
+fakeWindow.EduCashProContextGuide.close();
+for(const page of ["/agenda.html","/marketplace.html","/affiliate.html","/publish.html","/support.html"]){
+ const pageMounted=new Map(),pageListeners=new Map();
+ const pageDocument={body:{appendChild:el=>pageMounted.set(el.id,el)},documentElement:{lang:"pt"},createElement:t=>new FakeElement(t),getElementById:id=>pageMounted.get(id)||null,addEventListener:(type,fn)=>pageListeners.set(type,fn)};
+ const target={window:{EduCashProLocale:{resolve:()=>"pt"}},document:pageDocument,navigator:{language:"pt-BR"},sessionStorage:fakeStorage,Element:FakeElement,location:{pathname:page,href:"https://example.com"+page},setTimeout:fn=>(fn(),1)};
+ vm.runInNewContext(guide,target);
+ pageListeners.get("DOMContentLoaded")();
+ assert(pageMounted.get("ecpContextGuideLauncher")?.hidden===false, "Standalone page must show the compact button: "+page);
+ assert(!pageMounted.has("ecpGuideOverlay"),"Standalone page must not show tutorial automatically: "+page);
+}
+console.log("Contextual tutorial interactions: on-demand, dismiss X, feature switches, independent pages and four-language button: OK");
