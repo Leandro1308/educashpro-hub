@@ -289,6 +289,7 @@
   }
 
   const CONTRACT_SCHEMA={
+    setQualificationExempt:{label:"Dispensar requisitos de níveis",fields:[["user","Carteira do usuário","text"],["enabled","Dispensar requisitos (Sim concede; Não retira)","boolean"]]},
     setTreasury:{label:"Tesouraria",fields:[["newTreasury","Endereço da nova tesouraria","text"]]},
     setOwner:{label:"Transferir owner",fields:[["newOwner","Novo owner","text"]]},
     setPriceUsdt:{label:"Preço periódico",fields:[["newPriceUsdt","Preço em USDT","number"]]},
@@ -413,3 +414,4 @@
   document.addEventListener('educashpro:area-rendered',()=>void mountShortcut());
   window.EduCashProAdminCenter={mountShortcut,open,close,openContent,openReviewers,openBroadcast,openChannel,openInvite,openContract,openManual,openDelegates};
 })();
+
