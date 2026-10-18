@@ -82,13 +82,15 @@
 
   async function render(options = {}) {
     if (typeof options?.back === "function") returnTo = options.back;
+    const ticket=window.EduCashProNavigation?.stamp?.();
     injectStyles();
     content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><section class="hero"><span class="eyebrow">${esc(t("eyebrow"))}</span><h1>💼 ${esc(t("title"))}</h1><p>${esc(t("lead"))}</p></section><section class="profileCard professionalQuickActions"><h2>${esc(t("quickActions"))}</h2><div class="profileActions"><button id="fastProfessionalPage" class="wideButton">⚙️ ${esc(t("editPage"))}</button><button id="fastProfessionalAgenda" class="secondaryButton">📅 ${esc(t("openAgenda"))}</button></div></section><section class="profileCard"><h2>${esc(t("setup"))}</h2><p>${esc(t("loading"))}</p><div class="professionalProgress"><span style="width:20%"></span></div></section>`;
     document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
     document.getElementById("fastProfessionalAgenda").onclick=()=>window.EduCashProApp?.openAgenda?.("","appointments");
-    document.getElementById("fastProfessionalPage").onclick=async()=>{try{await window.EduCashProResources?.loadLinks?.();window.EduCashProLinks?.setSession?.(session);window.EduCashProLinks?.renderPageEditor?.({back:render})}catch{toast(t("error"))}};
+    document.getElementById("fastProfessionalPage").onclick=async()=>{try{await window.EduCashProResources?.loadLinks?.();if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;window.EduCashProLinks?.setSession?.(session);window.EduCashProLinks?.renderPageEditor?.({back:render})}catch{toast(t("error"))}};
     try {
       const [pageResult, agendaResult]=await Promise.all([api("/api/hub/link-page").catch(()=>({page:null})),api("/api/agenda/bootstrap",{appointmentOffset:0,appointmentLimit:20}).catch(()=>({access:null,services:[],appointments:[]}))]);
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
       const page=pageResult.page || null, agenda=agendaResult.access?.agenda || null, services=agendaResult.services || [], appointments=agendaResult.appointments || [];
       const checks=[!!page,!!page?.profileImage,(page?.links||[]).length>0,!!agenda,services.length>0], done=checks.filter(Boolean).length, percent=Math.round(done/checks.length*100);
       const needsPage=!page||!page?.profileImage||!(page?.links||[]).length;
@@ -98,13 +100,15 @@
       const step=(id,icon,title,subtitle,complete)=>`<button id="${id}" class="professionalCheck professionalStep secondaryButton"><span>${complete?"✅":icon}</span><div><strong>${esc(title)}</strong><small>${esc(subtitle)}</small></div><em>${esc(complete?t("done"):t("pending"))}</em><span class="professionalStepArrow">›</span></button>`;
       content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><section class="hero"><span class="eyebrow">${esc(t("eyebrow"))}</span><h1>💼 ${esc(t("title"))}</h1><p>${esc(t("lead"))}</p></section><section class="profileCard"><div class="sectionHead"><div><h2>${esc(t("setup"))}</h2></div><strong>${percent}%</strong></div><div class="professionalProgress"><span style="width:${percent}%"></span></div><div class="professionalChecklist"><div class="professionalCheck"><span>${page?"✅":"○"}</span><div><strong>${esc(t("page"))}</strong><small>${esc(page?t("pageReady"):t("pageMissing"))}</small></div></div><div class="professionalCheck"><span>${agenda&&services.length?"✅":"○"}</span><div><strong>${esc(t("agenda"))}</strong><small>${esc(agenda&&services.length?t("agendaReady"):t("agendaMissing"))}</small></div></div></div></section><section class="professionalStats"><div class="professionalStat"><strong>${(page?.links||[]).length}</strong><small>${esc(t("links"))}</small></div><div class="professionalStat"><strong>${services.length}</strong><small>${esc(t("services"))}</small></div><div class="professionalStat"><strong>${agendaResult.appointmentTotal||appointments.length}</strong><small>${esc(t("appointments"))}</small></div></section><section class="notice professionalNext"><b>${esc(t("next"))}</b><br>${esc(next)}<button id="recommendedProfessionalAction" class="wideButton">${esc(nextAction)} →</button></section><section class="profileCard professionalConfig"><h2>${esc(t("configureTitle"))}</h2><p>${esc(t("configureLead"))}</p><div class="professionalChecklist">${step("configureInfo","👤",t("infoStep"),t("infoStepSub"),!!page&&!!page?.profileImage)}${step("configureContacts","🔗",t("contactsStep"),t("contactsStepSub"),(page?.links||[]).length>0)}${step("configureServices","🧰",t("servicesStep"),t("servicesStepSub"),services.length>0)}${step("configureAgenda","📅",t("agendaStep"),t("agendaStepSub"),!!agenda)}${step("configureAppearance","🎨",t("appearanceStep"),t("appearanceStepSub"),!!page&&!!agenda&&services.length>0)}</div></section><section class="profileCard professionalQuickActions"><h2>${esc(t("quickActions"))}</h2><div class="profileActions"><button id="editProfessionalPage" class="wideButton">⚙️ ${esc(t("configure"))}</button><button id="manageProfessionalAgenda" class="secondaryButton">📅 ${esc(t("openAgenda"))}</button><button id="previewProfessional" class="secondaryButton">💳 ${esc(t("preview"))}</button>${pageUrl(page)?`<button id="openPublicProfessional" class="secondaryButton">↗ ${esc(t("publicPage"))}</button>`:""}</div></section>`;
       const openPageEditor=async()=>{
+        const editorTicket=window.EduCashProNavigation?.stamp?.();
         content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><section class="profileCard"><p>${esc(t("loading"))}</p></section>`;
         document.getElementById("professionalBack").onclick=render;
         try{
           await window.EduCashProResources?.loadLinks?.();
+          if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(editorTicket))return;
           window.EduCashProLinks?.setSession?.(session);
           return window.EduCashProLinks?.renderPageEditor?.({back:render});
-        }catch{return render()}
+        }catch{if(!window.EduCashProNavigation || window.EduCashProNavigation.isCurrent(editorTicket))return render()}
       };
       const openAgendaView=view=>window.EduCashProApp?.openAgenda?.("",view);
       document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()};
@@ -113,7 +117,7 @@
       document.getElementById("configureInfo").onclick=openPageEditor;document.getElementById("configureContacts").onclick=openPageEditor;
       document.getElementById("configureServices").onclick=()=>openAgendaView("services");document.getElementById("configureAgenda").onclick=()=>openAgendaView("settings");document.getElementById("configureAppearance").onclick=()=>renderCard(page,agendaResult);
       document.getElementById("manageProfessionalAgenda").onclick=()=>openAgendaView("appointments");document.getElementById("previewProfessional").onclick=()=>renderCard(page,agendaResult);document.getElementById("openPublicProfessional")?.addEventListener("click",()=>openUrl(pageUrl(page)));
-    } catch { content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><div class="empty error">${esc(t("error"))}</div>`;document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()}; }
+    } catch { if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;content().innerHTML=`<button id="professionalBack" class="textButton">← ${esc(t("back"))}</button><div class="empty error">${esc(t("error"))}</div>`;document.getElementById("professionalBack").onclick=()=>{const back=returnTo||window.EduCashProApp?.renderHome;if(typeof back==="function")back()}; }
   }
 
   function maybeOnboard(){

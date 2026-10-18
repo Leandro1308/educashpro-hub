@@ -1,4 +1,10 @@
 (function () {
+  function requestSignal(){
+    if(typeof AbortSignal.timeout === "function")return AbortSignal.timeout(15000);
+    const controller=new AbortController();
+    setTimeout(()=>controller.abort(),15000);
+    return controller.signal;
+  }
   const API_BASE = "https://educashpro-all.onrender.com";
   const platform = window.EduCashProPlatform;
   const auth = window.EduCashProWebAuth;
@@ -360,6 +366,7 @@
     const token = session()?.token;
     if (!token) throw new Error("session_missing");
     const response = await fetch(`${API_BASE}${path}`, {
+      signal: requestSignal(),
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.13.2";
+  const APP_RUNTIME_BUILD = "2026.10.18.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -1011,7 +1011,11 @@
       else if (target === "tools") renderTools();
       else if (target === "games") {
         rememberRoute("tools", "games");
-        window.EduCashProResources?.loadGames?.().then(() => window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language })).catch(handleError);
+        const ticket=window.EduCashProNavigation?.stamp?.();
+        window.EduCashProResources?.loadGames?.().then(() => {
+          if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+          window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language });
+        }).catch(error=>{if(!window.EduCashProNavigation || window.EduCashProNavigation.isCurrent(ticket))handleError(error)});
       }
       else if (target === "agenda") openAgenda();
       else if (target === "support") location.assign("./support.html");
@@ -1688,7 +1692,9 @@
   async function openAccountCenter(method){
     try{
       content.innerHTML = navigationShell("👤", localizedNavTitle("account"));
+      const ticket=window.EduCashProNavigation?.stamp?.();
       await window.EduCashProResources?.loadAccountCenter?.();
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
       return window.EduCashProAccountCenter?.[method]?.();
     }catch(error){
       console.warn("[EduCashPro] account center:",error?.message||error);

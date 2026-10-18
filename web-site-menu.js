@@ -75,7 +75,7 @@
     if(action==="presentation"){close();app?.renderPresentation?.(app.renderPublicLanding);return}
     if(action==="install"){close();if(window.EduCashProPWA?.install)return window.EduCashProPWA.install();location.assign(new URL("./install.html",location.href).toString());return}
     if(action==="marketplace"){location.assign(internal("./marketplace.html"));return}
-    if(action==="games"){close();await window.EduCashProResources?.loadGames?.();window.EduCashProMentalGames?.renderCatalog?.({public:true,lang:lang(),back:app?.renderPublicLanding});return}
+    if(action==="games"){close();app?.rememberRoute?.("tools","games");const ticket=window.EduCashProNavigation?.stamp?.();await window.EduCashProResources?.loadGames?.();if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;window.EduCashProMentalGames?.renderCatalog?.({public:true,lang:lang(),back:app?.renderPublicLanding});return}
     if(action==="tools"){close();app?.renderTools?.();return}
     if(action==="scan"){close();app?.scanMembershipQr?.();return}
     if(action==="telegram-app"){location.assign(telegramApp());return}

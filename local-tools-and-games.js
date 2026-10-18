@@ -176,6 +176,7 @@
     }
     if (!target) return;
     const items = await loadGames();
+    if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
     const categories = [...new Set(items.map((item) => gameText(item.category)).filter(Boolean))];
     const visible = category ? items.filter((item) => gameText(item.category) === category) : items;
     document.getElementById("gameCatalog").innerHTML = `<div class="filters"><button class="filter ${category ? "" : "active"}" data-game-category="">${esc(tr("all"))}</button>${categories.map((item) => `<button class="filter ${item === category ? "active" : ""}" data-game-category="${esc(item)}">${esc(item)}</button>`).join("")}</div><div class="gameGrid">${visible.length ? visible.map((item) => `<article class="gameCard">${item.image ? `<img src="${esc(item.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : `<div class="gamePlaceholder">🎮</div>`}<div><span class="chip">${esc(gameText(item.category))}</span><h3>${esc(gameText(item.name))}</h3><p>${esc(gameText(item.description))}</p><small>${esc(tr("external"))}</small><button class="primaryButton" data-game-url="${esc(item.url)}">${esc(tr("open"))}</button></div></article>`).join("") : `<div class="empty">${esc(tr("empty"))}</div>`}</div>`;
@@ -380,6 +381,16 @@
   }
 
   async function openTool(id, skipAccess=false){
+    const task=openToolImpl(id,skipAccess);
+    const ticket=window.EduCashProNavigation?.stamp?.();
+    try { return await task; } catch(error) {
+      if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
+      console.warn("[EduCashPro] tool:",error?.message||error);
+      if(document.getElementById("toolLoadBack") || document.getElementById("gameCatalog"))renderToolsHub();
+    }
+  }
+
+  async function openToolImpl(id, skipAccess=false){
     if(!skipAccess && ACCESS_TOOLS.includes(id) && currentSession()?.profile?.active !== true && window.EduCashProAccess?.isActive?.() !== true)return renderToolAccess(id);
     if(skipAccess && id === "monthly-finance")return openFinanceControl("monthly-finance:overview");
     if(id.startsWith("monthly-finance"))return openFinanceControl(id);

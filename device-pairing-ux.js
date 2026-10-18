@@ -125,8 +125,8 @@
       const text=String(status.textContent||"").toLowerCase();
       const success=text.includes("autoriz")||text.includes("authorized")||text.includes("autorizado")||text.includes("разреш");
       const invalid=text.includes("invál")||text.includes("invalid")||text.includes("caduc")||text.includes("истёк");
-      if(success){status.textContent=s("approved");window.setTimeout(()=>setOpened(false),1400)}
-      else if(invalid){status.textContent=s("invalid")}
+      if(success && status.textContent!==s("approved")){status.textContent=s("approved");window.setTimeout(()=>setOpened(false),1400)}
+      else if(invalid && status.textContent!==s("invalid")){status.textContent=s("invalid")}
     });
     statusObserver.observe(status,{childList:true,characterData:true,subtree:true});
   }
