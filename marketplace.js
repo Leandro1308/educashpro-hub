@@ -1,4 +1,10 @@
 (function () {
+  function requestSignal(){
+    if(typeof AbortSignal.timeout === "function")return AbortSignal.timeout(15000);
+    const controller=new AbortController();
+    setTimeout(()=>controller.abort(),15000);
+    return controller.signal;
+  }
   const API_BASE = "https://educashpro-all.onrender.com";
   const CACHE_TTL = 5 * 60 * 1000;
 
@@ -150,18 +156,22 @@
     el("previousButton").disabled = state.page <= 1; el("nextButton").disabled = !state.hasMore;
   }
 
+  let listEpoch=0, detailEpoch=0;
   async function loadCompanies({ useCache = true } = {}) {
-    if (state.loading) return; state.loading = true;
+    const ticket=++listEpoch; state.loading = true;
     const params = currentParams(); const cached = useCache ? readCache(params) : null;
     if (cached) renderList(cached); else showSkeleton();
     try {
-      const response = await fetch(`${API_BASE}/api/public/marketplace?${params.toString()}`, { headers: { Accept: "application/json" } });
+      const response = await fetch(`${API_BASE}/api/public/marketplace?${params.toString()}`, { signal:requestSignal(), headers: { Accept: "application/json" } });
       const data = await response.json(); if (!response.ok || !data?.ok) throw new Error(data?.reason || "marketplace_failed");
-      writeCache(params, data); renderList(data);
+      writeCache(params, data);
+      if(ticket!==listEpoch)return;
+      renderList(data);
     } catch (error) {
+      if(ticket!==listEpoch)return;
       console.error("[Marketplace]", error);
       if (!cached) { el("companyGrid").innerHTML = ""; el("emptyState").classList.add("hidden"); el("errorState").classList.remove("hidden"); setText("resultStatus", ""); }
-    } finally { state.loading = false; }
+    } finally { if(ticket===listEpoch)state.loading = false; }
   }
 
   function detailMarkup(item) {
@@ -188,21 +198,25 @@
 
   async function openCompany(id, { push = true } = {}) {
     if (!id) return;
+    const ticket=++detailEpoch;
     closeReport();
     el("listView").classList.add("hidden"); el("detailView").classList.remove("hidden"); el("companyDetail").innerHTML = `<div class="skeleton" style="height:420px;border-radius:0"></div>`;
     if (push) { const url = new URL(location.href); url.searchParams.set("company", id); url.searchParams.set("lang", lang); history.pushState({ company: id }, "", url); }
     window.scrollTo({ top: 0, behavior: "smooth" });
     try {
-      const response = await fetch(`${API_BASE}/api/public/marketplace/${encodeURIComponent(id)}`, { headers: { Accept: "application/json" } });
+      const response = await fetch(`${API_BASE}/api/public/marketplace/${encodeURIComponent(id)}`, { signal:requestSignal(), headers: { Accept: "application/json" } });
       const data = await response.json(); if (!response.ok || !data?.ok) throw new Error(data?.reason || "not_found");
+      if(ticket!==detailEpoch)return;
       el("companyDetail").innerHTML = detailMarkup(data.item);
     } catch (error) {
+      if(ticket!==detailEpoch)return;
       console.error("[Marketplace detail]", error);
       el("companyDetail").innerHTML = `<div class="emptyState"><div>⚠️</div><strong>${escapeHtml(copy.errorTitle)}</strong><p>${escapeHtml(copy.errorText)}</p></div>`;
     }
   }
 
   function closeDetail({ push = true } = {}) {
+    detailEpoch++;
     closeReport();
     el("detailView").classList.add("hidden"); el("listView").classList.remove("hidden");
     if (push) { const url = new URL(location.href); url.searchParams.delete("company"); url.searchParams.set("lang", lang); history.pushState({}, "", url); }
@@ -248,6 +262,7 @@
 
     try {
       const response = await fetch(`${API_BASE}/api/public/moderation/report`, {
+        signal:requestSignal(),
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({

@@ -1,4 +1,10 @@
 (function () {
+  function requestSignal(){
+    if(typeof AbortSignal.timeout === "function")return AbortSignal.timeout(15000);
+    const controller=new AbortController();
+    setTimeout(()=>controller.abort(),15000);
+    return controller.signal;
+  }
   "use strict";
   const platform = window.EduCashProPlatform;
   if (!platform?.isWeb?.()) return;
@@ -24,7 +30,7 @@
   const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const status = text => { const el=layer?.querySelector("[data-status]"); if(el) el.textContent=text; };
   async function request(path, options={}) {
-    const response = await fetch(API+path,{...options,headers:{"Content-Type":"application/json",Authorization:`Bearer ${session()?.token || ""}`,...options.headers},cache:"no-store"});
+    const response = await fetch(API+path,{signal:requestSignal(),...options,headers:{"Content-Type":"application/json",Authorization:`Bearer ${session()?.token || ""}`,...options.headers},cache:"no-store"});
     const text = await response.text(); let data; try{data=JSON.parse(text)}catch{data={message:text}}
     if(!response.ok || data?.ok===false) throw new Error(data?.message || data?.reason || data?.code || "request_failed");
     return data;

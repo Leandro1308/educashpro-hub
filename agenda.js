@@ -1334,12 +1334,18 @@ async function init() {
         location.assign("./");
         return;
       }
+      const sessionController = new AbortController();
+      const sessionTimer = setTimeout(()=>sessionController.abort(),15000);
+      let s;
+      try {
       const response = await fetch(`${API_BASE}/api/hub/session`, {
+          signal: sessionController.signal,
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ initData }),
-        }),
+        });
         s = await response.json();
+      } finally { clearTimeout(sessionTimer); }
       if (!s.token) throw Error("session_required");
       state.token = s.token;
       state.profile = s.profile;
