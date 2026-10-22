@@ -78,8 +78,10 @@
       linkTelegram: "Vincular Telegram",
       adminTitle: "Administração",
       total: "Usuários",
-      activeUsers: "Ativos",
-      inactiveUsers: "Inativos",
+      activeUsers: "Assinatura ativa",
+      inactiveUsers: "Assinatura inativa",
+      nonSubscriber: "Não assinante",
+      calculatedAt: "Apurado em",
       userMessages: "Mensagens dos usuários",
       readOnly: "Painel de consulta. Nenhuma função de pagamento ou ativação é executada aqui.",
       noPayment: "Pagamento e ativação continuam desativados nesta etapa.",
@@ -153,8 +155,10 @@
       linkTelegram: "Link Telegram",
       adminTitle: "Administration",
       total: "Users",
-      activeUsers: "Active",
-      inactiveUsers: "Inactive",
+      activeUsers: "Active subscription",
+      inactiveUsers: "Inactive subscription",
+      nonSubscriber: "Non-subscriber",
+      calculatedAt: "Calculated at",
       userMessages: "User messages",
       readOnly: "Read-only dashboard. No payment or subscription activation runs here.",
       noPayment: "Payment and activation remain disabled at this stage.",
@@ -224,8 +228,10 @@
       linkTelegram: "Vincular Telegram",
       adminTitle: "Administración",
       total: "Usuarios",
-      activeUsers: "Activos",
-      inactiveUsers: "Inactivos",
+      activeUsers: "Suscripción activa",
+      inactiveUsers: "Suscripción inactiva",
+      nonSubscriber: "No suscriptor",
+      calculatedAt: "Calculado el",
       userMessages: "Mensajes de usuarios",
       readOnly: "Panel de consulta. Aquí no se ejecutan pagos ni activaciones.",
       noPayment: "El pago y la activación siguen desactivados en esta etapa.",
@@ -299,8 +305,10 @@
       linkTelegram: "Привязать Telegram",
       adminTitle: "Администрирование",
       total: "Пользователи",
-      activeUsers: "Активные",
-      inactiveUsers: "Неактивные",
+      activeUsers: "Активная подписка",
+      inactiveUsers: "Неактивная подписка",
+      nonSubscriber: "Без подписки",
+      calculatedAt: "Рассчитано",
       userMessages: "Сообщения пользователей",
       readOnly: "Панель только для просмотра. Платежи и активации здесь не выполняются.",
       noPayment: "Платежи и активация на этом этапе остаются отключёнными.",
@@ -954,7 +962,7 @@
 
   async function openAdmin() {
     if (window.EduCashProPlatform?.isWeb?.() && !window.EduCashProAdminCenter?.open) {
-      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261006-admin-actions"); } catch {}
+      try { await window.EduCashProResources?.script?.("./admin-center.js?v=20261022-user-counts"); } catch {}
     }
     if (window.EduCashProAdminCenter?.open) {
       close();
@@ -975,7 +983,9 @@
             <div class="accountMetric"><small>${esc(t("total"))}</small><b>${Number(stats.total || 0)}</b></div>
             <div class="accountMetric"><small>${esc(t("activeUsers"))}</small><b>${Number(stats.active || 0)}</b></div>
             <div class="accountMetric"><small>${esc(t("inactiveUsers"))}</small><b>${Number(stats.inactive || 0)}</b></div>
+            <div class="accountMetric"><small>${esc(t("nonSubscriber"))}</small><b>${stats.nonSubscriber == null ? "—" : Number(stats.nonSubscriber)}</b></div>
           </div>
+          ${stats.calculatedAt ? `<p class="accountNote">${esc(t("calculatedAt"))}: ${esc(new Date(stats.calculatedAt).toLocaleString(lang()))}</p>` : ""}
           <button id="accountAdminMessages" class="accountSecondary" type="button">📨 ${esc(t("userMessages"))}</button>
           <button id="accountAdminIcon" class="accountSecondary" type="button">🖼️ ${esc(adminIconCopy().title)}</button>
           <p class="accountNote">${esc(t("readOnly"))}</p>
