@@ -15,7 +15,7 @@ for(const source of [manual,pt,en,es,ru])vm.runInNewContext(source,{window});
 const localizations=window.EduCashProGuideTranslations;
 assert(localizations,"Contextual guide translations not loaded");
 const keys=Object.keys(localizations.pt);
-assert.equal(keys.length,43);
+assert.equal(keys.length,36);
 for(const lang of ["pt","en","es","ru"]){
  const docs=localizations[lang];
  assert(docs,"Guide language missing: "+lang);
@@ -28,7 +28,7 @@ for(const lang of ["pt","en","es","ru"]){
    assert(entry[3].length>=15,lang+" "+id+" missing closing information");
  }
  const articles=window.EduCashProSupportManual.articles(lang);
- assert.equal(articles.length,15,lang+" manual coverage");
+ assert.equal(articles.length,14,lang+" manual coverage");
  assert(articles.every(x=>x.steps.length>=4&&x.title),lang+" old manual must remain intact");
 }
 const listeners={};const document={addEventListener:(n,fn)=>{listeners[n]=fn},documentElement:{lang:"pt"},body:null};
@@ -36,9 +36,9 @@ const sandbox={window,document,navigator:{language:"pt-BR"},location:{pathname:"
 vm.runInNewContext(guide,sandbox);
 const guides=window.EduCashProContextGuide;assert(guides?.open && guides?.close);
 const registryIDs=[...registry.matchAll(/\{ id:"([^"]+)", group:/g)].map(x=>x[1]);
-assert(registryIDs.length>=20);
+assert(registryIDs.includes("technical") && !registryIDs.includes("games"));
 for(const id of registryIDs){assert(guides.available(id),"Registry function has no guide: "+id)}
-for(const id of ["book-business-21","set-for-life","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","math-space","peg-solitaire","sliding-puzzle","word-search","math-academy","agenda-team","agenda-finance","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
+for(const id of ["book-business-21","set-for-life","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","agenda-team","agenda-finance","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
  assert(guides.available(id),"Public function has no instructions: "+id);
 }
 for(const path of [html,agenda,marketplace,affiliate,support,publish]){
@@ -50,7 +50,7 @@ assert(!guide.includes("fetch(")&&!guide.includes("/api/"),"Guidance must not ca
 assert(app.includes("renderCourseCategory")&&loader.includes("loadBookCourse"),"Guide update cannot remove the Academy course");
 assert(tools.includes('toolCard("receivables"')&&tools.includes('toolCard("quote"'),"Financial tools must remain intact");
 assert(en.length>5000&&es.length>5000&&ru.length>5000,"Guide translations must be static assets");
-console.log("EduCashPro guide audit OK:",registryIDs.length,"features;",keys.length,"detailed guides x 4 languages and 15 legacy help articles x 4; every entrypoint wired");
+console.log("EduCashPro guide audit OK:",registryIDs.length,"features;",keys.length,"detailed guides x 4 languages and 14 help articles x 4; every entrypoint wired");
 
  
 // Regression: navigating between functions must not create a modal.

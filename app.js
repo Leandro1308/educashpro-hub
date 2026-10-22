@@ -168,7 +168,7 @@
       included: [
         ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
         ["🔎", "Descoberta organizada", "Grupos, canais, bots, páginas e projetos selecionados."],
-        ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras, sorteadores e passatempos no celular."],
+        ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras e ferramentas financeiras no celular."],
         ["📅", "Organização profissional", "Agenda para atendimentos, reuniões, aulas, serviços e outros compromissos."],
         ["🎁", "Benefícios exclusivos", "Vantagens e parcerias disponibilizadas aos assinantes ativos."],
         ["❤️", "Minha Área", "Assinatura, credencial, suporte, comunidade, links e projetos reunidos no mesmo espaço."],
@@ -207,7 +207,7 @@
       included: [
         ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
         ["🔎", "Organized discovery", "Selected groups, channels, bots, pages and projects."],
-        ["🧰", "Digital tools", "Link page, Smart Link, calculators, randomizers and pastimes on mobile."],
+        ["🧰", "Digital tools", "Link page, Smart Link, calculators and finance tools on mobile."],
         ["📅", "Professional organization", "A schedule for appointments, meetings, classes, services and other commitments."],
         ["🎁", "Exclusive benefits", "Advantages and partnerships available to active subscribers."],
         ["❤️", "My Area", "Subscription, credential, support, community, links and projects in one place."],
@@ -246,7 +246,7 @@
       included: [
         ["🎓", "Aprendizaje práctico", "Educación financiera, Telegram, marketing de red y habilidades digitales."],
         ["🔎", "Descubrimiento organizado", "Grupos, canales, bots, páginas y proyectos seleccionados."],
-        ["🧰", "Herramientas digitales", "Página de enlaces, Enlace Inteligente, calculadoras, sorteos y juegos en el celular."],
+        ["🧰", "Herramientas digitales", "Página de enlaces, Enlace Inteligente, calculadoras y herramientas financieras en el celular."],
         ["📅", "Organización profesional", "Agenda para citas, reuniones, clases, servicios y otros compromisos."],
         ["🎁", "Beneficios exclusivos", "Ventajas y alianzas disponibles para suscriptores activos."],
         ["❤️", "Mi Área", "Suscripción, credencial, soporte, comunidad, enlaces y proyectos en un solo espacio."],
@@ -285,7 +285,7 @@
       included: [
         ["🎓", "Практическое обучение", "Финансовая грамотность, Telegram, сетевой маркетинг и цифровые навыки."],
         ["🔎", "Удобный каталог", "Отобранные группы, каналы, боты, страницы и проекты."],
-        ["🧰", "Цифровые инструменты", "Страница ссылок, умная ссылка, калькуляторы, жеребьёвки и игры в телефоне."],
+        ["🧰", "Цифровые инструменты", "Страница ссылок, умная ссылка, калькуляторы и финансовые инструменты в телефоне."],
         ["📅", "Рабочая организация", "Расписание приёмов, встреч, занятий, услуг и других дел."],
         ["🎁", "Эксклюзивные преимущества", "Преимущества и партнёрства для активных подписчиков."],
         ["❤️", "Мой раздел", "Подписка, подтверждение, поддержка, сообщество, ссылки и проекты в одном месте."],
@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.22.1";
+  const APP_RUNTIME_BUILD = "2026.10.22.2";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -711,7 +711,7 @@
   }
 
   const LAST_ROUTE_KEY = "educashpro:last-route:v1";
-  const RESTORABLE_VIEWS = new Set(["home", "learn", "explore", "benefits", "area", "tools", "course", "presentation"]);
+  const RESTORABLE_VIEWS = new Set(["home", "learn", "explore", "benefits", "area", "tools", "course", "analysis", "presentation"]);
   let currentRouteDetail = "";
   let routeScrollTimer = null;
 
@@ -783,7 +783,7 @@
       restoreRememberedScroll(route);
       return true;
     }
-    if (route.view === "learn" && route.detail === "technical_analysis") {
+    if (route.view === "analysis" || (route.view === "learn" && route.detail === "technical_analysis")) {
       await openMarkets();
       restoreRememberedScroll(route);
       return true;
@@ -859,7 +859,7 @@
       else window.setTimeout(run,0);
     };
     if (requestedCourse) { renderLearn(); deferRoute(()=>restoreRoute({view:"course",detail:requestedCourse})); }
-    else if (requestedAcademy === "technical_analysis") { renderLearn(); deferRoute(()=>openMarkets()); }
+    else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(params.get("tool")) || requestedAcademy === "technical_analysis") { deferRoute(()=>openMarkets()); }
     else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) { renderLearn(); deferRoute(()=>openAcademyCategory(requestedAcademy)); }
     else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") { renderBenefits(); deferRoute(()=>renderExclusiveBenefits()); }
     else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
@@ -880,6 +880,7 @@
   }
 
   function setView(view) {
+    if (view === "analysis") return openMarkets();
     window.__EDUCASHPRO_MARKETS_OPEN__ = false;
     stopBookTracking();
     if (!state.profile?.active && ["explore"].includes(view)) {
@@ -927,37 +928,31 @@
       es: ["Perfil Profesional", "Página, servicios, agenda y tarjeta digital"],
       ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
     }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
-    const gamesLabels = {
-      pt: ["Passatempo", "Atividades, campeonatos e sorteios para seus momentos livres"],
-      en: ["Pastime", "Activities, tournaments and raffles for your free time"],
-      es: ["Pasatiempo", "Actividades, campeonatos y sorteos para tus momentos libres"],
-      ru: ["Досуг", "Занятия, турниры и розыгрыши для свободного времени"],
-    }[state.language] || ["Jogos e desafios", "Jogue, crie campeonatos e organize sorteios"];
     const groups = ({
       pt: {
         learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
-        tools:["Ferramentas e jogos","Recursos práticos para aprender, organizar e interagir."],
+        tools:["Ferramentas","Recursos práticos para aprender, organizar e interagir."],
         presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
         discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
         account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
       },
       en: {
         learn:["Learn","Courses and content organized by topic."],
-        tools:["Tools and games","Practical resources to learn, organize and interact."],
+        tools:["Tools","Practical resources to learn, organize and interact."],
         presence:["Build your presence","Professional profile, schedule and digital presence in one place."],
         discover:["Explore and benefit","Discover projects, businesses and ecosystem benefits."],
         account:["Your account","Access support and continue managing your account in My Area."]
       },
       es: {
         learn:["Aprende","Cursos y contenidos organizados por tema."],
-        tools:["Herramientas y juegos","Recursos prácticos para aprender, organizar e interactuar."],
+        tools:["Herramientas","Recursos prácticos para aprender, organizar e interactuar."],
         presence:["Construye tu presencia","Perfil profesional, agenda y presencia digital en un solo lugar."],
         discover:["Explora y aprovecha","Descubre proyectos, empresas y beneficios del ecosistema."],
         account:["Tu cuenta","Accede al soporte y continúa gestionando tu cuenta en Mi Área."]
       },
       ru: {
         learn:["Обучение","Курсы и материалы по темам."],
-        tools:["Инструменты и игры","Практические ресурсы для обучения, организации и взаимодействия."],
+        tools:["Инструменты","Практические ресурсы для обучения, организации и взаимодействия."],
         presence:["Профессиональное присутствие","Профиль, запись и цифровое присутствие в одном месте."],
         discover:["Каталог и преимущества","Проекты, компании и преимущества экосистемы."],
         account:["Ваш аккаунт","Поддержка и управление аккаунтом в разделе «Мой раздел»."]
@@ -965,18 +960,17 @@
     })[state.language] || null;
     const g = groups || {
       learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
-      tools:["Ferramentas e jogos","Recursos práticos para aprender, organizar e interagir."],
+      tools:["Ferramentas","Recursos práticos para aprender, organizar e interagir."],
       presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
       discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
       account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
     };
 
     const learnCards = `
-      ${quickCard("learn", "🎓", p.active ? t("continueLearning") : t("courses"), t("coursesSub"), "academy")}
-      ${quickCard("course:analise_tecnica_completa", "📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Bolsa, Análise Técnica e Price Action", t("learnDesc"), "technical")}`;
+      ${quickCard("learn", "🎓", p.active ? t("continueLearning") : t("courses"), t("coursesSub"), "academy")}`;
     const toolCards = `
       ${quickCard("tools", "🧰", t("tools"), t("toolsSub"), "tools")}
-      ${quickCard("games", "🎮", gamesLabels[0], gamesLabels[1], "games")}`;
+      ${quickCard("analysis", "📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Análise Técnica", "Price Action · TradingView · Fibonacci", "technical")}`;
     const presenceCards = `
       ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1], "professional")}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"), "agenda")}`;
@@ -1009,14 +1003,7 @@
       if (target.startsWith("course:")) openCourse(target.split(":")[1]);
       else if (target === "professional") openAreaProfessional();
       else if (target === "tools") renderTools();
-      else if (target === "games") {
-        rememberRoute("tools", "games");
-        const ticket=window.EduCashProNavigation?.stamp?.();
-        window.EduCashProResources?.loadGames?.().then(() => {
-          if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket))return;
-          window.EduCashProMentalGames?.renderCatalog?.({ back: renderHome, lang: state.language });
-        }).catch(error=>{if(!window.EduCashProNavigation || window.EduCashProNavigation.isCurrent(ticket))handleError(error)});
-      }
+      else if (target === "analysis") void openMarkets();
       else if (target === "agenda") openAgenda();
       else if (target === "support") location.assign("./support.html");
       else setView(target);
@@ -1173,7 +1160,6 @@
         categories: [
           ["free_courses", "📘", "Continuar Aprendendo · Cursos Livres", "Cursos gratuitos com aulas sequenciais, exemplos e perguntas comentadas."],
           ["network_marketing", "🤝", "Marketing, Relacionamento e Afiliados", "Produto, comunicação, indicação, profissão afiliado e desenvolvimento de rede."],
-          ["technical_analysis", "📈", "Bolsa de Valores, Análise Técnica e Price Action", "Ações e índices, gráfico avançado, resumo técnico, mapa de calor, calendário econômico, tendências, Fibonacci e curso completo de Price Action."],
           ["financial_education", "💰", "Educação Financeira e Negócios", "Renda, organização financeira, negócios digitais e construção de novas fontes de renda."],
           ["telegram", "✈️", "Telegram Profissional", "Grupos, canais, bots, segurança, crescimento e monetização responsável."],
           ["tools", "🧮", "Ferramentas", "Calculadoras, simuladores e recursos educativos."],
@@ -1185,7 +1171,6 @@
         categories: [
           ["free_courses", "📘", "Continue Learning · Free Courses", "Free courses with sequential lessons, examples and explained questions."],
           ["network_marketing", "🤝", "Marketing, Relationships and Affiliates", "Product, communication, referrals, affiliate work and network development."],
-          ["technical_analysis", "📈", "Stocks, Technical Analysis and Price Action", "Stocks and indices, advanced charts, technical summary, heatmap, economic calendar, trends, Fibonacci and the full Price Action course."],
           ["financial_education", "💰", "Financial Education and Business", "Income, financial organization, digital business and new income sources."],
           ["telegram", "✈️", "Professional Telegram", "Groups, channels, bots, safety, growth and responsible monetization."],
           ["tools", "🧮", "Tools", "Calculators, simulators and educational resources."],
@@ -1197,7 +1182,6 @@
         categories: [
           ["free_courses", "📘", "Seguir Aprendiendo · Cursos Gratuitos", "Cursos gratuitos con lecciones, ejemplos y preguntas comentadas."],
           ["network_marketing", "🤝", "Marketing, Relaciones y Afiliados", "Producto, comunicación, indicación, profesión afiliado y desarrollo de red."],
-          ["technical_analysis", "📈", "Bolsa, Análisis Técnico y Price Action", "Acciones e índices, gráfico avanzado, resumen técnico, mapa de calor, calendario económico, tendencias, Fibonacci y curso completo de Price Action."],
           ["financial_education", "💰", "Educación Financiera y Negocios", "Ingresos, organización financiera, negocios digitales y nuevas fuentes de ingresos."],
           ["telegram", "✈️", "Telegram Profesional", "Grupos, canales, bots, seguridad, crecimiento y monetización responsable."],
           ["tools", "🧮", "Herramientas", "Calculadoras, simuladores y recursos educativos."],
@@ -1209,7 +1193,6 @@
         categories: [
           ["free_courses", "📘", "Продолжить обучение · Бесплатные курсы", "Бесплатные курсы с последовательными уроками, примерами и пояснениями."],
           ["network_marketing", "🤝", "Маркетинг, отношения и партнёрство", "Продукт, коммуникация, рекомендации, работа партнёра и развитие сети."],
-          ["technical_analysis", "📈", "Акции, технический анализ и Price Action", "Акции и индексы, расширенный график, техническая сводка, тепловая карта, экономический календарь, тренды, Фибоначчи и полный курс Price Action."],
           ["financial_education", "💰", "Финансовая грамотность и бизнес", "Доход, финансовая организация, цифровой бизнес и новые источники дохода."],
           ["telegram", "✈️", "Профессиональный Telegram", "Группы, каналы, боты, безопасность, рост и ответственная монетизация."],
           ["tools", "🧮", "Инструменты", "Калькуляторы, симуляторы и образовательные ресурсы."],
@@ -1255,11 +1238,12 @@
   }
 
   async function openMarkets() {
-    rememberRoute("learn","technical_analysis");
+    stopBookTracking();
+    rememberRoute("analysis");
     const marketTicket=window.EduCashProNavigation?.stamp?.();
     syncExternalSession();
-    state.view = "learn";
-    rememberRoute("learn", "technical_analysis");
+    state.view = "analysis";
+    rememberRoute("analysis");
     updateNav();
     content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Análise Técnica e Price Action");
     const accessPromise=Promise.resolve(window.EduCashProAccess?.refresh?.()).catch(()=>null);
@@ -1282,7 +1266,7 @@
     await marketsPromise;
     if(window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(marketTicket))return;
     const active = window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true;
-    return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderLearn,openCourse,openUrl,subscribe:subscribeNow});
+    return window.EduCashProMarkets?.render?.({language:state.language,active,back:renderHome,openCourse,openUrl,subscribe:subscribeNow});
   }
 
   async function openAcademyCategory(category) {
@@ -1412,7 +1396,7 @@
     const themeClass = course.theme === "exness" ? " technicalCourse" : "";
     const readerCopy={pt:["Leitura contínua","Começar leitura","Continuar leitura"],en:["Continuous reading","Start reading","Continue reading"],es:["Lectura continua","Comenzar lectura","Continuar lectura"],ru:["Непрерывное чтение","Начать чтение","Продолжить чтение"]}[state.language]||["Leitura contínua","Começar leitura","Continuar leitura"];
     content.innerHTML = `<div class="${themeClass.trim()}"><button id="courseBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="courseHero">${cover}<span class="eyebrow">${escapeHtml(readerCopy[0])}</span><h2>${escapeHtml(course.title)}</h2><div class="lessonBody">${course.home}</div>${visual}<div class="progressTrack"><span style="width:${percent}%"></span><button id="openBookReader" class="wideButton bookStart">${escapeHtml(percent?readerCopy[2]:readerCopy[1])} →</button>${calculatorButton}</section><div class="sectionHead"><div><h2>${escapeHtml(t("chapters"))}</h2></div></div><div class="cardList">${course.chapters.map((ch) => `<article class="chapter"><button data-reader-chapter="${ch.id}"><span>${escapeHtml(ch.title)}</span><span>›</span></button></article>`).join("")}</div>${course.books?.length ? `<div class="sectionHead"><div><h2>${escapeHtml(t("books"))}</h2></div></div><div class="cardList">${course.books.map((book) => `<button class="secondaryButton" data-book="${escapeHtml(book.url)}">${escapeHtml(book.text)}</button>`).join("")}</div>` : ""}${renderCoursePartnerCta(course)}</div>`;
-    document.getElementById("courseBack").onclick = renderLearn;
+    document.getElementById("courseBack").onclick = course.id === "analise_tecnica_completa" ? openMarkets : renderLearn;
     document.getElementById("openBookReader").onclick=()=>renderBookReader(completed);
     content.querySelectorAll("[data-reader-chapter]").forEach((button) => button.onclick = () => renderBookReader(Math.max(0,course.lessons.findIndex(lesson=>Number(lesson.ch)===Number(button.dataset.readerChapter)))));
     content.querySelectorAll("[data-book]").forEach((button) => button.onclick = () => openUrl(button.dataset.book));
@@ -1430,7 +1414,7 @@
     const sections=grouped.map(group=>`<section class="bookChapter" id="book-chapter-${group.chapter.id}" data-book-index="${group.lessons[0].index}"><span class="bookChapterLabel">${escapeHtml(t("chapters"))} ${escapeHtml(group.chapter.id)}</span><h2>${escapeHtml(String(group.chapter.title).replace(/^\s*\d+[.)-]?\s*/,""))}</h2>${group.lessons.map(lesson=>`<div class="lessonBody">${cleanLessonBody(lesson.body,group.chapter.title)}</div>`).join("")}</section>`).join("");
     content.innerHTML=`<div class="bookReader ${readerTheme}" style="--reader-font:${fontSize}px"><header class="bookReaderBar"><button id="bookBack" aria-label="${escapeHtml(copy.back)}">←</button><strong>${escapeHtml(course.title)}</strong><button id="readerTheme" class="readerThemeDot" aria-label="${escapeHtml(readerTheme==="dark"?copy.light:copy.dark)}" title="${escapeHtml(readerTheme==="dark"?copy.light:copy.dark)}"></button><span id="bookProgress">0%</span></header><details class="bookContents"><summary>☰ ${escapeHtml(copy.contents)}</summary><nav>${grouped.map(group=>`<button data-book-target="book-chapter-${group.chapter.id}">${escapeHtml(group.chapter.title)}</button>`).join("")}</nav></details><div class="bookFontControls"><button id="readerSmaller" class="secondaryButton" aria-label="${escapeHtml(copy.smaller)}">A−</button><button id="readerLarger" class="secondaryButton" aria-label="${escapeHtml(copy.larger)}">A+</button></div><article class="bookPage">${sections}<footer class="bookEnd"><b>✓ ${escapeHtml(copy.finished)}</b><button id="bookFinish" class="wideButton">${escapeHtml(copy.next)}</button></footer></article></div>`;
     const setFont=value=>{const next=Math.max(15,Math.min(23,value));localStorage.setItem("educashpro:reader-font",String(next));document.querySelector(".bookReader")?.style.setProperty("--reader-font",`${next}px`)};
-    document.getElementById("bookBack").onclick=renderCourseIndex;document.getElementById("readerSmaller").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)-1);document.getElementById("readerLarger").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)+1);document.getElementById("bookFinish").onclick=renderLearn;
+    document.getElementById("bookBack").onclick=renderCourseIndex;document.getElementById("readerSmaller").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)-1);document.getElementById("readerLarger").onclick=()=>setFont(Number(localStorage.getItem("educashpro:reader-font")||fontSize)+1);document.getElementById("bookFinish").onclick=course.id === "analise_tecnica_completa" ? openMarkets : renderLearn;
     document.getElementById("readerTheme").onclick=()=>{const reader=document.querySelector(".bookReader"),dark=!reader.classList.contains("dark");reader.classList.toggle("dark",dark);reader.classList.toggle("light",!dark);localStorage.setItem("educashpro:reader-theme",dark?"dark":"light");const button=document.getElementById("readerTheme"),label=dark?copy.light:copy.dark;button.setAttribute("aria-label",label);button.title=label};
     document.querySelectorAll("[data-book-target]").forEach(button=>button.onclick=()=>{document.getElementById(button.dataset.bookTarget)?.scrollIntoView({behavior:"smooth"});document.querySelector(".bookContents")?.removeAttribute("open")});
     const chapters=[...document.querySelectorAll(".bookChapter")],update=()=>{const root=document.documentElement,max=Math.max(1,root.scrollHeight-innerHeight),percent=Math.max(0,Math.min(100,Math.round(scrollY/max*100)));localStorage.setItem(`educashpro:course-percent:${course.id}`,String(percent));document.getElementById("bookProgress").textContent=`${percent}%`;let current=0;chapters.forEach(section=>{if(section.getBoundingClientRect().top<innerHeight*.45)current=Number(section.dataset.bookIndex||0)});saveProgress(course.id,current)};
@@ -2402,10 +2386,10 @@
     state.language = ["pt", "en", "es", "ru"].includes(browserLanguage) ? browserLanguage : "pt";
     applyLanguage();
     const copies = {
-      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Passatempo", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
-      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Pastime", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
-      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Pasatiempo", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo.", "Marketplace", "Encuentra empresas, beneficios y proyectos.", "Abrir App en Telegram", "Accede a EduCashPro directamente en Telegram.", "Credencial del suscriptor", "Muestra este QR a la tienda acreditada.", "Escanear QR", "Abre la cámara y comprueba titular, estado y validez."],
-      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Досуг", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
+      pt: ["Conhecimento, ferramentas e oportunidades em um só lugar.", "Acesse cursos, recursos para negócios, benefícios, projetos e sua conta pelo site ou pelo Telegram.", "Aprenda", "Conteúdos organizados por tema.", "Utilize", "Ferramentas gratuitas no celular.", "Aproveite", "Benefícios e parceiros avaliados.", "Entrar no canal gratuito", "Use o site ou abra o bot do EduCashPro no Telegram. Sua conta e sua indicação permanecem vinculadas entre os dois ambientes.", "Análise Técnica", "Treine atenção e raciocínio lógico.", "Conectar outro dispositivo", "Digite neste celular o código exibido no outro aparelho.", "Marketplace", "Encontre empresas, benefícios e projetos.", "Abrir App no Telegram", "Acesse o EduCashPro diretamente no Telegram.", "Credencial do assinante", "Mostre este QR Code à loja credenciada.", "Escanear QR Code", "Abra a câmera e confira titular, status e validade."],
+      en: ["Knowledge, tools and opportunities in one place.", "Access courses, business resources, benefits, projects and your account on the website or in Telegram.", "Learn", "Content organized by topic.", "Use", "Free tools on your phone.", "Benefit", "Reviewed benefits and partners.", "Join the free channel", "Use the website or open the EduCashPro bot in Telegram. Your account and referral remain connected across both environments.", "Technical Analysis", "Train attention and logical thinking.", "Connect another device", "Enter on this phone the code shown on the other device.", "Marketplace", "Find businesses, benefits and projects.", "Open App in Telegram", "Access EduCashPro directly in Telegram.", "Subscriber credential", "Show this QR Code to the accredited store.", "Scan QR Code", "Open the camera and check holder, status and validity."],
+      es: ["Conocimiento, herramientas y oportunidades en un solo lugar.", "Accede a cursos, recursos para negocios, beneficios, proyectos y tu cuenta desde el sitio o Telegram.", "Aprende", "Contenido organizado por tema.", "Utiliza", "Herramientas gratuitas en tu celular.", "Aprovecha", "Beneficios y socios evaluados.", "Entrar al canal gratuito", "Usa el sitio o abre el bot de EduCashPro en Telegram. Tu cuenta y tu indicación permanecen vinculadas en ambos entornos.", "Análisis Técnico", "Entrena atención y pensamiento lógico.", "Conectar otro dispositivo", "Introduce en este móvil el código mostrado en el otro dispositivo.", "Marketplace", "Encuentra empresas, beneficios y proyectos.", "Abrir App en Telegram", "Accede a EduCashPro directamente en Telegram.", "Credencial del suscriptor", "Muestra este QR a la tienda acreditada.", "Escanear QR", "Abre la cámara y comprueba titular, estado y validez."],
+      ru: ["Знания, инструменты и возможности в одном месте.", "Открывайте курсы, бизнес-инструменты, преимущества, проекты и свой аккаунт на сайте или в Telegram.", "Учитесь", "Материалы по темам.", "Используйте", "Бесплатные инструменты в телефоне.", "Получайте", "Проверенные преимущества и партнёры.", "Войти в бесплатный канал", "Используйте сайт или бот EduCashPro в Telegram. Аккаунт и партнёрская ссылка остаются связанными в обеих средах.", "Технический анализ", "Развивайте внимание и логику.", "Подключить другое устройство", "Введите на этом телефоне код с другого устройства.", "Маркетплейс", "Компании, преимущества и проекты.", "Открыть приложение в Telegram", "Откройте EduCashPro прямо в Telegram.", "Карта подписчика", "Покажите этот QR-код магазину-партнёру.", "Сканировать QR-код", "Откройте камеру и проверьте владельца, статус и срок действия."],
     };
     const value = copies[browserLanguage] || copies.pt;
     const entryCopy = ({
@@ -2494,10 +2478,6 @@
     const scheduleContractConfig = () => void loadPublicContractConfig();
     if (window.EduCashProResources?.idle) window.EduCashProResources.idle(scheduleContractConfig, 1500);
     else window.setTimeout(scheduleContractConfig, 1100);
-    if (!tg?.initData && (publicParams.get("game") || publicParams.get("raffle"))) {
-      await window.EduCashProResources?.loadGames?.();
-      if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) { markAppReady("public-game"); return; }
-    }
     const credentialToVerify = publicParams.get("credential");
     if (credentialToVerify) { await verifyMembershipCredential(credentialToVerify, publicParams.get("lang")); markAppReady("credential"); return; }
     document.getElementById("closeButton").onclick = () => tg?.close?.();
@@ -2557,11 +2537,6 @@
         window.EduCashProResources?.idle?.(() => void checkForUpdates(), 9000);
         return;
       }
-      if (publicParams.get("game") || publicParams.get("tournament") || publicParams.get("raffle")) {
-        await window.EduCashProResources?.loadGames?.();
-        window.EduCashProMentalGames?.setSession?.(session);
-        if (await window.EduCashProMentalGames?.bootPublic?.(publicParams)) { markAppReady("authenticated-game"); return; }
-      }
       const receivedCredential = String(session.membershipCredential || "");
       const cachedCredential = String(localStorage.getItem("educashpro:membership-credential") || "");
       const receivedPayload = decodeCredential(receivedCredential);
@@ -2585,7 +2560,7 @@
       const requestedView = String(publicParams.get("view") || "");
       const requestedSection = String(publicParams.get("section") || "");
       if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
-      else if (requestedAcademy === "technical_analysis") await openMarkets();
+      else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(publicParams.get("tool")) || requestedAcademy === "technical_analysis") await openMarkets();
       else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
       else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
       else if (requestedView === "benefits" && requestedSection === "partner-stores") location.assign("./marketplace.html");
@@ -2645,7 +2620,7 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") flushRememberedRoute();
   });
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openMarkets, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
   window.EduCashProNavigation?.configure?.(restoreRoute);
   window.addEventListener("educashpro:web-hub-ready",()=>{
     tg=window.Telegram?.WebApp||tg;
