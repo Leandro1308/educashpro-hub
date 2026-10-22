@@ -456,7 +456,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.22.4";
+  const APP_RUNTIME_BUILD = "2026.10.22.5";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -967,10 +967,10 @@
     };
 
     const learnCards = `
-      ${quickCard("learn", "🎓", p.active ? t("continueLearning") : t("courses"), t("coursesSub"), "academy")}`;
+      ${quickCard("learn", "🎓", p.active ? t("continueLearning") : t("courses"), t("coursesSub"), "academy")}
+      ${quickCard("analysis", "📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Profissão Trader: Como Ganhar na Bolsa de Valores", "Price Action · TradingView · Fibonacci", "technical")}`;
     const toolCards = `
-      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"), "tools")}
-      ${quickCard("analysis", "📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Análise Técnica", "Price Action · TradingView · Fibonacci", "technical")}`;
+      ${quickCard("tools", "🧰", t("tools"), t("toolsSub"), "tools")}`;
     const presenceCards = `
       ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1], "professional")}
       ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"), "agenda")}`;
@@ -1245,7 +1245,7 @@
     state.view = "analysis";
     rememberRoute("analysis");
     updateNav();
-    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Análise Técnica e Price Action");
+    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Profissão Trader: Como Ganhar na Bolsa de Valores");
     const accessPromise=Promise.resolve(window.EduCashProAccess?.refresh?.()).catch(()=>null);
     const marketsPromise=window.EduCashProResources?.loadMarkets?.();
     try {

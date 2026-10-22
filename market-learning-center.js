@@ -41,7 +41,7 @@
 
   const COPY = {
     pt: {
-      title: "Bolsa de Valores, Análise Técnica e Price Action",
+      title: "Profissão Trader: Como Ganhar na Bolsa de Valores",
       intro: "Ações, índices, Forex, ouro e cripto em uma central de análise com gráfico, indicadores, calendário, visão de mercados e formação em Price Action.",
       tools: "Análise de mercado",
       toolsSub: "Use as ferramentas de Bolsa e análise técnica. No gráfico e na tendência, escolha livremente o ativo e o período; as demais abas ampliam a leitura do mercado.",
@@ -129,7 +129,7 @@
       back: "Voltar à Academy"
     },
     en: {
-      title: "Stocks, Technical Analysis and Price Action",
+      title: "Trading as a Career: How to Make Money in the Stock Market",
       intro: "Stocks, indices, Forex, gold and crypto in one analysis center with charts, indicators, calendar, market overview and Price Action training.",
       tools: "Market analysis",
       toolsSub: "Use the stock-market and technical-analysis tools. Choose any asset and timeframe in the chart and trend; the other tabs broaden the market view.",
@@ -196,7 +196,7 @@
       back: "Back to Academy"
     },
     es: {
-      title: "Bolsa, Análisis Técnico y Price Action",
+      title: "Profesión Trader: Cómo Ganar en la Bolsa de Valores",
       intro: "Acciones, índices, Forex, oro y cripto en un centro de análisis con gráficos, indicadores, calendario, visión de mercados y formación en Price Action.",
       tools: "Análisis de mercado",
       toolsSub: "Usa las herramientas de Bolsa y análisis técnico. En el gráfico y la tendencia, elige libremente el activo y el período; las demás pestañas amplían la lectura del mercado.",
@@ -263,7 +263,7 @@
       back: "Volver a Academy"
     },
     ru: {
-      title: "Акции, технический анализ и Price Action",
+      title: "Профессия трейдер: как зарабатывать на фондовом рынке",
       intro: "Акции, индексы, Forex, золото и крипто в одном центре анализа с графиками, индикаторами, календарём, обзором рынков и обучением Price Action.",
       tools: "Анализ рынка",
       toolsSub: "Используйте инструменты фондового рынка и технического анализа. На графике и в тенденции можно выбрать актив и период; остальные вкладки расширяют обзор рынка.",

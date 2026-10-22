@@ -70,7 +70,7 @@ assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("https://on
 assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js")&&marketCenter.includes("embed-widget-market-overview.js"),"TradingView widgets are incomplete");
-assert(app.includes('quickCard("analysis"')&&marketCenter.includes("Bolsa de Valores, Análise Técnica e Price Action"),"Stock market, technical analysis and Price Action entry is missing");
+assert(app.includes('quickCard("analysis"')&&marketCenter.includes("Profissão Trader: Como Ganhar na Bolsa de Valores"),"Stock market, technical analysis and Price Action entry is missing");
 assert(technicalCourse.includes('title: "Análise Técnica e Price Action"'),"Technical Analysis and Price Action course is missing");
 assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
 assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
