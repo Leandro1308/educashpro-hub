@@ -415,14 +415,15 @@
     const style = document.createElement("style");
     style.id = "marketDirectionStyles";
     style.textContent = `
-      .marketExnessInvite{margin:22px 0;text-align:center}
-      .marketExnessInvite>small{display:block;margin-bottom:9px;color:#9db0c6;font-size:10px;font-weight:800;letter-spacing:.08em}
-      .marketCenter .marketExnessCta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-sizing:border-box;width:100%;min-height:92px;padding:20px 16px;border:2px solid #30e6a6;border-radius:18px;background:#0c1d29;color:#f7fbff;cursor:pointer;text-align:center;white-space:normal;animation:marketExnessGlow 6s ease-in-out infinite alternate}
+      .marketExnessInvite{margin:28px 0 30px;text-align:center;padding:0 3px}
+      .marketExnessInvite>small{display:block;margin-bottom:12px;color:#b3c6d5;font-size:10px;font-weight:800;letter-spacing:.08em}
+      .marketCenter .marketExnessCta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-sizing:border-box;width:100%;min-height:96px;padding:22px 16px;border:2px solid #c4e5c6;border-radius:18px;background:linear-gradient(120deg,#bce9d2 0%,#d7ebcc 52%,#efe9bb 100%);color:#102a32;box-shadow:0 6px 0 #6a9c86,0 14px 30px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.72);cursor:pointer;text-align:center;white-space:normal;transform-origin:center;animation:marketExnessGlow 6s ease-in-out infinite alternate,marketExnessPulse 4.8s ease-in-out infinite}
       .marketExnessCta strong{font-size:clamp(16px,4.4vw,22px);font-weight:900;line-height:1.3;letter-spacing:.025em;overflow-wrap:anywhere}
-      .marketExnessCta small{color:#d5e1ed;font-size:13px;font-weight:500;line-height:1.5;text-transform:none;letter-spacing:normal}
-      .marketExnessCta:hover{background:#102635}.marketExnessCta:focus-visible{outline:3px solid #fff;outline-offset:5px}
-      @keyframes marketExnessGlow{from{border-color:#30e6a6;box-shadow:0 0 10px rgba(48,230,166,.14),inset 0 0 8px rgba(48,230,166,.04)}to{border-color:#ffda45;box-shadow:0 0 17px rgba(255,218,69,.22),inset 0 0 10px rgba(255,218,69,.06)}}
-      @media(prefers-reduced-motion:reduce){.marketCenter .marketExnessCta{animation:none}}
+      .marketExnessCta small{color:#29464b;font-size:13px;font-weight:600;line-height:1.5;text-transform:none;letter-spacing:normal}
+      .marketExnessCta:hover{filter:brightness(1.035)}.marketExnessCta:focus-visible{outline:3px solid #fff;outline-offset:5px;animation:none}.marketExnessCta:active{animation:none;transform:translateY(3px) scale(.995);box-shadow:0 3px 0 #6a9c86,0 7px 18px rgba(0,0,0,.22)}
+      @keyframes marketExnessGlow{from{border-color:#b4ddc1;box-shadow:0 6px 0 #6a9c86,0 14px 30px rgba(0,0,0,.24),0 0 14px rgba(186,232,202,.16),inset 0 1px 0 rgba(255,255,255,.72)}to{border-color:#e4d9a3;box-shadow:0 6px 0 #6a9c86,0 14px 30px rgba(0,0,0,.24),0 0 18px rgba(239,233,187,.22),inset 0 1px 0 rgba(255,255,255,.72)}}
+      @keyframes marketExnessPulse{0%,32%,72%,100%{transform:translateY(0) scale(1)}44%{transform:translateY(-3px) scale(1.018)}56%{transform:translateY(0) scale(1)}64%{transform:translateY(-1px) scale(1.008)}}
+      @media(prefers-reduced-motion:reduce){.marketCenter .marketExnessCta{animation:none;transform:none}}
 
       .marketDirectionPanel{display:grid;gap:12px;margin-bottom:12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#0a1728}
       .marketDirectionTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
