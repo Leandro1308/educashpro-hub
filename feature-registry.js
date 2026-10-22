@@ -1,7 +1,7 @@
 (function () {
   const features = [
     { id:"academy", group:"learn", access:"mixed", icon:"🎓", label:{pt:"Academy",en:"Academy",es:"Academy",ru:"Academy"} },
-    { id:"technical", group:"tools", access:"free", icon:"📈", label:{pt:"Bolsa, Análise Técnica e Price Action",en:"Markets, Technical Analysis and Price Action",es:"Bolsa, Análisis Técnico y Price Action",ru:"Рынки, теханализ и Price Action"} },
+    { id:"technical", group:"learn", access:"free", icon:"📈", label:{"pt":"Profissão Trader: Como Ganhar na Bolsa de Valores","en":"Trading as a Career: How to Make Money in the Stock Market","es":"Profesión Trader: Cómo Ganar en la Bolsa de Valores","ru":"Профессия трейдер: как зарабатывать на фондовом рынке"} },
     { id:"financial", group:"learn", access:"mixed", icon:"💰", label:{pt:"Educação Financeira e Negócios",en:"Financial Education and Business",es:"Educación Financiera y Negocios",ru:"Финансовое образование и бизнес"} },
     { id:"telegram", group:"learn", access:"subscriber", icon:"✈️", label:{pt:"Telegram Profissional",en:"Professional Telegram",es:"Telegram Profesional",ru:"Профессиональный Telegram"} },
     { id:"tools", group:"tools", access:"mixed", icon:"🧰", label:{pt:"Ferramentas",en:"Tools",es:"Herramientas",ru:"Инструменты"} },
