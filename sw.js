@@ -1,4 +1,4 @@
-const BUILD="2026.10.22.2";
+const BUILD="2026.10.22.3";
 
 self.addEventListener("install",()=>self.skipWaiting());
 
@@ -19,4 +19,5 @@ self.addEventListener("message",event=>{
 // Intencionalmente não há listener de fetch.
 // Navegações e assets seguem o cache HTTP normal do navegador, evitando
 // páginas antigas, revalidações duplicadas e recarregamentos forçados.
+
 

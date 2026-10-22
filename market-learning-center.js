@@ -3,7 +3,7 @@
 
   const TRADINGVIEW_AFFILIATE = "https://br.tradingview.com/?aff_id=170669";
   const TRADINGVIEW_PRICING = "https://br.tradingview.com/pricing/?aff_id=170669";
-  const EXNESS_AFFILIATE = "https://one.exnessonelink.com/a/93bgo7jpfo/?campaign=43340";
+  const EXNESS_AFFILIATE = "https://one.exnessonelink.com/a/93bgo7jpfo?source=app";
   const VIDEO_COURSE = "https://t.me/boost?c=3706880680";
   const BINANCE_MARKET_DATA = "https://data-api.binance.vision/api/v3/klines";
   const BINANCE_24H_DATA = "https://data-api.binance.vision/api/v3/ticker/24hr";
@@ -123,6 +123,9 @@
       exness: "Praticar na Exness",
       exnessText: "Abra sua conta pelo link do parceiro e comece pela conta demonstrativa.",
       register: "Abrir Exness",
+      registerCta: "CADASTRE-SE GRÁTIS",
+      demoCredits: "Receba créditos ilimitados para treinar",
+      demoAccount: "EXNESS · CONTA DEMONSTRATIVA",
       back: "Voltar à Academy"
     },
     en: {
@@ -187,6 +190,9 @@
       exness: "Practice with Exness",
       exnessText: "Open an account through the partner link and begin with a Demo account.",
       register: "Open Exness",
+      registerCta: "SIGN UP FREE",
+      demoCredits: "Get unlimited credits to practice",
+      demoAccount: "EXNESS · DEMO ACCOUNT",
       back: "Back to Academy"
     },
     es: {
@@ -251,6 +257,9 @@
       exness: "Practicar en Exness",
       exnessText: "Abre una cuenta mediante el enlace de socio y comienza con una cuenta Demo.",
       register: "Abrir Exness",
+      registerCta: "REGÍSTRATE GRATIS",
+      demoCredits: "Recibe créditos ilimitados para practicar",
+      demoAccount: "EXNESS · CUENTA DEMOSTRATIVA",
       back: "Volver a Academy"
     },
     ru: {
@@ -315,6 +324,9 @@
       exness: "Практика в Exness",
       exnessText: "Откройте счёт по партнёрской ссылке и начните с демо-счёта.",
       register: "Открыть Exness",
+      registerCta: "ЗАРЕГИСТРИРОВАТЬСЯ БЕСПЛАТНО",
+      demoCredits: "Получите неограниченные учебные средства для практики",
+      demoAccount: "EXNESS · ДЕМОСЧЁТ",
       back: "Назад в Academy"
     }
   };
@@ -403,6 +415,15 @@
     const style = document.createElement("style");
     style.id = "marketDirectionStyles";
     style.textContent = `
+      .marketExnessInvite{margin:22px 0;text-align:center}
+      .marketExnessInvite>small{display:block;margin-bottom:9px;color:#9db0c6;font-size:10px;font-weight:800;letter-spacing:.08em}
+      .marketCenter .marketExnessCta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-sizing:border-box;width:100%;min-height:92px;padding:20px 16px;border:2px solid #30e6a6;border-radius:18px;background:#0c1d29;color:#f7fbff;cursor:pointer;text-align:center;white-space:normal;animation:marketExnessGlow 6s ease-in-out infinite alternate}
+      .marketExnessCta strong{font-size:clamp(16px,4.4vw,22px);font-weight:900;line-height:1.3;letter-spacing:.025em;overflow-wrap:anywhere}
+      .marketExnessCta small{color:#d5e1ed;font-size:13px;font-weight:500;line-height:1.5;text-transform:none;letter-spacing:normal}
+      .marketExnessCta:hover{background:#102635}.marketExnessCta:focus-visible{outline:3px solid #fff;outline-offset:5px}
+      @keyframes marketExnessGlow{from{border-color:#30e6a6;box-shadow:0 0 10px rgba(48,230,166,.14),inset 0 0 8px rgba(48,230,166,.04)}to{border-color:#ffda45;box-shadow:0 0 17px rgba(255,218,69,.22),inset 0 0 10px rgba(255,218,69,.06)}}
+      @media(prefers-reduced-motion:reduce){.marketCenter .marketExnessCta{animation:none}}
+
       .marketDirectionPanel{display:grid;gap:12px;margin-bottom:12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:#0a1728}
       .marketDirectionTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
       .marketDirectionTop strong{font-size:14px}.marketDirectionTop button{min-height:34px;padding:6px 10px;border:1px solid rgba(48,230,166,.35);border-radius:10px;color:#30e6a6;background:rgba(48,230,166,.08);font-size:11px;font-weight:900}
@@ -1029,6 +1050,10 @@
         </div>
         <div id="marketWidget" class="marketWidget"></div>
       </section>
+      <div class="marketExnessInvite">
+        <small>${esc(copy.demoAccount)}</small>
+        <button type="button" class="marketExnessCta" data-url="${esc(EXNESS_AFFILIATE)}"><strong>${esc(copy.registerCta)}</strong><small>${esc(copy.demoCredits)}</small></button>
+      </div>
       <section class="marketSection">
         <header><h2>${esc(copy.education)}</h2><p>${esc(copy.educationSub)}</p></header>
         <div class="marketCourseGrid">
@@ -1069,4 +1094,5 @@
 
   window.EduCashProMarkets = { render };
 })();
+
 
