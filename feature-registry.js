@@ -1,12 +1,11 @@
 (function () {
   const features = [
     { id:"academy", group:"learn", access:"mixed", icon:"🎓", label:{pt:"Academy",en:"Academy",es:"Academy",ru:"Academy"} },
-    { id:"technical", group:"learn", access:"free", icon:"📈", label:{pt:"Bolsa, Análise Técnica e Price Action",en:"Markets, Technical Analysis and Price Action",es:"Bolsa, Análisis Técnico y Price Action",ru:"Рынки, теханализ и Price Action"} },
+    { id:"technical", group:"tools", access:"free", icon:"📈", label:{pt:"Bolsa, Análise Técnica e Price Action",en:"Markets, Technical Analysis and Price Action",es:"Bolsa, Análisis Técnico y Price Action",ru:"Рынки, теханализ и Price Action"} },
     { id:"financial", group:"learn", access:"mixed", icon:"💰", label:{pt:"Educação Financeira e Negócios",en:"Financial Education and Business",es:"Educación Financiera y Negocios",ru:"Финансовое образование и бизнес"} },
     { id:"telegram", group:"learn", access:"subscriber", icon:"✈️", label:{pt:"Telegram Profissional",en:"Professional Telegram",es:"Telegram Profesional",ru:"Профессиональный Telegram"} },
     { id:"tools", group:"tools", access:"mixed", icon:"🧰", label:{pt:"Ferramentas",en:"Tools",es:"Herramientas",ru:"Инструменты"} },
     { id:"finance-control", group:"tools", access:"subscriber", icon:"📒", label:{pt:"Controle Financeiro Mensal",en:"Monthly Finance Control",es:"Control Financiero Mensual",ru:"Ежемесячный финансовый контроль"} },
-    { id:"games", group:"play", access:"mixed", icon:"🎮", label:{pt:"Jogos e desafios",en:"Games and challenges",es:"Juegos y desafíos",ru:"Игры и задания"} },
     { id:"explore", group:"discover", access:"mixed", icon:"🔎", label:{pt:"Explorar projetos",en:"Explore projects",es:"Explorar proyectos",ru:"Каталог проектов"} },
     { id:"benefits", group:"benefits", access:"mixed", icon:"🎁", label:{pt:"Benefícios",en:"Benefits",es:"Beneficios",ru:"Преимущества"} },
     { id:"marketplace", group:"benefits", access:"free", icon:"🏪", label:{pt:"Empresas parceiras",en:"Partner businesses",es:"Empresas asociadas",ru:"Партнёрские компании"} },
@@ -25,7 +24,6 @@
   const groups = {
     learn:{pt:"Aprenda",en:"Learn",es:"Aprende",ru:"Обучение"},
     tools:{pt:"Ferramentas",en:"Tools",es:"Herramientas",ru:"Инструменты"},
-    play:{pt:"Jogos",en:"Games",es:"Juegos",ru:"Игры"},
     discover:{pt:"Explore",en:"Explore",es:"Explora",ru:"Каталог"},
     benefits:{pt:"Benefícios",en:"Benefits",es:"Beneficios",ru:"Преимущества"},
     business:{pt:"Construa sua presença",en:"Build your presence",es:"Construye tu presencia",ru:"Профессиональное присутствие"},

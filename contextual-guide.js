@@ -7,25 +7,25 @@ areaAccountSettings:"account",areaLanguage:"account",areaPreferences:"notificati
 areaSubscription:"subscription",areaSmartLink:"smart-link",areaAffiliate:"affiliate",affiliateQr:"affiliate",
 areaSupport:"troubleshoot",areaDocuments:"account",manageProjects:"project-register",
 areaAdminEntry:"admin",openHelpCenter:"start",
-copyLink:"affiliate",gameHistory:"games",offerBenefit:"benefit-offer",
+copyLink:"affiliate",offerBenefit:"benefit-offer",
 openProjection:"affiliate-calc",reactivate:"subscription",
 accountCenterButton:"account",loadAreaProjects:"project-register",
 finPdfAction:"finance-pdf",financePdfAction:"finance-pdf",financeShareAction:"finance-share",
 marketExpand:"market-chart"
 };
 const FEATURE={
-academy:"academy",technical:"market-chart",financial:"academy",telegram:"telegram",tools:"tools",
-"finance-control":"monthly-finance",games:"games",explore:"explore",benefits:"benefits",
+academy:"academy",analysis:"market-chart",technical:"market-chart",financial:"academy",telegram:"telegram",tools:"tools",
+"finance-control":"monthly-finance",explore:"explore",benefits:"benefits",
 marketplace:"marketplace",professional:"professional",links:"link-page",agenda:"agenda",
 "smart-link":"smart-link",credential:"credential",affiliate:"affiliate",
 network:"affiliate",subscription:"subscription",support:"troubleshoot",admin:"admin",
 "network_marketing":"academy","financial_education":"academy",
 "technical_analysis":"market-chart","free_courses":"free_courses",
-"math-space":"math-space","peg-solitaire":"peg-solitaire",
-"sliding-puzzle":"sliding-puzzle","word-search":"word-search","math-academy":"math-academy",
+
+
 "monthly-finance":"monthly-finance","receivables":"receivables","quote":"quote",
-"link-page":"link-page","qr-code":"qr-code","randomizers":"randomizers",
-"games":"games","affiliate-calc":"affiliate-calc","affiliate":"affiliate",
+"link-page":"link-page","qr-code":"qr-code",
+"affiliate-calc":"affiliate-calc","affiliate":"affiliate",
 "professional":"professional", "my-qr":"credential",
 "pair-device":"device-pairing", "language":"account", "preferences":"notifications",
 "settings":"account", "documents":"account", "profile-photo":"profile-photo",
@@ -39,7 +39,7 @@ network:"affiliate",subscription:"subscription",support:"troubleshoot",admin:"ad
 const MANUAL={
 home:"start",learn:"academy",academy:"academy",account:"account",
 subscription:"subscription",affiliate:"affiliate",professional:"professional",
-agenda:"agenda",links:"links","monthly-finance":"finance",tools:"tools",games:"games",
+agenda:"agenda",links:"links","monthly-finance":"finance",tools:"tools",
 explore:"explore",benefits:"benefits",telegram:"telegram",admin:"account",
 "troubleshoot":"troubleshoot","financial_education":"academy"
 };
@@ -49,8 +49,8 @@ const ACCESS={
 "analise_tecnica_completa":"free","liberdade_financeira_assinantes":"subscriber",
 "monthly-finance":"mixed","receivables":"limited","quote":"limited",
 "affiliate-calc":"free","link-page":"limited","smart-link":"limited","qr-code":"free",
-"randomizers":"free","games":"mixed","math-space":"mixed","peg-solitaire":"mixed",
-"sliding-puzzle":"mixed","word-search":"mixed","math-academy":"mixed",
+
+
 "agenda":"subscriber","agenda-settings":"subscriber","agenda-services":"subscriber",
 "agenda-clients":"subscriber","agenda-team":"subscriber","agenda-finance":"subscriber",
 "market-chart":"subscriber","market-technical":"subscriber",
@@ -170,15 +170,12 @@ function setContext(id){
 }
 function resolve(target){
  if(!(target instanceof Element)||target.closest("#ecpGuideOverlay")||target.closest("#ecpContextGuideButton"))return"";
- const matched=target.closest("[data-tool-id],[data-course],[data-academy-category],[data-play],[data-tournament],[data-open-game],[data-market-widget],[data-fin-card],[data-action],[data-target],[data-view],[data-book-chapter],[data-reader-chapter],button[id],a[href]");
+ const matched=target.closest("[data-tool-id],[data-course],[data-academy-category],[data-market-widget],[data-fin-card],[data-action],[data-target],[data-view],[data-book-chapter],[data-reader-chapter],button[id],a[href]");
  if(!matched)return"";
  const d=matched.dataset;
  if(d.course)return d.course;
  if(d.academyCategory)return FEATURE[d.academyCategory]||d.academyCategory;
  if(d.toolId)return d.toolId;
- if(d.play)return FEATURE[d.play]||d.play;
- if(d.tournament)return FEATURE[d.tournament]||"games";
- if(d.openGame)return d.openGame==="peg"?"peg-solitaire":d.openGame==="sliding"?"sliding-puzzle":"games";
  if(d.marketWidget)return FEATURE[d.marketWidget]||"market-chart";
  if(d.finCard)return d.finCard==="0"?"receivables":"quote";
  const onAgenda=/\/agenda\.html$/i.test(location.pathname);

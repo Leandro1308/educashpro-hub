@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261022.1";
+  const VERSION="20261022.2";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -69,62 +69,7 @@
   async function parallelStyles(files){await Promise.all(files.map(style))}
   function currentSession(){return window.__EDUCASHPRO_SESSION__||window.EduCashProRuntime?.session||null}
 
-  let gamesPromise=null,gamesEnhancementPromise=null,toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
-
-  function loadGameEnhancements(){
-    if(gamesEnhancementPromise)return gamesEnhancementPromise;
-    gamesEnhancementPromise=(async()=>{
-      await Promise.allSettled([
-        style("./game-polish-v3.css"),style("./game-experience-v4.css"),style("./extra-games-v5.css"),
-        style("./extra-games-fix-v6.css"),style("./falling-blocks-v7.css"),style("./color-lines-v8.css"),
-        style("./educash-empire-v12.css")
-      ]);
-      await script("./local-arcade-core.js");
-      // O estudo do livro é carregado somente quando o usuário abre esse Passatempo.
-      // Evita executar os 252 exercícios enquanto outros jogos são iniciados.
-      await script("./math-learning-game.js");
-      await script("./local-games-bootstrap-v13.js");
-      try{await script("./game-local-storage-v8.js")}catch(_){}
-      try{await script("./social-play.js")}catch(_){}
-      for(const file of ["./game-polish-v3.js","./game-experience-v4.js","./extra-games-v5.js","./extra-games-fix-v6.js","./falling-blocks-v7.js","./color-lines-v8.js","./game-interaction-fix-v10.js","./educash-empire-v12.js"]){
-        try{await script(file)}catch(error){console.warn("[EduCashPro] complemento de jogo ignorado:",file,error?.message||error)}
-      }
-      try{
-        await script("./local-game-catalog-bridge.js");
-        window.EduCashProLocalCatalogBridge?.ensure?.();
-      }catch(_){}
-      try{await script("./game-usage-limit-v14.js")}catch(_){}
-      const value=currentSession();
-      if(value){
-        window.EduCashProMentalGames?.setSession?.(value);
-        window.EduCashProGameSuite?.setSession?.(value);
-      }
-      return true;
-    })().catch(error=>{gamesEnhancementPromise=null;console.warn("[EduCashPro] jogos complementares:",error?.message||error);return false});
-    return gamesEnhancementPromise;
-  }
-
-  function loadGames(){
-    if(window.EduCashProMentalGames?.renderCatalog){
-      void loadGameEnhancements();
-      return parallelStyles(["./local-games.css","./game-controls.css"]).then(()=>true);
-    }
-    if(gamesPromise) return gamesPromise;
-    gamesPromise=(async()=>{
-      // Mostra o catálogo principal primeiro. Jogos extras entram progressivamente.
-      await parallelStyles(["./local-games.css","./game-controls.css"]);
-      await series(["./mental-games.js","./game-suite.js"]);
-      const value=currentSession();
-      if(value){
-        window.EduCashProMentalGames?.setSession?.(value);
-        window.EduCashProGameSuite?.setSession?.(value);
-      }
-      void loadGameEnhancements();
-      return true;
-    })().catch(error=>{gamesPromise=null;throw error});
-    return gamesPromise;
-  }
-
+  let toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
   const bookLanguageLoads=new Map();
   function loadBookCourse(lang="pt"){
@@ -230,6 +175,6 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,prefetch,loadGames,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,prefetch,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
 })();
 

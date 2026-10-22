@@ -65,7 +65,7 @@
         ["🛠️", "Use digital tools", "Access practical tools designed to support organization, communication, promotion and everyday digital activities."],
         ["🌎", "Discover resources and communities", "Explore groups, channels, bots, pages, courses, tools, partner businesses, benefits and digital resources."],
         ["🏷️", "Access member benefits", "Discover discounts, special services and partner offers when available in your region."],
-        ["🎮", "Enjoy free resources", "Use selected tools, games and resources even before subscribing, while active members unlock additional experiences."],
+        ["🎮", "Enjoy free resources", "Use selected tools and resources even before subscribing, while active members unlock additional experiences."],
         ["❤️", "Keep everything in one place", "Manage your membership, referral link, support, community access, projects and other EduCashPro resources from one environment."],
       ].map((item) => benefitCard(...item)).join("");
     }

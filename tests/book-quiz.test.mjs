@@ -4,7 +4,7 @@ import vm from "node:vm";
 const root=new URL("../",import.meta.url);
 const hubPrefix=await fs.access(new URL("src/hub/book-quiz-engine-v4.js",root)).then(()=>"src/hub/").catch(()=>"");
 const read=path=>fs.readFile(new URL(hubPrefix+path,root),"utf8");
-const paths=["book-quiz-engine-v4.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-content-en.js","book-quiz-content-es.js","book-quiz-content-ru.js","book-quiz-business-21-i18n.js","game-suite.js"];
+const paths=["book-quiz-engine-v4.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-content-en.js","book-quiz-content-es.js","book-quiz-content-ru.js","book-quiz-business-21-i18n.js"];
 const sources=await Promise.all(paths.map(read));
 const values=new Map();
 const localStorage={getItem:key=>values.get(key)||null,setItem:(key,val)=>values.set(key,val),removeItem:key=>values.delete(key)};
@@ -71,7 +71,7 @@ assert(sources[0].includes("bookQuizReviewCard")&&sources[0].includes("localStor
 assert(!sources[0].includes("l!==\"pt\""),"Portuguese-only language notice must not remain");
 assert(!sources[0].includes("fetch(")&&!sources[0].includes("/api/"),"Quiz must not contact API");
 assert(!sources[8].includes("fetch(")&&!sources[8].includes("/api/"));
-const games=sources[9];
+
 const academyApp=await read("app.js");
 const academyLoader=await read("resource-loader.js");
 const academyCatalog=JSON.parse(await read("courses.json"));
@@ -81,7 +81,7 @@ assert(["pt","en","es","ru"].every(lang=>freeCourse.title[lang]&&freeCourse.desc
 assert(academyApp.includes('courseId === "book-business-21"')&&academyApp.includes('loadBookCourse?.(state.language)'),"Academy must launch the local course");
 assert(academyApp.includes('new Set(["free_courses", "network_marketing", "financial_education", "telegram"])'),"Free courses must be an Academy learning path");
 assert(academyLoader.includes("function loadBookCourse(")&&academyLoader.includes("book-quiz-engine-v4.js"),"Book course must load only in Academy");
-assert(!games.includes("book-business-21"),"Book must not appear in any pastime code or routing");
+assert(!academyLoader.includes("loadGames"),"Academy loader must not restore pastime games");
 assert(sources[0].includes("bookQuizConcepts")&&sources[0].includes("conceptCards"),"12 concepts must be taught before quiz");
 assert(!sources[0].includes('EDUCASHPRO · ${esc'),"Malformed green header must not render");
 

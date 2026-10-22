@@ -13,9 +13,9 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,games,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style,serviceWorker,pwaInstall,versionFile]=await Promise.all([
+const [index,app,agenda,support,links,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style,serviceWorker,pwaInstall,versionFile]=await Promise.all([
   read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
-  read("game-suite.js"),read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
+  read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
 ]);
 const runtimeStability=await read("runtime-stability-v11.js");
 const experienceV2=await read("experience-v2.css");
@@ -51,10 +51,8 @@ assert(app.includes("const deferRoute=")&&app.includes('renderArea(); deferRoute
 assert(professional.includes('id="professionalBack"')&&professional.includes('id="fastProfessionalPage"')&&professional.includes('controller.abort(), 4500'),"Professional profile does not paint immediately or still waits too long for APIs");
 assert(loader.includes("function loadProfessional()")&&!loader.includes("await loadLinks();\n      await script(\"./professional-profile.js\")"),"Professional profile still blocks on the link editor bundle");
 JSON.parse(courses);
-assert(!games.includes('id="gameRaffle"'),"Raffle entry must not be visible");
 assert(!index.includes('<script defer src="./game-suite.js'),"Games must be lazy-loaded");
 assert(!index.includes('<script defer src="./technical-analysis-course.js'),"Courses must be lazy-loaded");
-assert(loader.includes("loadGames")&&loader.includes("loadCourses")&&loader.includes("loadFinance"),"Resource loader is incomplete");
 assert(!loader.includes("business-21st-century-course.js")&&!loader.includes("course-final-notice.js"),"Retired course patches are still loaded");
 assert(!loader.includes("video-course-access.js"),"The free video course must not load a subscriber gate");
 assert(app.includes('quickCard("professional"'),"Professional Profile is missing from active home");
@@ -72,7 +70,7 @@ assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("campaign=4
 assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
 assert(marketCenter.includes("embed-widget-advanced-chart.js")&&marketCenter.includes("embed-widget-events.js")&&marketCenter.includes("embed-widget-forex-heat-map.js")&&marketCenter.includes("embed-widget-market-overview.js"),"TradingView widgets are incomplete");
-assert(app.includes("Bolsa de Valores, Análise Técnica e Price Action")&&marketCenter.includes("Bolsa de Valores, Análise Técnica e Price Action"),"Stock market, technical analysis and Price Action entry is missing");
+assert(app.includes('quickCard("analysis"')&&marketCenter.includes("Bolsa de Valores, Análise Técnica e Price Action"),"Stock market, technical analysis and Price Action entry is missing");
 assert(technicalCourse.includes('title: "Análise Técnica e Price Action"'),"Technical Analysis and Price Action course is missing");
 assert(marketCenter.includes('new Set(["chart", "technical"])')&&app.includes("window.EduCashProAccess?.isActive?.() === true || state.profile?.active === true"),"Premium market tools are not restricted to active subscribers");
 assert(loader.includes("monthly-finance-control.js")&&links.includes("page.affiliateUrl || page.officialUrl"),"The finance tool or user affiliate attribution is incomplete");
@@ -167,18 +165,11 @@ assert(app.includes('actionCard("areaAccountSettings"')&&app.includes('actionCar
 assert(loader.includes("function loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
 
 assert(!experienceV2.includes(".bottomNav{display:none!important}"),"Production theme must never hide the primary footer navigation");
-assert(loader.includes('await series(["./mental-games.js","./game-suite.js"])')&&loader.includes("Promise.allSettled"),"Games catalog must load independently from optional enhancements");
 
-const localArcade=await read("local-arcade-core.js");
-const mathLearning=await read("math-learning-game.js");
-const gameUsageLimit=await read("game-usage-limit-v14.js");
 const bookEngine=await read("book-quiz-engine-v4.js");
 const bookData=await read("book-quiz-business-21-i18n.js");
 const bookCss=await read("book-quiz.css");
 
-for(const file of ["local-arcade-core.js","math-learning-game.js"]){
-  assert(loader.includes(file),`Active local educational module is missing: ${file}`);
-}
 for(const file of ["book-quiz-engine-v4.js","book-quiz-business-21-i18n.js","book-quiz-content-part1.js","book-quiz-content-part2.js","book-quiz-content-part3.js","book-quiz-content-part4.js","book-quiz-v3.css","book-quiz.css"]){
   assert(loader.includes(file),`Free Academy course must load independently of pastime: ${file}`);
 }
@@ -189,20 +180,6 @@ for(const language of ["en","es","ru"]){
 }
 assert(!loader.includes('script("./book-quiz-engine.js")')&&!loader.includes('script("./book-quiz-business-21.js")'),"Book quiz must not preload while unrelated pastime games run");
 assert(!loader.includes('script("./speed-race-game.js")')&&!loader.includes('script("./air-defense-game.js")'),"Removed arcade games must not be downloaded");
-for(const gameId of ["math-space","peg-solitaire","sliding-puzzle","word-search","math-academy"]){
-  assert(games.includes(`"${gameId}"`),`Active pastime is missing from catalog: ${gameId}`);
-}
-for(const gameId of ["car-rush","air-defense","air-defense-2","math-cross"]){
-  assert(!games.includes(`"${gameId}": [`),`Removed pastime must not remain in active catalog: ${gameId}`);
-}
-assert(games.includes('const TOURNAMENT_GAMES = new Set(["math-space","peg-solitaire","sliding-puzzle","word-search"])'),"Math Cross must be removed from active tournament/catalog wiring");
-assert(!mathLearning.includes("fetch("),"Math Academy gameplay must remain local");
-assert(localArcade.includes("localStorage")&&localArcade.includes("educashpro:local-arcade:v1"),"Local arcade progress storage is missing");
-assert(loader.includes('script("./game-usage-limit-v14.js")')&&gameUsageLimit.includes("const PLAY_MS=60*60*1000")&&gameUsageLimit.includes("const COOLDOWN_MS=8*60*60*1000")&&gameUsageLimit.includes("localStorage"),"Non-subscriber pastime usage control changed unexpectedly");
-assert(!games.includes("book-business-21")&&!gameUsageLimit.includes("book-business-21"),"Book course must not appear in pastime catalog or play timers");
-assert(mathLearning.includes("LESSONS")&&mathLearning.includes('data-mode="training"')&&mathLearning.includes('data-mode="speed"')&&mathLearning.includes('data-mode="survival"'),"Math learning/practice modes are incomplete");
-assert(mathLearning.includes("Array.from({length:10}")&&mathLearning.includes("best60")&&mathLearning.includes("bestSurvival"),"Math tables or local progress are incomplete");
-
 assert(bookEngine.includes("localStorage")&&bookEngine.includes("educashpro:book-quiz:v3:"),"Book quiz must store per-chapter progress on the current device");
 assert(bookEngine.includes("state.index")&&bookEngine.includes("state.answers")&&bookEngine.includes("state.score"),"Book quiz must persist exact resume position, answers and score");
 assert(!bookEngine.includes("fetch(")&&!bookEngine.includes("/api/"),"Book quiz gameplay must not consume Render or MongoDB");
@@ -213,26 +190,7 @@ assert(app.includes('loadBookCourse?.(state.language)')&&app.includes('courseId 
 assert(JSON.parse(courses).courses.some(c=>c.id==="book-business-21"&&c.access==="free"&&c.category==="free_courses"),"Free course must appear in the Academy catalog");
 assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFeedback"),"Book quiz UI styles are incomplete");
 
-const localCatalogBridge=await read("local-game-catalog-bridge.js");
-assert(loader.includes('script("./local-game-catalog-bridge.js")'),"Runtime local-game catalog bridge is not loaded after game patches");
-assert(loader.includes("EduCashProLocalCatalogBridge?.ensure"),"Game loader does not finalize the local-game catalog bridge");
-assert(localCatalogBridge.includes('const IDS=["math-academy"]'),"Catalog bridge must not restore removed arcade games");
-assert(localCatalogBridge.includes("MutationObserver")&&localCatalogBridge.includes("insertAdjacentHTML"),"Catalog bridge does not self-heal a stale rendered catalog");
-assert(localCatalogBridge.includes("stopImmediatePropagation")&&localCatalogBridge.includes("EduCashProAdvancedGames"),"Catalog bridge does not route remaining local game clicks directly");
 
-const directLocalBootstrap=await read("local-games-bootstrap-v13.js");
-assert(!index.includes("local-games-bootstrap-v13.js"),"Local game bootstrap must stay out of the critical HTML path");
-assert(loader.includes('script("./local-games-bootstrap-v13.js")'),"Local game bootstrap must be lazy-loaded by the resource loader");
-assert(directLocalBootstrap.includes("EduCashProGameSuite")&&directLocalBootstrap.includes("GAME_META"),"Direct bootstrap does not register remaining local games in the visible catalog");
-assert(directLocalBootstrap.includes('const IDS=["math-academy"]'),"Direct bootstrap must not restore removed arcade games");
-assert(directLocalBootstrap.includes('loadScript("./local-arcade-core.js")')&&directLocalBootstrap.includes('loadScript("./math-learning-game.js")')&&!directLocalBootstrap.includes('loadScript("./speed-race-game.js")')&&!directLocalBootstrap.includes('loadScript("./air-defense-game.js")'),"Direct bootstrap must recover only the remaining local learning game");
-assert(directLocalBootstrap.includes("MutationObserver")&&directLocalBootstrap.includes("setInterval"),"Direct bootstrap does not survive a stale/rebuilt lazy catalog");
-assert(localArcade.includes('has:(id)=>typeof games[id]==="function"'),"Local arcade does not expose game-registration state to bootstrap");
-
-const empireRegistrar=await read("educash-empire-v12.js");
-assert(empireRegistrar.includes('const LOCAL_IDS=["math-academy"]'),"Empire extension must not restore removed arcade games");
-assert(!empireRegistrar.includes('"car-rush"')&&!empireRegistrar.includes('"air-defense"')&&!empireRegistrar.includes('"air-defense-2"'),"Empire extension still contains removed arcade registrations");
-assert(empireRegistrar.includes("registerLocalMeta")&&empireRegistrar.includes("patchCatalog"),"Visible Empire extension does not register/patch remaining local games");
-assert(empireRegistrar.includes('node.src="./"+file+"?v=20260929.9"'),"Empire local-game recovery does not bypass stale lazy-loader cache");
-assert(empireRegistrar.includes("MutationObserver")&&empireRegistrar.includes("base.renderCatalog"),"Empire extension does not repair every catalog render");
-assert(empireRegistrar.includes('if(k==="empire")return t("title",l)')&&empireRegistrar.includes("setTextIfChanged"),"Empire title/subtitle repair is missing");
+for (const asset of ["game-suite.js","mental-games.js","social-play.js","local-arcade-core.js"]) assert(!files.includes(asset), "Retired asset remains: " + asset);
+assert(!loader.includes("loadGames") && app.includes('rememberRoute("analysis")'), "Independent analysis route missing");
+assert(!app.includes('["technical_analysis", "📈",'), "Analysis must be outside Academy");
