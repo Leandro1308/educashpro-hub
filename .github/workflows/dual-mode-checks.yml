@@ -36,6 +36,9 @@ jobs:
           node --check app.js
           node --check tests/dual-mode-audit.mjs
           node --check tests/static-audit.mjs
+      - name: Verify independent professional profile in four languages
+        run: node --test tests/professional-profile.test.mjs
+
       - name: Run dual-mode audit
         run: node tests/dual-mode-audit.mjs
       - name: Run static audit

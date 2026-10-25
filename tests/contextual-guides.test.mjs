@@ -4,18 +4,18 @@ import vm from "node:vm";
 const root=new URL("../",import.meta.url);
 const mount=await fs.access(new URL("src/hub/contextual-guide.js",root)).then(()=>"src/hub/").catch(()=>"");
 const read=name=>fs.readFile(new URL(mount+name,root),"utf8");
-const [guide,manual,pt,en,es,ru,registry,app,loader,tools,html,agenda,marketplace,affiliate,support,publish]=await Promise.all([
+const [guide,manual,pt,en,es,ru,registry,app,loader,tools,html,marketplace,affiliate,support,publish]=await Promise.all([
  "contextual-guide.js","support-manual.js","contextual-guides-pt.js","contextual-guides-en.js",
  "contextual-guides-es.js","contextual-guides-ru.js","feature-registry.js",
  "app.js","resource-loader.js","local-tools-and-games.js",
- "index.html","agenda.html","marketplace.html","affiliate.html","support.html","publish.html"
+ "index.html","marketplace.html","affiliate.html","support.html","publish.html"
 ].map(read));
 const window={};
 for(const source of [manual,pt,en,es,ru])vm.runInNewContext(source,{window});
 const localizations=window.EduCashProGuideTranslations;
 assert(localizations,"Contextual guide translations not loaded");
 const keys=Object.keys(localizations.pt);
-assert.equal(keys.length,36);
+assert.equal(keys.length,31);
 for(const lang of ["pt","en","es","ru"]){
  const docs=localizations[lang];
  assert(docs,"Guide language missing: "+lang);
@@ -28,7 +28,7 @@ for(const lang of ["pt","en","es","ru"]){
    assert(entry[3].length>=15,lang+" "+id+" missing closing information");
  }
  const articles=window.EduCashProSupportManual.articles(lang);
- assert.equal(articles.length,14,lang+" manual coverage");
+ assert.equal(articles.length,13,lang+" manual coverage");
  assert(articles.every(x=>x.steps.length>=4&&x.title),lang+" old manual must remain intact");
 }
 const listeners={};const document={addEventListener:(n,fn)=>{listeners[n]=fn},documentElement:{lang:"pt"},body:null};
@@ -38,10 +38,10 @@ const guides=window.EduCashProContextGuide;assert(guides?.open && guides?.close)
 const registryIDs=[...registry.matchAll(/\{ id:"([^"]+)", group:/g)].map(x=>x[1]);
 assert(registryIDs.includes("technical") && !registryIDs.includes("games"));
 for(const id of registryIDs){assert(guides.available(id),"Registry function has no guide: "+id)}
-for(const id of ["book-business-21","set-for-life","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","agenda-team","agenda-finance","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
+for(const id of ["book-business-21","set-for-life","free_courses","receivables","quote","qr-code","smart-link","link-page","affiliate-calc","market-chart","market-technical","market-calendar","market-fibonacci","company-register","project-register","wallet"]){
  assert(guides.available(id),"Public function has no instructions: "+id);
 }
-for(const path of [html,agenda,marketplace,affiliate,support,publish]){
+for(const path of [html,marketplace,affiliate,support,publish]){
  assert(path.includes("contextual-guide.js"),"Entry point missing guided cards");
  assert(path.includes("contextual-guide.css"),"Entry point missing guide styling");
 }
@@ -116,7 +116,7 @@ localLanguage="en";
 listeners2.get("click")({target:new ToolTarget("smart-link")});
 assert(howTo.textContent.includes("How to use"),"Help control must follow the selected language");
 fakeWindow.EduCashProContextGuide.close();
-for(const page of ["/agenda.html","/marketplace.html","/affiliate.html","/publish.html","/support.html"]){
+for(const page of ["/marketplace.html","/affiliate.html","/publish.html","/support.html"]){
  const pageMounted=new Map(),pageListeners=new Map();
  const pageDocument={body:{appendChild:el=>pageMounted.set(el.id,el)},documentElement:{lang:"pt"},createElement:t=>new FakeElement(t),getElementById:id=>pageMounted.get(id)||null,addEventListener:(type,fn)=>pageListeners.set(type,fn)};
  const target={window:{EduCashProLocale:{resolve:()=>"pt"}},document:pageDocument,navigator:{language:"pt-BR"},sessionStorage:fakeStorage,Element:FakeElement,location:{pathname:page,href:"https://example.com"+page},setTimeout:fn=>(fn(),1)};

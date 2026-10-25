@@ -169,7 +169,6 @@
         ["🎓", "Aprendizado prático", "Educação financeira, Telegram, marketing de rede e habilidades digitais."],
         ["🔎", "Descoberta organizada", "Grupos, canais, bots, páginas e projetos selecionados."],
         ["🧰", "Ferramentas digitais", "Página de links, Link Inteligente, calculadoras e ferramentas financeiras no celular."],
-        ["📅", "Organização profissional", "Agenda para atendimentos, reuniões, aulas, serviços e outros compromissos."],
         ["🎁", "Benefícios exclusivos", "Vantagens e parcerias disponibilizadas aos assinantes ativos."],
         ["❤️", "Minha Área", "Assinatura, credencial, suporte, comunidade, links e projetos reunidos no mesmo espaço."],
       ],
@@ -208,7 +207,6 @@
         ["🎓", "Practical learning", "Financial education, Telegram, network marketing and digital skills."],
         ["🔎", "Organized discovery", "Selected groups, channels, bots, pages and projects."],
         ["🧰", "Digital tools", "Link page, Smart Link, calculators and finance tools on mobile."],
-        ["📅", "Professional organization", "A schedule for appointments, meetings, classes, services and other commitments."],
         ["🎁", "Exclusive benefits", "Advantages and partnerships available to active subscribers."],
         ["❤️", "My Area", "Subscription, credential, support, community, links and projects in one place."],
       ],
@@ -247,7 +245,6 @@
         ["🎓", "Aprendizaje práctico", "Educación financiera, Telegram, marketing de red y habilidades digitales."],
         ["🔎", "Descubrimiento organizado", "Grupos, canales, bots, páginas y proyectos seleccionados."],
         ["🧰", "Herramientas digitales", "Página de enlaces, Enlace Inteligente, calculadoras y herramientas financieras en el celular."],
-        ["📅", "Organización profesional", "Agenda para citas, reuniones, clases, servicios y otros compromisos."],
         ["🎁", "Beneficios exclusivos", "Ventajas y alianzas disponibles para suscriptores activos."],
         ["❤️", "Mi Área", "Suscripción, credencial, soporte, comunidad, enlaces y proyectos en un solo espacio."],
       ],
@@ -286,7 +283,6 @@
         ["🎓", "Практическое обучение", "Финансовая грамотность, Telegram, сетевой маркетинг и цифровые навыки."],
         ["🔎", "Удобный каталог", "Отобранные группы, каналы, боты, страницы и проекты."],
         ["🧰", "Цифровые инструменты", "Страница ссылок, умная ссылка, калькуляторы и финансовые инструменты в телефоне."],
-        ["📅", "Рабочая организация", "Расписание приёмов, встреч, занятий, услуг и других дел."],
         ["🎁", "Эксклюзивные преимущества", "Преимущества и партнёрства для активных подписчиков."],
         ["❤️", "Мой раздел", "Подписка, подтверждение, поддержка, сообщество, ссылки и проекты в одном месте."],
       ],
@@ -379,14 +375,8 @@
     },
   };
 
-  const AGENDA_COPY = {
-    pt: { agenda: "Agenda Profissional", agendaSub: "Atendimentos, serviços, reuniões, aulas, visitas e compromissos" },
-    en: { agenda: "Professional Schedule", agendaSub: "Appointments, services, meetings, classes, visits and commitments" },
-    es: { agenda: "Agenda Profesional", agendaSub: "Atenciones, servicios, reuniones, clases, visitas y compromisos" },
-    ru: { agenda: "Профессиональное расписание", agendaSub: "Приёмы, услуги, встречи, занятия, визиты и личные дела" },
-  };
 
-  function t(key) { return AGENDA_COPY[state.language]?.[key] || EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || AGENDA_COPY.pt[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
+  function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
   function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
   function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
   function benefitNavigationCopy(key) {
@@ -456,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.22.5";
+  const APP_RUNTIME_BUILD = "2026.10.25.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -616,12 +606,6 @@
   }
 
   function subscribeNow() { openSubscription(); }
-  function openAgenda(publicId = "", view = "") {
-    const query = new URLSearchParams();
-    if (publicId) query.set("agenda", publicId);
-    if (["appointments", "services", "clients", "staff", "settings"].includes(view)) query.set("view", view);
-    window.location.assign(`./agenda.html${query.size ? `?${query}` : ""}`);
-  }
 
   function showLockedInfo(item) {
     const modal = document.getElementById("accessModal");
@@ -814,7 +798,6 @@
       restoreRememberedScroll(route);
       return true;
     }
-    if(route.view === "area" && route.detail === "agenda"){rememberRoute("area","agenda");openAgenda("","settings");return true;}
     if(route.view === "area" && ["account","subscription","network","pair","language","preferences","documents"].includes(route.detail)){
       const method={account:"open",subscription:"openSubscription",network:"openNetwork",pair:"openDevicePairing",language:"openLanguage",preferences:"openPreferences",documents:"openDocuments"}[route.detail];
       rememberRoute("area",route.detail);
@@ -923,37 +906,37 @@
     };
     const supportLabel = supportLabels[state.language] || supportLabels.pt;
     const professionalLabels = {
-      pt: ["Perfil Profissional", "Página, serviços, agenda e cartão digital"],
-      en: ["Professional Profile", "Page, services, schedule and digital card"],
-      es: ["Perfil Profesional", "Página, servicios, agenda y tarjeta digital"],
-      ru: ["Профессиональный профиль", "Страница, услуги, запись и визитка"],
-    }[state.language] || ["Perfil Profissional", "Página, serviços, agenda e cartão digital"];
+      pt: ["Perfil Profissional", "Página, contatos e cartão digital"],
+      en: ["Professional Profile", "Page, contacts and digital card"],
+      es: ["Perfil Profesional", "Página, contactos y tarjeta digital"],
+      ru: ["Профессиональный профиль", "Страница, контакты и визитка"],
+    }[state.language] || ["Perfil Profissional", "Página, contatos e cartão digital"];
     const groups = ({
       pt: {
         learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
         tools:["Ferramentas","Recursos práticos para aprender, organizar e interagir."],
-        presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
+        presence:["Construa sua presença","Perfil profissional e presença digital em um só lugar."],
         discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
         account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
       },
       en: {
         learn:["Learn","Courses and content organized by topic."],
         tools:["Tools","Practical resources to learn, organize and interact."],
-        presence:["Build your presence","Professional profile, schedule and digital presence in one place."],
+        presence:["Build your presence","Professional profile and digital presence in one place."],
         discover:["Explore and benefit","Discover projects, businesses and ecosystem benefits."],
         account:["Your account","Access support and continue managing your account in My Area."]
       },
       es: {
         learn:["Aprende","Cursos y contenidos organizados por tema."],
         tools:["Herramientas","Recursos prácticos para aprender, organizar e interactuar."],
-        presence:["Construye tu presencia","Perfil profesional, agenda y presencia digital en un solo lugar."],
+        presence:["Construye tu presencia","Perfil profesional y presencia digital en un solo lugar."],
         discover:["Explora y aprovecha","Descubre proyectos, empresas y beneficios del ecosistema."],
         account:["Tu cuenta","Accede al soporte y continúa gestionando tu cuenta en Mi Área."]
       },
       ru: {
         learn:["Обучение","Курсы и материалы по темам."],
         tools:["Инструменты","Практические ресурсы для обучения, организации и взаимодействия."],
-        presence:["Профессиональное присутствие","Профиль, запись и цифровое присутствие в одном месте."],
+        presence:["Профессиональное присутствие","Профиль и цифровое присутствие в одном месте."],
         discover:["Каталог и преимущества","Проекты, компании и преимущества экосистемы."],
         account:["Ваш аккаунт","Поддержка и управление аккаунтом в разделе «Мой раздел»."]
       }
@@ -961,7 +944,7 @@
     const g = groups || {
       learn:["Aprenda","Cursos e conteúdos organizados por assunto."],
       tools:["Ferramentas","Recursos práticos para aprender, organizar e interagir."],
-      presence:["Construa sua presença","Perfil profissional, agenda e presença digital em um só lugar."],
+      presence:["Construa sua presença","Perfil profissional e presença digital em um só lugar."],
       discover:["Explore e aproveite","Descubra projetos, empresas e benefícios do ecossistema."],
       account:["Sua conta","Acesse suporte e continue a gestão da sua conta em Minha Área."]
     };
@@ -972,8 +955,7 @@
     const toolCards = `
       ${quickCard("tools", "🧰", t("tools"), t("toolsSub"), "tools")}`;
     const presenceCards = `
-      ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1], "professional")}
-      ${quickCard("agenda", "📅", t("agenda"), t("agendaSub"), "agenda")}`;
+      ${quickCard("professional", "💼", professionalLabels[0], professionalLabels[1], "professional")}`;
     const discoverCards = `
       ${quickCard("explore", "🔎", t("explore"), t("exploreSub"), "explore")}
       ${quickCard("benefits", "🎁", t("benefits"), t("benefitsSub"), "benefits")}`;
@@ -1004,7 +986,6 @@
       else if (target === "professional") openAreaProfessional();
       else if (target === "tools") renderTools();
       else if (target === "analysis") void openMarkets();
-      else if (target === "agenda") openAgenda();
       else if (target === "support") location.assign("./support.html");
       else setView(target);
     });
@@ -1211,10 +1192,10 @@
     if (!state.courseCatalog.length) hydrateCourseCatalogFromCache();
     const menu = academyMenuCopy();
     const helpCopy = {
-      pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, serviços, agenda, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
-      en:["How to use EduCashPro","Quick guides for profile, page, services, schedule, card, projects and subscription.","Open Help Center","Learning paths"],
-      es:["Cómo usar EduCashPro","Guías rápidas para perfil, página, servicios, agenda, tarjeta, proyectos y suscripción.","Abrir Central de Ayuda","Rutas de aprendizaje"],
-      ru:["Как пользоваться EduCashPro","Краткие инструкции по профилю, странице, услугам, расписанию, проектам и подписке.","Открыть Центр помощи","Учебные направления"]
+      pt:["Como usar o EduCashPro","Guias rápidos para configurar perfil, página, contatos, cartão, projetos e assinatura.","Abrir Central de Ajuda","Trilhas de aprendizagem"],
+      en:["How to use EduCashPro","Quick guides for profile, page, contacts, card, projects and subscription.","Open Help Center","Learning paths"],
+      es:["Cómo usar EduCashPro","Guías rápidas para perfil, página, contactos, tarjeta, proyectos y suscripción.","Abrir Central de Ayuda","Rutas de aprendizaje"],
+      ru:["Как пользоваться EduCashPro","Краткие инструкции по профилю, странице, контактам, проектам и подписке.","Открыть Центр помощи","Учебные направления"]
     }[state.language] || ["Como usar o EduCashPro","Guias rápidos para configurar e utilizar os recursos.","Abrir Central de Ajuda","Trilhas de aprendizagem"];
     content.innerHTML = `
       <section class="courseHero academyMainHero"><span class="eyebrow">ACADEMY</span><h2>${escapeHtml(t("learnTitle"))}</h2><p>${escapeHtml(t("learnDesc"))}</p></section>
@@ -1705,7 +1686,6 @@
         professional:"Informações do perfil", professionalSub:"Nome, apresentação, contatos, serviços e cartão digital.",
         photo:"Foto do perfil", photoSub:"Atualize ou remova sua foto principal.",
         links:"Página de links", linksSub:"Edite nome, descrição, endereço, foto e seus links.",
-        agenda:"Agenda profissional", agendaSub:"Gerencie serviços, horários, clientes e compromissos.",
         accountTitle:"Conta e assinatura", accountSub:"Preferências, idioma, credencial, rede e assinatura.",
         settings:"Conta e configurações", settingsSub:"Veja os dados da conta e conexões.",
         language:"Idioma", languageSub:"Escolha o idioma da sua experiência.",
@@ -1726,7 +1706,6 @@
         professional:"Profile information", professionalSub:"Name, presentation, contacts, services and digital card.",
         photo:"Profile photo", photoSub:"Update or remove your main photo.",
         links:"Link page", linksSub:"Edit name, description, address, photo and links.",
-        agenda:"Professional schedule", agendaSub:"Manage services, hours, clients and appointments.",
         accountTitle:"Account and subscription", accountSub:"Preferences, language, credential, network and subscription.",
         settings:"Account settings", settingsSub:"View account data and connections.",
         language:"Language", languageSub:"Choose your experience language.",
@@ -1747,7 +1726,6 @@
         professional:"Información del perfil", professionalSub:"Nombre, presentación, contactos, servicios y tarjeta digital.",
         photo:"Foto del perfil", photoSub:"Actualiza o elimina tu foto principal.",
         links:"Página de enlaces", linksSub:"Edita nombre, descripción, dirección, foto y enlaces.",
-        agenda:"Agenda profesional", agendaSub:"Administra servicios, horarios, clientes y citas.",
         accountTitle:"Cuenta y suscripción", accountSub:"Preferencias, idioma, credencial, red y suscripción.",
         settings:"Cuenta y configuración", settingsSub:"Consulta los datos y conexiones de la cuenta.",
         language:"Idioma", languageSub:"Elige el idioma de tu experiencia.",
@@ -1768,7 +1746,6 @@
         professional:"Информация профиля", professionalSub:"Имя, описание, контакты, услуги и цифровая визитка.",
         photo:"Фото профиля", photoSub:"Обновите или удалите основное фото.",
         links:"Страница ссылок", linksSub:"Изменяйте имя, описание, адрес, фото и ссылки.",
-        agenda:"Профессиональный календарь", agendaSub:"Управляйте услугами, временем, клиентами и записями.",
         accountTitle:"Аккаунт и подписка", accountSub:"Настройки, язык, QR, сеть и подписка.",
         settings:"Настройки аккаунта", settingsSub:"Данные аккаунта и подключения.",
         language:"Язык", languageSub:"Выберите язык интерфейса.",
@@ -1808,7 +1785,6 @@
         ${actionCard("areaProfessional","👤",c.professional,c.professionalSub,'data-target="professional"')}
         ${actionCard("editProfilePhoto","📷",c.photo,c.photoSub)}
         ${actionCard("areaLinkPage","🔗",c.links,c.linksSub)}
-        ${actionCard("areaAgenda","📅",c.agenda,c.agendaSub)}
       </section>
 
       <div class="sectionHead areaSectionHead"><div><h2>${escapeHtml(c.accountTitle)}</h2><p>${escapeHtml(c.accountSub)}</p></div></div>
@@ -1851,7 +1827,6 @@
     document.getElementById("areaProfessional")?.addEventListener("click", () => void openAreaProfessional());
     document.getElementById("editProfilePhoto")?.addEventListener("click", () => renderProfilePhotoEditor(renderArea));
     document.getElementById("areaLinkPage")?.addEventListener("click", () => void openAreaLinks("page"));
-    document.getElementById("areaAgenda")?.addEventListener("click", () => openAgenda("", "settings"));
     document.getElementById("areaAccountSettings")?.addEventListener("click", () => void openAccountCenter("openSettings"));
     document.getElementById("areaLanguage")?.addEventListener("click", () => void openAccountCenter("openLanguage"));
     document.getElementById("areaPreferences")?.addEventListener("click", () => void openAccountCenter("openPreferences"));
@@ -2545,10 +2520,6 @@
       state.membershipCredential = Number(cachedPayload?.validUntil || 0) === Number(receivedPayload?.validUntil || 0) && cachedCredential ? cachedCredential : receivedCredential;
       state.language = session.profile.language || "pt";
       const startParam = String(tg?.initDataUnsafe?.start_param || publicParams.get("tgWebAppStartParam") || "");
-      if (startParam.startsWith("agenda_")) {
-        openAgenda(startParam.slice(7));
-        return;
-      }
       hydrateCourseCatalogFromCache();
       applyLanguage();
       bottomNav.classList.remove("hidden");
@@ -2620,7 +2591,7 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") flushRememberedRoute();
   });
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openMarkets, openAgenda, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
+  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openMarkets, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
   window.EduCashProNavigation?.configure?.(restoreRoute);
   window.addEventListener("educashpro:web-hub-ready",()=>{
     tg=window.Telegram?.WebApp||tg;

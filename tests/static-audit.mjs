@@ -13,8 +13,8 @@ for(const file of javascriptFiles){
   execFileSync(process.execPath,["--check",path.join(root,file)],{stdio:"pipe"});
   assert(!source.includes('searchParams.get("api")'),`Public API override found in ${file}`);
 }
-const [index,app,agenda,support,links,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style,serviceWorker,pwaInstall,versionFile]=await Promise.all([
-  read("index.html"),read("app.js"),read("agenda.js"),read("support.js"),read("link-tools.js"),
+const [index,app,support,links,professional,loader,help,courses,accountCenter,webAuthEntry,webSiteMenu,style,serviceWorker,pwaInstall,versionFile]=await Promise.all([
+  read("index.html"),read("app.js"),read("support.js"),read("link-tools.js"),
   read("professional-profile.js"),read("resource-loader.js"),read("help-center.js"),read("courses.json"),read("account-center.js"),read("web-auth-entry.js"),read("web-site-menu.js"),read("style.css"),read("sw.js"),read("pwa-install.js"),read("version.json")
 ]);
 const runtimeStability=await read("runtime-stability-v11.js");
@@ -56,7 +56,6 @@ assert(!index.includes('<script defer src="./technical-analysis-course.js'),"Cou
 assert(!loader.includes("business-21st-century-course.js")&&!loader.includes("course-final-notice.js"),"Retired course patches are still loaded");
 assert(!loader.includes("video-course-access.js"),"The free video course must not load a subscriber gate");
 assert(app.includes('quickCard("professional"'),"Professional Profile is missing from active home");
-assert(links.includes("integratedAgendaLink"),"Agenda and public page are not integrated");
 assert(links.includes("page.affiliateUrl || page.officialUrl"),"Public user pages must preserve the affiliate destination");
 assert(links.includes("page.affiliateUrl || page.officialUrl")&&links.includes("link.affiliateUrl || link.officialUrl"),"Public user pages must preserve affiliate attribution");
 assert(loader.includes("help-center.js")&&loader.includes("loadHelp")&&app.includes("renderBookReader"),"Help center or continuous reader is missing");
@@ -81,8 +80,7 @@ assert(help.includes("Iscas digitais")&&help.includes("Lead magnets"),"Affiliate
 for(const language of ["pt:","en:","es:","ru:"])assert(help.includes(language),`Missing help translation: ${language}`);
 assert(!courses.includes('"id": "negocio_seculo_xxi"')&&!courses.includes('"id": "apresentacao"'),"Retired duplicate courses remain in catalog");
 assert(professional.includes('id="recommendedProfessionalAction"'),"Recommended action must have a contextual button");
-assert(professional.includes('step("configureServices"')&&professional.includes('step("configureAppearance"'),"Professional setup steps are incomplete");
-assert(app.includes('query.set("view", view)')&&agenda.includes('query.get("view")'),"Professional setup cannot open the requested agenda section");
+assert(professional.includes('step("configureInfo"')&&professional.includes('step("configureAppearance"'),"Professional setup steps are incomplete");
 for(const language of ["pt:","en:","es:","ru:"])assert(professional.includes(language),`Missing professional translation: ${language}`);
 
 assert(loader.includes('script("./account-center.js")')&&idleFeatures.includes('prefetch("./account-center.js")'),"Web account center is not available through the lazy loader");
@@ -96,7 +94,7 @@ console.log("EduCashPro static audit: OK");
 
 
 const crossPlatformNav=await read("cross-platform-nav.js");
-for(const page of ["index.html","agenda.html","affiliate.html","marketplace.html","publish.html","support.html"]){
+for(const page of ["index.html","affiliate.html","marketplace.html","publish.html","support.html"]){
   const source=await read(page);
   if(page==="index.html")assert(idleFeatures.includes("cross-platform-nav.js"),"Cross-platform navigation is not scheduled for the main app");
   else assert(source.includes("cross-platform-nav.js"),`Cross-platform navigation missing from ${page}`);
@@ -160,7 +158,7 @@ assert(!app.includes("navigationBusy"),"Footer navigation still contains a block
 assert(app.includes('id="loadAreaProjects"')&&app.includes('void loadAreaProjects(container)')&&!app.includes('const container = document.getElementById("projectList");\n    void loadAreaProjects(container);'),"My Area must not start a network request when the footer button opens");
 assert(app.includes('bottomNav.querySelectorAll("button[data-view]")')&&app.includes("navigateFromFooter(button);"),"Footer buttons must own their navigation directly");
 assert(!runtimeStability.includes('target.id==="areaLinkPage"')&&!runtimeStability.includes('target.id==="areaSmartLink"'),"My Area buttons must not be intercepted by the generic lazy replay");
-assert(app.includes('actionCard("areaProfessional"')&&app.includes('actionCard("editProfilePhoto"')&&app.includes('actionCard("areaLinkPage"')&&app.includes('actionCard("areaAgenda"'),"My Area must expose the complete editable profile hub");
+assert(app.includes('actionCard("areaProfessional"')&&app.includes('actionCard("editProfilePhoto"')&&app.includes('actionCard("areaLinkPage"'),"My Area must expose the complete editable profile hub");
 assert(app.includes('actionCard("areaAccountSettings"')&&app.includes('actionCard("areaLanguage"')&&app.includes('actionCard("areaPreferences"')&&app.includes('actionCard("areaNetwork"')&&app.includes('actionCard("areaSubscription"'),"My Area account controls are incomplete");
 assert(loader.includes("function loadLinks()")&&links.includes("setSession(value)")&&links.includes("backToOrigin"),"Profile link editor must load with the current session and return to My Area");
 

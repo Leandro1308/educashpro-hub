@@ -109,16 +109,16 @@
     }
   };
   const CATEGORY={
-    pt:{access:"Acesso e conta",subscription:"Assinatura",agenda:"Agenda",affiliates:"Afiliados",tools:"Ferramentas",links:"Página de links",payment:"Pagamento",other:"Outro"},
-    en:{access:"Access and account",subscription:"Subscription",agenda:"Schedule",affiliates:"Affiliates",tools:"Tools",links:"Link page",payment:"Payment",other:"Other"},
-    es:{access:"Acceso y cuenta",subscription:"Suscripción",agenda:"Agenda",affiliates:"Afiliados",tools:"Herramientas",links:"Página de enlaces",payment:"Pago",other:"Otro"},
-    ru:{access:"Доступ и аккаунт",subscription:"Подписка",agenda:"Календарь",affiliates:"Партнёры",tools:"Инструменты",links:"Страница ссылок",payment:"Оплата",other:"Другое"}
+    pt:{access:"Acesso e conta",subscription:"Assinatura",affiliates:"Afiliados",tools:"Ferramentas",links:"Página de links",payment:"Pagamento",other:"Outro"},
+    en:{access:"Access and account",subscription:"Subscription",affiliates:"Affiliates",tools:"Tools",links:"Link page",payment:"Payment",other:"Other"},
+    es:{access:"Acceso y cuenta",subscription:"Suscripción",affiliates:"Afiliados",tools:"Herramientas",links:"Página de enlaces",payment:"Pago",other:"Otro"},
+    ru:{access:"Доступ и аккаунт",subscription:"Подписка",affiliates:"Партнёры",tools:"Инструменты",links:"Страница ссылок",payment:"Оплата",other:"Другое"}
   };
   const FEATURE_LABELS={
-    pt:{area:"Minha área",account:"Minha conta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Assinatura",affiliate:"Meu link de afiliado",network:"Minha rede",professional:"Perfil Profissional",agenda:"Agenda Profissional",linkPage:"Página de links",smartLink:"Link Inteligente",finance:"Controle financeiro",tools:"Ferramentas",academy:"Academy",explore:"Explorar",benefits:"Benefícios",marketplace:"Marketing Place"},
-    en:{area:"My area",account:"My account",language:"Language",pair:"Connect device",subscription:"Subscription",affiliate:"My affiliate link",network:"My network",professional:"Professional Profile",agenda:"Professional Schedule",linkPage:"Link Page",smartLink:"Smart Link",finance:"Financial control",tools:"Tools",academy:"Academy",explore:"Explore",benefits:"Benefits",marketplace:"Marketing Place"},
-    es:{area:"Mi área",account:"Mi cuenta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Suscripción",affiliate:"Mi enlace de afiliado",network:"Mi red",professional:"Perfil Profesional",agenda:"Agenda Profesional",linkPage:"Página de enlaces",smartLink:"Enlace Inteligente",finance:"Control financiero",tools:"Herramientas",academy:"Academy",explore:"Explorar",benefits:"Beneficios",marketplace:"Marketing Place"},
-    ru:{area:"Мой раздел",account:"Мой аккаунт",language:"Язык",pair:"Подключить устройство",subscription:"Подписка",affiliate:"Моя партнёрская ссылка",network:"Моя сеть",professional:"Профессиональный профиль",agenda:"Профессиональный календарь",linkPage:"Страница ссылок",smartLink:"Умная ссылка",finance:"Финансовый учёт",tools:"Инструменты",academy:"Academy",explore:"Поиск",benefits:"Преимущества",marketplace:"Marketing Place"}
+    pt:{area:"Minha área",account:"Minha conta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Assinatura",affiliate:"Meu link de afiliado",network:"Minha rede",professional:"Perfil Profissional",linkPage:"Página de links",smartLink:"Link Inteligente",finance:"Controle financeiro",tools:"Ferramentas",academy:"Academy",explore:"Explorar",benefits:"Benefícios",marketplace:"Marketing Place"},
+    en:{area:"My area",account:"My account",language:"Language",pair:"Connect device",subscription:"Subscription",affiliate:"My affiliate link",network:"My network",professional:"Professional Profile",linkPage:"Link Page",smartLink:"Smart Link",finance:"Financial control",tools:"Tools",academy:"Academy",explore:"Explore",benefits:"Benefits",marketplace:"Marketing Place"},
+    es:{area:"Mi área",account:"Mi cuenta",language:"Idioma",pair:"Conectar dispositivo",subscription:"Suscripción",affiliate:"Mi enlace de afiliado",network:"Mi red",professional:"Perfil Profesional",linkPage:"Página de enlaces",smartLink:"Enlace Inteligente",finance:"Control financiero",tools:"Herramientas",academy:"Academy",explore:"Explorar",benefits:"Beneficios",marketplace:"Marketing Place"},
+    ru:{area:"Мой раздел",account:"Мой аккаунт",language:"Язык",pair:"Подключить устройство",subscription:"Подписка",affiliate:"Моя партнёрская ссылка",network:"Моя сеть",professional:"Профессиональный профиль",linkPage:"Страница ссылок",smartLink:"Умная ссылка",finance:"Финансовый учёт",tools:"Инструменты",academy:"Academy",explore:"Поиск",benefits:"Преимущества",marketplace:"Marketing Place"}
   };
   const FEATURE_ACTIONS={
     start:[["area","./?view=area"]],
@@ -126,7 +126,6 @@
     subscription:[["subscription","./?view=area&panel=subscription"]],
     affiliate:[["affiliate","./affiliate.html"],["network","./?view=area&panel=network"]],
     professional:[["professional","./?view=area&panel=professional"]],
-    agenda:[["agenda","./?view=area&panel=agenda"]],
     links:[["linkPage","./?view=area&panel=links"],["smartLink","./?view=area&panel=smart-link"]],
     finance:[["finance","./?view=tools&tool=monthly-finance"]],
     tools:[["tools","./?view=tools"]],
@@ -242,7 +241,7 @@
     return Object.keys(CATEGORY.pt).map((key)=>`<option value="${key}" ${selected===key?"selected":""}>${esc(categoryLabel(key))}</option>`).join("");
   }
   function guideCategory(id){
-    return ({account:"access",start:"access",subscription:"subscription",agenda:"agenda",affiliate:"affiliates",tools:"tools",finance:"tools",links:"links",professional:"other",academy:"other",explore:"other",benefits:"other",telegram:"access",troubleshoot:"other"})[id]||"other";
+    return ({account:"access",start:"access",subscription:"subscription",affiliate:"affiliates",tools:"tools",finance:"tools",links:"links",professional:"other",academy:"other",explore:"other",benefits:"other",telegram:"access",troubleshoot:"other"})[id]||"other";
   }
   function renderReport(guideId=""){
     activeTab="report";

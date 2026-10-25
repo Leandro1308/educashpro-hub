@@ -11,7 +11,6 @@
     { id:"marketplace", group:"benefits", access:"free", icon:"🏪", label:{pt:"Empresas parceiras",en:"Partner businesses",es:"Empresas asociadas",ru:"Партнёрские компании"} },
     { id:"professional", group:"business", access:"account", icon:"💼", label:{pt:"Perfil Profissional",en:"Professional Profile",es:"Perfil Profesional",ru:"Профессиональный профиль"} },
     { id:"links", group:"business", access:"account", icon:"🔗", label:{pt:"Página de Links",en:"Link Page",es:"Página de Enlaces",ru:"Страница ссылок"} },
-    { id:"agenda", group:"business", access:"account", icon:"📅", label:{pt:"Agenda Profissional",en:"Professional Schedule",es:"Agenda Profesional",ru:"Профессиональный календарь"} },
     { id:"smart-link", group:"business", access:"account", icon:"✂️", label:{pt:"Link Inteligente",en:"Smart Link",es:"Enlace Inteligente",ru:"Умная ссылка"} },
     { id:"credential", group:"account", access:"account", icon:"🔳", label:{pt:"Credencial e QR Code",en:"Credential and QR Code",es:"Credencial y QR",ru:"Карта и QR-код"} },
     { id:"affiliate", group:"account", access:"active", icon:"🤝", label:{pt:"Programa de Afiliados",en:"Affiliate Program",es:"Programa de Afiliados",ru:"Партнёрская программа"} },

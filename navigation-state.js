@@ -4,7 +4,6 @@
   const SAFE_PAGES = new Set([
     "/",
     "/index.html",
-    "/agenda.html",
     "/affiliate.html",
     "/marketplace.html",
     "/publish.html",
@@ -29,7 +28,6 @@
     const value = normalizedPath(path);
     if (SAFE_PAGES.has(value)) return true;
     return value.endsWith("/index.html") ||
-      value.endsWith("/agenda.html") ||
       value.endsWith("/affiliate.html") ||
       value.endsWith("/marketplace.html") ||
       value.endsWith("/publish.html") ||
@@ -106,7 +104,7 @@
 
   function hasExplicitEntryIntent() {
     const params = new URLSearchParams(location.search);
-    return ["view", "course", "academy", "section", "ref", "start", "action", "agenda"]
+    return ["view", "course", "academy", "section", "ref", "start", "action"]
       .some((key) => params.has(key));
   }
 

@@ -1,6 +1,6 @@
 # EduCashPro Hub
 
-Mini App do EduCashPro para Telegram. O produto reúne presença profissional, página de links, agenda, serviços, educação aplicada, benefícios, diretório e jogos educativos processados localmente.
+Mini App do EduCashPro para Telegram. O produto reúne presença profissional, página de links, educação aplicada, benefícios, diretório e jogos educativos processados localmente.
 
 ## Proposta do produto
 
@@ -9,7 +9,7 @@ O núcleo do EduCashPro é ajudar profissionais, criadores e pequenos negócios 
 ## Acesso
 
 - Recursos livres: Central de Ajuda, parte da Academy, página com até 3 links, links inteligentes dentro do limite gratuito, simuladores e jogos básicos.
-- Assinatura ativa: Perfil Profissional completo, até 20 links, agenda, cursos exclusivos, diretório, benefícios, parceiros, níveis avançados e Programa de Afiliados.
+- Assinatura ativa: Perfil Profissional completo, até 20 links, cursos exclusivos, diretório, benefícios, parceiros, níveis avançados e Programa de Afiliados.
 
 ## Arquitetura
 
@@ -27,7 +27,6 @@ O domínio da API é fixo. Parâmetros públicos não podem substituir o destino
 - `professional-profile.js`: painel profissional, cartão digital, QR, vCard e calendário.
 - `help-center.js`: orientações gratuitas, ações contextuais e conceitos como iscas digitais.
 - `link-tools.js`: página pública e links inteligentes.
-- `agenda.js`: serviços, clientes, equipe e compromissos.
 - `resource-loader.js`: carregamento sob demanda de cursos e jogos.
 - `game-suite.js`: jogos e torneios. Rifas não fazem parte do portfólio.
 
@@ -54,6 +53,6 @@ O workflow `.github/workflows/pages.yml` publica o branch `main` no GitHub Pages
 
 1. Execute a auditoria estática.
 2. Verifique usuário ativo e inativo.
-3. Verifique abertura pública, página de links e agenda.
+3. Verifique abertura pública, página de links e cartão digital.
 4. Confirme os quatro idiomas.
 5. Atualize `version.json` para invalidar caches antigos.
