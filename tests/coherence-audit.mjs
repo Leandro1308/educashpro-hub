@@ -22,7 +22,7 @@ assert(app.includes("/api/platform-public/config"), "Apresentação deve consult
 assert(app.includes("contractRules.direct"), "Comissão direta exibida deve vir da configuração vigente");
 assert(!app.includes('<div class="directCommission"><b>60%</b>'), "Apresentação não pode fixar a comissão direta em 60%");
 
-for (const page of ["affiliate.html", "marketplace.html", "publish.html", "agenda.html", "support.html"]) {
+for (const page of ["affiliate.html", "marketplace.html", "publish.html",  "support.html"]) {
   assert(read(page).includes("locale-resolver.js"), `${page} deve carregar o idioma canônico`);
 }
 

@@ -26,7 +26,6 @@
       affiliate: "Indicar EduCashPro",
       network: "Minha Rede",
       subscription: "Assinatura",
-      agenda: "Agenda Profissional",
       projects: "Meus Projetos",
       language: "Idioma",
       preferences: "Preferências",
@@ -107,7 +106,6 @@
       affiliate: "Refer EduCashPro",
       network: "My Network",
       subscription: "Subscription",
-      agenda: "Professional Schedule",
       projects: "My Projects",
       language: "Language",
       preferences: "Preferences",
@@ -184,7 +182,6 @@
       affiliate: "Indicar EduCashPro",
       network: "Mi Red",
       subscription: "Suscripción",
-      agenda: "Agenda Profesional",
       projects: "Mis Proyectos",
       language: "Idioma",
       preferences: "Preferencias",
@@ -257,7 +254,6 @@
       affiliate: "Пригласить в EduCashPro",
       network: "Моя сеть",
       subscription: "Подписка",
-      agenda: "Расписание",
       projects: "Мои проекты",
       language: "Язык",
       preferences: "Предпочтения",
@@ -1041,7 +1037,6 @@
           case "network": openNetwork(); break;
           case "subscription": openSubscription(); break;
           case "pair-device": openDevicePairing(); break;
-          case "agenda": page("./agenda.html"); break;
           case "projects": nav("area"); break;
           case "profile-photo":
             close();

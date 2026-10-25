@@ -7,7 +7,6 @@
       academy: "Academy", academySub: "Cursos e conteúdos organizados.",
       explore: "Explorar", exploreSub: "Grupos, canais, bots e páginas.",
       benefits: "Benefícios", benefitsSub: "Vantagens e empresas parceiras.",
-      agenda: "Agenda Profissional", agendaSub: "Serviços, clientes e compromissos.",
       marketplace: "Marketplace", marketplaceSub: "Pesquise empresas e parceiros.",
       affiliate: "Meu Link", affiliateSub: "Acesse seu link de indicação.",
       publish: "Publicar", publishSub: "Divulgue seu projeto no EduCashPro.",
@@ -16,15 +15,15 @@
     },
     en: {
       title: "Explore EduCashPro", lead: "The same areas are available on mobile and desktop. Sign in to use personal features.",
-      presentation: "Discover EduCashPro", presentationSub: "Platform overview and presentation.", academy: "Academy", academySub: "Organized courses and content.", explore: "Explore", exploreSub: "Groups, channels, bots and pages.", benefits: "Benefits", benefitsSub: "Advantages and partner businesses.", agenda: "Professional Schedule", agendaSub: "Services, clients and appointments.", marketplace: "Marketplace", marketplaceSub: "Search businesses and partners.", affiliate: "My Link", affiliateSub: "Access your referral link.", publish: "Publish", publishSub: "Share your project on EduCashPro.", support: "Support", supportSub: "Contact the administration.", login: "Sign in to open this feature.",
+      presentation: "Discover EduCashPro", presentationSub: "Platform overview and presentation.", academy: "Academy", academySub: "Organized courses and content.", explore: "Explore", exploreSub: "Groups, channels, bots and pages.", benefits: "Benefits", benefitsSub: "Advantages and partner businesses.", marketplace: "Marketplace", marketplaceSub: "Search businesses and partners.", affiliate: "My Link", affiliateSub: "Access your referral link.", publish: "Publish", publishSub: "Share your project on EduCashPro.", support: "Support", supportSub: "Contact the administration.", login: "Sign in to open this feature.",
     },
     es: {
       title: "Explora EduCashPro", lead: "Las mismas áreas están disponibles en móvil y ordenador. Entra en tu cuenta para usar los recursos personales.",
-      presentation: "Conoce EduCashPro", presentationSub: "Presentación general de la plataforma.", academy: "Academy", academySub: "Cursos y contenidos organizados.", explore: "Explorar", exploreSub: "Grupos, canales, bots y páginas.", benefits: "Beneficios", benefitsSub: "Ventajas y empresas asociadas.", agenda: "Agenda Profesional", agendaSub: "Servicios, clientes y compromisos.", marketplace: "Marketplace", marketplaceSub: "Busca empresas y socios.", affiliate: "Mi Enlace", affiliateSub: "Accede a tu enlace de referido.", publish: "Publicar", publishSub: "Divulga tu proyecto en EduCashPro.", support: "Soporte", supportSub: "Habla con la administración.", login: "Entra en tu cuenta para abrir este recurso.",
+      presentation: "Conoce EduCashPro", presentationSub: "Presentación general de la plataforma.", academy: "Academy", academySub: "Cursos y contenidos organizados.", explore: "Explorar", exploreSub: "Grupos, canales, bots y páginas.", benefits: "Beneficios", benefitsSub: "Ventajas y empresas asociadas.", marketplace: "Marketplace", marketplaceSub: "Busca empresas y socios.", affiliate: "Mi Enlace", affiliateSub: "Accede a tu enlace de referido.", publish: "Publicar", publishSub: "Divulga tu proyecto en EduCashPro.", support: "Soporte", supportSub: "Habla con la administración.", login: "Entra en tu cuenta para abrir este recurso.",
     },
     ru: {
       title: "Возможности EduCashPro", lead: "Одни и те же разделы доступны на телефоне и компьютере. Войдите в аккаунт для личных функций.",
-      presentation: "О EduCashPro", presentationSub: "Обзор платформы.", academy: "Academy", academySub: "Курсы и материалы.", explore: "Обзор", exploreSub: "Группы, каналы, боты и страницы.", benefits: "Преимущества", benefitsSub: "Партнёры и специальные условия.", agenda: "Профессиональное расписание", agendaSub: "Услуги, клиенты и записи.", marketplace: "Marketplace", marketplaceSub: "Компании и партнёры.", affiliate: "Моя ссылка", affiliateSub: "Ваша реферальная ссылка.", publish: "Опубликовать", publishSub: "Разместить проект в EduCashPro.", support: "Поддержка", supportSub: "Связаться с администрацией.", login: "Войдите в аккаунт, чтобы открыть этот раздел.",
+      presentation: "О EduCashPro", presentationSub: "Обзор платформы.", academy: "Academy", academySub: "Курсы и материалы.", explore: "Обзор", exploreSub: "Группы, каналы, боты и страницы.", benefits: "Преимущества", benefitsSub: "Партнёры и специальные условия.", marketplace: "Marketplace", marketplaceSub: "Компании и партнёры.", affiliate: "Моя ссылка", affiliateSub: "Ваша реферальная ссылка.", publish: "Опубликовать", publishSub: "Разместить проект в EduCashPro.", support: "Поддержка", supportSub: "Связаться с администрацией.", login: "Войдите в аккаунт, чтобы открыть этот раздел.",
     },
   };
 
@@ -82,7 +81,6 @@
         ${card("🎓", "academy", "academySub", "login")}
         ${card("🔎", "explore", "exploreSub", "login")}
         ${card("🎁", "benefits", "benefitsSub", "login")}
-        ${card("📅", "agenda", "agendaSub", "login")}
         ${card("🏪", "marketplace", "marketplaceSub", "marketplace", true)}
         ${card("🔗", "affiliate", "affiliateSub", "login")}
         ${card("➕", "publish", "publishSub", "login")}

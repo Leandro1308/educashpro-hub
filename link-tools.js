@@ -253,17 +253,8 @@
     content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><div class="empty">${esc(text("loading"))}</div>`;
     document.getElementById("linkBack").onclick = backToOrigin;
     try {
-      const [data,agendaData] = await Promise.all([
-        api("/api/hub/link-page", { token: session?.token }),
-        active() ? api("/api/agenda/bootstrap", { token: session?.token, appointmentOffset: 0, appointmentLimit: 1 }).catch(() => null) : null
-      ]);
-      const page=data.page || {};
-      const agenda=agendaData?.access?.agenda;
-      if(agenda?.publicId && session?.botUrl){
-        const labels={pt:"Agendar atendimento",en:"Book an appointment",es:"Reservar una cita",ru:"Записаться"};
-        page.integratedAgendaLink={title:labels[language()]||labels.pt,url:`${session.botUrl}?startapp=agenda_${agenda.publicId}`};
-      }
-      renderPageForm(page);
+      const data = await api("/api/hub/link-page", { token: session?.token });
+      renderPageForm(data.page || {});
     } catch { renderPageForm({}); }
   }
 
@@ -271,7 +262,6 @@
     ++campaignEpoch;
     const limit = active() ? 20 : 3;
     const storedLinks = Array.isArray(page.links) ? page.links.slice(0, 20) : [];
-    if(page.integratedAgendaLink && !storedLinks.some(item=>item.url===page.integratedAgendaLink.url) && storedLinks.length<limit) storedLinks.push(page.integratedAgendaLink);
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < Math.min(limit, 3)) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";

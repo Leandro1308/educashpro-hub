@@ -2,7 +2,7 @@
 "use strict";
 if(window.EduCashProContextGuide)return;
 const IDS={
-areaProfessional:"professional",editProfilePhoto:"profile-photo",areaLinkPage:"link-page",areaAgenda:"agenda",
+areaProfessional:"professional",editProfilePhoto:"profile-photo",areaLinkPage:"link-page",
 areaAccountSettings:"account",areaLanguage:"account",areaPreferences:"notifications",membershipProof:"credential",areaNetwork:"affiliate",
 areaSubscription:"subscription",areaSmartLink:"smart-link",areaAffiliate:"affiliate",affiliateQr:"affiliate",
 areaSupport:"troubleshoot",areaDocuments:"account",manageProjects:"project-register",
@@ -16,7 +16,7 @@ marketExpand:"market-chart"
 const FEATURE={
 academy:"academy",analysis:"market-chart",technical:"market-chart",financial:"academy",telegram:"telegram",tools:"tools",
 "finance-control":"monthly-finance",explore:"explore",benefits:"benefits",
-marketplace:"marketplace",professional:"professional",links:"link-page",agenda:"agenda",
+marketplace:"marketplace",professional:"professional",links:"link-page",
 "smart-link":"smart-link",credential:"credential",affiliate:"affiliate",
 network:"affiliate",subscription:"subscription",support:"troubleshoot",admin:"admin",
 "network_marketing":"academy","financial_education":"academy",
@@ -33,13 +33,11 @@ network:"affiliate",subscription:"subscription",support:"troubleshoot",admin:"ad
 "marketplace-company":"marketplace",
 "chart":"market-chart","technical":"market-technical",
 "heatmap":"market-heatmap","calendar":"market-calendar","fibonacci":"market-fibonacci",
-"services":"agenda-services","clients":"agenda-clients","team":"agenda-team",
-"finance":"agenda-finance","agenda":"agenda","settings":"agenda-settings"
 };
 const MANUAL={
 home:"start",learn:"academy",academy:"academy",account:"account",
 subscription:"subscription",affiliate:"affiliate",professional:"professional",
-agenda:"agenda",links:"links","monthly-finance":"finance",tools:"tools",
+links:"links","monthly-finance":"finance",tools:"tools",
 explore:"explore",benefits:"benefits",telegram:"telegram",admin:"account",
 "troubleshoot":"troubleshoot","financial_education":"academy"
 };
@@ -51,8 +49,6 @@ const ACCESS={
 "affiliate-calc":"free","link-page":"limited","smart-link":"limited","qr-code":"free",
 
 
-"agenda":"subscriber","agenda-settings":"subscriber","agenda-services":"subscriber",
-"agenda-clients":"subscriber","agenda-team":"subscriber","agenda-finance":"subscriber",
 "market-chart":"subscriber","market-technical":"subscriber",
 "market-fibonacci":"free","market-calendar":"free","market-heatmap":"free",
 "marketplace":"free","company-register":"subscriber","project-register":"subscriber",
@@ -178,12 +174,11 @@ function resolve(target){
  if(d.toolId)return d.toolId;
  if(d.marketWidget)return FEATURE[d.marketWidget]||"market-chart";
  if(d.finCard)return d.finCard==="0"?"receivables":"quote";
- const onAgenda=/\/agenda\.html$/i.test(location.pathname);
- if(d.view)return onAgenda?(FEATURE[d.view]||"agenda"):(SITE_KEYS.has(d.view)?({learn:"academy",explore:"explore",benefits:"benefits",area:"account",tools:"tools",home:"home",presentation:"start"}[d.view]):"");
+ if(d.view)return (SITE_KEYS.has(d.view)?({learn:"academy",explore:"explore",benefits:"benefits",area:"account",tools:"tools",home:"home",presentation:"start"}[d.view]):"");
  if(d.target)return FEATURE[d.target]||MANUAL[d.target]||"";
  if(d.action){if(d.action==="settings")return"account";return FEATURE[d.action]||"";}
  if(matched.id&&IDS[matched.id])return IDS[matched.id];
- if(matched.tagName==="A"){const href=matched.getAttribute("href")||"";if(href.includes("marketplace.html"))return"marketplace";if(href.includes("agenda.html"))return"agenda";if(href.includes("support.html"))return"troubleshoot"}
+ if(matched.tagName==="A"){const href=matched.getAttribute("href")||"";if(href.includes("marketplace.html"))return"marketplace";if(href.includes("support.html"))return"troubleshoot"}
  if(d.bookChapter!==undefined)return "book-business-21";
  return"";
 }
@@ -208,8 +203,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  }catch{}
  const page=String(location.pathname||"");
  if(!target){
-   if(/\/agenda\.html$/i.test(page))target="agenda";
-   else if(/\/marketplace\.html$/i.test(page))target="marketplace";
+   if(/\/marketplace\.html$/i.test(page))target="marketplace";
    else if(/\/affiliate\.html$/i.test(page))target="affiliate";
    else if(/\/publish\.html$/i.test(page))target="project-register";
    else if(/\/support\.html$/i.test(page))target="troubleshoot";
