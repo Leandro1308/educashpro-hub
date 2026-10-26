@@ -60,3 +60,36 @@ const run=new Function('status','s','window','setOpened',callback);
 for(let i=0;i<5;i++)run(status,key=>key==='approved'?'Device authorized.':'Invalid code.',{setTimeout(){timers++}},()=>{});
 assert.equal(writes,1);assert.equal(timers,1);
 console.log(`Navigation performance regression checks OK: ${pages.length} HTML entrypoints, filter races, detail races, observer convergence and request deadlines`);
+
+// The contextual Back button must use internal history, including Benefits.
+const menuSource=fs.readFileSync('web-site-menu.js','utf8');
+assert(menuSource.includes('back.setAttribute("data-navigation-back", "")'));
+const contextBack=menuSource.match(/back\.onclick=\(\)=>\{([\s\S]*?)\n      \};/)[1];
+const runBack=new Function('window','session',contextBack);
+const signedIn=()=>({token:'test',profile:{userId:1}});
+const calls=[];
+const app={setView:view=>calls.push(view),renderPublicLanding:()=>calls.push('landing')};
+runBack({EduCashProNavigation:{back:()=>{calls.push('previous');return true}},EduCashProApp:app},signedIn);
+assert.deepEqual(calls,['previous']);
+calls.length=0;
+runBack({EduCashProNavigation:{back:()=>false},EduCashProApp:app},signedIn);
+assert.deepEqual(calls,['home'],'Direct entry must have a working signed-in fallback');
+calls.length=0;
+runBack({EduCashProApp:app},()=>null);
+assert.deepEqual(calls,['landing'],'Guest entry must return to the public landing');
+
+const listeners={};
+let backCalls=0;
+const navWindow={scrollY:0,scrollTo(){},addEventListener:(name,fn)=>listeners[name]=fn};
+const navHistory={state:null,replaceState(value){this.state=value},pushState(value){this.state=value},back(){backCalls++}};
+vm.runInNewContext(fs.readFileSync('navigation-flow.js','utf8'),{
+ window:navWindow,history:navHistory,location:{href:'https://example.test/'},URL,console,
+ document:{addEventListener:(name,fn)=>listeners[name]=fn}
+});
+const nav=navWindow.EduCashProNavigation;
+nav.record({view:'learn'});nav.record({view:'benefits'});
+let stopped=false;
+listeners.click({target:{closest:()=>({id:'',matches:selector=>selector==='[data-navigation-back]',classList:{contains:()=>false}})},preventDefault(){},stopImmediatePropagation(){stopped=true}});
+assert.equal(backCalls,1,'One click must trigger exactly one history back');
+assert(stopped,'Capture handler must prevent a second back from the button handler');
+console.log('Contextual Back regression checks OK: previous page, direct entry and guest fallback');
