@@ -1540,6 +1540,7 @@
     content.innerHTML = `<button id="formBack" class="textButton">← ${escapeHtml(fc("back"))}</button><section class="hero"><span class="eyebrow">EDUCASHPRO</span><h1>${escapeHtml(title)}</h1><p>${escapeHtml(t("benefitsDesc"))}</p></section>${kind === "partner" ? `<div id="ownedCompanies" class="cardList" style="margin-bottom:14px"></div>` : `<section class="creatorReferralNotice compact"><span>🔗</span><div><h2>${escapeHtml(featureCopy("creatorReferralTitle"))}</h2><p>${escapeHtml(featureCopy("creatorReferralText"))}</p></div></section>`}<form id="submissionForm" class="toolCard"><input id="partnerId" type="hidden" value="${escapeHtml(existingPartner?.id || "")}"><div class="fieldGrid">${fields}${field("language", fc("language"), "select", true, [["pt", "Português"], ["en", "English"], ["es", "Español"], ["ru", "Русский"]])}</div><button id="submitForm" class="wideButton" type="submit" style="margin-top:14px">${escapeHtml(kind === "partner" ? companyActionCopy.save : fc("save"))}</button></form>`;
     document.getElementById("language").value = state.language;
     if (kind === "partner") {
+      window.EduCashProResources?.script("./partner-banner.js?v=20261025.2").then(() => window.EduCashProPartnerBanner?.attach()).catch(error => console.error("[Company banner]",error));
       let unitCount = 1;
       const setValue = (id, value) => { const input = document.getElementById(id); if (input) input.value = value ?? ""; };
       if (existingPartner) {
@@ -2606,5 +2607,6 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
+
 
 
