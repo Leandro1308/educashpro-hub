@@ -137,7 +137,14 @@
     labelAccount();
     const content=document.getElementById("content");
     if(content&&!content.querySelector(".publicWelcome,.splash")&&!content.querySelector(".webContextBack,[id$='Back'],.gameBack,#formBack,#qrBack,#proofBack,#profilePhotoBack")){
-      const back=document.createElement("button");back.className="webContextBack";back.type="button";back.textContent=`← ${lang()==="en"?"Back":lang()==="es"?"Volver":lang()==="ru"?"Назад":"Voltar"}`;back.onclick=()=>window.EduCashProApp?.renderPublicLanding?.();content.prepend(back);
+      const back=document.createElement("button");back.className="webContextBack";back.type="button";back.textContent=`← ${lang()==="en"?"Back":lang()==="es"?"Volver":lang()==="ru"?"Назад":"Voltar"}`;back.setAttribute("data-navigation-back", "");
+      back.onclick=()=>{
+        if(window.EduCashProNavigation?.back?.())return;
+        const app=window.EduCashProApp;
+        if(session()?.token&&session()?.profile?.userId)app?.setView?.("home");
+        else app?.renderPublicLanding?.();
+      };
+      content.prepend(back);
     }
   }
   let installQueued=false;
