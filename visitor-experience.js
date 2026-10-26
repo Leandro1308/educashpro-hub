@@ -304,7 +304,7 @@
   function enhancePartnerForm() {
     const form = document.getElementById("submissionForm");
     const companyName = document.getElementById("companyName");
-    if (!form || !companyName || form.dataset.partnerEnhanced === "1") return;
+    if (!form || !companyName || form.dataset.partnerBanner === "1" || form.dataset.partnerEnhanced === "1") return;
     form.dataset.partnerEnhanced = "1";
 
     const description = document.getElementById("description");
@@ -380,4 +380,5 @@
   observer.observe(observedRoot, { childList: true, subtree: false });
   document.addEventListener("DOMContentLoaded",()=>{syncSession();enhance()});
 })();
+
 

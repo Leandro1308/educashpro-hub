@@ -1,10 +1,9 @@
 (function () {
   function requestSignal(){
     if(typeof AbortSignal.timeout === "function")return AbortSignal.timeout(15000);
-    const controller=new AbortController();
-    setTimeout(()=>controller.abort(),15000);
-    return controller.signal;
+    const controller=new AbortController();setTimeout(()=>controller.abort(),15000);return controller.signal;
   }
+  let detailEpoch=0;
   const API_BASE = "https://educashpro-all.onrender.com";
   const CACHE_TTL = 5 * 60 * 1000;
 
@@ -65,6 +64,20 @@
     ru:{name:"Клуб преимуществ",register:"Добавить мою компанию",credential:"Открыть мою карту",services:"Услуги",units:"Отделения",rules:"Правила преимущества",subscriber:"Преимущество доступно только активным подписчикам EduCashPro. Покажите QR-код карты в физическом отделении.",submitted:"Предложение добавлено партнёром. Регистрационные данные и данные ответственного лица доступны только администрации.",verified:"Проверенная компания"},
   })[lang];
 
+  const filterCopy = ({
+    pt:{segment:"Segmento",allSegments:"Todos",filters:"Filtros",language:"Idioma do anúncio",all:"Todos os idiomas",country:"País",state:"Estado/Região",city:"Cidade",benefit:"Benefício para assinantes",hint:"Selecione ou digite"},
+    en:{segment:"Segment",allSegments:"All",filters:"Filters",language:"Listing language",all:"All languages",country:"Country",state:"State/Region",city:"City",benefit:"Subscriber benefit",hint:"Select or type"},
+    es:{segment:"Segmento",allSegments:"Todos",filters:"Filtros",language:"Idioma del anuncio",all:"Todos los idiomas",country:"País",state:"Estado/Región",city:"Ciudad",benefit:"Beneficio para suscriptores",hint:"Selecciona o escribe"},
+    ru:{segment:"Категория",allSegments:"Все",filters:"Фильтры",language:"Язык объявления",all:"Все языки",country:"Страна",state:"Регион",city:"Город",benefit:"Преимущество подписчика",hint:"Выберите или введите"}
+  })[lang];
+  function bannerUrl(value) {
+    try {
+      const url=new URL(value);
+      if(!["https:","http:"].includes(url.protocol)) return "";
+      if(url.hostname === "res.cloudinary.com") return url.toString().replace("/image/upload/","/image/upload/f_auto,q_auto,w_720,h_288,c_fill/");
+      return url.toString();
+    } catch { return ""; }
+  }
   const segmentLabels = {
     pt: { pharmacy:"Farmácias", clinic:"Clínicas", physiotherapy:"Fisioterapia", gym:"Academias", dental:"Odontologia", laboratory:"Laboratórios", nutrition:"Nutrição", psychology:"Psicologia", beauty:"Beleza", education:"Educação", restaurants:"Restaurantes", retail:"Comércio", services:"Serviços", technology:"Tecnologia", other:"Outros" },
     en: { pharmacy:"Pharmacies", clinic:"Clinics", physiotherapy:"Physiotherapy", gym:"Gyms", dental:"Dental", laboratory:"Laboratories", nutrition:"Nutrition", psychology:"Psychology", beauty:"Beauty", education:"Education", restaurants:"Restaurants", retail:"Retail", services:"Services", technology:"Technology", other:"Other" },
@@ -73,7 +86,7 @@
   }[lang];
 
   const el = (id) => document.getElementById(id);
-  const state = { page: 1, hasMore: false, loading: false, items: [], reportCompanyId: "", reportSending: false };
+  const state = { page: 1, hasMore: false, loading: false, items: [], reportCompanyId: "", reportSending: false, requestId: 0, controller: null };
 
   function setText(id, value) { const node = el(id); if (node) node.textContent = value; }
   function escapeHtml(value) { return String(value || "").replace(/[&<>'"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
@@ -92,7 +105,11 @@
     document.documentElement.lang = lang === "pt" ? "pt-BR" : lang;
     setText("eyebrow", copy.eyebrow); setText("marketTitle", copy.title); setText("marketSubtitle", copy.subtitle);
     setText("searchLabel", copy.search); el("searchInput").placeholder = copy.searchPlaceholder;
-    setText("categoryLabel", copy.category); setText("locationLabel", copy.locality); el("locationInput").placeholder = copy.localityPlaceholder;
+    setText("categoryLabel", filterCopy.segment);
+    for(const key of ["country","state","city"]) {setText(key+"Label",filterCopy[key]);el(key+"Input").placeholder=filterCopy.hint;}
+    setText("adLanguageLabel",filterCopy.language);setText("filtersToggle",filterCopy.filters);
+    el("adLanguageSelect").options[0].textContent=filterCopy.all;
+    if(window.matchMedia("(max-width: 560px)").matches) el("advancedFilters").open=false;
     setText("filterButton", copy.searchButton); setText("clearButton", copy.clear); setText("emptyTitle", copy.emptyTitle); setText("emptyText", copy.emptyText);
     setText("errorTitle", copy.errorTitle); setText("errorText", copy.errorText); setText("retryButton", copy.retry);
     setText("previousText", copy.previous); setText("nextText", copy.next); setText("detailBackText", copy.back);
@@ -105,11 +122,11 @@
   function renderSegments(segments) {
     const select = el("segmentSelect");
     const current = select.value;
-    select.innerHTML = `<option value="">${escapeHtml(copy.all)}</option>` + (segments || Object.keys(segmentLabels)).map((segment) => `<option value="${escapeHtml(segment)}">${escapeHtml(segmentText(segment))}</option>`).join("");
+    select.innerHTML = `<option value="">${escapeHtml(filterCopy.allSegments)}</option>` + (segments || Object.keys(segmentLabels)).map((segment) => `<option value="${escapeHtml(segment)}">${escapeHtml(segmentText(segment))}</option>`).join("");
     select.value = current;
   }
 
-  function cacheKey(params) { return `educashpro:marketplace:v1:${params.toString()}`; }
+  function cacheKey(params) { return `educashpro:marketplace:v2:${params.toString()}`; }
   function readCache(params) {
     try {
       const raw = localStorage.getItem(cacheKey(params)); if (!raw) return null;
@@ -121,8 +138,11 @@
 
   function currentParams() {
     const params = new URLSearchParams();
-    const q = el("searchInput").value.trim(); const segment = el("segmentSelect").value; const locationValue = el("locationInput").value.trim();
-    if (q) params.set("q", q); if (segment) params.set("segment", segment); if (locationValue) params.set("location", locationValue);
+    const q = el("searchInput").value.trim(), segment=el("segmentSelect").value;
+    if(q)params.set("q",q);if(segment)params.set("segment",segment);
+    const language=el("adLanguageSelect").value;if(language)params.set("language",language);
+    for(const key of ["country","state","city"]){const value=el(key+"Input").value.trim();if(value)params.set(key,value);}
+    if(state.page === 1)params.set("filters","1");
     params.set("page", String(state.page)); params.set("pageSize", "20");
     return params;
   }
@@ -133,45 +153,42 @@
   }
 
   function companyCard(item) {
-    const logo = item.logoUrl ? `<img src="${escapeHtml(item.logoUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer" />` : escapeHtml(initials(item.companyName));
-    const coverClass = item.coverUrl ? "companyCover hasImage" : "companyCover";
-    const coverStyle = item.coverUrl ? ` style="background-image:url('${escapeHtml(item.coverUrl)}')"` : "";
-    return `<article class="companyCard">
-      <div class="${coverClass}"${coverStyle}><div class="companyLogo">${logo}</div></div>
-      <div class="companyBody">
-        <h2><button type="button" data-company="${escapeHtml(item.id)}">${escapeHtml(item.companyName)}</button></h2>
-        <div class="companyMeta"><span class="pill">${escapeHtml(segmentText(item.segment))}</span><span class="pill">📍 ${escapeHtml(locationText(item))}</span></div>
-        <p class="companyDescription">${escapeHtml(item.description || copy.noDescription)}</p>
-        <div class="cardAction"><button type="button" data-company="${escapeHtml(item.id)}">${escapeHtml(copy.view)}</button></div>
-      </div>
-    </article>`;
+    const cover=bannerUrl(item.coverUrl);
+    return `<article class="companyCard"><button type="button" class="companyCardLink" data-company="${escapeHtml(item.id)}" aria-label="${escapeHtml(copy.view+": "+item.companyName)}">
+      <div class="companyCover">${cover?`<img class="companyBanner" src="${escapeHtml(cover)}" alt="" width="720" height="288" loading="lazy" decoding="async" referrerpolicy="no-referrer">`:`<span class="bannerFallback">${escapeHtml(initials(item.companyName))}</span>`}</div>
+      <div class="companyBody"><h2>${escapeHtml(item.companyName)}</h2><p class="companyLocation">📍 ${escapeHtml(locationText(item))}</p>
+      <div class="companyMeta"><span class="pill">${escapeHtml(segmentText(item.segment))}</span>${item.discountRange?`<span class="pill benefitPill">${escapeHtml(filterCopy.benefit)} · ${escapeHtml(item.discountRange)}</span>`:""}</div>
+      <span class="cardDetailLabel">${escapeHtml(copy.view)} →</span></div></button></article>`;
+  }
+  function renderFilterChoices(filters) {
+    if(!filters)return;
+    for(const [key,source] of [["country","countries"],["state","states"],["city","cities"]])el(key+"Choices").innerHTML=(filters[source]||[]).map(value=>`<option value="${escapeHtml(value)}"></option>`).join("");
   }
 
   function renderList(data) {
     state.items = Array.isArray(data.items) ? data.items : []; state.hasMore = !!data.hasMore;
-    renderSegments(data.segments);
+    renderSegments(data.segments); renderFilterChoices(data.filters);
     el("companyGrid").innerHTML = state.items.map(companyCard).join("");
     el("emptyState").classList.toggle("hidden", state.items.length > 0); el("errorState").classList.add("hidden");
     setText("resultStatus", copy.results(state.items.length)); setText("pageLabel", copy.page(state.page));
     el("previousButton").disabled = state.page <= 1; el("nextButton").disabled = !state.hasMore;
   }
 
-  let listEpoch=0, detailEpoch=0;
   async function loadCompanies({ useCache = true } = {}) {
-    const ticket=++listEpoch; state.loading = true;
+    state.controller?.abort(); const controller=new AbortController();state.controller=controller;
+    const requestId=++state.requestId;state.loading=true;
+    const timeout=setTimeout(()=>controller.abort(),15000);
     const params = currentParams(); const cached = useCache ? readCache(params) : null;
     if (cached) renderList(cached); else showSkeleton();
     try {
-      const response = await fetch(`${API_BASE}/api/public/marketplace?${params.toString()}`, { signal:requestSignal(), headers: { Accept: "application/json" } });
+      const response = await fetch(`${API_BASE}/api/public/marketplace?${params.toString()}`, { headers: { Accept: "application/json" }, signal:controller.signal });
       const data = await response.json(); if (!response.ok || !data?.ok) throw new Error(data?.reason || "marketplace_failed");
-      writeCache(params, data);
-      if(ticket!==listEpoch)return;
-      renderList(data);
+      if(requestId !== state.requestId)return; writeCache(params, data); renderList(data);
     } catch (error) {
-      if(ticket!==listEpoch)return;
+      if(requestId !== state.requestId)return;
       console.error("[Marketplace]", error);
       if (!cached) { el("companyGrid").innerHTML = ""; el("emptyState").classList.add("hidden"); el("errorState").classList.remove("hidden"); setText("resultStatus", ""); }
-    } finally { if(ticket===listEpoch)state.loading = false; }
+    } finally { clearTimeout(timeout);if(requestId === state.requestId)state.loading = false; }
   }
 
   function detailMarkup(item) {
@@ -309,9 +326,15 @@
 
   applyCopy(); renderSegments(Object.keys(segmentLabels));
   el("filterButton").addEventListener("click", () => { state.page = 1; loadCompanies(); });
-  el("searchInput").addEventListener("input", debouncedSearch); el("locationInput").addEventListener("input", debouncedSearch);
+  el("searchInput").addEventListener("input", debouncedSearch);
+  for(const key of ["country","state","city"]){el(key+"Input").addEventListener("input",()=>{
+    if(key === "country"){el("stateInput").value="";el("cityInput").value="";el("stateChoices").innerHTML="";el("cityChoices").innerHTML="";}
+    if(key === "state"){el("cityInput").value="";el("cityChoices").innerHTML="";}
+    el("stateInput").disabled=!el("countryInput").value.trim();el("cityInput").disabled=!el("stateInput").value.trim();debouncedSearch();
+  });}
+  el("adLanguageSelect").addEventListener("change",()=>{state.page=1;loadCompanies();});
   el("segmentSelect").addEventListener("change", () => { state.page = 1; loadCompanies(); });
-  el("clearButton").addEventListener("click", () => { el("searchInput").value = ""; el("locationInput").value = ""; el("segmentSelect").value = ""; state.page = 1; loadCompanies(); });
+  el("clearButton").addEventListener("click", () => { el("searchInput").value = ""; for(const key of ["country","state","city"])el(key+"Input").value="";el("adLanguageSelect").value="";el("stateInput").disabled=true;el("cityInput").disabled=true; el("segmentSelect").value = ""; state.page = 1; loadCompanies(); });
   el("retryButton").addEventListener("click", () => loadCompanies({ useCache: false }));
   el("previousButton").addEventListener("click", () => { if (state.page <= 1) return; state.page -= 1; loadCompanies(); window.scrollTo({ top: 0, behavior: "smooth" }); });
   el("nextButton").addEventListener("click", () => { if (!state.hasMore) return; state.page += 1; loadCompanies(); window.scrollTo({ top: 0, behavior: "smooth" }); });
@@ -326,3 +349,4 @@
   const initialCompany = qs.get("company");
   if (initialCompany) openCompany(initialCompany, { push: false }); else loadCompanies();
 })();
+
