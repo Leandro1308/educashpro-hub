@@ -1,0 +1,37 @@
+name: Verify shared finance live release v15
+on:
+  pull_request:
+    paths: [.github/workflows/verify-shared-finance-live-v15.yml]
+permissions:
+  contents: read
+jobs:
+  public-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check production version and canonical finance code
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          for file in version.json index.html monthly-finance-sharing.js monthly-finance-control.js app.js; do
+            curl -fLsS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 45 -H 'Cache-Control: no-cache' "$base/$file?audit=$nonce" -o "/tmp/live-$file"
+            echo "$file: $(wc -c </tmp/live-$file) bytes"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const read=n=>fs.readFileSync("/tmp/live-"+n,"utf8");
+            assert.equal(JSON.parse(read("version.json")).build,"2026.10.27.15");
+            assert(read("index.html").includes("resource-loader.js?v=20261027.15"));
+            const control=read("monthly-finance-control.js");
+            const share=read("monthly-finance-sharing.js");
+            const app=read("app.js");
+            assert(control.includes("onOwnerWorkspace:"),"Owner is not directed to shared ledger");
+            assert(share.includes("startViewerPoll("),"Live shared updates not deployed");
+            assert(share.includes("expectedRevision:"),"Concurrency protection not deployed");
+            assert(share.includes("financeViewerPdf"),"Shared PDF action missing");
+            assert(share.includes("EduCashProPdf.exportHtml"),"EduCashPro PDF generator missing");
+            assert(app.includes("Bearer cookie-session"),"Cookie authentication fix missing");
+            console.log("PASS PUBLIC Render finance v2026.10.27.15: unified ledger, auto refresh, revision conflict guard, PDF branding and authenticated sharing");
+          '
