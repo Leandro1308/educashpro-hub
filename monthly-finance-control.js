@@ -474,9 +474,6 @@
   function write(data) {
     try {
       localStorage.setItem(storageKey(), JSON.stringify(data));
-      if (options.active) localStorage.setItem(storageKey() + ":pending", "1");
-      if (options.active)
-        window.EduCashProFinanceShare?.sync?.(data)?.catch?.(() => {});
       return true;
     } catch {
       notice = t().error;
@@ -872,13 +869,6 @@
     const initialized = window.EduCashProFinanceShare?.init?.({
       ...options,
       read,
-      hasPending: () => localStorage.getItem(storageKey() + ":pending") === "1",
-      markSynced: () => localStorage.removeItem(storageKey() + ":pending"),
-      hydrate: (months) => {
-        const data = read();
-        Object.assign(data, months);
-        localStorage.setItem(storageKey(), JSON.stringify(data));
-      },
       backToFinance: renderPage,
     }).catch?.(() => {});
     if (args.sharedWorkspace)
