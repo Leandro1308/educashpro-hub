@@ -1,0 +1,82 @@
+name: Verify live finance buttons version 10
+on:
+  pull_request:
+    paths: [.github/workflows/verify-finance-live-v10.yml]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download public deployment and check build
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://go.educashpro.vip/app
+          q="$GITHUB_SHA-$GITHUB_RUN_ATTEMPT"
+          for file in version.json index.html monthly-finance-control.js local-tools-and-games.js resource-loader.js; do
+            curl -fLsS --retry 3 --retry-delay 2 --max-time 45 -H 'Cache-Control: no-cache' "$base/$file?test=$q" -o "/tmp/$file"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const f=n=>fs.readFileSync("/tmp/"+n,"utf8");
+            assert.equal(JSON.parse(f("version.json")).build,"2026.10.27.10");
+            assert(f("index.html").includes("resource-loader.js?v=20261027.10"));
+            assert(f("monthly-finance-control.js").includes("financeExpenseError"));
+            assert(f("monthly-finance-control.js").includes("bindOptionalActions()"));
+            assert(f("local-tools-and-games.js").includes("api:window.EduCashProApp?.financeApi"));
+            assert(f("resource-loader.js").includes("20261027.10"));
+            console.log("PASS deployed version 2026.10.27.10 with expense edit, PDF/share fallback and authenticated API");
+          '
+      - name: Verify live edit button in mobile browser
+        shell: bash
+        run: |
+          mkdir -p /tmp/livefinance
+          cd /tmp/livefinance
+          npm init -y >/dev/null
+          npm install --ignore-scripts --no-audit --no-fund playwright@1.58.2 >/dev/null
+          cat > verify.cjs <<'JS'
+          const {chromium}=require("playwright");
+          const assert=require("node:assert/strict");
+          (async()=>{
+          const browser=await chromium.launch({channel:"chrome",headless:true,args:["--no-sandbox"]});
+          try{
+            const page=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:"pt-BR"});
+            const errors=[];
+            page.on("pageerror",e=>errors.push(e.message));
+            page.on("dialog",d=>d.accept());
+            const base="https://go.educashpro.vip/app/";
+            await page.route(base+"__live_finance_test__.html",route=>route.fulfill({status:200,contentType:"text/html",body:'<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="content"></div></body></html>'}));
+            await page.goto(base+"__live_finance_test__.html");
+            await page.evaluate(()=>{
+              window.__EDUCASHPRO_SESSION__={token:"fixture",profile:{userId:"diagnostic-v10",active:false,language:"pt"}};
+              window.EduCashProNavigation={stamp:()=>1,isCurrent:()=>true};
+              window.EduCashProApp={rememberRoute(){},financeApi:async()=>({workspaces:[]})};
+              window.EduCashProAccess={snapshot:()=>({known:true,active:false})};
+            });
+            await page.addScriptTag({url:base+"resource-loader.js?v=20261027.10"});
+            await page.addScriptTag({url:base+"local-tools-and-games.js?v=20261027.10"});
+            await page.evaluate(()=>window.EduCashProLocal.openTool("monthly-finance"));
+            await page.locator("#financeStart").click();
+            await page.locator("#financeAdd").click();
+            await page.locator("#expenseAmount").fill("113,85");
+            await page.locator("#expenseCategory").selectOption("education");
+            await page.locator("#expenseDescription").fill("ChatGpt");
+            await page.locator("#financeExpenseForm button.wideButton").click();
+            const id=await page.locator("[data-edit]").first().getAttribute("data-edit");
+            assert(id,"Expense was not saved");
+            await page.locator("[data-edit]").first().click();
+            await page.locator("#expenseAmount").fill("114,85");
+            await page.locator("#expenseDescription").fill("ChatGpt corrigido");
+            await page.locator("#financeExpenseForm button.wideButton").click();
+            const record=await page.evaluate(()=>JSON.parse(localStorage.getItem("educashpro:monthly-finance:diagnostic-v10")||"{}"));
+            const entries=Object.values(record).flatMap(month=>month.expenses||[]);
+            assert(entries.some(row=>row.id===id&&row.amount===114.85&&row.description==="ChatGpt corrigido"),"Live Edit expense is not persisted");
+            assert.deepEqual(errors,[],"No JavaScript errors on live edit");
+            console.log("PASS live mobile expense creation and UPDATE button with production JS assets");
+            await page.close();
+          }finally{await browser.close()}
+          })().catch(err=>{console.error(err.stack||err);process.exitCode=1});
+          JS
+          node verify.cjs
