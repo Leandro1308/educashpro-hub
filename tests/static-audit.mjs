@@ -20,7 +20,7 @@ const [index,app,support,links,professional,loader,help,courses,accountCenter,we
 const runtimeStability=await read("runtime-stability-v11.js");
 const experienceV2=await read("experience-v2.css");
 const technicalCourse=await read("technical-analysis-course.js");
-const marketCenter=await read("market-learning-center.js");
+const marketCenter=await read("market-learning-center-v20261027.js");
 const financeControl=await read("monthly-finance-control.js");
 const localTools=await read("local-tools-and-games.js");
 const idleFeatures=await read("idle-features-v11.js");
@@ -62,9 +62,11 @@ assert(loader.includes("help-center.js")&&loader.includes("loadHelp")&&app.inclu
 assert(app.includes("readerThemeDot")&&app.includes("educashpro:reader-theme"),"Reader theme toggle is missing");
 assert(technicalCourse.includes("campaign=43340")&&!technicalCourse.includes("campaign=43335"),"Exness affiliate campaign is incorrect");
 assert(technicalCourse.includes('button: "CURSO EM VÍDEO"')&&technicalCourse.includes("url: VIDEO_COURSE_URL, videoUrl: EXNESS_URL"),"Free video and Exness actions are not separated correctly");
-assert(loader.includes("market-learning-center.js")&&loader.includes("loadMarkets")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
-assert(index.includes("resource-loader.js")&&loader.includes("market-learning-center.js")&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
-assert(!index.includes('src="./market-learning-center.js'),"Markets center must not race the lazy loader with an eager script");
+assert(loader.includes("market-learning-center-v20261027.js")&&loader.includes("loadMarkets")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
+assert(marketCenter.includes("trainerAvailable: true") && marketCenter.includes('id="marketPriceAction"'),"Published market module must include the trainer");
+assert(index.includes('src="./resource-loader-v20261027.js') && loader.includes("market_trainer_module_missing"),"Fresh browser loader must reject legacy cached market code");
+assert(index.includes("resource-loader-v20261027.js")&&loader.includes("market-learning-center-v20261027.js")&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
+assert(!index.includes('src="./market-learning-center-v20261027.js'),"Markets center must not race the lazy loader with an eager script");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("https://one.exnessonelink.com/a/93bgo7jpfo?source=app"),"Partner attribution is missing from the markets center");
 assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
 assert(!marketCenter.includes("babypips.com")&&!marketCenter.includes("ig.com/en/learn-to-trade"),"Non-partner course links must not be displayed");
