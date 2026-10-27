@@ -1,0 +1,35 @@
+name: Verify deployed Price Action Center
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-trader-center-live.yml"
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate actual Render site release and learning center
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          curl -fLsS --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/version.json?verify=$nonce" -o /tmp/version.json
+          node -e 'const v=require("/tmp/version.json");if(v.build!=="2026.10.27.5")throw Error("Wrong deployed build "+v.build);console.log("Live build: "+v.build)'
+          curl -fLsS --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/market-learning-center.js?verify=$nonce" -o /tmp/markets.js
+          curl -fLsS --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/price-action-trainer.js?verify=$nonce" -o /tmp/trainer.js
+          node --check /tmp/markets.js
+          node --check /tmp/trainer.js
+          node -e '
+            const fs=require("fs");
+            const market=fs.readFileSync("/tmp/markets.js","utf8");
+            const trainer=fs.readFileSync("/tmp/trainer.js","utf8");
+            const chart=market.slice(market.indexOf("  function render(args = {}) {"));
+            const center=market.slice(market.indexOf("  function learningSectionsMarkup("),market.indexOf("  function render(args = {}) {"));
+            if(!chart.includes("marketExnessInvite")||!chart.includes("marketLearningOpen"))throw Error("Main page missing Exness or Price Action Center link");
+            if(chart.includes("marketCourseGrid")||chart.includes("marketTrainerMount"))throw Error("Main Trader page still crowded");
+            if(!center.includes("marketLearningBack")||!center.includes("marketCourseGrid")||!center.includes("marketTrainerMount")||!center.includes("marketPartnerGrid"))throw Error("New center missing existing learning content");
+            if(!trainer.includes("sellInstructions")||!trainer.includes("paSellGuide"))throw Error("Spot sell guidance missing");
+            console.log("Verified: compact trader + separate center + trainer sell guidance");
+          '
