@@ -29,3 +29,16 @@ jobs:
             done
             echo "::endgroup::"
           done
+
+          echo "::group::Actual app route assets and scripts"
+          curl -L -sS --max-time 20 "https://go.educashpro.vip/app/" -o /tmp/live-app.html || true
+          echo "SCRIPT SOURCES in /app/ HTML:"
+          grep -oE 'src="[^"]+\.js[^"]*"' /tmp/live-app.html | head -70 || true
+          for path in "/app/version.json" "/app/resource-loader.js" "/app/market-learning-center.js" "/app/resource-loader-v20261027.js" "/app/market-learning-center-v20261027.js" "/app/index.html" "/app/app.js"; do
+            echo "APP PATH ${path}"
+            curl -LsS --connect-timeout 8 --max-time 20 -o /tmp/actual-app-asset -w 'STATUS %{http_code} FINAL %{url_effective} TYPE %{content_type} BYTES %{size_download}\n' "https://go.educashpro.vip${path}?diag=actual-20261027" || true
+            for token in "2026.10.27.3" "marketPriceAction" "trainerAvailable" "resource-loader-v20261027.js" "marketExnessInvite"; do
+              if grep -Fq "${token}" /tmp/actual-app-asset; then echo "FOUND ${token}"; fi
+            done
+          done
+          echo "::endgroup::"
