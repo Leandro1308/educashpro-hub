@@ -110,10 +110,10 @@
     return window.EduCashProFinance?.render?.({
       language: language(),
       session: activeSession,
-      active: activeSession?.profile?.active === true,
+      active: window.EduCashProAccess?.snapshot?.()?.known === true ? window.EduCashProAccess.snapshot().active === true : activeSession?.profile?.active === true,
       back: renderToolsHub,
       subscribe: subscriptionCard,
-      api: platformApi,
+      api: window.EduCashProApp?.financeApi,
       screen: parts[1] || "intro",
       month: parts[2],
       sharedWorkspace: parts[1] === "shared" ? parts[2] : "",
