@@ -39,6 +39,12 @@ jobs:
           test -s _site/index.html
           test -s _site/resource-loader.js
           test -s _site/subscription-coherence.js
+          test -s _site/market-learning-center.js
+          test -s _site/price-action-trainer.js
+          test -s _site/price-action-data.js
+          test -s _site/price-action-trainer.css
+          grep -Fq 'id="marketPriceAction"' _site/market-learning-center.js
+          grep -Fq 'window.EduCashProPriceAction' _site/price-action-trainer.js
       - name: Preparar arquivos
         uses: actions/upload-pages-artifact@v3
         with:
@@ -58,4 +64,23 @@ jobs:
           done
           if [[ "${failed}" != "0" ]]; then
             echo "::warning::Domínio ainda não serve todos os recursos; verifique DNS/Render. Nenhum corpo HTML, cookie ou cabeçalho sensível será registrado."
+          fi
+
+          # HTTP 200 alone is insufficient: custom domains may return stale scripts
+          # or an HTML fallback for assets that are absent.
+          trainer_live=0
+          for attempt in 1 2 3 4; do
+            if curl -L -f -sS --connect-timeout 10 --max-time 25 \
+                -o /tmp/educashpro-market-live.js \
+                "https://go.educashpro.vip/market-learning-center.js?deploy=${GITHUB_SHA}&attempt=${attempt}" \
+              && grep -Fq 'id="marketPriceAction"' /tmp/educashpro-market-live.js; then
+              trainer_live=1
+              echo "Price Action Trainer confirmed in published market-learning-center.js"
+              break
+            fi
+            echo "Price Action Trainer not confirmed on custom domain (attempt ${attempt}/4)"
+            if [[ "${attempt}" != "4" ]]; then sleep 10; fi
+          done
+          if [[ "${trainer_live}" != "1" ]]; then
+            echo "::warning::Novo Treinador de Price Action ainda não está visível pelo domínio; verifique cache/CDN/DNS."
           fi
