@@ -71,6 +71,17 @@
 
   let toolsHubPromise=null,accountCenterPromise=null,coursesPromise=null,financePromise=null,financialToolsPromise=null,linksPromise=null,professionalPromise=null,helpPromise=null,marketPromise=null,qrPromise=null,qrScannerPromise=null;
 
+  let trainerPromise=null;
+  function loadPriceAction(){
+    if(window.EduCashProPriceAction?.render)return Promise.resolve(true);
+    return trainerPromise||(trainerPromise=(async()=>{
+      await Promise.all([style("./price-action-trainer.css"),script("./price-action-data.js")]);
+      await script("./price-action-trainer.js");
+      if(!window.EduCashProPriceAction?.render)throw new Error("trainer_module_unavailable");
+      return true;
+    })().catch(error=>{trainerPromise=null;throw error}));
+  }
+
   const bookLanguageLoads=new Map();
   function loadBookCourse(lang="pt"){
     const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"pt";
@@ -175,7 +186,7 @@
   }
 
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
-  window.EduCashProResources={version:VERSION,script,style,prefetch,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadQr,loadQrScanner,idle};
+  window.EduCashProResources={version:VERSION,script,style,prefetch,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadPriceAction,loadQr,loadQrScanner,idle};
 })();
 
 
