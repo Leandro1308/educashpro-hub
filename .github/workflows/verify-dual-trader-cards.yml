@@ -1,0 +1,37 @@
+name: Verify live learning and trader home cards
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-dual-trader-cards.yml"
+permissions:
+  contents: read
+jobs:
+  live-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm production frontend homepage cards and direct route
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          for path in version.json index.html feature-registry.js app.js market-learning-center.js; do
+            curl -L -f -sS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 35 -H 'Cache-Control: no-cache' -o "/tmp/verify-$path" "$base/$path?check=$nonce"
+            printf 'Fetched %s (%s bytes)\n' "$path" "$(wc -c <"/tmp/verify-$path")"
+          done
+          node --input-type=module -e '
+            import assert from "node:assert/strict";
+            import fs from "node:fs";
+            const file=n=>fs.readFileSync("/tmp/verify-"+n,"utf8");
+            assert.equal(JSON.parse(file("version.json")).build,"2026.10.27.6");
+            const home=file("app.js"),features=file("feature-registry.js"),market=file("market-learning-center.js");
+            assert(file("index.html").includes("app.js?v=20261027.6"),"Old HTML scripts served");
+            assert(features.includes("Centro de Price Action")&&features.includes("Profissão Trader — Análise em Tempo Real"),"New labels not deployed");
+            const a=home.indexOf("quickCard(\\"price-action\\""),b=home.indexOf("quickCard(\\"analysis\\"");
+            assert(a>=0 && b>a && b-a<350,"Price Action and Trader not adjacent");
+            assert(home.includes("openPriceActionCenter(\\"home\\")"),"Home learning shortcut absent");
+            assert(home.includes("route.view === \\"price-action\\""),"Learning center route restore absent");
+            assert(market.includes("function openLearningCenter(args = {})"),"Direct learning center entry absent");
+            assert(market.includes("centerCopy.backHome"),"Learning center back to home absent");
+            console.log("PASS: Domain serves two adjacent cards and independent navigation on build 2026.10.27.6");
+          '
