@@ -1,0 +1,37 @@
+name: Verify fixed monthly finance published at Render
+on:
+  pull_request:
+    paths: [.github/workflows/finance-live-v9.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify version and root-cause fix on real domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          for file in version.json index.html app.js local-tools-and-games.js resource-loader.js finance-model.js monthly-finance-control.js; do
+            curl -fLsS --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/$file?audit=$nonce" -o "/tmp/live-$file"
+            echo "$file served: $(wc -c <"/tmp/live-$file") bytes"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const read=n=>fs.readFileSync("/tmp/live-"+n,"utf8");
+            assert.equal(JSON.parse(read("version.json")).build,"2026.10.27.9");
+            assert(read("index.html").includes("resource-loader.js?v=20261027.9"),"Cached HTML still serves old resources");
+            const app=read("app.js"),menu=read("local-tools-and-games.js"),model=read("finance-model.js"),control=read("monthly-finance-control.js");
+            assert(app.includes("async function financeApi(path, payload = {})"),"Canonical authenticated financial API absent");
+            assert(app.includes("openPriceActionCenter, financeApi, openSubscription"),"App finance API not exported");
+            assert(menu.includes("api:window.EduCashProApp?.financeApi"),"Menu not passing canonical API");
+            assert(!menu.includes("api:platformApi"),"Original undefined global still remains");
+            assert(menu.includes("openFinanceControl")&&menu.includes("snapshot?.()"),"Free/subscriber routing incomplete");
+            assert(model.includes("window.EduCashProFinanceModel"),"Finance model missing");
+            assert(control.includes("window.EduCashProFinance = { render, attachSharing }"),"Finance UI module missing");
+            for(const feature of ["financeBudgetForm","financeGoalForm","financeExpenseForm","financeShareAction","financePdfAction"])assert(control.includes(feature),"Missing finance feature "+feature);
+            console.log("PASS: live version 2026.10.27.9 supports functioning free/paid finance routes and authenticated API");
+          '
