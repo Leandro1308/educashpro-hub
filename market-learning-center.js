@@ -333,6 +333,13 @@
 
   const LOCALE = { pt: "br", en: "en", es: "es", ru: "ru" };
   const BINANCE_AFFILIATE = "https://web3.binance.com/m/referral?ref=IYN019BM";
+  const TRAINER_COPY = {
+    pt:{title:"Treinador de Price Action",description:"Aprenda a interpretar candles e pratique compra e venda com criptomoedas históricas sem arriscar dinheiro.",button:"ABRIR TREINADOR",loading:"Carregando exercícios…",retry:"TENTAR NOVAMENTE",error:"Não foi possível carregar o treinamento.",details:"Aprender · Treinar · Offline"},
+    en:{title:"Price Action Trainer",description:"Read candles and practice buy and sell decisions with historical crypto charts without risking real money.",button:"OPEN TRAINER",loading:"Loading exercises…",retry:"TRY AGAIN",error:"Could not load the trainer.",details:"Learn · Practice · Offline"},
+    es:{title:"Entrenador de Price Action",description:"Interpreta velas y practica compras y ventas con gráficos históricos de criptomonedas sin arriesgar dinero real.",button:"ABRIR ENTRENADOR",loading:"Cargando ejercicios…",retry:"REINTENTAR",error:"No se pudo cargar el entrenador.",details:"Aprender · Practicar · Sin conexión"},
+    ru:{title:"Тренажёр Price Action",description:"Изучайте свечи и тренируйте решения о покупке и продаже на исторических графиках криптовалют без риска для денег.",button:"ОТКРЫТЬ ТРЕНАЖЁР",loading:"Загрузка упражнений…",retry:"ПОВТОРИТЬ",error:"Не удалось открыть тренажёр.",details:"Учёба · Практика · Офлайн"}
+  };
+
   const COURSES = [{ icon: "₿", name: "Binance Academy", key: "binance", url: "https://academy.binance.com/", affiliateUrl: BINANCE_AFFILIATE }];
 
   const WIDGETS = {
@@ -415,6 +422,17 @@
     const style = document.createElement("style");
     style.id = "marketDirectionStyles";
     style.textContent = `
+      
+      .marketTrainerTeaser{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:13px;padding:18px;background:linear-gradient(145deg,#102a32,#102038);border:1px solid #2e756b;border-radius:15px}
+      .marketTrainerMark{width:50px;height:50px;display:grid;place-items:center;border-radius:13px;background:#204b46;color:#83e0bb;font-size:26px;font-weight:900}
+      .marketTrainerTeaser strong{display:block;color:#f3fbff;font-size:16px;line-height:1.35}
+      .marketTrainerTeaser p{color:#bed0dc;margin:4px 0 7px;font-size:12px;line-height:1.55}
+      .marketTrainerTeaser small{font-size:11px;color:#89cdbb}
+      .marketTrainerTeaser button{color:#06251b;font-size:12px;font-weight:900;min-height:44px;padding:11px 14px;border:none;border-radius:11px;background:#83e2b6;cursor:pointer}
+      .marketTrainerTeaser button:disabled{opacity:.62;cursor:wait}
+      .marketTrainerMount:not([hidden]){margin-top:16px}
+      .marketTrainerError{font-size:12px;color:#ffb4b4;margin-top:8px}
+      @media(max-width:680px){.marketTrainerTeaser{grid-template-columns:42px 1fr}.marketTrainerMark{width:40px;height:40px;font-size:22px}.marketTrainerTeaser button{grid-column:1/-1;width:100%}}
       .marketExnessInvite{margin:28px 0 30px;text-align:center;padding:0 3px}
       .marketExnessInvite>small{display:block;margin-bottom:12px;color:#b3c6d5;font-size:10px;font-weight:800;letter-spacing:.08em}
       .marketCenter .marketExnessCta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-sizing:border-box;width:100%;min-height:96px;padding:22px 16px;border:2px solid #c4e5c6;border-radius:18px;background:linear-gradient(120deg,#bce9d2 0%,#d7ebcc 52%,#efe9bb 100%);color:#102a32;box-shadow:0 6px 0 #6a9c86,0 14px 30px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.72);cursor:pointer;text-align:center;white-space:normal;transform-origin:center;animation:marketExnessGlow 6s ease-in-out infinite alternate,marketExnessPulse 4.8s ease-in-out infinite}
@@ -1033,6 +1051,7 @@
     selectedTimeframe = "1h";
     restoreMarketState();
     const copy = COPY[options.language];
+    const trainerCopy = TRAINER_COPY[options.language] || TRAINER_COPY.pt;
     const target = document.getElementById("content");
     if (!target) return;
 
@@ -1055,6 +1074,15 @@
         <small>${esc(copy.demoAccount)}</small>
         <button type="button" class="marketExnessCta" data-url="${esc(EXNESS_AFFILIATE)}"><strong>${esc(copy.registerCta)}</strong><small>${esc(copy.demoCredits)}</small></button>
       </div>
+      <section class="marketSection marketTrainerSection" id="marketPriceAction">
+        <div class="marketTrainerTeaser">
+          <span class="marketTrainerMark" aria-hidden="true">↗</span>
+          <div><strong>${esc(trainerCopy.title)}</strong><p>${esc(trainerCopy.description)}</p><small>${esc(trainerCopy.details)}</small></div>
+          <button type="button" id="marketTrainerStart">${esc(trainerCopy.button)}</button>
+        </div>
+        <p class="marketTrainerError" id="marketTrainerError" hidden role="alert"></p>
+        <div class="marketTrainerMount" id="marketTrainerMount" hidden></div>
+      </section>
       <section class="marketSection">
         <header><h2>${esc(copy.education)}</h2><p>${esc(copy.educationSub)}</p></header>
         <div class="marketCourseGrid">
@@ -1084,6 +1112,30 @@
     document.querySelectorAll("[data-url]").forEach((button) => {
       button.onclick = () => open(button.dataset.url);
     });
+    const trainerStart = document.getElementById("marketTrainerStart");
+    trainerStart.onclick = async () => {
+      if (trainerStart.disabled) return;
+      trainerStart.disabled = true;
+      trainerStart.textContent = trainerCopy.loading;
+      const trainerError = document.getElementById("marketTrainerError");
+      trainerError.hidden = true;
+      try {
+        const load = window.EduCashProResources?.loadPriceAction;
+        if (typeof load !== "function") throw new Error("trainer_loader_unavailable");
+        await load();
+        const mount = document.getElementById("marketTrainerMount");
+        if (!mount || !mount.isConnected) return;
+        mount.hidden = false;
+        window.EduCashProPriceAction.render({target:mount,language:options.language});
+        trainerStart.hidden = true;
+      } catch (error) {
+        trainerStart.disabled = false;
+        trainerStart.textContent = trainerCopy.retry;
+        trainerError.textContent = trainerCopy.error;
+        trainerError.hidden = false;
+        console.warn("[EduCashPro] Price Action training unavailable", error);
+      }
+    };
     document.querySelector("[data-own-course]").onclick = () => {
       window.__EDUCASHPRO_MARKETS_OPEN__ = false;
       options.openCourse?.("analise_tecnica_completa");
