@@ -192,3 +192,6 @@ assert(bookCss.includes(".bookQuizQuestionCard")&&bookCss.includes(".bookQuizFee
 for (const asset of ["game-suite.js","mental-games.js","social-play.js","local-arcade-core.js"]) assert(!files.includes(asset), "Retired asset remains: " + asset);
 assert(!loader.includes("loadGames") && app.includes('rememberRoute("analysis")'), "Independent analysis route missing");
 assert(!app.includes('["technical_analysis", "📈",'), "Analysis must be outside Academy");
+
+// Offline Price Action learner and simulator regression checks.
+await import("./price-action-trainer.test.mjs");
