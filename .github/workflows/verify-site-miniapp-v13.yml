@@ -1,0 +1,40 @@
+name: Verify website and Telegram Mini App parity
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-site-miniapp-v13.yml"
+permissions:
+  contents: read
+jobs:
+  compare-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm live site and Mini App deliver the same features
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=https://go.educashpro.vip
+          nonce="$GITHUB_SHA-$GITHUB_RUN_ATTEMPT"
+          for entry in app hub; do
+            for file in version.json web-site-menu.js pdf-documents.js monthly-finance-sharing.js; do
+              curl -fLsS --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/$entry/$file?check=$nonce" -o "/tmp/$entry-$file"
+              echo "Verified /$entry/$file ($(wc -c </tmp/$entry-$file) bytes)"
+            done
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const r=(dir,name)=>fs.readFileSync("/tmp/"+dir+"-"+name,"utf8");
+            for(const dir of ["app","hub"]){
+              assert.equal(JSON.parse(r(dir,"version.json")).build,"2026.10.27.13","Wrong build on "+dir);
+              const menu=r(dir,"web-site-menu.js");
+              assert(menu.includes("const isMiniApp"),"Mini App menu support missing");
+              assert(menu.includes("monthly-finance")&&menu.includes("price-action-center"),"Learning/finance shortcuts missing");
+              const finance=r(dir,"monthly-finance-sharing.js");
+              assert(finance.includes("share: window.EduCashProPlatform?.isTelegram?.() === true"),"Telegram PDF sharing missing");
+              assert(r(dir,"pdf-documents.js").includes("navigator.share"),"Native file-sharing fallback missing");
+            }
+            for(const file of ["version.json","web-site-menu.js","pdf-documents.js","monthly-finance-sharing.js"])
+              assert.equal(r("app",file),r("hub",file),"Website and Mini App diverged: "+file);
+            console.log("PASS: Site /app and Telegram Mini App /hub serve identical build 2026.10.27.13 and features.");
+          '
