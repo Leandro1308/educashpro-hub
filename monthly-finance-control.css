@@ -49,3 +49,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Keep expense actions in one row and avoid oversized entries on phones. */
+.financeHistoryItem > .financeRowActions{display:flex;flex-flow:row nowrap;gap:6px;align-items:center;justify-content:flex-end;max-width:none}
+.financeHistoryItem{padding:8px 0}
+@media(max-width:640px){.financeHistoryItem{row-gap:4px;padding:8px 0}.financeHistoryItem > .financeRowActions{grid-column:2 / -1;justify-content:flex-end}.financeHistoryItem .financeRowActions button{width:40px;height:40px;min-height:40px;padding:0}}

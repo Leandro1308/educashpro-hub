@@ -64,8 +64,8 @@ assert(technicalCourse.includes("campaign=43340")&&!technicalCourse.includes("ca
 assert(technicalCourse.includes('button: "CURSO EM VÍDEO"')&&technicalCourse.includes("url: VIDEO_COURSE_URL, videoUrl: EXNESS_URL"),"Free video and Exness actions are not separated correctly");
 assert(loader.includes("market-learning-center-v20261027.js")&&loader.includes("loadMarkets")&&app.includes("EduCashProMarkets"),"Markets learning center is not connected");
 assert(marketCenter.includes("trainerAvailable: true") && marketCenter.includes('id="marketPriceAction"'),"Published market module must include the trainer");
-assert(index.includes('src="./resource-loader-v20261027.js') && loader.includes("market_trainer_module_missing"),"Fresh browser loader must reject legacy cached market code");
-assert(index.includes("resource-loader-v20261027.js")&&loader.includes("market-learning-center-v20261027.js")&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
+assert(index.includes('src="./resource-loader-v20261027-pdf.js') && loader.includes("market_trainer_module_missing"),"Fresh browser loader must reject legacy cached market code");
+assert(index.includes("resource-loader-v20261027-pdf.js")&&loader.includes("market-learning-center-v20261027.js")&&loader.includes('script("./help-center.js")'),"Complementary modules must use the non-blocking resource loader");
 assert(!index.includes('src="./market-learning-center-v20261027.js'),"Markets center must not race the lazy loader with an eager script");
 assert(marketCenter.includes("aff_id=170669")&&marketCenter.includes("https://one.exnessonelink.com/a/93bgo7jpfo?source=app"),"Partner attribution is missing from the markets center");
 assert(marketCenter.includes("https://academy.binance.com/")&&marketCenter.includes("https://web3.binance.com/m/referral?ref=IYN019BM"),"Binance Academy or Binance Web3 affiliate access is missing");
