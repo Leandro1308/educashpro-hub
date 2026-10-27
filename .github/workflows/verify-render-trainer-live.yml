@@ -1,0 +1,38 @@
+name: Verify live Render Price Action assets
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-render-trainer-live.yml"
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm real production frontend build and training assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          fetch() {
+            local file="$1"
+            local url="$base/$file?verify=$nonce"
+            echo "Checking $file"
+            curl -L -f -sS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 30 -H 'Cache-Control: no-cache' -o "/tmp/trainer-${file//\//_}" -w "Status: %{http_code}; Bytes: %{size_download}; Content-type: %{content_type}\n" "$url"
+          }
+          fetch version.json
+          node -e 'const f=require("fs");const v=JSON.parse(f.readFileSync("/tmp/trainer-version.json","utf8"));if(v.build!=="2026.10.27.4")throw new Error("Live build is "+v.build);console.log("Confirmed build:",v.build)'
+          fetch index.html
+          grep -Fq 'resource-loader.js?v=20261027.4' /tmp/trainer-index.html
+          fetch resource-loader.js
+          grep -Fq 'function loadPriceAction()' /tmp/trainer-resource-loader.js
+          fetch market-learning-center.js
+          grep -Fq 'id="marketPriceAction"' /tmp/trainer-market-learning-center.js
+          fetch price-action-trainer.js
+          grep -Fq 'window.EduCashProPriceAction=' /tmp/trainer-price-action-trainer.js
+          fetch price-action-data.js
+          grep -Fq 'EduCashProPriceActionData' /tmp/trainer-price-action-data.js
+          fetch price-action-trainer.css
+          grep -Fq '.pa-wrap' /tmp/trainer-price-action-trainer.css
+          echo "SUCCESS: The real Render domain serves all trainer assets in build 2026.10.27.4"
