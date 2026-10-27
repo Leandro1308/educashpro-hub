@@ -41,12 +41,12 @@ jobs:
           test -s _site/subscription-coherence.js
           test -s _site/market-learning-center.js
           test -s _site/market-learning-center-v20261027.js
-          test -s _site/resource-loader-v20261027.js
+          test -s _site/resource-loader-v20261027-pdf.js
           test -s _site/price-action-trainer.js
           test -s _site/price-action-data.js
           test -s _site/price-action-trainer.css
           grep -Fq 'id="marketPriceAction"' _site/market-learning-center-v20261027.js
-          grep -Fq 'src="./resource-loader-v20261027.js' _site/index.html
+          grep -Fq 'src="./resource-loader-v20261027-pdf.js' _site/index.html
           grep -Fq 'window.EduCashProPriceAction' _site/price-action-trainer.js
       - name: Preparar arquivos
         uses: actions/upload-pages-artifact@v3

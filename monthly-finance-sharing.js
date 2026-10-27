@@ -165,7 +165,7 @@
     const share = document.getElementById("financeShareAction");
     const pdf = document.getElementById("financePdfAction");
     if (share) { share.textContent = `${options?.active ? "👥" : "🔒"} ${options?.active ? c().share : c().lockedShare}`; share.classList.toggle("locked", !options?.active); share.onclick = () => options?.active ? openManager() : showPremiumCard("share"); }
-    if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => options?.active ? exportPdf(lastRecord, lastMonth, "") : showPremiumCard("pdf"); }
+    if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => { if (!options?.active) return showPremiumCard("pdf"); const current = options?.read?.()?.[lastMonth]; return exportPdf(current || lastRecord, lastMonth, ""); }; }
     renderSharedAccess();
     if(syncError){const node=document.getElementById("financeNotice");if(node)node.textContent=syncError;const root=document.getElementById("financeSharedAccess");if(root&&ownerWorkspace){const button=document.createElement("button");button.className="wideButton";button.textContent=c().open;button.onclick=()=>openViewer(ownerWorkspace.workspaceId,lastMonth);root.appendChild(button);}}
   }
@@ -350,7 +350,7 @@
 
     document.getElementById("financeViewerBack").onclick = () => options.backToFinance?.();
     document.getElementById("financeSharedRefresh").onclick = () => openViewer(workspaceId, month);
-    document.getElementById("financeViewerPdf")?.addEventListener("click", () => exportPdf(record, month, workspace.ownerName || "", workspace));
+    document.getElementById("financeViewerPdf")?.addEventListener("click", async () => { try { const latest = await api("/api/monthly-finance/month", { workspaceId, month }); await exportPdf(latest.record, month, latest.workspace.ownerName || "", latest.workspace); } catch { window.alert(copy.error); } });
     document.getElementById("financeViewerMonth").onchange = (event) => openViewer(workspaceId, event.target.value || month);
 
     if (!workspace.canEdit) return;
