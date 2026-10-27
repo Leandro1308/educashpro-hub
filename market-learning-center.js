@@ -1055,6 +1055,10 @@
         <small>${esc(copy.demoAccount)}</small>
         <button type="button" class="marketExnessCta" data-url="${esc(EXNESS_AFFILIATE)}"><strong>${esc(copy.registerCta)}</strong><small>${esc(copy.demoCredits)}</small></button>
       </div>
+      <section class="marketSection" id="priceActionTrainerSection">
+        <header><div><h2>${esc(({pt:"Treinador de Price Action",en:"Price Action Trainer",es:"Entrenador de Price Action",ru:"Тренажёр Price Action"})[options.language])}</h2><p>${esc(({pt:"Aprenda e pratique compra, venda ou espera sem dinheiro real.",en:"Learn and practice buy, sell or wait without real money.",es:"Aprende y practica comprar, vender o esperar sin dinero real.",ru:"Учитесь выбирать покупку, продажу или ожидание без реальных денег."})[options.language])}</p></div></header>
+        <div id="priceActionTrainerHost"><button type="button" id="priceActionTrainerOpen" class="marketExnessCta" style="min-height:64px;width:100%">${esc(({pt:"ABRIR TREINADOR",en:"OPEN TRAINER",es:"ABRIR ENTRENADOR",ru:"ОТКРЫТЬ ТРЕНАЖЁР"})[options.language])}</button></div>
+      </section>
       <section class="marketSection">
         <header><h2>${esc(copy.education)}</h2><p>${esc(copy.educationSub)}</p></header>
         <div class="marketCourseGrid">
@@ -1084,6 +1088,15 @@
     document.querySelectorAll("[data-url]").forEach((button) => {
       button.onclick = () => open(button.dataset.url);
     });
+    document.getElementById("priceActionTrainerOpen").onclick = async () => {
+      const host=document.getElementById("priceActionTrainerHost");
+      if(!host)return;
+      host.textContent="…";
+      try{
+        await window.EduCashProResources.script("./price-action-trainer.js");
+        window.EduCashProPriceActionTrainer.render(host,options.language);
+      }catch(error){console.error(error);host.textContent="Não foi possível carregar o treinador."}
+    };
     document.querySelector("[data-own-course]").onclick = () => {
       window.__EDUCASHPRO_MARKETS_OPEN__ = false;
       options.openCourse?.("analise_tecnica_completa");
