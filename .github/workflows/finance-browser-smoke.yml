@@ -1,0 +1,58 @@
+name: Diagnose real finance browser loading
+on:
+  pull_request:
+    paths: [.github/workflows/finance-browser-smoke.yml]
+permissions:
+  contents: read
+jobs:
+  finance-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install browser test runtime
+        run: |
+          mkdir -p /tmp/finance-test
+          cd /tmp/finance-test
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund --ignore-scripts playwright@1.58.2
+          which google-chrome-stable || which google-chrome || true
+      - name: Run isolated live-site mobile browser checks
+        shell: bash
+        run: |
+          cat > /tmp/finance-test/run.cjs <<'JS'
+          const {chromium}=require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
+            const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:'pt-BR'});
+            const page=await context.newPage();
+            const errors=[],consoleErrors=[],responses=[];
+            page.on('pageerror',err=>errors.push(err.stack||err.message));
+            page.on('console',msg=>{if(msg.type()==='error'||msg.type()==='warning')consoleErrors.push(msg.type()+': '+msg.text().slice(0,250))});
+            page.on('response',r=>{if(r.url().includes('finance')||r.url().includes('resource-loader'))responses.push([r.status(),r.url().split('?')[0]])});
+            await page.route('https://go.educashpro.vip/app/__finance_diagnostic__.html',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><html lang="pt"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="content"></div></body></html>'}));
+            await page.goto('https://go.educashpro.vip/app/__finance_diagnostic__.html');
+            await page.evaluate(()=>{window.EduCashProApp={rememberRoute(){}};window.EduCashProNavigation={stamp:()=>1,isCurrent:()=>true};});
+            await page.addScriptTag({url:'https://go.educashpro.vip/app/resource-loader.js?v=20261027.8'});
+            let result={};
+            try{
+              result.load=await page.evaluate(async()=>await window.EduCashProResources.loadFinance());
+              result.registered=await page.evaluate(()=>typeof window.EduCashProFinance?.render);
+              for(const active of [false,true]){
+                let value=await page.evaluate(async active=>{
+                  document.getElementById('content').innerHTML='';
+                  window.EduCashProFinance.render({language:'pt',active,session:{profile:{userId:'test-browser-in-memory',active}},back(){}});
+                  const initial=document.getElementById('content').innerText.slice(0,500);
+                  const btn=document.getElementById('financeStart');
+                  if(!btn)throw Error('financeStart missing '+active+' '+initial);
+                  btn.click();
+                  const screen=document.getElementById('content').innerText;
+                  return {active,initial:initial.slice(0,230),hasTabs:!!document.querySelector('.financeTabs'),hasIncome:screen.includes('Renda'),hasShare:!!document.getElementById('financeShareAction'),hasPDF:!!document.getElementById('financePdfAction'),length:screen.length,overview:screen.slice(0,250)};
+                },active);
+                result['scenario-'+active]=value;
+              }
+            }catch(err){result.error=err.stack||String(err)}
+            console.log('REAL_BROWSER_RESULT='+JSON.stringify({result,errors,consoleErrors,responses}));
+            await browser.close();
+            if(result.error||!result.load||result.registered!=='function'||!result['scenario-false']?.hasTabs||!result['scenario-true']?.hasTabs)process.exitCode=1;
+          })().catch(e=>{console.error(e.stack);process.exitCode=1});
+          JS
+          node /tmp/finance-test/run.cjs
