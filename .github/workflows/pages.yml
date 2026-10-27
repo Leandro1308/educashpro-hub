@@ -40,10 +40,13 @@ jobs:
           test -s _site/resource-loader.js
           test -s _site/subscription-coherence.js
           test -s _site/market-learning-center.js
+          test -s _site/market-learning-center-v20261027.js
+          test -s _site/resource-loader-v20261027.js
           test -s _site/price-action-trainer.js
           test -s _site/price-action-data.js
           test -s _site/price-action-trainer.css
-          grep -Fq 'id="marketPriceAction"' _site/market-learning-center.js
+          grep -Fq 'id="marketPriceAction"' _site/market-learning-center-v20261027.js
+          grep -Fq 'src="./resource-loader-v20261027.js' _site/index.html
           grep -Fq 'window.EduCashProPriceAction' _site/price-action-trainer.js
       - name: Preparar arquivos
         uses: actions/upload-pages-artifact@v3
@@ -72,10 +75,10 @@ jobs:
           for attempt in 1 2 3 4; do
             if curl -L -f -sS --connect-timeout 10 --max-time 25 \
                 -o /tmp/educashpro-market-live.js \
-                "https://go.educashpro.vip/market-learning-center.js?deploy=${GITHUB_SHA}&attempt=${attempt}" \
+                "https://go.educashpro.vip/market-learning-center-v20261027.js?deploy=${GITHUB_SHA}&attempt=${attempt}" \
               && grep -Fq 'id="marketPriceAction"' /tmp/educashpro-market-live.js; then
               trainer_live=1
-              echo "Price Action Trainer confirmed in published market-learning-center.js"
+              echo "Price Action Trainer confirmed in published versioned market asset"
               break
             fi
             echo "Price Action Trainer not confirmed on custom domain (attempt ${attempt}/4)"
