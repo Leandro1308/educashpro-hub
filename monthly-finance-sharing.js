@@ -161,7 +161,7 @@
     const share = document.getElementById("financeShareAction");
     const pdf = document.getElementById("financePdfAction");
     if (share) { share.textContent = `${options?.active ? "👥" : "🔒"} ${options?.active ? c().share : c().lockedShare}`; share.classList.toggle("locked", !options?.active); share.onclick = () => options?.active ? openManager() : showPremiumCard("share"); }
-    if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => options?.active ? exportPdf(lastRecord, lastMonth, "") : showPremiumCard("pdf"); }
+    if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => { if (!options?.active) return showPremiumCard("pdf"); const current = options?.read?.()?.[lastMonth]; return exportPdf(current || lastRecord, lastMonth, ""); }; }
     renderSharedAccess();
 
   }
