@@ -1,0 +1,35 @@
+name: Verify live Finance PDF v12
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-live-finance-v12.yml"
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect published Render files without touching customer data
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          for file in version.json index.html monthly-finance-sharing.js resource-loader.js app.js; do
+            curl -fsSL --retry 3 --retry-delay 2 --max-time 35 -H 'Cache-Control: no-cache' "$base/$file?diagnostic=$nonce" -o "/tmp/$file"
+            echo "$file $(wc -c </tmp/$file) bytes"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const source=n=>fs.readFileSync("/tmp/"+n,"utf8");
+            assert.equal(JSON.parse(source("version.json")).build,"2026.10.27.12","Old release on public domain");
+            assert(source("index.html").includes("20261027.12"),"Old page cache markers");
+            const finance=source("monthly-finance-sharing.js");
+            assert(finance.includes("selectedMonthPdfRecord"),"Fresh local PDF snapshot not present");
+            assert(finance.includes("meaningfulMonths"),"Cloud overwrite protection missing");
+            assert(finance.includes("warnEmptyMonthPdf"),"Missing empty-month PDF warning");
+            assert(finance.includes("EduCashPro"),"Brand missing");
+            assert(source("app.js").includes("financeApi"),"Authenticated financial API missing");
+            console.log("PASS public Render build 2026.10.27.12 includes PDF data reconciliation and safe sharing");
+          '
