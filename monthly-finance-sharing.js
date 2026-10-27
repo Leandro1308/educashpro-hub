@@ -6,7 +6,7 @@
       share: "Compartilhar controle", pdf: "Baixar PDF", lockedShare: "Compartilhar é exclusivo para assinantes",
       lockedPdf: "PDF exclusivo para assinantes", subscribe: "Assinar mensal", title: "Compartilhamento do controle",
       intro: "Assinantes ativos podem compartilhar este controle com até 5 pessoas. Os convidados podem adicionar, editar e excluir lançamentos no controle compartilhado.",
-      activate: "Ativar compartilhamento", activateText: "Ao ativar, seu histórico local é copiado para um espaço compartilhado e passa a ser sincronizado automaticamente.",
+      activate: "Ativar compartilhamento", activateText: "Crie um espaço separado. Seus registros pessoais permanecem privados neste aparelho.",
       invite: "Convidar por e-mail", inviteButton: "Adicionar pessoa", placeholder: "email@exemplo.com",
       guest: "Não assinante", subscribers: "Assinantes", remove: "Remover", none: "Nenhuma pessoa adicionada.",
       pending: "Acesso pendente até a pessoa entrar no EduCashPro com este e-mail.", active: "Compartilhamento ativo",
@@ -23,7 +23,7 @@
     en: {
       share: "Share control", pdf: "Download PDF", lockedShare: "Sharing is for subscribers only", lockedPdf: "PDF is for subscribers only",
       subscribe: "Subscribe monthly", title: "Share finance control", intro: "Active subscribers can share this control with up to 5 people. Guests can add, edit and delete entries in the shared control.",
-      activate: "Enable sharing", activateText: "When enabled, your local history is copied to a shared space and synchronized automatically.",
+      activate: "Enable sharing", activateText: "Create a separate space. Your personal entries remain private on this device.",
       invite: "Invite by email", inviteButton: "Add person", placeholder: "email@example.com", guest: "Non-subscriber", subscribers: "Subscribers",
       remove: "Remove", none: "No one added yet.", pending: "Access is pending until the person signs in to EduCashPro with this email.", active: "Sharing active",
       sharedWithMe: "Shared with me", open: "Open", owner: "Control by", back: "Back to my control", month: "Month", income: "Income", spent: "Expenses",
@@ -37,7 +37,7 @@
     es: {
       share: "Compartir control", pdf: "Descargar PDF", lockedShare: "Compartir es exclusivo para suscriptores", lockedPdf: "PDF exclusivo para suscriptores",
       subscribe: "Suscripción mensual", title: "Compartir el control", intro: "Los suscriptores activos pueden compartir este control con hasta 5 personas. Los invitados pueden agregar, editar y eliminar registros.",
-      activate: "Activar uso compartido", activateText: "Al activarlo, tu historial local se copia a un espacio compartido y se sincroniza automáticamente.",
+      activate: "Activar uso compartido", activateText: "Crea un espacio separado. Tus registros personales permanecen privados en este dispositivo.",
       invite: "Invitar por correo", inviteButton: "Agregar persona", placeholder: "email@ejemplo.com", guest: "No suscriptor", subscribers: "Suscriptores",
       remove: "Eliminar", none: "Aún no se agregó a nadie.", pending: "El acceso queda pendiente hasta que la persona entre en EduCashPro con este correo.", active: "Uso compartido activo",
       sharedWithMe: "Compartido conmigo", open: "Abrir", owner: "Control de", back: "Volver a mi control", month: "Mes", income: "Ingresos", spent: "Gastos",
@@ -51,7 +51,7 @@
     ru: {
       share: "Поделиться контролем", pdf: "Скачать PDF", lockedShare: "Совместный доступ только для подписчиков", lockedPdf: "PDF только для подписчиков",
       subscribe: "Оформить подписку", title: "Совместный финансовый контроль", intro: "Активный подписчик может поделиться этим контролем с 5 людьми. Приглашённые пользователи могут добавлять, изменять и удалять записи.",
-      activate: "Включить совместный доступ", activateText: "После включения локальная история копируется в общее пространство и синхронизируется автоматически.",
+      activate: "Включить совместный доступ", activateText: "Создайте отдельное пространство. Личные записи останутся на этом устройстве.",
       invite: "Пригласить по e-mail", inviteButton: "Добавить", placeholder: "email@example.com", guest: "Без подписки", subscribers: "Подписчики",
       remove: "Удалить", none: "Участники пока не добавлены.", pending: "Доступ появится после входа в EduCashPro с этим e-mail.", active: "Совместный доступ активен",
       sharedWithMe: "Доступные мне", open: "Открыть", owner: "Контроль:", back: "Назад к моему контролю", month: "Месяц", income: "Доход", spent: "Расходы",
@@ -71,13 +71,13 @@
   let lastMonth = "";
   let displayCurrency = "USD";
   let lastCategories = [];
-  let syncTimer = null;
+  let refreshTimer = null;
   let viewedWorkspace = null;
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   const c = () => COPY[options?.language] || COPY.pt;
   const fmt = (value) => new Intl.NumberFormat(options?.language === "pt" ? "pt-BR" : options?.language || "en", { style: "currency", currency: displayCurrency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
-  const totals = (record) => { const spent = (record?.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0); return { spent, balance: Number(record?.income || 0) - spent }; };
+  const totals = (record) => window.EduCashProFinanceModel.totals(record || {});
   const categoryName = (id) => { const source = lastCategories.length ? lastCategories.map((item) => [item[0], item[2]]) : c().categories; return source.find((item) => item[0] === id)?.[1] || id; };
 
   function showPremiumCard(kind = "share") {
@@ -112,31 +112,27 @@
     catch { workspaces = []; ownerWorkspace = null; }
   }
 
-  let syncReady=false, syncing=false, queuedData=null, syncError="";
-  const conflictCopy={pt:"O controle foi atualizado por outra pessoa. Seus registros locais foram preservados. Abra o controle compartilhado para conferir antes de tentar novamente.",en:"Someone else updated this control. Your local entries were kept. Open the shared control and review it before trying again.",es:"Otra persona actualizó este control. Tus registros locales se conservaron. Abre el control compartido y revísalo antes de volver a intentarlo.",ru:"Другой участник обновил учёт. Локальные записи сохранены. Откройте общий учёт и проверьте изменения перед повторной попыткой."};
-  async function sync(data) {
-    if(!options?.active||!ownerWorkspace?.workspaceId||!syncReady)return;
-    queuedData=JSON.parse(JSON.stringify(data||options.read?.()||{}));
-    window.clearTimeout(syncTimer);
-    syncTimer=window.setTimeout(flushSync,500);
+  const conflictCopy={pt:"O controle foi atualizado por outra pessoa. Atualize e tente novamente.",en:"Another person updated this control. Refresh and try again.",es:"Otra persona actualizó este control. Actualiza e inténtalo de nuevo.",ru:"Другой участник изменил учёт. Обновите страницу."};
+  async function sync() { /* Personal data never syncs to the shared control. */ }
+  const detailCopy = {
+    pt:{payer:"Quem pagou?", unspecified:"Não informado", paid:"Pago", pending:"A pagar", cash:"Saldo após pagamentos", forecast:"Saldo previsto", byPerson:"Pagamentos por pessoa", created:"Registrado por", changed:"Última alteração", updated:"Há alterações novas. Toque em Atualizar.", personal:"Controle pessoal", shared:"Controle compartilhado"},
+    en:{payer:"Who paid?", unspecified:"Not specified", paid:"Paid", pending:"To pay", cash:"Balance after payments", forecast:"Projected balance", byPerson:"Payments by person", created:"Recorded by", changed:"Last edited by", updated:"New changes available. Tap Refresh.", personal:"Personal control", shared:"Shared control"},
+    es:{payer:"¿Quién pagó?", unspecified:"Sin indicar", paid:"Pagado", pending:"Por pagar", cash:"Saldo tras pagos", forecast:"Saldo previsto", byPerson:"Pagos por persona", created:"Registrado por", changed:"Última edición", updated:"Hay cambios nuevos. Pulsa Actualizar.", personal:"Control personal", shared:"Control compartido"},
+    ru:{payer:"Кто оплатил?", unspecified:"Не указано", paid:"Оплачено", pending:"К оплате", cash:"Остаток после оплаты", forecast:"Прогноз остатка", byPerson:"Платежи по участникам", created:"Создал", changed:"Изменил", updated:"Есть новые изменения. Нажмите Обновить.", personal:"Личный учёт", shared:"Общий учёт"}
+  };
+  const details = () => detailCopy[options?.language] || detailCopy.pt;
+  const personName = (id, workspace) => (workspace?.participants || []).find(p => p.userId === id)?.displayName || details().unspecified;
+  function personTotals(record) {
+    const groups = new Map();
+    for (const item of record?.expenses || []) {
+      if (item.paid === false) continue;
+      const key = item.payerUserId || "";
+      const previous = groups.get(key) || {name: item.payerName || details().unspecified, cents: 0};
+      previous.cents += Math.round(Number(item.amount || 0) * 100);
+      groups.set(key, previous);
+    }
+    return Array.from(groups.values());
   }
-  async function flushSync(){
-    if(syncing||!queuedData||!syncReady)return;
-    syncing=true;
-    const data=queuedData;queuedData=null;
-    try{
-      const result=await api("/api/monthly-finance/share/sync",{workspaceId:ownerWorkspace.workspaceId,months:data,expectedUpdatedAt:ownerWorkspace.updatedAt});
-      ownerWorkspace.updatedAt=result.updatedAt;
-      if(!queuedData)options.markSynced?.();syncError="";
-    }catch(error){
-      syncReady=false;
-      const message=String(error?.message||'').includes('sharing_conflict')?conflictCopy[options.language]:c().error;
-      syncError=message;
-      const node=document.getElementById("financeNotice");if(node)node.textContent=message;
-      else window.alert(message);
-    }finally{syncing=false;if(queuedData&&syncReady)void flushSync();}
-  }
-
   function renderSharedAccess() {
     const root = document.getElementById("financeSharedAccess");
     if (!root) return;
@@ -167,33 +163,18 @@
     if (share) { share.textContent = `${options?.active ? "👥" : "🔒"} ${options?.active ? c().share : c().lockedShare}`; share.classList.toggle("locked", !options?.active); share.onclick = () => options?.active ? openManager() : showPremiumCard("share"); }
     if (pdf) { pdf.textContent = `${options?.active ? "📄" : "🔒"} ${options?.active ? c().pdf : c().lockedPdf}`; pdf.classList.toggle("locked", !options?.active); pdf.onclick = () => options?.active ? exportPdf(lastRecord, lastMonth, "") : showPremiumCard("pdf"); }
     renderSharedAccess();
-    if(syncError){const node=document.getElementById("financeNotice");if(node)node.textContent=syncError;const root=document.getElementById("financeSharedAccess");if(root&&ownerWorkspace){const button=document.createElement("button");button.className="wideButton";button.textContent=c().open;button.onclick=()=>openViewer(ownerWorkspace.workspaceId,lastMonth);root.appendChild(button);}}
+
   }
 
   async function init(args = {}) {
-    window.clearTimeout(syncTimer);queuedData=null;syncReady=false;
     options = args;
-    const startingData=JSON.stringify(options.read?.()||{});
     await refresh();
-    if (options?.active && options?.session?.profile?.userId && !ownerWorkspace && typeof options?.api === "function") {
-      try {
-        await api("/api/monthly-finance/share/create", { months: options.read?.() || {} });
-        options.markSynced?.();
-        await refresh();
-      } catch (error) {
-        console.log("[EduCashPro] finance cloud init:", error);
-      }
-    }
-    if(options.active && ownerWorkspace?.workspaceId){
-      try{const data=await api("/api/monthly-finance/owner-data",{workspaceId:ownerWorkspace.workspaceId});if(JSON.stringify(options.read?.()||{})!==startingData || options.hasPending?.()){syncError=conflictCopy[options.language];syncReady=false;}else{options.hydrate?.(data.months || {});ownerWorkspace.updatedAt=data.updatedAt;syncReady=true;syncError="";}}
-      catch{syncReady=false;}
-    }
     bind({});
   }
 
   async function createWorkspace() {
     const status = document.getElementById("financeShareStatus");
-    try { const result = await api("/api/monthly-finance/share/create", { months: options.read?.() || {} }); ownerWorkspace = result.workspace || null; await refresh(); if (status) status.textContent = c().active; openManager(); }
+    try { const result = await api("/api/monthly-finance/share/create", {}); ownerWorkspace = result.workspace || null; await refresh(); if (status) status.textContent = c().active; openManager(); }
     catch (error) { if (status) status.textContent = errorText(error?.message); }
   }
 
@@ -299,6 +280,7 @@
   }
 
   async function openViewer(workspaceId, month = lastMonth || new Date().toISOString().slice(0, 7)) {
+    window.clearInterval(refreshTimer);
     const copy = c();
     const labels = {
       pt: { shared: "Controle compartilhado", editable: "Você e as pessoas autorizadas podem lançar e editar gastos.", refresh: "Atualizar", setIncome: "Definir renda", addExpense: "Adicionar gasto", amount: "Valor", category: "Categoria", saveIncome: "Salvar renda", saveExpense: "Registrar gasto", updateExpense: "Atualizar gasto", edit: "Editar", remove: "Excluir", confirm: "Excluir este gasto?", invalid: "Digite um valor válido.", choose: "Escolha uma categoria." },
@@ -328,8 +310,11 @@
       ["housing","🏠",categoryName("housing")],["food","🍽️",categoryName("food")],["transport","🚗",categoryName("transport")],["health","❤️",categoryName("health")],["education","📚",categoryName("education")],["debts","💳",categoryName("debts")],["leisure","🎉",categoryName("leisure")],["investment","📈",categoryName("investment")],["other","•••",categoryName("other")]
     ];
 
+    const detail = details();
+    const people = workspace.participants || [];
+    const paymentRows = personTotals(record);
     const history = (record.expenses || []).length
-      ? record.expenses.map((item) => `<article class="financeHistoryItem"><span>${esc(categories.find((cat) => cat[0] === item.category)?.[1] || "•")}</span><div><strong>${esc(item.description || categoryName(item.category))}</strong><small>${new Date(item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language)}</small></div><b>${fmt(item.amount)}</b>${workspace.canEdit ? `<button data-shared-edit="${esc(item.id)}" aria-label="${esc(labels.edit)}">✎</button><button data-shared-remove="${esc(item.id)}" aria-label="${esc(labels.remove)}">×</button>` : ""}</article>`).join("")
+      ? record.expenses.map((item) => `<article class="financeHistoryItem"><span>${esc(categories.find((cat) => cat[0] === item.category)?.[1] || "•")}</span><div><strong>${esc(item.description || categoryName(item.category))}</strong><small>${esc(item.date || "")} · ${esc(item.paid === false ? detail.pending : detail.paid)} · ${esc(detail.payer)} ${esc(item.payerName || detail.unspecified)}<br>${esc(detail.created)}: ${esc(personName(item.createdByUserId, workspace))} · ${esc(detail.changed)}: ${esc(personName(item.actorUserId, workspace))}</small></div><b>${fmt(item.amount)}</b>${workspace.canEdit ? `<button data-shared-edit="${esc(item.id)}" aria-label="${esc(labels.edit)}">✎</button><button data-shared-remove="${esc(item.id)}" aria-label="${esc(labels.remove)}">×</button>` : ""}</article>`).join("")
       : `<div class="empty">${esc(copy.empty)}</div>`;
 
     document.getElementById("content").innerHTML = `
@@ -338,11 +323,11 @@
         <header class="financeHero"><span>👥</span><div><h1>${esc(labels.shared)}</h1><p>${esc(labels.editable)}</p></div></header>
         <section class="financeSharedToolbar"><button id="financeSharedRefresh">↻ ${esc(labels.refresh)}</button>${workspace.role === "owner" ? `<button id="financeViewerPdf">📄 ${esc(copy.pdf)}</button>` : ""}</section>
         <label class="financeMonth"><span>${esc(copy.month)}</span><input id="financeViewerMonth" type="month" value="${esc(month)}"></label>
-        <section class="financeSummary"><article><small>${esc(copy.income)}</small><strong>${fmt(record.income)}</strong></article><article><small>${esc(copy.spent)}</small><strong>${fmt(sum.spent)}</strong></article><article class="${sum.balance < 0 ? "negative" : ""}"><small>${esc(copy.balance)}</small><strong>${fmt(sum.balance)}</strong></article></section>
+        <p id="financeSharedChanged" role="status"></p><section class="financeSummary">${[[copy.income,record.income],[detail.paid,sum.paid],[detail.pending,sum.pending],[detail.cash,sum.cash],[detail.forecast,sum.balance]].map(([label,value]) => `<article><small>${esc(label)}</small><strong>${fmt(value)}</strong></article>`).join("")}</section><section class="financePanel"><h2>${esc(detail.byPerson)}</h2>${paymentRows.length ? paymentRows.map(row=>`<p>${esc(row.name)}: <strong>${fmt(row.cents / 100)}</strong></p>`).join("") : `<p>${esc(copy.empty)}</p>`}</section>
         ${workspace.canEdit ? `
           <section class="financeSharedEntry">
             <div class="financeSharedFormBlock"><h3>＋ ${esc(labels.setIncome)}</h3><div class="financeSharedFormRow"><input id="sharedIncomeValue" type="number" min="0" step="0.01" inputmode="decimal" value="${Number(record.income || 0)}"><button id="sharedIncomeSave" class="wideButton">${esc(labels.saveIncome)}</button></div></div>
-            <div class="financeSharedFormBlock"><h3>− ${esc(labels.addExpense)}</h3><div class="financeSharedExpenseGrid"><input id="sharedExpenseValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${esc(labels.amount)}"><select id="sharedExpenseCategory"><option value="">${esc(labels.category)}</option>${categories.map((cat) => `<option value="${esc(cat[0])}">${esc(cat[1] + " " + cat[2])}</option>`).join("")}</select><input id="sharedExpenseDescription" maxlength="160" placeholder="${esc(entryLabels.description)}" aria-label="${esc(entryLabels.description)}"><input id="sharedExpenseDate" type="date" aria-label="${esc(entryLabels.date)}" value="${month}-01"><select id="sharedExpensePaid" aria-label="${esc(entryLabels.paid)}"><option value="true">${esc(entryLabels.paid)}</option><option value="false">${esc(entryLabels.pending)}</option></select></div><button id="sharedExpenseSave" class="wideButton">${esc(labels.saveExpense)}</button><button id="sharedExpenseCancel" class="textButton hidden" type="button">×</button><p id="sharedExpenseMessage" class="financeMessage"></p></div>
+            <div class="financeSharedFormBlock"><h3>− ${esc(labels.addExpense)}</h3><div class="financeSharedExpenseGrid"><input id="sharedExpenseValue" type="number" min="0" step="0.01" inputmode="decimal" placeholder="${esc(labels.amount)}"><select id="sharedExpenseCategory"><option value="">${esc(labels.category)}</option>${categories.map((cat) => `<option value="${esc(cat[0])}">${esc(cat[1] + " " + cat[2])}</option>`).join("")}</select><input id="sharedExpenseDescription" maxlength="160" placeholder="${esc(entryLabels.description)}" aria-label="${esc(entryLabels.description)}"><input id="sharedExpenseDate" type="date" aria-label="${esc(entryLabels.date)}" value="${month}-01"><label>${esc(detail.payer)}<select id="sharedExpensePayer"><option value="">${esc(detail.unspecified)}</option>${people.map(person=>`<option value="${esc(person.userId)}">${esc(person.displayName)}</option>`).join("")}</select></label><select id="sharedExpensePaid" aria-label="${esc(entryLabels.paid)}"><option value="true">${esc(entryLabels.paid)}</option><option value="false">${esc(entryLabels.pending)}</option></select></div><button id="sharedExpenseSave" class="wideButton">${esc(labels.saveExpense)}</button><button id="sharedExpenseCancel" class="textButton hidden" type="button">×</button><p id="sharedExpenseMessage" class="financeMessage"></p></div>
           </section>
         ` : ""}
         <section class="financeHistory"><header><div><h2>${esc(copy.history)}</h2><small>☁️ ${esc(copy.active)}</small></div></header>${history}</section>
@@ -350,7 +335,8 @@
 
     document.getElementById("financeViewerBack").onclick = () => options.backToFinance?.();
     document.getElementById("financeSharedRefresh").onclick = () => openViewer(workspaceId, month);
-    document.getElementById("financeViewerPdf")?.addEventListener("click", () => exportPdf(record, month, workspace.ownerName || "", workspace));
+    document.getElementById("financeViewerPdf")?.addEventListener("click", async () => { try { const latest = await api("/api/monthly-finance/month", {workspaceId, month}); await exportPdf(latest.record, month, latest.workspace.ownerName || "", latest.workspace); } catch { window.alert(copy.error); } });
+    refreshTimer = window.setInterval(async () => { const root = document.getElementById("financeSharedWorkspaceRoot"); if (!root || root.dataset.workspaceId !== workspaceId) { window.clearInterval(refreshTimer); return; } try { const latest = await api("/api/monthly-finance/month", {workspaceId, month}); if (latest.workspace.updatedAt !== workspace.updatedAt) document.getElementById("financeSharedChanged").textContent = detail.updated; } catch {} }, 30000);
     document.getElementById("financeViewerMonth").onchange = (event) => openViewer(workspaceId, event.target.value || month);
 
     if (!workspace.canEdit) return;
@@ -377,11 +363,12 @@
       const description=document.getElementById("sharedExpenseDescription").value.trim();
       const date=document.getElementById("sharedExpenseDate").value;
       const paid=document.getElementById("sharedExpensePaid").value === "true";
+      const payerUserId=document.getElementById("sharedExpensePayer").value;
       if(!date || date.slice(0,7)!==month){message.textContent=labels.invalid;return;}
       if (editingId) {
-        await api("/api/monthly-finance/expense", { workspaceId, month, action: "update", expenseId: editingId, amount, category, description, date, paid });
+        await api("/api/monthly-finance/expense", { workspaceId, month, action: "update", expenseId: editingId, amount, category, description, date, paid, payerUserId });
       } else {
-        await api("/api/monthly-finance/expense", { workspaceId, month, action: "add", expense: { amount, category, description, date, paid, createdAt: Date.now() } });
+        await api("/api/monthly-finance/expense", { workspaceId, month, action: "add", expense: { amount, category, description, date, paid, payerUserId, createdAt: Date.now() } });
       }
       openViewer(workspaceId, month);
     };
@@ -396,6 +383,7 @@
         document.getElementById("sharedExpenseDescription").value=item.description || "";
         document.getElementById("sharedExpenseDate").value=item.date || month+"-01";
         document.getElementById("sharedExpensePaid").value=String(item.paid !== false);
+        document.getElementById("sharedExpensePayer").value=item.payerUserId || "";
         saveButton.textContent = labels.updateExpense;
         cancelButton.classList.remove("hidden");
         valueInput.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -409,6 +397,7 @@
       document.getElementById("sharedExpenseDescription").value="";
       document.getElementById("sharedExpenseDate").value=month+"-01";
       document.getElementById("sharedExpensePaid").value="true";
+      document.getElementById("sharedExpensePayer").value="";
       saveButton.textContent = labels.saveExpense;
       cancelButton.classList.add("hidden");
       message.textContent = "";
@@ -433,10 +422,10 @@
 
   function reportHtml(record, month, ownerName = "") {
     displayCurrency = record.currency || "USD";
-    const copy = c(); const sum = totals(record);
+    const copy = c(); const sum = totals(record); const detail = details();
     const labels={pt:{paid:"Pago",pending:"A pagar"},en:{paid:"Paid",pending:"To pay"},es:{paid:"Pagado",pending:"Por pagar"},ru:{paid:"Оплачено",pending:"К оплате"}}[options.language];
-    const rows = (record.expenses || []).map((item) => `<tr><td style="padding:7px;border-bottom:1px solid #ddd">${esc(new Date((item.date || "").length ? item.date+"T12:00:00" : item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language))}</td><td style="padding:7px;border-bottom:1px solid #ddd">${esc(item.description || categoryName(item.category))}<br><small>${esc(categoryName(item.category))} · ${esc(item.paid === false ? labels.pending : labels.paid)}</small></td><td style="padding:7px;border-bottom:1px solid #ddd;text-align:right">${esc(fmt(item.amount))}</td></tr>`).join("");
-    return `<div style="font-family:Arial,sans-serif;color:#142033;background:#fff;padding:24px"><h1 style="margin:0 0 6px;font-size:24px">${esc(copy.report)}</h1><p style="margin:0 0 18px;color:#667">${ownerName ? `${esc(copy.owner)} ${esc(ownerName)} • ` : ""}${esc(month)}</p><table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.income)}</b><br>${esc(fmt(record.income))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.spent)}</b><br>${esc(fmt(sum.spent))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.balance)}</b><br>${esc(fmt(sum.balance))}</td></tr></table><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:7px">${esc(copy.date)}</th><th style="text-align:left;padding:7px">${esc(copy.category)}</th><th style="text-align:right;padding:7px">${esc(copy.value)}</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="padding:12px">${esc(copy.empty)}</td></tr>`}</tbody><tfoot><tr><td colspan="2" style="padding:8px;border-top:2px solid #222"><b>${esc(copy.total)}</b></td><td style="padding:8px;border-top:2px solid #222;text-align:right"><b>${esc(fmt(sum.spent))}</b></td></tr></tfoot></table><p style="margin-top:24px;font-size:10px;color:#777">${esc(copy.generated)} ${esc(new Date().toLocaleString(options.language === "pt" ? "pt-BR" : options.language))} • EduCashPro</p></div>`;
+    const rows = (record.expenses || []).map((item) => `<tr><td style="padding:7px;border-bottom:1px solid #ddd">${esc(new Date((item.date || "").length ? item.date+"T12:00:00" : item.createdAt).toLocaleDateString(options.language === "pt" ? "pt-BR" : options.language))}</td><td style="padding:7px;border-bottom:1px solid #ddd">${esc(item.description || categoryName(item.category))}<br><small>${esc(categoryName(item.category))} · ${esc(item.paid === false ? labels.pending : labels.paid)}${ownerName ? ` · ${esc(detail.payer)} ${esc(item.payerName || detail.unspecified)}` : ""}</small></td><td style="padding:7px;border-bottom:1px solid #ddd;text-align:right">${esc(fmt(item.amount))}</td></tr>`).join("");
+    return `<div style="font-family:Arial,sans-serif;color:#142033;background:#fff;padding:24px"><h1 style="margin:0 0 6px;font-size:24px">${esc(copy.report)}</h1><p style="margin:0 0 18px;color:#667">${esc(ownerName ? detail.shared : detail.personal)} • ${ownerName ? `${esc(copy.owner)} ${esc(ownerName)} • ` : ""}${esc(month)}</p><table style="width:100%;border-collapse:collapse;margin-bottom:20px"><tr><td style="padding:10px;border:1px solid #ddd"><b>${esc(copy.income)}</b><br>${esc(fmt(record.income))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(detail.paid)}</b><br>${esc(fmt(sum.paid))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(detail.pending)}</b><br>${esc(fmt(sum.pending))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(detail.cash)}</b><br>${esc(fmt(sum.cash))}</td><td style="padding:10px;border:1px solid #ddd"><b>${esc(detail.forecast)}</b><br>${esc(fmt(sum.balance))}</td></tr></table><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:7px">${esc(copy.date)}</th><th style="text-align:left;padding:7px">${esc(copy.category)}</th><th style="text-align:right;padding:7px">${esc(copy.value)}</th></tr></thead><tbody>${rows || `<tr><td colspan="3" style="padding:12px">${esc(copy.empty)}</td></tr>`}</tbody><tfoot><tr><td colspan="2" style="padding:8px;border-top:2px solid #222"><b>${esc(copy.total)}</b></td><td style="padding:8px;border-top:2px solid #222;text-align:right"><b>${esc(fmt(sum.spent))}</b></td></tr></tfoot></table>${ownerName ? `<h2>${esc(detail.byPerson)}</h2>${personTotals(record).map(row => `<p>${esc(row.name)}: ${esc(fmt(row.cents / 100))}</p>`).join("")}` : ""}<p style="margin-top:24px;font-size:10px;color:#777">${esc(copy.generated)} ${esc(new Date().toLocaleString(options.language === "pt" ? "pt-BR" : options.language))} • EduCashPro</p></div>`;
   }
 
   async function exportPdf(record, month, ownerName = "", workspace = null) {
