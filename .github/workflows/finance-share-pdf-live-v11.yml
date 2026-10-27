@@ -1,0 +1,38 @@
+name: Verify live EduCashPro sharing and branded PDF v11
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/finance-share-pdf-live-v11.yml"
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify actual site assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="$GITHUB_SHA-$GITHUB_RUN_ATTEMPT"
+          for file in version.json index.html app.js monthly-finance-control.js monthly-finance-sharing.js pdf-documents.js resource-loader.js; do
+            curl -fLsS --retry 3 --retry-delay 2 --max-time 40 -H 'Cache-Control: no-cache' "$base/$file?verify=$nonce" -o "/tmp/live-$file"
+            echo "Downloaded $file ($(wc -c <"/tmp/live-$file") bytes)"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const f=n=>fs.readFileSync("/tmp/live-"+n,"utf8");
+            assert.equal(JSON.parse(f("version.json")).build,"2026.10.27.11");
+            assert(f("index.html").includes("resource-loader.js?v=20261027.11"),"Old HTML assets still served");
+            const app=f("app.js"),share=f("monthly-finance-sharing.js"),finance=f("monthly-finance-control.js"),pdf=f("pdf-documents.js");
+            assert(app.includes("Bearer cookie-session"),"First-party authenticated sharing fix missing");
+            assert(app.includes("window.location.origin + path"),"First-party endpoint fix missing");
+            assert(share.includes("verified_email_required"),"Account verification error missing");
+            assert(share.includes("financeShareCreate"),"Explicit sharing activation missing");
+            assert(share.includes("pdfPrint"),"Safari PDF recovery missing");
+            assert(share.includes("EduCashPro</strong>"),"Branded PDF report header missing");
+            assert(finance.includes("shareInitPromise"),"Shared module loading race fix missing");
+            assert(pdf.includes("stamp(pdf,referralUrl(session))"),"EduCashPro PDF stamp missing");
+            console.log("PASS: actual Render domain serves version 2026.10.27.11 with authenticated sharing, explicit activation and branded PDF");
+          '
