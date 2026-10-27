@@ -27,10 +27,10 @@ jobs:
             const home=file("app.js"),features=file("feature-registry.js"),market=file("market-learning-center.js");
             assert(file("index.html").includes("app.js?v=20261027.6"),"Old HTML scripts served");
             assert(features.includes("Centro de Price Action")&&features.includes("Profissão Trader — Análise em Tempo Real"),"New labels not deployed");
-            const a=home.indexOf("quickCard(\\"price-action\\""),b=home.indexOf("quickCard(\\"analysis\\"");
+            const quote=String.fromCharCode(34);const a=home.indexOf("quickCard("+quote+"price-action"+quote),b=home.indexOf("quickCard("+quote+"analysis"+quote);
             assert(a>=0 && b>a && b-a<350,"Price Action and Trader not adjacent");
-            assert(home.includes("openPriceActionCenter(\\"home\\")"),"Home learning shortcut absent");
-            assert(home.includes("route.view === \\"price-action\\""),"Learning center route restore absent");
+            assert(home.includes("openPriceActionCenter("+quote+"home"+quote+")"),"Home learning shortcut absent");
+            assert(home.includes("route.view === "+quote+"price-action"+quote),"Learning center route restore absent");
             assert(market.includes("function openLearningCenter(args = {})"),"Direct learning center entry absent");
             assert(market.includes("centerCopy.backHome"),"Learning center back to home absent");
             console.log("PASS: Domain serves two adjacent cards and independent navigation on build 2026.10.27.6");
