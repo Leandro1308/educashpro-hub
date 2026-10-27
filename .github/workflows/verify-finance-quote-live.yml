@@ -1,0 +1,38 @@
+name: Verify live finance and retired quote
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/verify-finance-quote-live.yml"
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect public Render frontend
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://go.educashpro.vip/app"
+          nonce="${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
+          for file in version.json local-tools-and-games.js financial-tools-suite.js resource-loader.js navigation-flow.js contextual-guide.js contextual-guides-pt.js contextual-guides-en.js contextual-guides-es.js contextual-guides-ru.js subscription-showcase.js; do
+            curl -fLsS --retry 3 --retry-delay 2 --connect-timeout 10 --max-time 35 -H "Cache-Control: no-cache" "$base/$file?test=$nonce" -o "/tmp/check-$file"
+            echo "Fetched $file: $(wc -c <"/tmp/check-$file") bytes"
+          done
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const file=n=>fs.readFileSync("/tmp/check-"+n,"utf8");
+            assert.equal(JSON.parse(file("version.json")).build,"2026.10.27.8");
+            const menu=file("local-tools-and-games.js");
+            assert(!menu.includes("quoteSub:")&&!menu.includes("toolCard("+"\"quote\""),"Old quote menu still served");
+            assert(menu.includes("openFinanceControl")&&menu.includes("openFinancialTool"),"Financial tools not available");
+            assert(!file("financial-tools-suite.js").includes("renderQuote"),"Old quote screen still served");
+            assert(!file("resource-loader.js").includes("quotes.js"),"Old quote loader still served");
+            assert(file("resource-loader.js").includes("loadFinanceExtras"),"Finance recovery disappeared");
+            assert(file("navigation-flow.js").includes("data-navigation-back"),"Back button protection missing");
+            assert(!file("contextual-guide.js").includes("\"quote\":\"quote\""),"Old quote guide mapping still served");
+            for(const lang of ["pt","en","es","ru"])assert(!file("contextual-guides-"+lang+".js").includes("\"quote\":"),"Old quote guide still served: "+lang);
+            assert(!file("subscription-showcase.js").includes("\"quote\""),"Old quote benefit still served");
+            console.log("PASS: Render live v2026.10.27.8, finance available, navigation guarded and quotation feature retired.");
+          '
