@@ -30,7 +30,8 @@
     document.head.append(style);
     const control=document.createElement("div");control.id="ecpLanguageControl";
     control.innerHTML='<button id="ecpLanguageToggle" aria-haspopup="true" aria-label="'+labels[code]+'" aria-expanded="false">🌐 '+code.toUpperCase()+'</button><div id="ecpLanguageMenu" hidden aria-label="'+labels[code]+'">'+Object.entries({pt:"Português",en:"English",es:"Español",ru:"Русский"}).map(([value,label])=>'<button data-language="'+value+'" aria-pressed="'+(value===code)+'">'+label+'</button>').join('')+'</div>';
-    document.body.prepend(control);
+    const header=document.querySelector('.topbar');
+    if(header){header.insertBefore(control,document.getElementById('closeButton'));const inline=document.createElement('style');inline.textContent='body{padding-top:0!important}.topbar{position:sticky!important;top:0!important;z-index:2147483000!important}#ecpLanguageControl{position:relative;inset:auto;height:auto;padding:0;background:transparent;border:0;flex-shrink:0}#ecpLanguageControl button{padding:6px 9px;white-space:nowrap}#ecpLanguageMenu{top:44px;right:0}.topbar .brandcopy{min-width:0;flex:1}';document.head.append(inline);}else document.body.prepend(control);
     const toggle=control.querySelector('#ecpLanguageToggle'),menu=control.querySelector('#ecpLanguageMenu');
     toggle.onclick=()=>{menu.hidden=!menu.hidden;toggle.setAttribute('aria-expanded',String(!menu.hidden));};
     menu.querySelectorAll('[data-language]').forEach(button=>button.onclick=()=>choose(button.dataset.language));
