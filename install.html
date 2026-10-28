@@ -23,7 +23,7 @@
   <script>
     if(window.navigator.standalone===true||window.matchMedia("(display-mode: standalone)").matches){location.replace("/");}
   </script>
-</head>
+<link rel="stylesheet" href="./internal-ui.css?v=20261028.11"></head>
 <body>
   <main class="card">
     <div class="top"><img class="icon" src="https://educashpro-all.onrender.com/api/platform-public/app-icon?size=180" alt="Ícone EduCashPro"><div><small>EDUCASHPRO</small><h1>Adicionar à Tela de Início</h1></div></div>
@@ -54,7 +54,7 @@
       document.getElementById(chrome?"chrome":"safari").classList.add("show");
     })();
   </script>
-<script src="./locale-resolver.js?v=20261028.10"></script><script>
+<script src="./locale-resolver.js?v=20261028.11"></script><script>
 (function(){const c={"en": ["Add to Home Screen", "You are using Chrome. On iPhone, complete the final installation step in Safari.", "Tap Chrome’s Share button ⬆️", "Use the icon to the right of the address bar.", "Tap “Open in Safari”", "This page will open in Safari.", "In Safari: Share → Add to Home Screen", "Keep “Open as Web App” enabled and tap “Add”.", "You are using Safari. You can complete installation here.", "Tap Share ⬆️", "Use Safari’s own button.", "Choose “Add to Home Screen”", "Scroll the action list if needed.", "Enable “Open as Web App”", "Then tap “Add”.", "The icon above should appear on your Home Screen. If it does not load here, refresh before installing.", "Back to EduCashPro"], "es": ["Añadir a la pantalla de inicio", "Estás en Chrome. En iPhone, completa el último paso en Safari.", "Toca Compartir ⬆️ en Chrome", "Usa el icono a la derecha de la barra de direcciones.", "Toca “Abrir en Safari”", "Esta página se abrirá en Safari.", "En Safari: Compartir → Añadir a pantalla de inicio", "Mantén “Abrir como app web” activado y toca “Añadir”.", "Estás en Safari. Puedes completar la instalación aquí.", "Toca Compartir ⬆️", "Usa el botón de Safari.", "Elige “Añadir a pantalla de inicio”", "Desplázate por las acciones si es necesario.", "Activa “Abrir como app web”", "Después toca “Añadir”.", "El icono de arriba aparecerá en tu pantalla de inicio. Si no carga aquí, actualiza antes de instalar.", "Volver a EduCashPro"], "ru": ["Добавить на экран «Домой»", "Вы используете Chrome. На iPhone завершите установку в Safari.", "Нажмите «Поделиться» ⬆️ в Chrome", "Используйте значок справа от адресной строки.", "Нажмите «Открыть в Safari»", "Эта страница откроется в Safari.", "В Safari: Поделиться → На экран «Домой»", "Оставьте «Открывать как веб-приложение» включённым и нажмите «Добавить».", "Вы используете Safari. Установку можно завершить здесь.", "Нажмите «Поделиться» ⬆️", "Используйте кнопку Safari.", "Выберите «На экран Домой»", "При необходимости прокрутите список действий.", "Включите «Открывать как веб-приложение»", "Затем нажмите «Добавить».", "Значок выше появится на экране «Домой». Если он не загрузился, обновите страницу перед установкой.", "Вернуться в EduCashPro"]};const language=window.EduCashProLocale.resolve(),values=c[language];if(!values)return;
 const nodes=[document.querySelector('h1'),document.querySelector('#chrome p'),...document.querySelectorAll('#chrome .step b,#chrome .step div>span'),document.querySelector('#safari p'),...document.querySelectorAll('#safari .step b,#safari .step div>span'),document.querySelector('.note'),document.querySelector('.button')];nodes.forEach((node,index)=>{if(node)node.textContent=values[index];});document.title='EduCashPro | '+values[0];})();
 </script>
