@@ -10,7 +10,7 @@
     ru:{channel:"Официальные новости",share:"Поделиться EduCashPro",site:"Ссылка сайта",telegram:"Ссылка Telegram",copy:"Копировать",copied:"Скопировано",channelError:"Официальный канал сейчас недоступен."}
   };
   function session(){return platform.readWebSession?.()||null}
-  function lang(){const raw=String(session()?.profile?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
+  function lang(){const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;const raw=String(session()?.profile?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
   function t(k){return COPY[lang()]?.[k]||COPY.pt[k]||k}
   function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
   async function post(path){const token=session()?.token;if(!token)throw new Error("session_missing");const r=await fetch(`${API_BASE}${path}`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:"{}",cache:"no-store"});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.reason||"request_failed");return d}
@@ -24,3 +24,4 @@
 
   const observer=new MutationObserver(patch);observer.observe(document.documentElement,{childList:true,subtree:true});if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",patch,{once:true});else patch();
 })();
+

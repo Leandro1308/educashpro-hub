@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.28.6";
+  const APP_RUNTIME_BUILD = "2026.10.28.7";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -537,7 +537,8 @@
     state.referrerId = String(externalSession.referrerId || state.referrerId || "");
     state.planPriceUsdt = Number(externalSession.planPriceUsdt || state.planPriceUsdt || 12);
     state.botUrl = externalSession.botUrl || state.botUrl;
-    state.language = state.profile.language || state.language || "pt";
+    state.language = window.EduCashProLocale.resolve({language:state.profile.language});
+    state.profile.language = state.language;
     state.membershipCredential = externalSession.membershipCredential || state.membershipCredential || String(localStorage.getItem("educashpro:membership-credential") || "");
     const effectiveSession = { ...externalSession, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
     window.__EDUCASHPRO_SESSION__ = effectiveSession;
@@ -557,7 +558,8 @@
     state.referrerId = String(session.referrerId || state.referrerId || "");
     state.planPriceUsdt = Number(session.planPriceUsdt || state.planPriceUsdt || 12);
     state.botUrl = session.botUrl || state.botUrl;
-    state.language = state.profile.language || state.language || "pt";
+    state.language = window.EduCashProLocale.resolve({language:state.profile.language});
+    state.profile.language = state.language;
     state.membershipCredential = session.membershipCredential || state.membershipCredential || String(localStorage.getItem("educashpro:membership-credential") || "");
     const effectiveSession = { ...session, token: state.token, profile: state.profile, affiliateLink: state.affiliateLink };
     window.__EDUCASHPRO_SESSION__ = effectiveSession;
@@ -1294,6 +1296,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
   async function openAreaProfessional(){return renderTools();}
 
   async function openAccountCenter(method){
+    if(method==="openLanguage")return window.EduCashProLocale.open();
     try{
       content.innerHTML = navigationShell("👤", localizedNavTitle("account"));
       const ticket=window.EduCashProNavigation?.stamp?.();
@@ -1776,7 +1779,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
   function handleError(error, target = content) { const message = error?.message === "SESSION" ? t("expires") : t("error"); target.innerHTML = `<div class="empty error">${escapeHtml(message)}</div>`; }
 
   function applyLanguage() {
-    state.language = window.EduCashProLocale?.normalize?.(state.language) || state.language || "pt";
+    state.language = window.EduCashProLocale.resolve({language:state.language});
     if (window.EduCashProLocale?.apply) window.EduCashProLocale.apply(state.language);
     else document.documentElement.lang = state.language;
     headerSubtitle.textContent = t("subtitle");window.EduCashProProduct.applyLanguage(state.language);
@@ -1870,7 +1873,8 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
       const cachedPayload = decodeCredential(cachedCredential);
       if (receivedCredential && Number(receivedPayload?.validUntil || 0) !== Number(cachedPayload?.validUntil || 0)) localStorage.setItem("educashpro:membership-credential", receivedCredential);
       state.membershipCredential = Number(cachedPayload?.validUntil || 0) === Number(receivedPayload?.validUntil || 0) && cachedCredential ? cachedCredential : receivedCredential;
-      state.language = session.profile.language || "pt";
+      state.language = window.EduCashProLocale.resolve({language:session.profile.language});
+      state.profile.language = state.language;
       const startParam = String(tg?.initDataUnsafe?.start_param || publicParams.get("tgWebAppStartParam") || "");
       hydrateCourseCatalogFromCache();
       applyLanguage();
@@ -1949,7 +1953,7 @@ function productContext(){
     entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
     finance:()=>renderCourseCategory('financial_education'),business:()=>renderCourseCategory('business'),technical:()=>openCourse('analise_tecnica_completa'),
     subscription:()=>openAccountCenter('openSubscription'),network:()=>openAccountCenter('openNetwork'),settings:()=>openAccountCenter('openSettings')};
-  ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>openAccountCenter('openLanguage');
+  ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>window.EduCashProLocale.open();
   ctx.program=()=>{const u=new URL('./affiliate.html',location.href);u.searchParams.set('lang',language);const ref=profile?.referralCode||window.EduCashProPlatform?.pendingReferral?.();if(ref)u.searchParams.set('ref',ref);openUrl(u.toString())};
   ctx.help=()=>window.EduCashProProduct.help(productContext());ctx.channel=()=>openUrl('https://t.me/+1mP5ad7vJH5lOGNh');ctx.group=()=>window.EduCashProProduct.group(ctx);
   ctx.telegram=()=>{const code=window.EduCashProPlatform?.pendingReferral?.()||'';const u=new URL('https://t.me/EduCashProBot');if(code)u.searchParams.set('start','ref_'+code);openUrl(u.toString())};
@@ -1970,6 +1974,7 @@ function productContext(){
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 })();
+
 
 
 

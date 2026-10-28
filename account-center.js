@@ -325,6 +325,7 @@
   function session(){return platform.isTelegram?.()?telegramSession:platform.readWebSession?.()||null;}
 
   function lang() {
+    const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;
     const raw = String(session()?.profile?.language || navigator.language || "pt").toLowerCase();
     if (raw.startsWith("en")) return "en";
     if (raw.startsWith("es")) return "es";
@@ -560,6 +561,7 @@
  }
 
   async function openLanguage() {
+    if(window.EduCashProLocale?.open)return window.EduCashProLocale.open();
     const body = shell(`
       <div class="accountPanel">
         <h3>🌐 ${esc(t("languageTitle"))}</h3>
@@ -1122,5 +1124,6 @@
     mountAdminShortcut,
   };
 })();
+
 
 
