@@ -24,10 +24,10 @@
       partner: {
         eyebrow: "APRENDA E PRATIQUE",
         title: "Continue pelo curso em vídeo",
-        text: "Assista às aulas em vídeo gratuitamente. Para praticar, você também pode abrir a Exness pelo link do parceiro EduCashPro e começar em uma conta demonstrativa.",
+        text: "Assista às aulas em vídeo gratuitamente. Para praticar, você também pode abrir a Exness pelo botão abaixo e começar em uma conta demonstrativa.",
         button: "CURSO EM VÍDEO",
         videoText: "CADASTRE-SE NA EXNESS",
-        disclosure: "O curso em vídeo é gratuito. O cadastro na Exness utiliza um link de parceiro.",
+        disclosure: "O curso em vídeo é gratuito. Para praticar, comece pela conta demonstrativa.",
         url: VIDEO_COURSE_URL, videoUrl: EXNESS_URL,
         floating: "TREINE GRÁTIS NA CONTA DEMO",
         close: "Fechar",
@@ -37,19 +37,19 @@
       title: "Technical Analysis and Price Action",
       home: "<p>A visual, progressive course on context, structure, trends, support, resistance, breakouts, continuation and reversal patterns, entries and risk management. The core rule is simple: <b>context comes before the setup</b>.</p><p>Each figure is taught separately in its own chart. The goal is not to memorize shapes, but to understand confirmation, invalidation and responsible Demo practice.</p>",
       key: "How to identify", confirm: "What confirms it", error: "Common mistake", example: "Reading example", warning: "Warning",
-      partner: { eyebrow:"LEARN AND PRACTICE", title:"Continue with the video course", text:"Watch the video lessons for free. To practice, you can also open Exness through the EduCashPro partner link and start with a Demo account.", button:"VIDEO COURSE", videoText:"SIGN UP WITH EXNESS", disclosure:"The video course is free. Exness registration uses a partner link.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"PRACTICE FREE ON DEMO", close:"Close" },
+      partner: { eyebrow:"LEARN AND PRACTICE", title:"Continue with the video course", text:"Watch the video lessons for free. To practice, you can also open Exness using the button below and start with a Demo account.", button:"VIDEO COURSE", videoText:"SIGN UP WITH EXNESS", disclosure:"The video course is free. Start practicing with a demo account.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"PRACTICE FREE ON DEMO", close:"Close" },
     },
     es: {
       title: "Análisis Técnico y Price Action",
       home: "<p>Curso visual y progresivo sobre contexto, estructura, tendencias, soportes, resistencias, rompimientos, patrones de continuación y reversión, entradas y gestión de riesgo. La regla central es: <b>el contexto viene antes del setup</b>.</p><p>Cada figura se estudia por separado, en su propio gráfico. El objetivo no es memorizar dibujos, sino comprender confirmación, invalidación y práctica responsable en Demo.</p>",
       key: "Cómo identificar", confirm: "Qué lo confirma", error: "Error común", example: "Ejemplo de lectura", warning: "Atención",
-      partner: { eyebrow:"APRENDE Y PRACTICA", title:"Continúa con el curso en video", text:"Mira gratis las clases en video. Para practicar, también puedes abrir Exness mediante el enlace de socio de EduCashPro y comenzar con una cuenta Demo.", button:"CURSO EN VIDEO", videoText:"REGÍSTRATE EN EXNESS", disclosure:"El curso en video es gratuito. El registro en Exness utiliza un enlace de socio.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"PRACTICA GRATIS EN DEMO", close:"Cerrar" },
+      partner: { eyebrow:"APRENDE Y PRACTICA", title:"Continúa con el curso en video", text:"Mira gratis las clases en video. Para practicar, también puedes abrir Exness mediante el acceso a Exness de EduCashPro y comenzar con una cuenta Demo.", button:"CURSO EN VIDEO", videoText:"REGÍSTRATE EN EXNESS", disclosure:"El curso en video es gratuito. Empieza a practicar con una cuenta demo.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"PRACTICA GRATIS EN DEMO", close:"Cerrar" },
     },
     ru: {
       title: "Технический анализ и Price Action",
       home: "<p>Последовательный визуальный курс по контексту, структуре, трендам, поддержке, сопротивлению, пробоям, моделям продолжения и разворота, входам и управлению риском. Главное правило: <b>контекст важнее сетапа</b>.</p><p>Каждая фигура изучается отдельно на собственном графике. Цель — понимать подтверждение, отмену сценария и сначала практиковаться на демо-счёте.</p>",
       key: "Как распознать", confirm: "Что подтверждает", error: "Типичная ошибка", example: "Пример чтения", warning: "Внимание",
-      partner: { eyebrow:"УЧИТЕСЬ И ПРАКТИКУЙТЕСЬ", title:"Продолжите обучение в видеокурсе", text:"Смотрите видеоуроки бесплатно. Для практики можно открыть Exness по партнёрской ссылке EduCashPro и начать с демо-счёта.", button:"ВИДЕОКУРС", videoText:"РЕГИСТРАЦИЯ В EXNESS", disclosure:"Видеокурс доступен бесплатно. Для регистрации в Exness используется партнёрская ссылка.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"БЕСПЛАТНАЯ ДЕМО-ПРАКТИКА", close:"Закрыть" },
+      partner: { eyebrow:"УЧИТЕСЬ И ПРАКТИКУЙТЕСЬ", title:"Продолжите обучение в видеокурсе", text:"Смотрите видеоуроки бесплатно. Для практики можно открыть Exness по кнопке ниже и начать с демо-счёта.", button:"ВИДЕОКУРС", videoText:"РЕГИСТРАЦИЯ В EXNESS", disclosure:"Видеокурс доступен бесплатно. Начните практику с демо-счёта.", url:VIDEO_COURSE_URL, videoUrl:EXNESS_URL, floating:"БЕСПЛАТНАЯ ДЕМО-ПРАКТИКА", close:"Закрыть" },
     },
   };
 
@@ -250,3 +250,4 @@
 
   window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE={id:COURSE_ID,getCourseData};
 })();
+

@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261027.5";
+  const VERSION="20261028.2";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -136,7 +136,6 @@
     if(window.EduCashProAccountCenter)return Promise.resolve(true);
     return accountCenterPromise||(accountCenterPromise=(async()=>{
       await script("./account-center.js");
-      void script("./account-center-extras.js").catch(()=>{});
       return true;
     })().catch(error=>{accountCenterPromise=null;throw error}));
   }
@@ -188,6 +187,7 @@
   window.EDUCASHPRO_ASSET_VERSION=VERSION;
   window.EduCashProResources={version:VERSION,script,style,prefetch,loadToolsHub,loadAccountCenter,loadCourses,loadBookCourse,loadSetForLifeCourse,loadFinance,loadFinancialTools,loadLinks,loadProfessional,loadHelp,loadMarkets,loadPriceAction,loadQr,loadQrScanner,idle};
 })();
+
 
 
 
