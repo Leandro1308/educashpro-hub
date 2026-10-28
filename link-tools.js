@@ -126,7 +126,7 @@
     host.querySelector('#lcRefresh').onclick=load;host.querySelector('#lcDays').onchange=load;host.scrollIntoView?.({behavior:'smooth'});await load();
   }
 
-  function language() { const value = String(session?.profile?.language || params.get("lang") || "pt").toLowerCase(); return COPY[value] ? value : "pt"; }
+  function language() { const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;const value = String(session?.profile?.language || params.get("lang") || "pt").toLowerCase(); return COPY[value] ? value : "pt"; }
   function text(key, values = {}) { return Object.entries(values).reduce((value, [name, item]) => value.replace(`{${name}}`, item), COPY[language()][key] || COPY.pt[key] || key); }
   function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
   function content() { return document.getElementById("content"); }
@@ -362,5 +362,6 @@
 
   window.EduCashProLinks = { normalizePageAddress:pageSlug, text, renderPageEditor, renderShortener, bootPublic, setSession(value){ session = value || session; } };
 })();
+
 
 

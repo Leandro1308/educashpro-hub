@@ -28,6 +28,7 @@
   };
 
   function language() {
+    const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;
     const raw = String(navigator.language || "pt").toLowerCase();
     if (raw.startsWith("en")) return "en";
     if (raw.startsWith("es")) return "es";
@@ -113,3 +114,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render, { once: true });
   else render();
 })();
+
