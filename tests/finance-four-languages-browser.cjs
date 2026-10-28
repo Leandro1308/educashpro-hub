@@ -1,0 +1,195 @@
+const assert=require("node:assert/strict");
+const {chromium,webkit}=require("playwright");
+const BASE="http://127.0.0.1:8765";
+async function run(active,engine=chromium,language="pt"){
+ const browser=await engine.launch(engine===chromium?{headless:true,channel:"chrome",args:["--no-sandbox"]}:{headless:true});
+ try{
+  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,locale:({pt:"pt-BR",en:"en-US",es:"es-ES",ru:"ru-RU"}[language]),acceptDownloads:true});
+  const page=await context.newPage(),errors=[],consoleWarnings=[];
+  page.on("pageerror",e=>errors.push(e.message));
+  page.on("console",m=>{if(m.type()==="error")consoleWarnings.push(m.text())});
+  page.on("dialog",async d=>{if(d.type()==="confirm")await d.accept();else if(d.type()==="prompt")await d.accept("150");else await d.dismiss();});
+  await page.route(BASE+"/audit.html",r=>r.fulfill({status:200,contentType:"text/html",body:'<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="content"></div></body></html>'}));
+  await page.goto(BASE+"/audit.html");
+  await page.evaluate(({active,language})=>{
+   window.__EDUCASHPRO_SESSION__={token:"fixture-token",profile:{userId:"expense-test-member",language,active}};
+   window.EduCashProNavigation={stamp:()=>1,isCurrent:()=>true};
+   window.EduCashProApp={rememberRoute(){},openSubscription(){},
+      financeApi:async path=>path.endsWith("/list")?{workspaces:[]}:{ok:true}};
+   window.EduCashProAccess={snapshot:()=>({known:true,active}),isActive:()=>active};
+   window.__auditActions=[];
+  },{active,language});
+  await page.addScriptTag({url:BASE+"/resource-loader.js"});
+  await page.addScriptTag({url:BASE+"/local-tools-and-games.js"});
+  await page.evaluate(async()=>await window.EduCashProLocal.openTool("monthly-finance"));
+  await page.locator("#financeStart").click();
+  await page.locator(".financeTabs").waitFor();
+  const store=()=>page.evaluate(()=>JSON.parse(localStorage.getItem("educashpro:monthly-finance:expense-test-member")||"{}"));
+  const month=await page.locator("#financeMonth").inputValue();
+  const take=async()=>{
+    const data=await store();
+    return data[month]||{income:0,expenses:[]};
+  };
+  const switchTab=async t=>page.locator('[data-tab="'+t+'"]').click();
+  await page.locator("#financeAdd").click();
+  assert.equal(await page.locator("#financeExpenseForm").count(),1,"Overview Add expense button must navigate to form");
+  await page.locator("#financeIncomeForm").locator("button").count();
+  await page.locator("details.financePanel summary").click();
+  await page.locator("#incomeAmount").fill("1430,50");
+  await page.locator("#financeIncomeForm button").click();
+  assert.equal((await take()).income,1430.5,"Income amount not persisted");
+  await page.locator("details.financePanel summary").click();
+  await page.locator("#incomeAmount").fill("100");
+  await page.locator("#incomeOperation").selectOption("add");
+  await page.locator("#financeIncomeForm button").click();
+  assert.equal((await take()).income,1530.5,"Add to income action is not functional");
+  await page.locator("#financeCurrency").selectOption("BRL");
+  assert.equal((await take()).currency,"BRL","Currency selector did not persist");
+  await page.locator("#financeMonth").fill(month);
+  assert.equal(await page.locator("#financeMonth").inputValue(),month,"Month selector lost its value");
+  const add=async(desc,amount,paid,date)=>{
+    await switchTab("entries");
+    await page.locator("#expenseAmount").fill(amount);
+    await page.locator("#expenseCategory").selectOption("education");
+    await page.locator("#expenseDescription").fill(desc);
+    await page.locator("#expenseDate").fill(date||month+"-27");
+    await page.locator("#expensePaid").selectOption(paid?"true":"false");
+    await page.locator("#financeExpenseForm button[type=submit], #financeExpenseForm button.wideButton").first().click();
+    return await take();
+  };
+  let r=await add("ChatGpt","113,85",true,month+"-27");
+  assert.equal(r.expenses.length,1,"Initial expense not saved");
+  assert.equal(r.expenses[0].amount,113.85);
+  let id=r.expenses[0].id;
+  await page.locator('[data-edit="'+id+'"]').first().click();
+  assert.equal(await page.locator("#financeExpenseForm button.wideButton").first().innerText(),({pt:"Atualizar gasto",en:"Update expense",es:"Actualizar gasto",ru:"Обновить расход"}[language]));
+  assert.equal(await page.locator("#expenseDescription").inputValue(),"ChatGpt");
+  await page.locator("#expenseAmount").fill("117,40");
+  await page.locator("#expenseDescription").fill("ChatGPT atualizado");
+  await page.locator("#expensePaid").selectOption("false");
+  await page.locator("#financeExpenseForm button.wideButton").first().click();
+  r=await take();
+  console.log("EDIT_RESULT active="+active+" "+JSON.stringify({expenses:r.expenses,notice:await page.locator("#financeNotice").innerText(),errors}));
+  assert.equal(r.expenses.length,1,"Edit created duplicate instead of updating");
+  assert.equal(r.expenses[0].amount,117.4,"Update expense amount was not persisted");
+  assert.equal(r.expenses[0].description,"ChatGPT atualizado","Updated description not persisted");
+  assert.equal(r.expenses[0].paid,false,"Paid state change not persisted");
+  await page.locator('[data-edit="'+id+'"]').first().click();
+  await page.locator("#expenseAmount").fill("invalid amount");
+  await page.locator("#financeExpenseForm button.wideButton").first().click();
+  assert.equal((await take()).expenses[0].amount,117.4,"Invalid edit must not change saved data");
+  assert.ok((await page.locator("#financeExpenseError").innerText()).length>0,"Invalid form must explain the error by the Save button");
+  await page.locator("#expenseDescription").fill("Cancel should not persist");
+  await page.locator("#cancelExpense").click();
+  assert.equal((await take()).expenses[0].description,"ChatGPT atualizado","Cancel must not save");
+  await switchTab("overview");
+  await page.locator('[data-paid="'+id+'"]').first().click();
+  assert.equal((await take()).expenses[0].paid,true,"Mark as paid did not persist");
+  await switchTab("entries");
+  await page.locator("#financeSearch").fill("not-a-real-expense");
+  assert.equal(await page.locator(".financeHistoryItem").count(),0,"History search does not filter");
+  await page.locator("#financeSearch").fill("");
+  await page.locator("#financeFilter").selectOption("education");
+  assert.equal(await page.locator(".financeHistoryItem").count(),1,"Category filter does not work");
+  await page.locator('[data-remove="'+id+'"]').first().click();
+  assert.equal((await take()).expenses.length,0,"Delete expense did not persist");
+  if(active){
+    await switchTab("entries");
+    await page.locator("#expenseAmount").fill("50");
+    await page.locator("#expenseCategory").selectOption("food");
+    await page.locator("#expenseDescription").fill("Mensalidade");
+    await page.locator("#expenseDate").fill(month+"-27");
+    await page.locator("#expenseKind").selectOption("recurring");
+    await page.locator("#expenseCount").fill("3");
+    await page.locator("#financeExpenseForm button.wideButton").first().click();
+    const storage=await store();
+    const later=Object.keys(storage).filter(k=>k!==month).sort();
+    assert.equal(later.length,2,"Recurring expense must schedule two future months");
+    await switchTab("entries");
+    await page.locator("#expenseAmount").fill("90");
+    await page.locator("#expenseCategory").selectOption("transport");
+    await page.locator("#expenseDescription").fill("Parcelado");
+    await page.locator("#expenseDate").fill(month+"-27");
+    await page.locator("#expenseKind").selectOption("installments");
+    await page.locator("#expenseCount").fill("2");
+    await page.locator("#financeExpenseForm button.wideButton").first().click();
+    const installments=await store();
+    assert(installments[month].expenses.some(x=>x.kind==="installments"&&x.amount===45),"Installment current month must divide amount correctly");
+    assert(Object.values(installments).some(x=>Array.isArray(x.expenses)&&x.expenses.some(y=>y.kind==="installments"&&y.installment===2&&y.amount===45)),"Future installment not scheduled");
+    await switchTab("plan");
+    await page.locator("#budgetCategory").selectOption("food");
+    await page.locator("#budgetAmount").fill("500");
+    await page.locator("#financeBudgetForm button").click();
+    assert.equal((await take()).budgets.food,500,"Budget did not save");
+    await page.locator('[data-budget-remove="food"]').click();
+    assert.equal((await take()).budgets.food,undefined,"Budget remove did not save");
+    await page.locator("#goalName").fill("Reserva");
+    await page.locator("#goalTarget").fill("1000");
+    await page.locator("#goalSaved").fill("100");
+    await page.locator("#financeGoalForm button").click();
+    assert.equal((await take()).goals.length,1,"Goal not created");
+    await page.locator('[data-goal]').first().click();
+    assert.equal((await take()).goals[0].saved,150,"Goal edit button did not update saved amount");
+    await page.locator('[data-goal-remove]').click();
+    assert.equal((await take()).goals.length,0,"Goal not removed");
+    await switchTab("reports");
+    assert.equal(await page.locator(".financeTabs").count(),1,"Report page broke");
+  }else{
+    await switchTab("plan");
+    assert.equal(await page.locator("#financeBudgetForm").count(),0,"Free account bypassed subscription");
+    await switchTab("reports");
+    assert.equal(await page.locator(".financeTabs").count(),1,"Free report access broke");
+  }
+  const shareHandlers=await page.evaluate(()=>({share:typeof document.getElementById("financeShareAction")?.onclick,pdf:typeof document.getElementById("financePdfAction")?.onclick}));
+  console.log("FINANCE_BUTTON_HANDLERS active="+active+" "+JSON.stringify(shareHandlers));
+  assert.equal(shareHandlers.share,"function","Share button is inert");
+  assert.equal(shareHandlers.pdf,"function","PDF button is inert");
+  await page.waitForFunction(()=>typeof window.EduCashProFinanceShare?.init==="function",{timeout:20000});
+  if(active){
+    await page.evaluate(()=>{
+      window.__financePdfExports=[];
+      window.EduCashProPdf.exportHtml=async (html,meta)=>{window.__financePdfExports.push({bytes:html.length,filename:meta.filename})};
+    });
+    await page.locator("#financePdfAction").click();
+    await page.waitForFunction(()=>window.__financePdfExports?.length>0,{timeout:12000});
+    assert.equal((await page.evaluate(()=>window.__financePdfExports.length)),1,"PDF export action did not run");
+    await page.locator("#financeShareAction").click();
+    await page.locator("#financeShareBack").waitFor();
+    assert.equal(await page.locator("#financeShareCreate").count(),1,"Sharing manager should offer workspace activation");
+    await page.locator("#financeShareBack").click();
+    await page.locator(".financeTabs").waitFor();
+  }else{
+    await page.locator("#financeShareAction").click();
+    const gate=page.locator(".financePremiumGate");
+    await gate.waitFor();
+    await gate.locator(".finHelpClose").click();
+    await page.locator("#financePdfAction").click();
+    await gate.waitFor();
+    await gate.locator(".finHelpClose").click();
+  }
+  // Previously persisted records may have a due date from a different month.
+  // A valid edit must not appear to do nothing; move the existing entry.
+  await switchTab("entries");
+  const previousDate=new Date(month+"-01T00:00:00Z");
+  previousDate.setUTCMonth(previousDate.getUTCMonth()-1);
+  const previousMonth=previousDate.toISOString().slice(0,7);
+  await page.evaluate(({month,previousMonth})=>{
+    const key="educashpro:monthly-finance:expense-test-member";
+    const data=JSON.parse(localStorage.getItem(key)||"{}");
+    data[month]={...data[month],expenses:[{id:"legacy-date",amount:113.85,category:"education",description:"Legacy ChatGpt",date:previousMonth+"-15",paid:true,createdAt:Date.now()}]};
+    localStorage.setItem(key,JSON.stringify(data));
+  },{month,previousMonth});
+  await switchTab("overview");
+  await switchTab("entries");
+  await page.locator('[data-edit="legacy-date"]').click();
+  await page.locator("#expenseDescription").fill("Legacy ChatGpt atualizado");
+  await page.locator("#financeExpenseForm button.wideButton").click();
+  const allMonths=await store();
+  assert.equal(allMonths[month].expenses.length,0,"Legacy expense must leave its original month");
+  assert(allMonths[previousMonth].expenses.some(x=>x.id==="legacy-date"&&x.description==="Legacy ChatGpt atualizado"),"Legacy expense must move without losing ID or data");
+  assert.deepEqual(errors,[],"Browser JavaScript errors");
+  console.log("FINANCE_FULL_AUDIT_PASS language="+language+" engine="+(engine===chromium?"chrome":"webkit")+" active="+active+" "+JSON.stringify({income:(await take()).income,shareHandlers,warningCount:consoleWarnings.length}));
+  await context.close();
+ }finally{await browser.close()}
+}
+(async()=>{for(const engine of (process.env.FINANCE_TEST_WEBKIT==="1"?[webkit]:[chromium]))for(const language of ["pt","en","es","ru"])for(const active of [false,true])await run(active,engine,language)})().catch(error=>{console.error(error.stack||error);process.exitCode=1});
