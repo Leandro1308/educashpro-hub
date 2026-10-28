@@ -95,6 +95,10 @@ async function scenario(engine,language){
       const bytes=fs.readFileSync(path);
       assert(bytes.subarray(0,5).toString()==="%PDF-","Downloaded file is not a PDF");
       assert(bytes.length>1500,"Generated PDF is unexpectedly empty");
+      const rendered="/tmp/educashpro-finance-"+language;
+      execFileSync("pdftoppm",["-f","1","-l","1","-r","150","-png","-singlefile",path,rendered]);
+      const visibleText=execFileSync("tesseract",[rendered+".png","stdout"],{encoding:"utf8",stdio:["ignore","pipe","ignore"]});
+      assert.match(visibleText,/ChatGPT/i,"Generated PDF does not visibly render the saved expense");
       const report=await page.evaluate(()=>window.__pdfReport);
       assert(report.html.includes("EduCashPro"),"Report lacks EduCashPro branding");
       assert(report.html.includes("ChatGPT"),"Report lacks saved expense entries");
