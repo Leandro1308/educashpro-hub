@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.28.2";
+  const APP_RUNTIME_BUILD = "2026.10.28.3";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -691,7 +691,7 @@
   }
 
   function updateNav() {
-    bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
+    bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === (state.view === "analysis" ? "practice" : state.view)));
   }
 
   const LAST_ROUTE_KEY = "educashpro:last-route:v1";
@@ -759,7 +759,7 @@
 
   async function restoreRoute(route) {
     if(route && (['benefits','explore','games','randomizers'].includes(route.view)||(route.view==='tools'&&route.detail&&!['link-page','page'].includes(route.detail))))return renderHome();
-    if(route?.view==='practice'||route?.view==='analysis'||route?.view==='price-action')return openMarkets();
+    if(route?.view==='analysis')return openLiveMarkets();if(route?.view==='practice'||route?.view==='price-action')return openMarkets();
     if(route?.view==='area'&&route?.detail==='group')return window.EduCashProProduct.group(productContext());
     const restoreTicket=window.EduCashProNavigation?.stamp?.();
     if (!route || !RESTORABLE_VIEWS.has(route.view)) return false;
@@ -845,7 +845,7 @@
       else window.setTimeout(run,0);
     };
     if (requestedCourse) { renderLearn(); deferRoute(()=>restoreRoute({view:"course",detail:requestedCourse})); }
-    else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(params.get("tool")) || requestedAcademy === "technical_analysis") { deferRoute(()=>openMarkets()); }
+    else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(params.get("tool")) || requestedAcademy === "technical_analysis") { deferRoute(()=>openLiveMarkets()); }
     else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) { renderLearn(); deferRoute(()=>openAcademyCategory(requestedAcademy)); }
     else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") { renderBenefits(); deferRoute(()=>renderExclusiveBenefits()); }
     else if (requestedView === "benefits" && requestedSection === "partner-stores") window.location.assign("./marketplace.html");
@@ -865,7 +865,7 @@
     return true;
   }
 
-  function setView(view){stopBookTracking();if(view==='analysis'||view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
+  function setView(view){stopBookTracking();if(view==='analysis')return openLiveMarkets();if(view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
 
   function navigateFromFooter(button) {
     if (!button) return;
@@ -949,7 +949,40 @@
 
   async function renderLearn(){stopBookTracking();state.view='learn';rememberRoute('learn');syncExternalSession();updateNav();if(!state.courseCatalog.length)hydrateCourseCatalogFromCache();window.EduCashProProduct.learn(productContext());refreshCourseCatalogLater();}
 
-  async function openMarkets(){stopBookTracking();state.view='practice';rememberRoute('practice');syncExternalSession();updateNav();return window.EduCashProProduct.practice(productContext());}
+  async function openLiveMarkets() {
+    stopBookTracking();
+    syncExternalSession();
+    state.view = "analysis";
+    rememberRoute("analysis");
+    const marketTicket=window.EduCashProNavigation?.stamp?.();
+    const current=()=>!window.EduCashProNavigation||window.EduCashProNavigation.isCurrent(marketTicket);
+    updateNav();
+    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Profissão Trader: Como Ganhar na Bolsa de Valores");
+    // Verification continues independently; it must not hold the public analysis screen.
+    const accessPromise=Promise.resolve().then(()=>window.EduCashProAccess?.refresh?.()).catch(()=>null);
+    let rendered=false,lastActive=null;
+    const renderMarkets=()=>{
+      if(!current())return;
+      const access=window.EduCashProAccess?.snapshot?.();
+      const active=access?.known?access.active===true:state.profile?.active===true;
+      if(rendered&&active===lastActive)return;
+      lastActive=active;rendered=true;
+      return window.EduCashProMarkets?.render?.({language:state.language,active,back:openMarkets,openCourse,openUrl,subscribe:subscribeNow,openLearningCenter:()=>void openPriceActionCenter("analysis")});
+    };
+    void accessPromise.then(access=>{
+      if(!current()||access?.known!==true)return;
+      state.profile=normalizeProfile({...state.profile,active:access.active===true,isActive:access.active===true,activeUntil:access.activeUntil||null},state.profile);
+      const session=window.__EDUCASHPRO_SESSION__||{};
+      window.__EDUCASHPRO_SESSION__={...session,profile:state.profile};
+      if(rendered)renderMarkets();
+    }).catch(()=>{});
+    try{
+      await window.EduCashProResources?.loadMarkets?.();
+      return renderMarkets();
+    }catch(error){if(current())handleError(error);}
+  }
+
+async function openMarkets(){stopBookTracking();state.view='practice';rememberRoute('practice');syncExternalSession();updateNav();return window.EduCashProProduct.practice(productContext());}
 
   async function openAcademyCategory(category) {
     const supported = new Set(["free_courses", "network_marketing", "financial_education", "telegram"]);
@@ -1797,6 +1830,7 @@
 
     if (!tg?.initData) {
       renderPublicLanding();
+      if(publicParams.get("view")==="presentation"||publicParams.has("ref")||publicParams.has("r"))renderPresentation();
       return;
     }
 
@@ -1836,7 +1870,7 @@
       const requestedView = String(publicParams.get("view") || "");
       const requestedSection = String(publicParams.get("section") || "");
       if (requestedCourse) await restoreRoute({view:"course",detail:requestedCourse});
-      else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(publicParams.get("tool")) || requestedAcademy === "technical_analysis") await openMarkets();
+      else if (requestedView === "analysis" || requestedView === "games" || requestedView === "tools" && ["games","randomizers"].includes(publicParams.get("tool")) || requestedAcademy === "technical_analysis") await openLiveMarkets();
       else if (["free_courses", "network_marketing", "financial_education", "telegram"].includes(requestedAcademy)) await openAcademyCategory(requestedAcademy);
       else if (requestedView === "benefits" && requestedSection === "exclusive-benefits") await renderExclusiveBenefits();
       else if (requestedView === "benefits" && requestedSection === "partner-stores") location.assign("./marketplace.html");
@@ -1902,7 +1936,7 @@ function productContext(){
     entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
     finance:()=>renderCourseCategory('financial_education'),business:()=>renderCourseCategory('business'),technical:()=>openCourse('analise_tecnica_completa'),
     subscription:()=>openAccountCenter('openSubscription'),network:()=>openAccountCenter('openNetwork'),settings:()=>openAccountCenter('openSettings')};
-  ctx.language=language;ctx.languageAction=()=>openAccountCenter('openLanguage');
+  ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>openAccountCenter('openLanguage');
   ctx.program=()=>{const u=new URL('./affiliate.html',location.href);u.searchParams.set('lang',language);if(profile?.referralCode)u.searchParams.set('ref',profile.referralCode);openUrl(u.toString())};
   ctx.help=()=>window.EduCashProProduct.help(productContext());ctx.channel=()=>openUrl('https://t.me/+1mP5ad7vJH5lOGNh');ctx.group=()=>window.EduCashProProduct.group(ctx);
   ctx.telegram=()=>{const code=window.EduCashProPlatform?.pendingReferral?.()||'';const u=new URL('https://t.me/EduCashProBot');if(code)u.searchParams.set('start','ref_'+code);openUrl(u.toString())};
