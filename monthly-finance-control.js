@@ -474,14 +474,12 @@
   function write(data) {
     try {
       localStorage.setItem(storageKey(), JSON.stringify(data));
-      if (options.active) localStorage.setItem(storageKey() + ":pending", "1");
-      if (options.active)
-        window.EduCashProFinanceShare?.sync?.(data)?.catch?.(() => {});
-      return true;
-    } catch {
+    } catch (error) {
+      console.warn("[EduCashPro] Finance local storage unavailable:", error?.message || error);
       notice = t().error;
       return false;
     }
+    return true;
   }
   const record = () => M.normalize(read()[month]);
   const currency = () => record().currency || "USD";
@@ -551,7 +549,7 @@
   }
   function entryForm(r) {
     const x = r.expenses.find((x) => x.id === editing) || {};
-    return `<section class="financePanel"><h2>${esc(editing ? c().edit : c().addExpense)}</h2><form id="financeExpenseForm" class="financeForm"><div class="financeFormGrid">${amountInput("expenseAmount", c().value, x.amount || "")}<label>${esc(c().category)}<select id="expenseCategory" required><option value="">—</option>${cats()}</select></label><label>${esc(t().description)}<input id="expenseDescription" maxlength="160" value="${esc(x.description || "")}"></label><label>${esc(t().date)}<input id="expenseDate" type="date" required value="${esc(x.date || M.dateInMonth(month, new Date().getDate()))}"></label><label>${esc(t().status)}<select id="expensePaid"><option value="true">${esc(t().paid)}</option><option value="false">${esc(t().unpaid)}</option></select></label>${options.active && !editing ? `<label>${esc(t().once + " / " + t().recurring)}<select id="expenseKind"><option value="once">${esc(t().once)}</option><option value="recurring">${esc(t().recurring)}</option><option value="installments">${esc(t().installments)}</option></select></label><label id="expenseCountLabel" hidden>${esc(t().count)}<input id="expenseCount" type="number" min="1" max="120" value="12"></label>` : ""}</div>${options.active && !editing ? `<p id="financeScheduleHelp" class="financeHint" hidden>${esc(t().scheduleHelp)}</p>` : ""}<div class="financeFormActions"><button class="wideButton" type="submit">${esc(editing ? c().updateExpense : c().saveExpense)}</button>${editing ? `<button type="button" id="cancelExpense" class="secondaryButton">${esc(t().cancel)}</button>` : ""}</div></form></section>`;
+    return `<section class="financePanel"><h2>${esc(editing ? c().edit : c().addExpense)}</h2><form id="financeExpenseForm" class="financeForm" novalidate><div class="financeFormGrid">${amountInput("expenseAmount", c().value, x.amount || "")}<label>${esc(c().category)}<select id="expenseCategory" required><option value="">—</option>${cats()}</select></label><label>${esc(t().description)}<input id="expenseDescription" maxlength="160" value="${esc(x.description || "")}"></label><label>${esc(t().date)}<input id="expenseDate" type="date" required value="${esc(x.date || M.dateInMonth(month, new Date().getDate()))}"></label><label>${esc(t().status)}<select id="expensePaid"><option value="true">${esc(t().paid)}</option><option value="false">${esc(t().unpaid)}</option></select></label>${options.active && !editing ? `<label>${esc(t().once + " / " + t().recurring)}<select id="expenseKind"><option value="once">${esc(t().once)}</option><option value="recurring">${esc(t().recurring)}</option><option value="installments">${esc(t().installments)}</option></select></label><label id="expenseCountLabel" hidden>${esc(t().count)}<input id="expenseCount" type="number" min="1" max="120" value="12"></label>` : ""}</div>${options.active && !editing ? `<p id="financeScheduleHelp" class="financeHint" hidden>${esc(t().scheduleHelp)}</p>` : ""}<div class="financeFormActions"><button class="wideButton" type="submit">${esc(editing ? c().updateExpense : c().saveExpense)}</button>${editing ? `<button type="button" id="cancelExpense" class="secondaryButton">${esc(t().cancel)}</button>` : ""}</div><p id="financeExpenseError" class="financeMessage" role="alert" aria-live="assertive"></p></form></section>`;
   }
   function overview(r) {
     const pending = r.expenses
@@ -592,6 +590,41 @@
       })
       .join("")}</section>`;
   }
+  function bindOptionalActions() {
+    // The offline editor loads before the cloud-sharing and PDF modules.
+    // Always attach click handlers immediately; previously these buttons
+    // could be displayed without a listener while optional scripts loaded.
+    for (const [id, kind] of [["financeShareAction", "share"], ["financePdfAction", "pdf"]]) {
+      const button = document.getElementById(id);
+      if (!button || typeof button.onclick === "function") continue;
+      button.onclick = async () => {
+        if (!options.active) return options.subscribe?.();
+        button.disabled = true;
+        try {
+          await window.EduCashProResources?.loadFinanceExtras?.();
+          const shared = window.EduCashProFinanceShare;
+          if (!shared) throw new Error("finance_optional_module_unavailable");
+          const ready = await attachSharing();
+          if (!ready) throw new Error("finance_optional_module_unavailable");
+          if (kind === "share") {
+            if (typeof shared.openManager !== "function") throw new Error("finance_sharing_unavailable");
+            return shared.openManager();
+          }
+          if (typeof shared.exportPdf !== "function" || typeof window.EduCashProPdf?.exportHtml !== "function")
+            throw new Error("finance_pdf_unavailable");
+          return await shared.exportPdf(record(), month, "");
+        } catch (error) {
+          console.warn("[EduCashPro] Optional finance action failed:", error?.message || error);
+          notice = t().error;
+          const status = document.getElementById("financeNotice");
+          if (status) status.textContent = notice;
+        } finally {
+          button.disabled = false;
+        }
+      };
+    }
+  }
+
   function renderPage() {
     window.EduCashProApp?.rememberRoute?.(
       "tools",
@@ -607,6 +640,7 @@
       month,
       categories: c().categories,
     });
+    bindOptionalActions();
   }
   function bindSubscribe() {
     document
@@ -619,6 +653,8 @@
     if (write(data)) {
       notice = t().savedOk;
       renderPage();
+    } else {
+      error();
     }
   }
   function bind(r) {
@@ -691,7 +727,7 @@
           ),
           cat = document.getElementById("expenseCategory").value,
           date = document.getElementById("expenseDate").value;
-        if (!(value > 0) || !cat || date.slice(0, 7) !== month) return error();
+        if (!(value > 0) || !cat || !/^\d{4}-\d{2}-\d{2}$/.test(date) || (!editing && date.slice(0, 7) !== month)) return error();
         const item = {
           id: editing || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
           amount: value,
@@ -705,9 +741,30 @@
           updatedAt: Date.now(),
         };
         if (editing) {
-          Object.assign(x, item);
-          editing = "";
-          saveMonth(r);
+          if (!x) return error();
+          const targetMonth = date.slice(0, 7);
+          if (targetMonth !== month) {
+            // Legacy entries and corrected due dates may legitimately belong
+            // to a different month. Move the existing ID rather than silently
+            // rejecting a valid edit or duplicating the expense.
+            const data = read();
+            const next = M.normalize(data[targetMonth]);
+            next.currency = next.currency || currency();
+            next.expenses.unshift(item);
+            r.expenses = r.expenses.filter((row) => row.id !== editing);
+            data[month] = r;
+            data[targetMonth] = next;
+            if (write(data)) {
+              month = targetMonth;
+              editing = "";
+              notice = t().savedOk;
+              renderPage();
+            } else error();
+          } else {
+            Object.assign(x, item);
+            editing = "";
+            saveMonth(r);
+          }
         } else {
           try {
             const kind = options.active
@@ -730,7 +787,7 @@
             if (write(data)) {
               notice = t().savedOk;
               renderPage();
-            }
+            } else error();
           } catch {
             return error();
           }
@@ -839,11 +896,87 @@
   }
   function error() {
     notice = t().error;
+    const inline = document.getElementById("financeExpenseError");
+    if (inline) {
+      inline.textContent = notice;
+      inline.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+    }
     const node = document.getElementById("financeNotice");
     if (node) {
       node.textContent = notice;
-      node.scrollIntoView({ block: "center", behavior: "smooth" });
+      if (!inline) node.scrollIntoView?.({ block: "center", behavior: "smooth" });
     }
+  }
+  let shareInitializedForView = false;
+  let shareInitPromise = null;
+  let canonicalSharedView = false;
+  function attachSharing(force = false) {
+    const sharing = window.EduCashProFinanceShare;
+    if (!sharing?.init) return Promise.resolve(false);
+    // A user can tap Share/PDF while the background initialization is
+    // pending. Reuse that promise rather than opening an uninitialized view.
+    if (shareInitPromise) return shareInitPromise;
+    if (shareInitializedForView) return Promise.resolve(true);
+    if (!force && !document.querySelector(".financeControl")) return Promise.resolve(false);
+    shareInitializedForView = true;
+    const pending = Promise.resolve().then(() => sharing.init({
+      ...options,
+      read,
+      hasPending: () => localStorage.getItem(storageKey() + ":pending") === "1",
+      markSynced: () => localStorage.removeItem(storageKey() + ":pending"),
+      readBaseline: () => {
+        try { return localStorage.getItem(storageKey() + ":synced-fingerprint") || ""; }
+        catch { return ""; }
+      },
+      saveBaseline: (fingerprint) => {
+        try { localStorage.setItem(storageKey() + ":synced-fingerprint", String(fingerprint)); return true; }
+        catch (error) { console.warn("[EduCashPro] Finance sync baseline:", error?.message || error); return false; }
+      },
+      saveBackup: (data, cloudData = {}) => {
+        // Keep both pre-merge histories; an owner may need to recover
+        // entries previously changed on another device.
+        // No access tokens, profiles or credentials are stored here.
+        try {
+          const base=storageKey() + ":before-share-merge";
+          const snapshot=JSON.stringify({
+            savedAt:new Date().toISOString(),localMonths:data,sharedMonths:cloudData
+          });
+          if (!localStorage.getItem(base)) localStorage.setItem(base,snapshot);
+          localStorage.setItem(base+":latest",snapshot);
+          return true;
+        } catch (error) {
+          console.warn("[EduCashPro] Could not save finance backup:", error?.message || error);
+          return false;
+        }
+      },
+      clearNotice: () => {
+        notice = "";
+        const target=document.getElementById("financeNotice");
+        if(target)target.textContent="";
+      },
+      hydrate: (months, replaceAll = false) => {
+        const data = replaceAll ? { ...months } : { ...read(), ...months };
+        localStorage.setItem(storageKey(), JSON.stringify(data));
+      },
+      onOwnerWorkspace: (workspaceId) => {
+        if (!workspaceId || !options.active || options.sharedWorkspace || !document.querySelector(".financeControl") ||
+            document.querySelector(".financeSharePage") || document.querySelector("#financeSharedWorkspaceRoot")) return;
+        // Never interrupt somebody who is actively entering a local draft.
+        const focused = document.activeElement;
+        if (focused?.closest?.("#financeIncomeForm, #financeExpenseForm, #financeBudgetForm, #financeGoalForm")) return;
+        canonicalSharedView = true;
+        void window.EduCashProFinanceShare?.openViewer?.(workspaceId, month);
+      },
+      onSharedActivation: () => { canonicalSharedView = true; },
+      backToFinance: () => renderPage(),
+    })).then(() => true).catch(error => {
+      shareInitializedForView = false;
+      console.warn("[EduCashPro] Optional finance sharing failed:", error?.message || error);
+      return false;
+    });
+    shareInitPromise = pending.finally(() => { if (shareInitPromise === finished) shareInitPromise = null; });
+    const finished = shareInitPromise;
+    return finished;
   }
   function render(args = {}) {
     options = {
@@ -854,6 +987,9 @@
       active: args.active === true,
       session: args.session || {},
     };
+    shareInitializedForView = false;
+    shareInitPromise = null;
+    canonicalSharedView = false;
     month = /^\d{4}-(0[1-9]|1[0-2])$/.test(args.month || "")
       ? args.month
       : currentMonth();
@@ -867,33 +1003,21 @@
     if (!args.sharedWorkspace) {
       if (args.screen && args.screen !== "intro") renderPage();
       else renderIntroduction();
+      // Local navigation must never wait for the optional remote sharing API.
+      void attachSharing();
+      return true;
     }
+    // A shared workspace is the only mode that actually requires cloud sharing.
     const financeTicket = window.EduCashProNavigation?.stamp?.();
-    const initialized = window.EduCashProFinanceShare?.init?.({
-      ...options,
-      read,
-      hasPending: () => localStorage.getItem(storageKey() + ":pending") === "1",
-      markSynced: () => localStorage.removeItem(storageKey() + ":pending"),
-      hydrate: (months) => {
-        const data = read();
-        Object.assign(data, months);
-        localStorage.setItem(storageKey(), JSON.stringify(data));
-      },
-      backToFinance: renderPage,
-    }).catch?.(() => {});
-    if (args.sharedWorkspace)
-      return Promise.resolve(initialized).then(() => {
-        if (
-          window.EduCashProNavigation &&
-          !window.EduCashProNavigation.isCurrent(financeTicket)
-        )
-          return;
-        return window.EduCashProFinanceShare?.openViewer?.(
-          args.sharedWorkspace,
-          args.sharedMonth,
-        );
-      });
-    return initialized;
+    return attachSharing(true).then(() => {
+      if (window.EduCashProNavigation &&
+          !window.EduCashProNavigation.isCurrent(financeTicket)) return;
+      if (!window.EduCashProFinanceShare?.openViewer)
+        throw new Error("finance_sharing_unavailable");
+      return window.EduCashProFinanceShare.openViewer(
+        args.sharedWorkspace, args.sharedMonth,
+      );
+    });
   }
-  window.EduCashProFinance = { render };
+  window.EduCashProFinance = { render, attachSharing };
 })();

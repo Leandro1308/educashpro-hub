@@ -1,0 +1,46 @@
+name: Finance interface in four languages
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "monthly-finance-control.js"
+      - "monthly-finance-sharing.js"
+      - "local-tools-and-games.js"
+      - "tests/finance-*"
+      - ".github/workflows/finance-four-languages.yml"
+permissions:
+  contents: read
+jobs:
+  chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - run: npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.58.2 html2pdf.js@0.10.1
+      - run: sudo apt-get update && sudo apt-get install -y poppler-utils tesseract-ocr
+      - run: node --test tests/finance-site-api.test.mjs
+      - name: Exercise personal and shared expenses and PDF in four languages
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory . >/tmp/finance-i18n.log 2>&1 &
+          sleep 2
+          node tests/finance-four-languages-browser.cjs
+          node tests/finance-sharing-pdf-four-languages.cjs
+          node tests/finance-shared-ledger-two-users.cjs
+  webkit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: "22"}
+      - run: npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.58.2 html2pdf.js@0.10.1 && npx playwright install --with-deps webkit
+      - name: Exercise personal and shared expenses in WebKit
+        env:
+          FINANCE_TEST_WEBKIT: "1"
+          TEST_WEBKIT: "1"
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory . >/tmp/finance-i18n.log 2>&1 &
+          sleep 2
+          node tests/finance-four-languages-browser.cjs
+          node tests/finance-sharing-pdf-four-languages.cjs
+          node tests/finance-shared-ledger-two-users.cjs
