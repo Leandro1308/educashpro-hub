@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.27.5";
+  const APP_RUNTIME_BUILD = "2026.10.28.2";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -1737,7 +1737,7 @@
     document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   }
 
-  function renderPublicLanding(){syncExternalSession();state.language=window.EduCashProProduct.locale(state.profile?.language||navigator.language);applyLanguage();state.view='home';window.EduCashProProduct.landing(productContext());bottomNav.classList.remove('hidden');markAppReady('public-landing');}
+  function renderPublicLanding(){syncExternalSession();state.language=window.EduCashProLocale?.resolve?.({language:state.profile?.language})||window.EduCashProProduct.locale(navigator.language);applyLanguage();state.view='home';window.EduCashProProduct.landing(productContext());bottomNav.classList.remove('hidden');markAppReady('public-landing');}
 
   async function runInit() {
     window.__EDUCASHPRO_INIT_STARTED__ = true;

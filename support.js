@@ -193,6 +193,7 @@
     content.innerHTML=`${tabs()}<div class="supportBody">${body}</div>`;
     content.querySelectorAll("[data-tab]").forEach((button)=>button.onclick=()=>openTab(button.dataset.tab));
   }
+  FEATURE_ACTIONS.links=[['linkPage','./?view=tools']];FEATURE_ACTIONS.practice=[['tools','./?view=practice']];FEATURE_ACTIONS.affiliate=[['affiliate','./affiliate.html'],['network','./?view=area&panel=network']];
   function manualArticles(){return window.EduCashProSupportManual?.articles?.(lang)||[]}
   function renderHelp(query="",group=""){
     activeTab="help";

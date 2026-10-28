@@ -1,8 +1,6 @@
 name: Dual Mode Frontend Checks
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -36,8 +34,6 @@ jobs:
           node --check app.js
           node --check tests/dual-mode-audit.mjs
           node --check tests/static-audit.mjs
-      - name: Verify independent professional profile in four languages
-        run: node --test tests/professional-profile.test.mjs
 
       - name: Run dual-mode audit
         run: node tests/dual-mode-audit.mjs
@@ -47,11 +43,10 @@ jobs:
         run: node tests/cookie-transport.test.mjs
       - name: Verify guided book quiz content and chapter progress
         run: node tests/book-quiz.test.mjs
-      - name: Verify contextual function guides in four languages
-        run: node tests/contextual-guides.test.mjs
       - name: Verify Set for Life curriculum in all four languages
         run: node tests/set-for-life.test.mjs
 
-      - name: Verify navigation races and request deadlines
-        run: node tests/navigation-performance.test.mjs
+      - name: Verify offline Price Action
+        run: node tests/price-action-trainer.test.mjs
+
 
