@@ -22,8 +22,8 @@ async function run(active,engine=chromium,language="pt"){
   await page.addScriptTag({url:BASE+"/resource-loader.js"});
   await page.addScriptTag({url:BASE+"/local-tools-and-games.js"});
   await page.evaluate(async()=>await window.EduCashProLocal.openTool("monthly-finance"));
-  if(!(await page.locator("#financeStart").count())) console.log("FINANCE_OPEN_DEBUG",await page.locator("#content").innerText(),JSON.stringify({errors,consoleWarnings}));
-  await page.locator("#financeStart").click();
+  if (await page.locator("#accessContinue").count()) await page.locator("#accessContinue").click();
+  if (await page.locator("#financeStart").count()) await page.locator("#financeStart").click();
   await page.locator(".financeTabs").waitFor();
   const store=()=>page.evaluate(()=>JSON.parse(localStorage.getItem("educashpro:monthly-finance:expense-test-member")||"{}"));
   const month=await page.locator("#financeMonth").inputValue();
