@@ -1,64 +1,148 @@
 (function(){
-  const API="https://educashpro-all.onrender.com";
-  let tg=window.Telegram?.WebApp;
-  async function resolveTelegramRuntime(){
-    if(window.__EDUCASHPRO_TELEGRAM_HINT__&&window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__){
-      await Promise.race([
-        Promise.resolve(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__).catch(()=>false),
-        new Promise(resolve=>setTimeout(resolve,3000))
-      ]);
-    }
-    tg=window.Telegram?.WebApp;
-    try{tg?.ready?.();tg?.expand?.()}catch{}
-    return tg;
-  }
-  const qs=new URLSearchParams(location.search);
-  const lang=window.EduCashProLocale?.resolve?.()||"pt";
-  const C={
-    pt:{header:"Programa de Afiliados",eyebrow:"PROGRAMA DE AFILIADOS",title:"Seu link já existe. Sua elegibilidade depende da sua atividade.",subtitle:"Todo usuário cadastrado no EduCashPro recebe um link pessoal de indicação. Possuir o link não significa estar automaticamente qualificado para receber comissões.",yourLink:"Seu link pessoal de indicação",copy:"Copiar link",share:"Compartilhar",active:"Assinatura ativa — elegível conforme as regras vigentes",inactive:"Assinatura inativa — link disponível, mas sem elegibilidade para novas comissões",loading:"Carregando situação…",directTitle:"1. Primeira assinatura direta",directText:"Quando uma pessoa realiza a primeira assinatura válida diretamente pelo seu link, aplica-se o percentual vigente de comissão direta.",joinLabel:"da primeira assinatura direta válida",example:(p,j,v)=>`Exemplo com a assinatura atual de ${p} USDT: ${p} × ${j}% = ${v} USDT de comissão direta, desde que você esteja elegível no momento da operação.`,renewTitle:"2. Renovações e rede de até cinco níveis",renewIntro:"Nas renovações, a comissão pode ser distribuída pela rede conforme o nível, a atividade do afiliado e os critérios de qualificação vigentes.",level:"Nível",commission:"Comissão",requirement:"Critério",directs:n=>n===0?"Indicação direta":`${n} diretos`,qualificationOn:"Os critérios mínimos de diretos estão ativos no contrato e devem ser atendidos para os níveis correspondentes.",qualificationOff:"A exigência mínima de diretos está atualmente desativada no contrato. Os valores exibidos permanecem como configuração cadastrada e poderão ser ativados pelo administrador.",dupTitle:"3. O poder da duplicação",you:"Você",directPeople:"Pessoas indicadas diretamente",expansion:"A rede pode continuar se expandindo",dupText:"O modelo permite que indicações sucessivas formem uma rede. O crescimento depende de adesões e renovações reais e não existe garantia de quantidade de membros, renda ou resultado financeiro.",activeTitle:"4. Por que manter a assinatura ativa?",activeLead:"Seu link continua sendo seu. Sua elegibilidade para receber comissões depende da assinatura ativa e das regras vigentes.",rules:["Enquanto estiver inativo, você não recebe comissões de novas adesões nem das renovações ocorridas nesse período.","Os membros que já estavam vinculados antes da inatividade permanecem na sua rede.","Novas pessoas que entrarem pelo seu link durante a inatividade não integram sua rede e não serão vinculadas retroativamente.","Comissões não recebidas durante a inatividade não ficam acumuladas nem são pagas depois.","Ao reativar, você volta a participar das comissões futuras da rede que permaneceu vinculada e volta a poder formar novas vinculações."],inactiveAlert:"Sua assinatura está inativa neste momento. Você pode copiar e divulgar seu link, mas não está elegível para receber novas comissões enquanto permanecer inativo.",activate:"Ativar assinatura",linkInactiveTitle:"5. Seu link continua disponível mesmo se você estiver inativo",linkInactiveText:"Mesmo com a assinatura inativa, você poderá visualizar, copiar e compartilhar seu link pessoal. Isso permite conhecer e divulgar o programa, mas não cria direito a comissões durante o período de inatividade.",communityTitle:"6. Integre seus grupos e canais",communityText:"Ao integrar um grupo ou canal que você administra, o EduCashPro poderá publicar e fixar uma mensagem de integração contendo seu link pessoal de indicação. A integração exige autorização administrativa explícita no próprio Telegram.",publish:"Publicar ou integrar projeto",importantTitle:"7. Informação importante",importantText:"O EduCashPro é uma plataforma de conteúdos, ferramentas e benefícios digitais. O Programa de Afiliados é adicional e opcional. Não há garantia de renda ou de resultados. Comissões somente podem existir quando forem atendidos os critérios vigentes e ocorrerem operações válidas previstas no sistema.",telegramOnly:"Abra esta página pelo Mini App do EduCashPro dentro do Telegram para visualizar seu link pessoal.",copied:"Link copiado.",shareText:"Conheça o EduCashPro pelo meu link pessoal:"},
-    en:{header:"Affiliate Program",eyebrow:"AFFILIATE PROGRAM",title:"Your link already exists. Your eligibility depends on your active status.",subtitle:"Every registered EduCashPro user receives a personal referral link. Having a link does not automatically make you eligible for commissions.",yourLink:"Your personal referral link",copy:"Copy link",share:"Share",active:"Active subscription — eligible under current rules",inactive:"Inactive subscription — link available, but not eligible for new commissions",loading:"Loading status…",directTitle:"1. First direct subscription",directText:"When someone completes their first valid subscription directly through your link, the current direct commission rate applies.",joinLabel:"of the first valid direct subscription",example:(p,j,v)=>`Example using the current ${p} USDT subscription: ${p} × ${j}% = ${v} USDT in direct commission, provided you are eligible when the transaction occurs.`,renewTitle:"2. Renewals and a network of up to five levels",renewIntro:"On renewals, commissions may be distributed through the network according to level, affiliate activity and the qualification rules currently in force.",level:"Level",commission:"Commission",requirement:"Qualification",directs:n=>n===0?"Direct referral":`${n} direct referrals`,qualificationOn:"Minimum direct-referral requirements are currently enabled in the contract and must be met for the corresponding levels.",qualificationOff:"Minimum direct-referral requirements are currently disabled in the contract. The values shown remain configured and may be enabled by the administrator.",dupTitle:"3. The duplication effect",you:"You",directPeople:"People you refer directly",expansion:"The network may continue expanding",dupText:"Successive referrals can form a network, but growth depends on real subscriptions and renewals. There is no guarantee of network size, income or financial results.",activeTitle:"4. Why keep your subscription active?",activeLead:"Your link remains yours. Eligibility to receive commissions depends on an active subscription and the current program rules.",rules:["While inactive, you do not receive commissions from new subscriptions or renewals occurring during that period.","Members linked before inactivity remain in your existing network.","New people entering through your link while you are inactive are not added to your network and are not added retroactively.","Missed commissions are not accumulated or paid retroactively.","After reactivation, you become eligible again for future commissions from the network that remained linked and can form new links."],inactiveAlert:"Your subscription is currently inactive. You may still copy and share your link, but you are not eligible for new commissions while inactive.",activate:"Activate subscription",linkInactiveTitle:"5. Your link remains available while inactive",linkInactiveText:"Even while inactive, you can view, copy and share your personal link. This lets you understand and share the program, but it does not create commission eligibility during inactivity.",communityTitle:"6. Integrate your groups and channels",communityText:"When you integrate a Telegram group or channel you administer, EduCashPro can publish and pin an integration notice containing your personal referral link. Explicit administrator authorization is required in Telegram.",publish:"Publish or integrate a project",importantTitle:"7. Important information",importantText:"EduCashPro is a digital content, tools and benefits platform. The Affiliate Program is optional and additional. Income or results are not guaranteed. Commissions only exist when current eligibility rules are met and valid qualifying transactions occur.",telegramOnly:"Open this page from the EduCashPro Mini App inside Telegram to view your personal link.",copied:"Link copied.",shareText:"Discover EduCashPro through my personal link:"},
-    es:{header:"Programa de Afiliados",eyebrow:"PROGRAMA DE AFILIADOS",title:"Tu enlace ya existe. Tu elegibilidad depende de tu actividad.",subtitle:"Todo usuario registrado en EduCashPro recibe un enlace personal. Tener el enlace no significa estar automáticamente habilitado para recibir comisiones.",yourLink:"Tu enlace personal de referido",copy:"Copiar enlace",share:"Compartir",active:"Suscripción activa — elegible según las reglas vigentes",inactive:"Suscripción inactiva — enlace disponible, sin elegibilidad para nuevas comisiones",loading:"Cargando estado…",directTitle:"1. Primera suscripción directa",directText:"Cuando una persona realiza su primera suscripción válida directamente por tu enlace, se aplica el porcentaje vigente de comisión directa.",joinLabel:"de la primera suscripción directa válida",example:(p,j,v)=>`Ejemplo con la suscripción actual de ${p} USDT: ${p} × ${j}% = ${v} USDT de comisión directa, siempre que estés elegible en el momento de la operación.`,renewTitle:"2. Renovaciones y red de hasta cinco niveles",renewIntro:"En las renovaciones, las comisiones pueden distribuirse por la red según el nivel, la actividad y los criterios vigentes.",level:"Nivel",commission:"Comisión",requirement:"Criterio",directs:n=>n===0?"Referido directo":`${n} directos`,qualificationOn:"Los requisitos mínimos de directos están activos en el contrato.",qualificationOff:"Los requisitos mínimos de directos están actualmente desactivados; los valores mostrados permanecen configurados y pueden activarse.",dupTitle:"3. El poder de la duplicación",you:"Tú",directPeople:"Personas indicadas directamente",expansion:"La red puede seguir creciendo",dupText:"Las indicaciones sucesivas pueden formar una red. El crecimiento depende de suscripciones y renovaciones reales; no existe garantía de ingresos ni resultados.",activeTitle:"4. ¿Por qué mantener la suscripción activa?",activeLead:"Tu enlace sigue siendo tuyo. La elegibilidad para comisiones depende de la suscripción activa y de las reglas vigentes.",rules:["Durante la inactividad no recibes comisiones de nuevas suscripciones ni renovaciones.","Los miembros ya vinculados permanecen en tu red.","Las nuevas personas que entren por tu enlace mientras estés inactivo no se vinculan a tu red ni después.","Las comisiones no recibidas no se acumulan ni se pagan retroactivamente.","Al reactivar vuelves a ser elegible para comisiones futuras y nuevas vinculaciones."],inactiveAlert:"Tu suscripción está inactiva. Puedes copiar y compartir tu enlace, pero no eres elegible para nuevas comisiones mientras continúes inactivo.",activate:"Activar suscripción",linkInactiveTitle:"5. Tu enlace continúa disponible aunque estés inactivo",linkInactiveText:"Puedes visualizar, copiar y compartir tu enlace incluso con la suscripción inactiva, pero eso no genera derecho a comisiones durante ese período.",communityTitle:"6. Integra tus grupos y canales",communityText:"Al integrar un grupo o canal de Telegram que administras, EduCashPro puede publicar y fijar un aviso con tu enlace personal. Se requiere autorización administrativa explícita.",publish:"Publicar o integrar proyecto",importantTitle:"7. Información importante",importantText:"EduCashPro es una plataforma de contenidos, herramientas y beneficios digitales. El Programa de Afiliados es adicional y opcional. No hay garantía de ingresos o resultados.",telegramOnly:"Abre esta página desde el Mini App de EduCashPro en Telegram para ver tu enlace personal.",copied:"Enlace copiado.",shareText:"Conoce EduCashPro por mi enlace personal:"},
-    ru:{header:"Партнёрская программа",eyebrow:"ПАРТНЁРСКАЯ ПРОГРАММА",title:"Ваша ссылка уже существует. Право на комиссии зависит от активности.",subtitle:"Каждый зарегистрированный пользователь EduCashPro получает персональную реферальную ссылку. Наличие ссылки само по себе не даёт права на комиссии.",yourLink:"Ваша персональная ссылка",copy:"Копировать",share:"Поделиться",active:"Подписка активна — право определяется действующими правилами",inactive:"Подписка неактивна — ссылка доступна, новые комиссии недоступны",loading:"Загрузка статуса…",directTitle:"1. Первая прямая подписка",directText:"Когда человек оформляет первую действительную подписку напрямую по вашей ссылке, применяется текущий процент прямой комиссии.",joinLabel:"от первой действительной прямой подписки",example:(p,j,v)=>`Пример для текущей подписки ${p} USDT: ${p} × ${j}% = ${v} USDT прямой комиссии при наличии права на выплату.`,renewTitle:"2. Продления и сеть до пяти уровней",renewIntro:"При продлениях комиссии могут распределяться по сети в зависимости от уровня, активности и действующих критериев.",level:"Уровень",commission:"Комиссия",requirement:"Критерий",directs:n=>n===0?"Прямой реферал":`${n} прямых`,qualificationOn:"Минимальные требования по прямым приглашениям активны в контракте.",qualificationOff:"Минимальные требования сейчас отключены; показанные значения остаются настроенными и могут быть включены администратором.",dupTitle:"3. Эффект дублирования",you:"Вы",directPeople:"Люди, приглашённые напрямую",expansion:"Сеть может продолжать расти",dupText:"Последовательные рекомендации могут формировать сеть, но рост зависит от реальных подписок и продлений. Доход не гарантируется.",activeTitle:"4. Зачем поддерживать активную подписку?",activeLead:"Ссылка остаётся вашей. Право на комиссии зависит от активной подписки и действующих правил.",rules:["При неактивной подписке новые комиссии и комиссии за продления не начисляются.","Уже связанные участники остаются в вашей сети.","Новые пользователи, пришедшие по ссылке во время неактивности, не добавляются в сеть и не добавляются задним числом.","Пропущенные комиссии не накапливаются и не выплачиваются позже.","После активации снова становятся доступны будущие комиссии и новые связи."],inactiveAlert:"Ваша подписка неактивна. Ссылку можно копировать и распространять, но новые комиссии недоступны до реактивации.",activate:"Активировать подписку",linkInactiveTitle:"5. Ссылка остаётся доступной при неактивной подписке",linkInactiveText:"Вы можете видеть, копировать и распространять ссылку даже без активной подписки, но право на комиссии в этот период не возникает.",communityTitle:"6. Интегрируйте группы и каналы",communityText:"После интеграции администрируемой вами группы или канала EduCashPro может опубликовать и закрепить сообщение с вашей персональной ссылкой. Требуется явное разрешение администратора Telegram.",publish:"Опубликовать или интегрировать проект",importantTitle:"7. Важная информация",importantText:"EduCashPro — платформа цифрового контента, инструментов и преимуществ. Партнёрская программа дополнительна и добровольна. Доход и результаты не гарантируются.",telegramOnly:"Откройте эту страницу через Mini App EduCashPro в Telegram, чтобы увидеть персональную ссылку.",copied:"Ссылка скопирована.",shareText:"Познакомьтесь с EduCashPro по моей ссылке:"}
-  }[lang];
-  const $=id=>document.getElementById(id);function txt(id,v){const e=$(id);if(e)e.textContent=v}function fmt(n){const x=Number(n||0);return Number.isInteger(x)?String(x):x.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}
-  let currentLink="";
-  function cleanReferral(value){const code=String(value||"").trim().toUpperCase();return /^[A-Z0-9][A-Z0-9_-]{2,79}$/.test(code)?code:""}
-  function codeFromLink(value){try{const url=new URL(String(value||""));return cleanReferral(url.searchParams.get("ref")||String(url.searchParams.get("start")||"").replace(/^ref_/i,""))}catch{return""}}
-  function contextReferral(){const stored=window.EduCashProPlatform?.readWebSession?.();return cleanReferral(stored?.profile?.referralCode)||cleanReferral(qs.get("ref")||qs.get("r"))}
-  function siteReferral(code){return code?`${location.origin}/?ref=${encodeURIComponent(code)}`:""}
-  function setLink(value,code=""){const resolvedCode=cleanReferral(code)||codeFromLink(value);currentLink=siteReferral(resolvedCode)||String(value||"").trim()||currentLink;if(currentLink)txt("affiliateLink",currentLink);const enabled=Boolean(currentLink);if($("copyButton"))$("copyButton").disabled=!enabled;if($("shareButton"))$("shareButton").disabled=!enabled;return currentLink}
-  async function copyCurrentLink(){if(!currentLink)return;try{await navigator.clipboard.writeText(currentLink);toast(C.copied);return}catch{}const field=document.createElement("textarea");field.value=currentLink;field.style.position="fixed";field.style.opacity="0";document.body.appendChild(field);field.select();try{document.execCommand("copy");toast(C.copied)}finally{field.remove()}}
-  function shareCurrentLink(){if(!currentLink)return;const text=`${C.shareText}\n${currentLink}`;if(navigator.share){navigator.share({text,url:currentLink}).catch(()=>{});return}const shareUrl=`https://t.me/share/url?url=${encodeURIComponent(currentLink)}&text=${encodeURIComponent(C.shareText)}`;if(tg?.openTelegramLink)tg.openTelegramLink(shareUrl);else window.open(shareUrl,"_blank","noopener")}
-  function apply(){document.documentElement.lang=lang;txt("headerSubtitle",C.header);txt("eyebrow",C.eyebrow);txt("title",C.title);txt("subtitle",C.subtitle);txt("yourLinkLabel",C.yourLink);txt("copyButton",C.copy);txt("shareButton",C.share);txt("statusBadge",C.loading);txt("directTitle",C.directTitle);txt("directText",C.directText);txt("joinLabel",C.joinLabel);txt("renewTitle",C.renewTitle);txt("renewIntro",C.renewIntro);txt("thLevel",C.level);txt("thCommission",C.commission);txt("thRequirement",C.requirement);txt("dupTitle",C.dupTitle);txt("networkYou",C.you);txt("networkDirect",C.directPeople);txt("networkExpansion",C.expansion);txt("dupText",C.dupText);txt("activeTitle",C.activeTitle);txt("activeLead",C.activeLead);$("inactiveRules").innerHTML=C.rules.map(x=>`<li>${x}</li>`).join("");txt("activateButton",C.activate);txt("linkInactiveTitle",C.linkInactiveTitle);txt("linkInactiveText",C.linkInactiveText);txt("communityTitle",C.communityTitle);txt("communityText",C.communityText);txt("publishButton",C.publish);txt("importantTitle",C.importantTitle);txt("importantText",C.importantText)}
-  function toast(v){txt("toast",v);$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2200)}
-  async function post(path,body){const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);try{const r=await fetch(API+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),cache:"no-store",signal:controller.signal});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.reason||"request_failed");return d}finally{clearTimeout(timeout)}}
-  async function boot(){
-    await resolveTelegramRuntime();
-    apply();
-    setLink("",contextReferral());
-    $("copyButton").onclick=copyCurrentLink;
-    $("shareButton").onclick=shareCurrentLink;
-    const initialCode=contextReferral();
-    $("publishButton").href=`./publish.html?lang=${encodeURIComponent(lang)}${initialCode?`&ref=${encodeURIComponent(initialCode)}`:""}`;
-    try{
-      const stored=window.EduCashProPlatform?.readWebSession?.();
-      const usingWeb=Boolean(stored?.token&&stored?.profile?.userId);
-      const initData=window.EduCashProPlatform?.telegramInitData?.()||"";
-      if(!usingWeb&&!initData){const badge=$("statusBadge");badge.classList.remove("loading");badge.classList.add("inactive");badge.textContent=C.inactive;if(!currentLink){$("errorBox").classList.remove("hidden");txt("errorBox",C.telegramOnly)}return}
-      const session=usingWeb
-        ? {token:stored.token,profile:stored.profile||{},affiliateLink:siteReferral(stored.profile?.referralCode)}
-        : await post("/api/hub/session",{initData});
-      const sessionCode=cleanReferral(session?.profile?.referralCode);
-      setLink(session.affiliateLink||"",sessionCode||contextReferral());
-      const cfg=await post("/api/affiliate/config",{token:session.token});
-      setLink(cfg.affiliateLink||session.affiliateLink||"",cleanReferral(cfg.referralCode)||sessionCode||contextReferral());
-      txt("joinPercent",fmt(cfg.joinPercent)+"%");txt("directExample",C.example(fmt(cfg.priceUsdt),fmt(cfg.joinPercent),fmt(cfg.exampleDirectCommissionUsdt)));
-      const req=cfg.levelRequirements||{},renewal=cfg.renewalPercents||[];
-      $("levelsBody").innerHTML=[1,2,3,4,5].map((level,i)=>`<tr><td>${level}º</td><td><strong>${fmt(renewal[i])}%</strong></td><td>${C.directs(Number(req[level]||0))}</td></tr>`).join("");
-      txt("qualificationNote",cfg.qualificationEnabled?C.qualificationOn:C.qualificationOff);
-      const badge=$("statusBadge");badge.classList.remove("loading");badge.classList.add(cfg.active?"active":"inactive");badge.textContent=cfg.active?C.active:C.inactive;
-      if(!cfg.active){txt("inactiveAlert",C.inactiveAlert);$("inactiveAlert").classList.remove("hidden");if(session.subscribeUrl){$("activateButton").href=session.subscribeUrl;$("activateButton").classList.remove("hidden")}}
-    }catch(error){console.error("[EduCashPro] affiliate status:",error);const badge=$("statusBadge");badge.classList.remove("loading");badge.classList.add("inactive");badge.textContent=C.inactive;if(!currentLink){$("errorBox").classList.remove("hidden");txt("errorBox",C.telegramOnly)}}
-  }
-  boot();
+const lang=window.EduCashProLocale?.resolve?.()||'pt',C=window.EduCashProAffiliateCopy[lang]||window.EduCashProAffiliateCopy.pt,API='https://educashpro-all.onrender.com';
+const WALT_URL='https://telegram.me/walt/start?startapp=ref-4-QhxQcMqCsfw';
+const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cfg=null,session=null,link='',walletUi=null,connecting=false,verifying=false,unsubscribe=null,conditionsVerified=false;
+const STATUS_COPY={
+pt:['Percentuais de referência: adesão de 30% para inativos e 60% para ativos; renovações de 30%, 20%, 10%, 5% e 5% para ativos. Aguardando confirmação das condições atuais.','Não foi possível confirmar as condições atuais. A comparação permanece disponível; tente novamente antes de participar.','Tentar novamente'],
+en:['Reference rates: 30% initial commission for inactive members and 60% for active members; active renewal rates of 30%, 20%, 10%, 5% and 5%. Awaiting confirmation of current terms.','Current terms could not be confirmed. The comparison remains available; try again before joining.','Try again'],
+es:['Porcentajes de referencia: adhesión del 30% para inactivos y 60% para activos; renovaciones del 30%, 20%, 10%, 5% y 5% para activos. Pendiente de confirmar las condiciones actuales.','No se pudieron confirmar las condiciones actuales. La comparación sigue disponible; vuelve a intentarlo antes de participar.','Reintentar'],
+ru:['Справочные ставки: 30% за первую покупку для неактивных и 60% для активных; продления для активных — 30%, 20%, 10%, 5% и 5%. Ожидается подтверждение действующих условий.','Не удалось подтвердить действующие условия. Сравнение остаётся доступным; повторите попытку перед участием.','Повторить']
+}[lang]||null;
+function referenceConfig(){return {priceUsdt:null,inactiveJoinPercent:30,joinPercent:60,renewalPercents:[30,20,10,5,5],freeReferralEnabled:true,qualificationEnabled:false,levelRequirements:{},accepted:false,walletLinked:false,canShare:false};}
+function showConditionsStatus(message,retry=false){
+ $('status').textContent=message;
+ let button=document.getElementById('conditionsRetry');
+ if(button)button.remove();
+ if(retry){button=document.createElement('button');button.id='conditionsRetry';button.type='button';button.className='secondaryCta';button.textContent=(STATUS_COPY||['','','Try again'])[2];button.onclick=()=>void refreshConditions();$('status').after(button);}
+}
+async function refreshConditions(){
+ conditionsVerified=false;updateJoin();
+ showConditionsStatus((STATUS_COPY||[C.loading])[0]);
+ try{
+ cfg={...cfg,...await post('/api/affiliate/public-config')};conditionsVerified=true;render();
+ if(session){try{await privateConfig();}catch{showConditionsStatus(C.error,true);return;}}
+ showConditionsStatus('');
+ }catch{
+ conditionsVerified=false;updateJoin();
+ showConditionsStatus((STATUS_COPY||['',C.unavailable])[1],true);
+ }
+}
+window.EduCashProAffiliateSessionActive=p=>{
+ const sub=p?.subscription||{};
+ if(p?.lifetime||p?.adminLifetime||p?.partnerLifetime||p?.onchainLifetime||p?.pendingLifetime||sub.lifetime||sub.pendingLifetime)return true;
+ const until=Number(p?.activeUntil||sub.activeUntil||0);
+ return (p?.active===true||p?.isActive===true||sub.active===true)&&(!until||(until<100000000000?until*1000:until)>Date.now());
+};
+const pct=n=>Number.isFinite(n)?Number(n)+'%':'—';
+async function post(path,body={}){const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(10000)});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.reason||'request_failed');return d;}
+function acceptedSession(){const s=window.EduCashProPlatform?.readWebSession?.();if(s?.token)window.EduCashProPlatform.writeWebSession?.({...s,profile:{...s.profile,affiliateAccepted:true}});}
+function updateJoin(){ $('join').disabled=!conditionsVerified||!session||!cfg?.walletLinked||!$('agree').checked; }
+function render(){
+const amount=n=>new Intl.NumberFormat(lang,{maximumFractionDigits:6}).format(n);
+const sale=Number(cfg.priceUsdt),hasExample=Number.isFinite(sale)&&sale>0;
+const exampleEarn=percent=>hasExample&&Number.isFinite(percent)?'<p class="commissionExample">'+esc(C.exampleEarn.replace('{amount}',amount(sale*percent/100)))+'</p>':'';
+$('conditions').innerHTML=`<section class="card commissionOffer"><h2>${esc(C.plans)}</h2><p>${esc(C.initialHint)}</p><div class="commissionCards"><article><h3>${esc(C.free)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.inactiveJoinPercent)}</strong>${exampleEarn(cfg.inactiveJoinPercent)}<p>${esc(C.freeDetail)}</p></article><article class="commissionActive"><span class="eyebrow">${esc(C.activeKicker)}</span><h3>${esc(C.paid)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.joinPercent)}</strong>${exampleEarn(cfg.joinPercent)}<p>${esc(C.paidDetail)}</p></article></div>${hasExample?'<p class="note">'+esc(C.example.replace('{amount}',amount(sale)))+'</p>':''}<h3 class="renewalTitle">${esc(C.renew)}</h3><div class="tableWrap"><table class="renewalTable"><thead><tr><th scope="col">${esc(C.level)}</th><th scope="col">${esc(C.free)}</th><th scope="col">${esc(C.paid)}</th></tr></thead><tbody>${cfg.renewalPercents.map((n,i)=>'<tr><th scope="row">'+esc(C.level)+' '+(i+1)+(i===0?' — '+esc(C.direct):'')+'</th><td>'+esc(C.zeroRenew)+'</td><td class="activeRenewal">'+pct(n)+'</td></tr>').join('')}</tbody></table></div><p class="note">${esc(C.renewHint)}</p><aside class="subscriberBenefits"><p>${esc(C.activeBenefit)}</p>${cfg.active?'<strong>'+esc(C.alreadyActive)+'</strong>':'<a class="activateButton" href="./?subscribe=pay&amp;lang='+encodeURIComponent(lang)+'">'+esc(C.subscribeCta)+'</a>'}</aside>${!cfg.freeReferralEnabled?'<p class="note">'+esc(C.pending)+'</p>':''}${cfg.qualificationEnabled?'<p>'+esc(C.requirements)+': '+Object.entries(cfg.levelRequirements).map(([l,n])=>l+': '+n).join(' · ')+'</p>':''}</section>`;
+$('enrollment').hidden=!!cfg.accepted||!!cfg.canShare;$('agree').checked=false;updateJoin();$('join').hidden=!session;$('login').hidden=!!session;$('agree').disabled=!conditionsVerified||!session||!cfg.walletLinked;
+$('login').href='./?affiliateReturn=1&lang='+lang;$('member').hidden=!cfg.accepted&&!cfg.canShare;
+$('walletLogin').href='./?affiliateReturn=1&lang='+lang;$('walletLogin').hidden=!!session;
+$('connectWallet').hidden=!session||cfg.walletLinked;$('connectWallet').disabled=connecting;
+$('walletState').textContent=cfg.walletLinked?C.walletConnected:'';
+$('walletReady').textContent=cfg.walletLinked?'':C.walletReady;
+$('memberStatus').textContent=!cfg.walletLinked?C.walletReady:cfg.canShare?C.accepted:C.pending;
+link=cfg.canShare?cfg.preferredAffiliateLink||'':'';
+$('linkTools').hidden=!link;$('affiliateLink').textContent=link;
+$('networkButton').href='./?view=area&panel=network&lang='+lang;$('networkButton').hidden=!cfg.walletLinked||!(cfg.active===true||window.EduCashProAffiliateSessionActive?.(session?.profile));
+}
+let memberPromise=null;
+async function privateConfig(){
+ if(!session)return;
+ if(memberPromise)return memberPromise;
+ memberPromise=(async()=>{
+   const member=await post('/api/affiliate/member',{token:session.token});
+   cfg={...cfg,...member};
+   const saved=window.EduCashProPlatform?.readWebSession?.();
+   if(saved?.token===session.token)window.EduCashProPlatform.writeWebSession?.({...saved,profile:{...saved.profile,walletLinked:member.walletLinked,affiliateAccepted:member.accepted,referralCode:member.referralCode||saved.profile?.referralCode,active:member.active===true||saved.profile?.active===true,...(member.lifetime?{subscription:{...saved.profile?.subscription,lifetime:true,active:true}}:{})}});
+   render();
+ })();
+ try{return await memberPromise;}finally{memberPromise=null;}
+}
+let sdkPromise;
+function loadWalletSdk(){
+if(window.TON_CONNECT_UI?.TonConnectUI)return Promise.resolve();
+if(!sdkPromise)sdkPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js';s.async=true;s.onload=()=>window.TON_CONNECT_UI?.TonConnectUI?resolve():reject(Error('wallet_sdk_missing'));s.onerror=()=>reject(Error('wallet_sdk_unavailable'));document.head.appendChild(s);}).catch(e=>{sdkPromise=null;throw e;});
+return sdkPromise;
+}
+function walletErrorMessage(error){
+ const reason=String(error?.data?.reason||error?.message||'');
+ const messages={
+ pt:{wallet_identity_conflict:'Esta carteira já pertence a outra conta EduCashPro. Entre na conta originalmente vinculada; o vínculo não foi alterado.',session_changed:'A conta mudou durante a conexão. Entre novamente e tente conectar.',ton_proof_not_supported:'A carteira não enviou a comprovação de propriedade. Abra novamente a conexão e autorize a solicitação.',wallet_restore_timeout:'A carteira não respondeu à restauração. Tente abrir novamente a conexão.'},
+ en:{wallet_identity_conflict:'This wallet belongs to another EduCashPro account. Sign in to the originally linked account.',session_changed:'The account changed during connection. Sign in again.',ton_proof_not_supported:'The wallet did not send ownership proof. Reconnect and approve the request.',wallet_restore_timeout:'Wallet restoration timed out. Try connecting again.'},
+ es:{wallet_identity_conflict:'Esta cartera pertenece a otra cuenta EduCashPro. Entra en la cuenta vinculada originalmente.',session_changed:'La cuenta cambió durante la conexión. Inicia sesión de nuevo.',ton_proof_not_supported:'La cartera no envió la prueba de propiedad. Reconecta y autoriza la solicitud.',wallet_restore_timeout:'La restauración de la cartera agotó el tiempo. Inténtalo de nuevo.'},
+ ru:{wallet_identity_conflict:'Этот кошелёк связан с другой учётной записью EduCashPro. Войдите в исходную учётную запись.',session_changed:'Учётная запись изменилась. Войдите снова.',ton_proof_not_supported:'Кошелёк не отправил подтверждение владения. Подключитесь снова и подтвердите запрос.',wallet_restore_timeout:'Время восстановления кошелька истекло. Повторите подключение.'}
+ };
+ return messages[lang]?.[reason]||C.walletError;
+}
+async function connectWallet(){
+if(connecting||cfg?.walletLinked)return;
+const latest=window.EduCashProPlatform?.readWebSession?.();
+if(!latest?.token || !latest?.profile?.userId)return;
+session=latest;const connectingUserId=latest.profile.userId;
+connecting=true;$('connectWallet').disabled=true;$('walletState').textContent=C.walletWaiting;
+try{
+await privateConfig();
+if(cfg.walletLinked){$('walletState').textContent=C.walletConnected;return;}
+await loadWalletSdk();
+const auth=window.EduCashProWebAuth;if(!auth)throw Error('wallet_auth_missing');
+if(!walletUi)walletUi=new window.TON_CONNECT_UI.TonConnectUI({manifestUrl:'https://go.educashpro.vip/tonconnect-manifest.json'});
+// A fresh ownership proof must be signed for the currently signed-in account.
+
+unsubscribe?.();unsubscribe=null;
+const challenge=await auth.prepareWalletAuthentication(walletUi);
+unsubscribe=walletUi.onStatusChange(async wallet=>{
+ if(!wallet||verifying)return;
+ verifying=true;
+ try{
+  if(!wallet.connectItems?.tonProof?.proof)throw Error('ton_proof_missing');
+  // Do not attach to another account if the signed-in account changed mid-connection.
+  const stored=window.EduCashProPlatform?.readWebSession?.();
+  if(!stored?.token||stored.profile?.userId!==connectingUserId)throw Error('session_changed');
+  session=stored;
+  await auth.verifyWalletProof({challengeId:challenge.challengeId,wallet,language:lang});
+  session=window.EduCashProPlatform.readWebSession();
+  await window.EduCashProApp?.setSession?.(session);
+  unsubscribe?.();unsubscribe=null;
+  await privateConfig();$('walletState').textContent=C.walletConnected;
+ }catch(error){ $('walletState').textContent=walletErrorMessage(error); }
+ finally{verifying=false;}
+});
+await walletUi.openModal();
+}catch(error){$('walletState').textContent=walletErrorMessage(error);}
+finally{connecting=false;$('connectWallet').disabled=false;}
+}
+async function boot(){
+document.documentElement.lang=lang;
+for(const id of ['title','intro','why','purpose','rulesTitle','agreeLabel','join','login','linkLabel','copy','share','networkButton','back','walletTitle','walletIntro','walletFree'])$(id).textContent=C[({agreeLabel:'agree',linkLabel:'link',networkButton:'network'})[id]||id];
+$('createWallet').textContent=C.walletCreate;$('createWallet').href=WALT_URL;$('connectWallet').textContent=C.wallet;$('walletLogin').textContent=C.walletLogin;
+$('walletSteps').innerHTML=C.walletSteps.map(x=>'<li>'+esc(x)+'</li>').join('');
+$('rules').innerHTML=C.rules.map(x=>'<li>'+esc(x)+'</li>').join('');$('status').textContent=C.loading;
+$('agree').onchange=updateJoin;$('connectWallet').onclick=connectWallet;
+$('join').onclick=async()=>{if(!conditionsVerified||!$('agree').checked||!session||!cfg?.walletLinked)return;$('join').disabled=true;try{await post('/api/affiliate/enroll',{token:session.token,agree:true,version:cfg.termsVersion,language:lang});await privateConfig();$('status').textContent=C.accepted;}catch{$('status').textContent=C.error;updateJoin();}};
+$('copy').onclick=async()=>{if(!link)return;try{await navigator.clipboard.writeText(link);$('status').textContent=C.copied}catch{$('status').textContent=link}};
+$('share').onclick=async()=>{if(!link)return;try{if(navigator.share)await navigator.share({title:'EduCashPro',url:link});else await navigator.clipboard.writeText(link)}catch{}};
+const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token)session=stored;
+cfg=referenceConfig();render();
+if(session)void privateConfig().catch(()=>{});
+void refreshConditions();
+if(!session){
+ try{
+ if(window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__)await Promise.race([window.__EDUCASHPRO_TELEGRAM_SDK_PROMISE__,new Promise(r=>setTimeout(r,2500))]);
+ window.Telegram?.WebApp?.ready?.();
+ const initData=window.EduCashProPlatform?.telegramInitData?.()||window.Telegram?.WebApp?.initData;
+ if(initData){await window.EduCashProWebAuth.authenticateFromTelegram();session=window.EduCashProPlatform.readWebSession();if(conditionsVerified)await privateConfig();}
+ }catch{showConditionsStatus(C.error,true);}
+}
+}
+boot();
 })();
+

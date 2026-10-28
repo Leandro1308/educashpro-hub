@@ -206,6 +206,8 @@
   }
 
   async function openTool(id, skipAccess=false){
+    if(id!=='link-page')return window.EduCashProApp?.renderTools?.();
+
     const task=openToolImpl(id,skipAccess);
     const ticket=window.EduCashProNavigation?.stamp?.();
     try { return await task; } catch(error) {
@@ -253,4 +255,5 @@
 
   window.EduCashProLocal = { renderToolsHub, openTool, setSession(value){session=value||session;queueMicrotask(enhanceHome)} };
 })();
+
 

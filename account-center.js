@@ -8,10 +8,12 @@
   const API_BASE = "https://educashpro-all.onrender.com";
   const platform = window.EduCashProPlatform;
   const auth = window.EduCashProWebAuth;
-  if (!platform?.isWeb?.() || !auth) return;
+  if (!platform || !auth) return;
 
   let overview = null;
   let busy = false;
+  let telegramSession=null,telegramSessionPending=null,renewTimer=null;
+  async function ensureAccountSession(){if(!platform.isTelegram?.())return platform.readWebSession?.();if(telegramSession)return telegramSession;if(telegramSessionPending)return telegramSessionPending;telegramSessionPending=(async()=>{const initData=platform.telegramInitData?.();if(!initData)throw Error("session_missing");const r=await fetch(API_BASE+"/api/platform-auth/from-telegram",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({initData}),cache:"no-store",signal:AbortSignal.timeout(10000)});const d=await r.json();if(!r.ok||!d.token)throw Error("session_missing");telegramSession={token:d.token,profile:d.profile};return telegramSession})().finally(()=>{telegramSessionPending=null});return telegramSessionPending;}
 
   const COPY = {
     pt: {
@@ -320,9 +322,7 @@
     },
   };
 
-  function session() {
-    return platform.readWebSession?.() || null;
-  }
+  function session(){return platform.isTelegram?.()?telegramSession:platform.readWebSession?.()||null;}
 
   function lang() {
     const raw = String(session()?.profile?.language || navigator.language || "pt").toLowerCase();
@@ -367,7 +367,7 @@
   }
 
   async function api(path, body = {}) {
-    const token = session()?.token;
+    const token = (await ensureAccountSession())?.token;
     if (!token) throw new Error("session_missing");
     const response = await fetch(`${API_BASE}${path}`, {
       signal: requestSignal(),
@@ -417,7 +417,7 @@
   }
 
   function close() {
-    document.querySelector(".accountCenterLayer")?.remove();
+    if(renewTimer){clearInterval(renewTimer);renewTimer=null;}document.querySelector(".accountCenterLayer")?.remove();
   }
 
   function returnToAccountCenter() {
@@ -522,15 +522,16 @@
     try {
       const data = await api("/api/platform-account/network");
       const network = data.network || {};
+      const shareData=await loadOverview();
       const rows = [1, 2, 3, 4, 5]
         .map((level) => `<div class="accountLevel"><span>${esc(t("level"))} ${level}</span><b>${Number(network.levels?.[level] || 0)}</b></div>`)
         .join("");
-      const goal = network.allUnlocked
+      const goal = network.qualificationEnabled===false ? window.EduCashProProduct.copy(lang()).unlocked : network.allUnlocked
         ? t("allUnlocked")
         : replaceVars(t("missing"), { n: network.missingDirects || 0, l: network.nextLevel || "—" });
       body.innerHTML = `
         <div class="accountPanel">
-          <h3>📊 ${esc(t("networkTitle"))}</h3>
+          <h3>📊 ${esc(t("networkTitle"))}</h3><div id="networkShareLinks"></div>
           <div class="accountMetricGrid">
             <div class="accountMetric"><small>${esc(t("directs"))}</small><b>${Number(network.directsActive || 0)}</b></div>
             <div class="accountMetric"><small>${esc(t("unlocked"))}</small><b>${Number(network.unlockedDepth || 1)}</b></div>
@@ -538,30 +539,25 @@
           <div style="margin-top:12px">${rows}</div>
           <p class="accountNote"><b>${esc(t("next"))}:</b> ${esc(goal)}</p>
         </div>`;
+      const host=body.querySelector('#networkShareLinks');
+      if(host){const c=window.EduCashProProduct.copy(lang());host.innerHTML=[['webReferral',c.web],['telegramReferral',c.bot]].filter(([key])=>shareData.links?.[key]).map(([key,label])=>'<label>'+esc(label)+'<input class="accountField" readonly value="'+esc(shareData.links[key])+'"></label><button class="accountSecondary" data-copy-network="'+key+'">'+esc(c.copy)+'</button>').join('');host.querySelectorAll('[data-copy-network]').forEach(b=>b.onclick=()=>navigator.clipboard?.writeText(shareData.links[b.dataset.copyNetwork]));}
     } catch {
       body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
     }
   }
 
-  async function openSubscription() {
-    const body = shell(`<div class="accountPanel">${esc(t("loading"))}</div>`);
-    try {
-      const data = await loadOverview(true);
-      const subscription = data.subscription || {};
-      body.innerHTML = `
-        <div class="accountPanel">
-          <h3>💳 ${esc(t("subscription"))}</h3>
-          <div class="accountMetricGrid">
-            <div class="accountMetric"><small>${esc(t("status"))}</small><b>${esc(subscription.active ? t("active") : t("inactive"))}</b></div>
-            <div class="accountMetric"><small>${esc(t("validUntil"))}</small><b>${esc(formatDate(subscription.activeUntil))}</b></div>
-          </div>
-          ${platform?.isWeb?.() && window.EduCashProWebCheckout ? (subscription.lifetime ? "" : `<button id="accountPaySubscription" class="accountSecondary" type="button">${esc(({pt:subscription.active?"Renovar assinatura":"Assinar",en:subscription.active?"Renew subscription":"Subscribe",es:subscription.active?"Renovar suscripción":"Suscribirse",ru:subscription.active?"Продлить подписку":"Оформить подписку"})[lang()])}</button>`) : `<p class="accountNote">${esc(t("readOnly"))}</p><p class="accountNote">${esc(t("noPayment"))}</p>`}
-        </div>`;
-      body.querySelector("#accountPaySubscription")?.addEventListener("click", () => { close(); void window.EduCashProWebCheckout.open(Number(subscription.activeUntil || 0) > 0 ? "renew" : "pay"); });
-    } catch {
-      body.innerHTML = `<div class="accountPanel">${esc(t("error"))}</div>`;
-    }
-  }
+  async function openSubscription(){
+  const body=shell('<div class="accountPanel">'+esc(t('loading'))+'</div>');
+  try{const data=await loadOverview(true),sub=data.subscription||{},c=window.EduCashProProduct.copy(lang());
+    const date=sub.lifetime?c.lifetime:formatDate(sub.activeUntil);
+    body.innerHTML='<div class="accountPanel"><h3>💳 '+esc(c.subscription)+'</h3><div class="accountMetricGrid"><div class="accountMetric"><small>'+esc(t('status'))+'</small><b>'+esc(sub.active?c.active:c.inactive)+'</b></div><div class="accountMetric"><small>'+esc(c.valid)+'</small><b>'+esc(date)+'</b></div></div>'+(sub.renewAvailableAt&&!sub.lifetime?'<p>'+esc(c.renewAt)+': <b>'+esc(formatDate(sub.renewAvailableAt))+'</b></p><p id="accountRenewCountdown" role="status"></p>':'')+(!sub.lifetime?'<button id="accountPaySubscription" class="accountPrimary" type="button">'+esc(sub.active?c.renewNow:c.subscribe)+'</button>':'')+'</div>';
+    const pay=body.querySelector('#accountPaySubscription'),counter=body.querySelector('#accountRenewCountdown');
+    const serverOffset=Number(sub.serverTime||Date.now()/1000)-Date.now()/1000;
+    const tick=()=>{if(!body.isConnected){if(renewTimer)clearInterval(renewTimer);renewTimer=null;return;}const left=Math.max(0,Math.ceil(Number(sub.renewAvailableAt||0)-(Date.now()/1000+serverOffset)));if(pay)pay.disabled=Boolean(sub.active&&!sub.renewWindowOpen&&(sub.renewAvailableAt?left>0:true));if(counter)counter.textContent=left>0?String(Math.floor(left/3600)).padStart(2,'0')+':'+String(Math.floor(left%3600/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0'):c.renewNow;};
+    tick();if(counter)renewTimer=setInterval(tick,1000);
+    if(pay)pay.onclick=()=>{close();if(platform.isWeb?.()&&window.EduCashProWebCheckout)return void window.EduCashProWebCheckout.open(Number(sub.activeUntil||0)>0?'renew':'pay');window.EduCashProApp?.openSubscription?.();};
+  }catch{body.innerHTML='<p role="alert">'+esc(t('error'))+'</p>'}
+ }
 
   async function openLanguage() {
     const body = shell(`
@@ -674,7 +670,6 @@
           ${data?.subscription?.active === true && !account.walletLinked ? `<button id="accountConnectWallet" class="accountSecondary" type="button">💎 ${esc(t("connectWallet"))}</button>` : ""}
           ${!account.telegramLinked ? `<button id="accountLinkTelegram" class="accountSecondary" type="button">✈️ ${esc(t("linkTelegram"))}</button>` : ""}
           <button id="accountEditProfilePhoto" class="accountSecondary" type="button">📷 ${esc(t("profilePhoto"))}</button>
-          <button id="accountShowQrCode" class="accountSecondary" type="button">🔳 ${esc(t("myQrCode"))}</button>
           <button id="accountOpenPreferences" class="accountSecondary" type="button">🔔 ${esc(t("preferences"))}</button>
           <button id="accountOpenDocuments" class="accountSecondary" type="button">📄 ${esc(t("documents"))}</button>
           <div style="margin-top:14px">
@@ -1014,8 +1009,7 @@
         </div>` : ""}
       <div class="accountCenterGrid">
         <button class="accountAction" data-action="profile-photo"><span>📷</span><b>${esc(t("profilePhoto"))}</b></button>
-        <button class="accountAction" data-action="subscription"><span>💳</span><b>${esc(t("subscription"))}</b></button>
-        <button class="accountAction" data-action="my-qr"><span>🔳</span><b>${esc(t("myQrCode"))}</b></button>
+        <button class="accountAction" data-action="network"><span>🌐</span><b>${esc(t("network"))}</b></button><button class="accountAction" data-action="subscription"><span>💳</span><b>${esc(t("subscription"))}</b></button>
         <button class="accountAction" data-action="pair-device"><span>📱</span><b>${esc(t("pairDevice"))}</b></button>
         <button class="accountAction" data-action="language"><span>🌐</span><b>${esc(t("language"))}</b></button>
         <button class="accountAction" data-action="preferences"><span>🔔</span><b>${esc(t("preferences"))}</b></button>
@@ -1128,4 +1122,5 @@
     mountAdminShortcut,
   };
 })();
+
 

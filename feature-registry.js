@@ -13,7 +13,7 @@
     { id:"links", group:"business", access:"account", icon:"🔗", label:{pt:"Página de Links",en:"Link Page",es:"Página de Enlaces",ru:"Страница ссылок"} },
     { id:"smart-link", group:"business", access:"account", icon:"✂️", label:{pt:"Link Inteligente",en:"Smart Link",es:"Enlace Inteligente",ru:"Умная ссылка"} },
     { id:"credential", group:"account", access:"account", icon:"🔳", label:{pt:"Credencial e QR Code",en:"Credential and QR Code",es:"Credencial y QR",ru:"Карта и QR-код"} },
-    { id:"affiliate", group:"account", access:"active", icon:"🤝", label:{pt:"Programa de Afiliados",en:"Affiliate Program",es:"Programa de Afiliados",ru:"Партнёрская программа"} },
+    { id:"affiliate", group:"account", access:"account", icon:"🤝", label:{pt:"Programa de Afiliados",en:"Affiliate Program",es:"Programa de Afiliados",ru:"Партнёрская программа"} },
     { id:"network", group:"account", access:"account", icon:"📊", label:{pt:"Minha Rede",en:"My Network",es:"Mi Red",ru:"Моя сеть"} },
     { id:"subscription", group:"account", access:"account", icon:"💳", label:{pt:"Assinatura",en:"Subscription",es:"Suscripción",ru:"Подписка"} },
     { id:"support", group:"account", access:"account", icon:"💬", label:{pt:"Suporte",en:"Support",es:"Soporte",ru:"Поддержка"} },
@@ -45,11 +45,11 @@
   }
 
   function list(group) {
-    return features.filter((item) => !group || item.group === group);
+    return features.filter((item) => ["academy","technical","financial","links","affiliate","network","subscription","support","admin"].includes(item.id) && (!group || item.group === group));
   }
 
   function get(id) {
-    return features.find((item) => item.id === id) || null;
+    return list().find((item) => item.id === id) || null;
   }
 
   function canUse(feature, context = {}) {
@@ -74,7 +74,7 @@
   }
 
   window.EduCashProFeatures = {
-    all: features,
+    all: features.filter(item=>["academy","technical","financial","links","affiliate","network","subscription","support","admin"].includes(item.id)),
     groups,
     list,
     get,

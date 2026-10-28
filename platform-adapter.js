@@ -9,7 +9,7 @@
   function environment(){return isRealTelegramInitData()?"telegram":"web"}
   function readWebSession(){try{return JSON.parse(localStorage.getItem(webSessionKey)||"null")}catch{return null}}
   function writeWebSession(session){if(!session){localStorage.removeItem(webSessionKey);return}localStorage.setItem(webSessionKey,JSON.stringify(session))}
-  function captureReferral(){const value=String(params.get("ref")||params.get("r")||"").trim();if(value)localStorage.setItem(referralKey,value);return value||String(localStorage.getItem(referralKey)||"").trim()}
+  function captureReferral(){let stored='';try{stored=String(localStorage.getItem(referralKey)||'').trim()}catch{}if(/^[a-zA-Z0-9_-]{2,80}$/.test(stored))return stored;const value=String(params.get('ref')||params.get('r')||'').trim();if(!/^[a-zA-Z0-9_-]{2,80}$/.test(value))return '';try{localStorage.setItem(referralKey,value)}catch{}return value;}
   function telegramInitData(){return isRealTelegramInitData()?rawInitData():""}
   function close(){const tg=telegram();if(environment()==="telegram"&&tg?.close)tg.close();else if(history.length>1)history.back()}
   window.EduCashProPlatform={environment,isTelegram:()=>environment()==="telegram",isWeb:()=>environment()==="web",telegramInitData,readWebSession,writeWebSession,pendingReferral:captureReferral,clearPendingReferral:()=>localStorage.removeItem(referralKey),close,webSentinel:WEB_SENTINEL};
@@ -69,3 +69,4 @@
   }).catch(()=>{});
   captureReferral();
 })();
+
