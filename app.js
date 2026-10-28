@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.10.28.5";
+  const APP_RUNTIME_BUILD = "2026.10.28.6";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -691,7 +691,7 @@
   }
 
   function updateNav() {
-    bottomNav.classList.toggle("hidden",!state.profile && state.view === "presentation");
+    bottomNav.classList.toggle("hidden",!state.profile?.userId&&!state.profile?.tgId);
     bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === (state.view === "analysis" ? "practice" : state.view)));
   }
 
@@ -759,6 +759,7 @@
   }
 
   async function restoreRoute(route) {
+    if(route?.view!=="presentation"&&!requireProductAccount())return false;
     if(route && (['benefits','explore','games','randomizers'].includes(route.view)||(route.view==='tools'&&route.detail&&!['link-page','page'].includes(route.detail))))return renderHome();
     if(route?.view==='analysis')return openLiveMarkets();if(route?.view==='practice'||route?.view==='price-action')return openMarkets();
     if(route?.view==='area'&&route?.detail==='group')return window.EduCashProProduct.group(productContext());
@@ -866,7 +867,18 @@
     return true;
   }
 
-  function setView(view){stopBookTracking();if(view==='analysis')return openLiveMarkets();if(view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
+  function requireProductAccount(){
+    syncExternalSession();
+    const hasIdentity=Boolean(state.token&&(state.profile?.userId||state.profile?.tgId));
+    const web=window.EduCashProPlatform?.isWeb?.();
+    const saved=web?window.EduCashProPlatform.readWebSession?.():null;
+    const canResume=!web||Boolean(saved?.token&&saved?.profile?.userId&&!window.EduCashProWebEntry?.requiresReauth?.()&&(!window.EduCashProSessionPolicy?.canResume||window.EduCashProSessionPolicy.canResume(saved)));
+    if(hasIdentity&&canResume)return true;
+    window.EduCashProWebEntry?.open?.();
+    return false;
+  }
+
+  function setView(view){if(!['home','presentation'].includes(view)&&!requireProductAccount())return;stopBookTracking();if(view==='analysis')return openLiveMarkets();if(view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
 
   function navigateFromFooter(button) {
     if (!button) return;
@@ -879,7 +891,7 @@
     }
   }
 
-  function renderHome(){state.view='home';rememberRoute('home');updateNav();return window.EduCashProProduct.home(productContext());}
+  function renderHome(){if(!requireProductAccount())return;state.view='home';rememberRoute('home');updateNav();return window.EduCashProProduct.home(productContext());}
 
   function renderMembershipUpsell(){return '';}
 
@@ -948,9 +960,9 @@
 
   function academyMenuCopy(){const c=window.EduCashProProduct.copy(state.language);return {choose:c.learn,chooseSub:c.learnSub,categories:[['financial_education','💰',c.finance,c.learnSub],['business','📘',c.business,c.learnSub],['technical_analysis','📈',c.technical,c.learnSub]]};}
 
-  async function renderLearn(){stopBookTracking();state.view='learn';rememberRoute('learn');syncExternalSession();updateNav();if(!state.courseCatalog.length)hydrateCourseCatalogFromCache();window.EduCashProProduct.learn(productContext());refreshCourseCatalogLater();}
+  async function renderLearn(){if(!requireProductAccount())return;stopBookTracking();state.view='learn';rememberRoute('learn');syncExternalSession();updateNav();if(!state.courseCatalog.length)hydrateCourseCatalogFromCache();window.EduCashProProduct.learn(productContext());refreshCourseCatalogLater();}
 
-  async function openLiveMarkets() {
+  async function openLiveMarkets() {if(!requireProductAccount())return;
     stopBookTracking();
     syncExternalSession();
     state.view = "analysis";
@@ -983,7 +995,7 @@
     }catch(error){if(current())handleError(error);}
   }
 
-async function openMarkets(){stopBookTracking();state.view='practice';rememberRoute('practice');syncExternalSession();updateNav();return window.EduCashProProduct.practice(productContext());}
+async function openMarkets(){if(!requireProductAccount())return;stopBookTracking();state.view='practice';rememberRoute('practice');syncExternalSession();updateNav();return window.EduCashProProduct.practice(productContext());}
 
   async function openAcademyCategory(category) {
     const supported = new Set(["free_courses", "network_marketing", "financial_education", "telegram"]);
@@ -998,7 +1010,7 @@ async function openMarkets(){stopBookTracking();state.view='practice';rememberRo
     }
   }
 
-  async function renderCourseCategory(category, options = {}) {
+  async function renderCourseCategory(category, options = {}) {if(!requireProductAccount())return;
     syncExternalSession();
     state.view = "learn";
     rememberRoute("learn", category);
@@ -1034,7 +1046,7 @@ async function openMarkets(){stopBookTracking();state.view='practice';rememberRo
     return `<article class="itemCard"><div class="itemTop"><div class="itemIcon">${item.icon || "🎓"}</div><div><h3>${escapeHtml(localized(item.title))}</h3><p>${escapeHtml(localized(item.description))}</p><div class="meta"><span class="chip">${escapeHtml(item.access === "free" ? t("freeCourse") : t("subscriberExperiences"))}</span><span class="chip">${percent}%</span></div></div></div><div class="progressTrack"><span style="width:${percent}%"></span></div><div class="cardActions" style="grid-template-columns:1fr"><button class="${locked ? "secondaryButton lockedButton" : "primaryButton"}" data-course="${item.id}" data-locked="${locked}">${escapeHtml(locked ? t("locked") : label)}</button></div></article>`;
   }
 
-  async function openCourse(courseId) {
+  async function openCourse(courseId) {if(!requireProductAccount())return;
     syncExternalSession();
     state.view = "course";
     rememberRoute("course", courseId);
@@ -1294,7 +1306,7 @@ async function openMarkets(){stopBookTracking();state.view='practice';rememberRo
     }
   }
 
-  function renderArea(){state.view='area';hideGlobalLoading(true);rememberRoute('area');syncExternalSession();updateNav();return window.EduCashProProduct.area(productContext());}
+  function renderArea(){if(!requireProductAccount())return;state.view='area';hideGlobalLoading(true);rememberRoute('area');syncExternalSession();updateNav();return window.EduCashProProduct.area(productContext());}
 
   async function loadAreaProjects(container) {
     if (!container) return;
@@ -1310,7 +1322,7 @@ async function openMarkets(){stopBookTracking();state.view='practice';rememberRo
     }
   }
 
-  async function renderTools(){state.view='tools';rememberRoute('tools');updateNav();syncExternalSession();if(!state.profile?.userId&&!state.profile?.tgId)return window.EduCashProWebEntry?.open?.();const ticket=window.EduCashProNavigation?.stamp?.();content.innerHTML=navigationShell('🔗',window.EduCashProProduct.copy(state.language).links);try{await window.EduCashProResources.loadLinks();if(window.EduCashProNavigation&&!window.EduCashProNavigation.isCurrent(ticket))return;window.EduCashProLinks.setSession({token:state.token,profile:state.profile});return window.EduCashProLinks.renderPageEditor({back:renderHome})}catch(error){handleError(error)}}
+  async function renderTools(){if(!requireProductAccount())return;state.view='tools';rememberRoute('tools');updateNav();syncExternalSession();if(!state.profile?.userId&&!state.profile?.tgId)return window.EduCashProWebEntry?.open?.();const ticket=window.EduCashProNavigation?.stamp?.();content.innerHTML=navigationShell('🔗',window.EduCashProProduct.copy(state.language).links);try{await window.EduCashProResources.loadLinks();if(window.EduCashProNavigation&&!window.EduCashProNavigation.isCurrent(ticket))return;window.EduCashProLinks.setSession({token:state.token,profile:state.profile});return window.EduCashProLinks.renderPageEditor({back:renderHome})}catch(error){handleError(error)}}
 
   function calculateProfitMargin() {
     const read = (id) => Number(String(document.getElementById(id).value || "0").replace(",", "."));
