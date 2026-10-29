@@ -46,7 +46,7 @@ $('conditions').innerHTML=`<section class="card commissionOffer"><h2>${esc(C.pla
 $('enrollment').hidden=!!cfg.accepted||!!cfg.canShare;$('agree').checked=false;updateJoin();$('join').hidden=!session;$('login').hidden=!!session;$('agree').disabled=!conditionsVerified||!session||!cfg.walletLinked;
 $('login').href='./?affiliateReturn=1&lang='+lang;$('member').hidden=!cfg.accepted&&!cfg.canShare;
 $('walletLogin').href='./?affiliateReturn=1&lang='+lang;$('walletLogin').hidden=!!session;
-$('connectWallet').hidden=!session;$('connectWallet').disabled=connecting||cfg.walletLinked===true;$('connectWallet').textContent=cfg.walletLinked?C.walletConnected:C.connectWallet;$('createWallet').hidden=cfg.walletLinked===true;
+$('connectWallet').hidden=!session;$('connectWallet').disabled=connecting||cfg.walletLinked===true;$('connectWallet').textContent=cfg.walletLinked?C.walletConnected:C.wallet;$('createWallet').hidden=cfg.walletLinked===true;
 $('walletState').textContent=cfg.walletLinked?C.walletConnected:'';
 $('walletReady').textContent=cfg.walletLinked?'':C.walletReady;
 $('memberStatus').textContent=!cfg.walletLinked?C.walletReady:cfg.canShare?C.accepted:C.pending;
