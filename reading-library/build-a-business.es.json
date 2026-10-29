@@ -1,13 +1,16 @@
 {
   "id": "build-a-business",
   "language": "es",
-  "version": "2026.10.29.1",
-  "title": "De la organización financiera a la construcción de un negocio",
-  "attribution": "Formación propia de EduCashPro. Ejemplos educativos; los resultados dependen de demanda, costes, ejecución y condiciones reales.",
+  "version": "2026.10.29.3",
+  "title": "Negocios que crecen con personas",
+  "attribution": "Libro original de la colección EduCashPro. Material educativo con situaciones ilustrativas; sin promesas de ingresos ni recomendaciones individuales.",
+  "edition": "EduCashPro • 2026",
   "chapters": [
     {
-      "title": "Organizar las finanzas antes de crecer",
+      "title": "La base financiera del negocio",
       "paragraphs": [
+        "Un negocio necesita recursos para entregar antes de distribuir resultados. Mezclar dinero personal y caja operativa impide saber si existe beneficio o solo entradas temporales para pagar obligaciones.",
+        "La separación financiera empieza con reglas claras, incluso en actividades pequeñas. Reconoce costos, establece retiros compatibles y no trates cada pago recibido como remuneración disponible.",
         "La renta incluye salario, honorarios, ventas, comisiones, alquileres e ingresos de un negocio. Lo importante es el mecanismo: la renta activa depende de la presencia; la renta basada en sistemas utiliza procesos, productos o equipos; la renta de activos proviene de un recurso que sigue produciendo valor.",
         "Dos personas pueden recibir la misma cantidad y tener distinta seguridad. Una depende de un solo empleo y consume casi todo; la otra mantiene reserva y desarrolla un servicio complementario. Seguridad es la capacidad de atravesar una interrupción sin desorganizar la vida.",
         "Diversificar no es comenzar muchos proyectos. Es reducir un único punto de falla mediante una actividad pequeña, compatible con la ocupación principal y validada con clientes reales.",
@@ -22,12 +25,42 @@
         "Si alguien ahorra 400 al mes pero mantiene una deuda al 8% mensual, quitar ese costo suele ser el primer uso productivo del excedente. Después se forma la reserva y se eligen activos adecuados.",
         "La organización financiera no necesita esperar mayores ingresos. Identifica los compromisos que deben cubrirse incluso en un mes difícil. Comprenderlos permite determinar cuánto tiempo y dinero puede recibir un experimento empresarial sin comprometer los gastos esenciales.",
         "Una actividad complementaria necesita un límite inicial de inversión y un criterio de revisión. Define qué deseas aprender, cómo reconocerás demanda y cuándo detendrás una tentativa que no funciona. Los límites previos distinguen persistencia y acumulación descontrolada de pérdidas.",
-        "La autonomía aumenta cuando conoces tus números y puedes elegir con menos presión. El avance puede ser reducir deuda, formar una reserva, mejorar una habilidad o conseguir clientes recurrentes. Cada etapa debe fortalecer la base necesaria para la siguiente."
+        "La autonomía aumenta cuando conoces tus números y puedes elegir con menos presión. El avance puede ser reducir deuda, formar una reserva, mejorar una habilidad o conseguir clientes recurrentes. Cada etapa debe fortalecer la base necesaria para la siguiente.",
+        "Una prestadora cobra por adelantado un servicio que necesitará materiales el mes siguiente. Parte del saldo financia la entrega prometida; gastarlo personalmente crea un déficit todavía invisible.",
+        "La disciplina de caja también protege a clientes y socios. Cumplir obligaciones exige preservar recursos necesarios antes de distribuir dinero basándose solo en expectativas.",
+        "Una base organizada no garantiza éxito comercial, pero permite ver resultados con menos distorsión. Esa claridad sostiene decisiones posteriores sobre oferta, remuneración y crecimiento."
       ]
     },
     {
-      "title": "Convertir una habilidad en una oferta sostenible",
+      "title": "Cómo se producen los ingresos",
       "paragraphs": [
+        "Comprender de dónde viene la facturación revela dependencias. Una operación basada en una persona tiene límites distintos de otra que entrega mediante procesos compartidos.",
+        "Ninguna forma de trabajo hace superior a una persona. El propósito es identificar decisiones que amplían continuidad y otras que exigen más tiempo, capital o responsabilidad.",
+        "La facturación puede depender de horas, entregas, licencias o resultados compartidos. Identificar el mecanismo muestra qué recursos deben seguir disponibles.",
+        "El empleo remunera una relación laboral; el autónomo depende en gran medida de su ejecución. La empresa organizada coordina personas y procesos, mientras la inversión compromete capital ante resultados inciertos.",
+        "Una persona puede combinar salario y servicio propio. Diversifica fuentes, pero ambas pueden depender de la misma disponibilidad de tiempo y salud.",
+        "Cambiar la forma de cobrar exige competencias nuevas. Pasar de precio por hora a precio por entrega requiere estimar esfuerzo, alcance y posibles correcciones.",
+        "El salario suele vincular trabajo definido y remuneración. Su previsibilidad debe analizarse con las condiciones laborales y no suponerse protección absoluta.",
+        "Quien trabaja por su cuenta debe vender, ejecutar y administrar. El precio debe considerar tiempo no facturado: atención, preparación y organización.",
+        "Un equipo puede repartir tareas y ampliar capacidad. Mejora el negocio si existe demanda suficiente para sostener coordinación y costos adicionales.",
+        "Aportar capital vincula resultados al desempeño de una actividad. El inversor necesita comprender condiciones, riesgos y derechos aunque no participe diariamente.",
+        "Cambiar de cliente o empleador puede mejorar ingresos sin reducir una dependencia esencial. Observa si cambia el riesgo o solo traslada la vulnerabilidad.",
+        "Porque la receta todavía depende de su actuación individual como pieza indispensable. Contratar a alguien ayuda, pero no transforma automáticamente el negocio en un sistema independiente. La autonomía operativa necesita ser construida. Por ejemplo, un autónomo contrata a un asistente, pero todavía ejecuta personalmente todo servicio esencial.",
+        "Ingresos iguales pueden exigir esfuerzos distintos. Muchas ventas con costos altos pueden remunerar menos que un servicio pequeño bien organizado y con demanda estable.",
+        "El esfuerzo personal tiene límite, mientras que sistemas e inversiones permiten otras formas de generar ingresos. Trabajo adicional puede ser útil, pero sigue vinculado a tiempo finito. Por ejemplo, una persona intenta mejorar las finanzas solo trabajando horas extras.",
+        "Prueba qué ocurre si la persona central falta varios días. Pedidos detenidos e información inaccesible revelan dependencias que requieren soluciones proporcionales.",
+        "Un cambio administrativo no crea por sí solo otra forma de operar. Registrar una actividad necesita organización, demanda y capacidad real para cumplir lo que se venderá.",
+        "La facturación recurrente no garantiza ingresos. Cancelaciones, impagos, costos y cambios en la utilidad pueden alterar rápidamente el resultado esperado.",
+        "Identifica qué sostiene cada entrada: tiempo, competencia, acuerdo, capital o estructura colectiva. Ese mapa orienta qué capacidades fortalecer primero.",
+        "Al cambiar cómo produces ingresos, evalúa las nuevas obligaciones. Contratar, licenciar o delegar puede reducir tareas y añadir coordinación, costos y control de calidad.",
+        "El diseño económico debe servir a la entrega y no al deseo de parecer empresario. Una estructura sencilla viable vale más que una operación compleja sin compradores suficientes."
+      ]
+    },
+    {
+      "title": "Una oferta que merece comprarse",
+      "paragraphs": [
+        "Una oferta reúne resultado esperado, condiciones de entrega y precio. Se comprende cuando el cliente reconoce la necesidad atendida sin interpretar promesas exageradas.",
+        "El beneficio debe existir en la experiencia del usuario. Una descripción elegante atrae atención, pero el valor duradero depende de utilidad, adecuación y límites acordados.",
         "Un negocio existe cuando resuelve un problema por el cual alguien acepta pagar. Antes del logotipo hay que definir cliente, problema, resultado, diferencia y costo de entrega.",
         "Una propuesta clara transforma habilidad en oferta. 'Hago páginas' es una actividad; 'creo una página móvil para que profesionales locales reciban pedidos' define público, resultado y medio.",
         "Facturación no es beneficio. El precio debe cubrir costos variables, parte de los costos fijos, tiempo, impuestos, riesgo y reinversión. Vender más con margen negativo acelera la pérdida.",
@@ -42,12 +75,217 @@
         "Una planilla para organizar gastos puede atraer a quien reconoce el problema, demostrar calidad y después conducir a una formación completa. No es un anuncio disfrazado, sino el inicio de una relación.",
         "Una oferta debe delimitar resultado y responsabilidades. Explica qué se entregará, qué depende del cliente, el plazo y las exclusiones. Esto reduce conflictos y permite calcular el trabajo necesario para atender bien, en vez de prometer ayuda ilimitada.",
         "Validar no es reunir elogios. Observa si las personas utilizan la solución, comprenden su beneficio y aceptan un precio compatible con sus costes. Una conversación entusiasta abre una hipótesis; la experiencia real permite comprobarla.",
-        "La mejor herramienta inicial resuelve un problema identificado. Una página sencilla, una descripción clara y un contacto pueden bastar para comenzar. Añade funciones cuando exista una necesidad concreta, no solamente para aparentar una actividad mayor."
+        "La mejor herramienta inicial resuelve un problema identificado. Una página sencilla, una descripción clara y un contacto pueden bastar para comenzar. Añade funciones cuando exista una necesidad concreta, no solamente para aparentar una actividad mayor.",
+        "Piensa en revisar presentaciones. Prometer mejorar cualquier venta exagera; explicar que se revisarán organización, legibilidad y coherencia define una entrega verificable.",
+        "Una oferta responsable explica también lo que no incluye. Un alcance claro reduce expectativas incompatibles y permite valorar trabajo adicional antes de convertirlo en conflicto.",
+        "Una buena presentación comercial ayuda a decidir con información. Comprar debe tener sentido para el cliente, incluso cuando su situación necesita otra solución."
       ]
     },
     {
-      "title": "Ejecutar, medir y mejorar sin perder el control",
+      "title": "Transformar trabajo en capacidad de entrega",
       "paragraphs": [
+        "Una empresa acumula capacidad cuando el aprendizaje no vive solo en la memoria del fundador. Procedimientos, materiales y relaciones organizadas apoyan futuras entregas si siguen siendo útiles.",
+        "Crear esa base exige trabajo que no siempre aparece en ingresos inmediatos. Documentar una solución recurrente puede ahorrar horas futuras si realmente se utiliza.",
+        "La renta es un flujo durante un periodo; un activo productivo contribuye a flujos futuros. Recibir dinero y construir patrimonio son procesos relacionados, pero diferentes.",
+        "Valor de mercado, efectivo disponible y mantenimiento deben separarse. Un bien valioso puede consumir dinero y una facturación elevada dejar poco beneficio. La visión de caja no reemplaza las definiciones contables.",
+        "Construir activos exige recursos y utilidad económica. En un negocio, clientes, entrega y continuidad deben sostener la operación antes de que exista renta residual.",
+        "La pregunta no es solo cuánto entra, sino qué se construye y qué obligaciones lo acompañan. Patrimonio, efectivo e ingresos deben analizarse juntos.",
+        "Aumentar la recepción inmediata no significa crear una fuente que continúe produciendo sin trabajo directo. Renda y activo son conceptos diferentes. Por ejemplo, un trabajador aumenta la facturación, pero necesita ejecutar personalmente cada tarea adicional.",
+        "Observar si el bien produce entradas o salidas de dinero en el flujo de caja. Un bien valorizado puede generar costos permanentes sin ofrecer renta recurrente. Por ejemplo, una persona clasifica como activo cualquier bien que tenga valor de reventa.",
+        "Patrimonio y flujo de caja no son lo mismo. Eso no anula su valor patrimonial, pero muestra que poseer algo valioso no significa recibir ingresos de él. Por ejemplo, una casa propia tiene mantenimiento, impuestos y prestaciones, pero no produce ingresos.",
+        "Produce flujo de caja para el propietario a lo largo del tiempo. El objetivo es poseer fuentes de entrada monetaria. Se debe analizar la Rentabilidad y el riesgo, ya que los pagos futuros no necesariamente se garantizan. Por ejemplo, una aplicación paga ingresos periódicos sin exigir atención diaria al cliente.",
+        "Porque su renta puede continuar limitada por su propia capacidad de venta. Incluso un excelente vendedor dispone de tiempo finito. La construcción de sistemas busca disminuir esa restricción individual. Por ejemplo, un vendedor gana solamente por las unidades que comercializa personalmente.",
+        "Una organización capaz de generar actividad económica más allá del fundador. El valor está en el sistema estructurado, y no sólo en el volumen de ventas del mes. El equipo necesita prestar servicio y mantener operaciones reales. Por ejemplo, un equipo capacita a otras personas para atender clientes por medio de procesos repetibles.",
+        "Destinatario parte del resultado de la construcción o adquisición de activos productivos. La recepción por sí solo no crea patrimonio sostenible. La decisión sobre el uso de la renta determina si ella refuerza consumo o fuentes futuras de caja. Por ejemplo, una persona recibe un gran bono y gasta íntegramente el valor.",
+        "Un sistema solo puede generar renta residual real después de funcionar y crear valor. La idea de renta residual no sustituye el trabajo inicial de construir una operación. Registro y expectativas no son equivalentes a activos productivos. Por ejemplo, un empresario afirma tener renta pasiva desde el primer día, aunque todavía no tiene clientes.",
+        "Porque la generación de negocios puede ser distribuida entre personas y procesos. El sistema depende de clientes, aprendizaje y mantenimiento. No es correcto confundir la existencia de una red con retornos automáticos. Por ejemplo, una red amplía la actividad comercial a través de representantes preparados.",
+        "Considerar tanto los pagos y costes recurrentes como cualquier ingreso efectivo. El uso de crédito puede crear obligaciones futuras. Examinar el efecto neto en el presupuesto evita atribuir capacidad de generar ingresos a cualquier adquisición. Por ejemplo, una persona hace financiación de un ítem que pierde valor y cuesta para mantener.",
+        "¿Cuánto de la renta permanece y se transforma en sistemas y activos que generan nuevas entradas. Los ingresos brutos pueden impresionar, pero no muestran sostenibilidad. La construcción de riqueza implica decisiones sobre margen, reinversión y activos. Por ejemplo, alguien mide la riqueza sólo por el dinero que entró en el mes.",
+        "La renta comienza a depender de la estructura construida, no sólo del esfuerzo personal. La madurez de un negocio implica procesos y clientes duraderos. Esta transición es central a la distinción entre trabajo activo y activo empresarial. Por ejemplo, un equipo pequeño mantiene clientes y continuidad operativa incluso sin acciones diarias del fundador.",
+        "Antes de llamar algo estratégico, comprueba si reduce dependencia, mejora calidad o atiende necesidades comprobadas. Un archivo olvidado no vale más solo porque exigió esfuerzo.",
+        "El objetivo es que el trabajo de hoy fortalezca la ejecución futura. Selecciona qué conservar, revisa lo que perdió utilidad y protege información que sostiene continuidad."
+      ]
+    },
+    {
+      "title": "Alianzas que amplían competencias",
+      "paragraphs": [
+        "Una buena alianza combina aportes compatibles. La afinidad facilita la convivencia, pero no sustituye claridad sobre responsabilidades, decisiones y distribución de resultados.",
+        "Antes de un compromiso amplio, observa una colaboración pequeña. Plazos, comunicación de dificultades y disposición a corregir errores revelan más que declaraciones entusiastas.",
+        "El capital social reúne relaciones de confianza, cooperación y acceso a conocimientos. Su calidad depende de reciprocidad y autonomía, no solo del número de contactos.",
+        "Compartir objetivos de aprendizaje puede ofrecer apoyo y nuevas perspectivas. El ambiente es más saludable cuando permite preguntas, desacuerdos y evaluación financiera independiente.",
+        "Una relación no debe reducirse a una oportunidad comercial. La cooperación duradera requiere claridad de intereses y libertad para rechazar una oferta sin perder respeto o pertenencia.",
+        "Una red de apoyo facilita conocimiento y ayuda. Los objetivos compartidos aportan más cuando se conserva libertad para evaluar los caminos.",
+        "Un círculo que desalienta nuevas actitudes puede reforzar límites y alojamiento. La convivencia afecta lo que parece normal o posible. Las críticas constantes pueden hacer más difícil perseverar en un objetivo legítimo. Por ejemplo, una persona pasa mucho tiempo con amigos que ridiculizan cualquier intento de aprender.",
+        "Recibir estímulo y referencias que favorecen el desarrollo de nuevos hábitos. Las relaciones de apoyo crean espacio para el intercambio de experiencias. El valor está en el aprendizaje mutuo, no apenas en el estatus económico de los participantes. Por ejemplo, un principiante encuentra personas que comparten su interés por la educación financiera.",
+        "Una amistad orientada por crecimiento, responsabilidad y expectativas realistas. Una comunidad sana fomenta decisiones fundamentadas. Apoyar no es vender ilusiones ni exigir concordancia permanente. Por ejemplo, un amigo ayuda otro a reflexionar sobre los objetivos en lugar de prometer dinero rápido.",
+        "Buscar mentores, colegas y comunidades capaces de compartir conocimientos. El contacto con referencias nuevas amplía perspectivas. Aprender con experiencias de terceros puede evitar algunos errores. Por ejemplo, una persona desea emprender, pero no conoce a nadie con experiencia.",
+        "Reciprocidad en el intercambio de conocimiento y en el apoyo al progreso. La fuerza de la relación está en la disposición de ayudar y aprender. Participar sin contribuir reduce las posibilidades de crecimiento colectivo. Por ejemplo, un grupo de estudio comparte dificultades, oportunidades y correcciones constructivas.",
+        "La influencia social también puede afectar elecciones financieras perjudiciales. Las relaciones influyen en comportamientos, incluso gastos. Reconocer la presión del grupo ayuda a establecer prioridades propias. Por ejemplo, una persona copia hábitos de consumo de sus amigos sin evaluar su presupuesto.",
+        "Mayor libertad para experimentar, corregir y perseverar con responsabilidad. Un ambiente de incentivo reduce el temor excesivo de fracasar. Esto no elimina la necesidad de evaluar riesgos. Por ejemplo, un emprendedor convive con personas que tratan error como ocasión de aprendizaje.",
+        "El valor del círculo está en el compartir visión y crecimiento, no sólo en la riqueza de los integrantes. Respeto, carácter y disposición para aprender son fundamentales. Las relaciones puramente instrumentales pueden destruir la confianza. Por ejemplo, una persona piensa que solo debe relacionarse con gente de alta renta.",
+        "Estimular el éxito mutuo y reconocer la evolución de las personas. El ambiente se fortalece cuando la realización de un miembro inspira a los demás. La propuesta difiere de competir para disminuir otros. Por ejemplo, un grupo celebra el desarrollo de habilidades de cada participante.",
+        "Cambiar hábitos también puede exigir nuevos ambientes de referencia y apoyo. El grupo influencia expectativas y rutinas. Construir espacios adecuados puede sostener cambios difíciles de mantener solo. Por ejemplo, una persona quiere cambiar de comportamiento, pero vuelve siempre a los mismos estándares colectivos.",
+        "Confianza suficiente para aprender con experiencias positivas y negativas. Relaciones productivas no ocultan fracasos ni riesgos. La honestidad fortalece discernimiento. Por ejemplo, dos colegas intercambian información sincera sobre dificultades en la creación de negocios.",
+        "Apoyo genuino a los objetivos de las personas y respeto a la autonomía. Una red de relaciones saludables no se basa en coerción. Las amistades y las oportunidades de negocio deben ser tratadas con discernimiento. Por ejemplo, una persona apoya los sueños de otros sin exigir participación en su propio proyecto.",
+        "Las divergencias necesitan un camino de resolución previo al conflicto. Una alianza saludable permite discrepar, revisar acuerdos y terminar sin convertir al cliente en rehén.",
+        "Las relaciones productivas crecen con reciprocidad verificable. Aportar, respetar límites y cumplir acuerdos construyen confianza más allá de promesas vagas de oportunidades futuras."
+      ]
+    },
+    {
+      "title": "Una red que merece confianza",
+      "paragraphs": [
+        "Una red comercial crea valor al conectar necesidades y soluciones adecuadas. El tamaño de la lista importa menos que la confianza para una conversación útil y respetuosa.",
+        "Recomendar implica responsabilidad por la información compartida. Conoce lo que presentas y distingue tu experiencia de resultados que otras personas podrían alcanzar o no.",
+        "Una red conecta personas mediante información, confianza y coordinación. Puede ampliar el alcance, pero su utilidad económica depende del servicio real.",
+        "Alcance e ingresos son distintos. Una audiencia amplia no demuestra demanda: las ventas requieren consumidores interesados y una experiencia de compra satisfactoria.",
+        "Las redes necesitan información organizada y soporte. Crecer más rápido que la capacidad de entrega puede difundir errores y promesas inadecuadas con la misma facilidad que información útil.",
+        "El tamaño debe evaluarse junto con calidad y continuidad. Las conexiones crean valor cuando mejoran la comprensión y atención de necesidades.",
+        "Una red necesita otros participantes para que las conexiones creen valor. Sin alguien con quien comunicar, la herramienta pierde gran parte de la utilidad. Por ejemplo, hay un teléfono aislado sin otros aparatos conectados.",
+        "Más conexiones pueden ampliar oportunidades de comunicación y colaboración. El valor no viene sólo del número de integrantes. Viene de la posibilidad de relaciones útiles entre ellos. Por ejemplo, una red pasa a conectar personas que antes no podían intercambiar información.",
+        "Como representación didáctica del potencial de crecimiento del valor de una red con más usuarios. La Ley de Metcalfe es empleada para ilustrar efectos de red. No significa que duplicar participantes multiplicará automáticamente el beneficio real por el mismo factor.",
+        "El efecto de red, en que conexiones adicionales aumentan la utilidad potencial del conjunto. Una plataforma puede mejorar porque conecta a más personas. Para que esto suceda, los participantes necesitan conseguir interactuar de manera significativa. Por ejemplo, un servicio digital se vuelve más útil conforme crece la comunidad de usuarios activos.",
+        "Conexiones necesitan ser relevantes y efectivas para generar beneficios. El conteo de contactos es solo un indicador bruto. Relaciones inactivas o sin utilidad no crean automáticamente actividad económica. Por ejemplo, una persona tiene una lista enorme de contactos, pero no mantiene relaciones ni ofrece valor.",
+        "Circulación de recomendaciones e informaciones entre participantes. El intercambio entre personas puede ampliar el alcance sin depender exclusivamente de anuncios. Credibilidad y experiencia real son fundamentales. Por ejemplo, una empresa permite a los clientes satisfecho comunicarse y compartir experiencias.",
+        "El número de combinaciones posibles de conexión crece con la participación. A medida que la red se expande, surgen nuevas relaciones potenciales. Eso no significa que todas se llevarán a cabo o producirán dinero. Por ejemplo, una comunidad atrae a nuevas personas que pasan a interactuar con participantes antiguos.",
+        "La capacidad de los propios integrantes de establecer conexiones útiles entre sí. Una red gana densidad cuando las personas aprenden, recomiendan y colaboran sin una centralización excesiva. Por ejemplo, un empresario concentra toda comunicación en él y impide intercambios directos entre participantes.",
+        "El valor de las conexiones depende de una experiencia lo suficientemente buena para mantenerlas activas. Sin utilidad real, los participantes dejan de interactuar o se alejan. Crecimiento en números no resuelve baja calidad. Por ejemplo, una organización quiere crecer, pero descuida la atención a los usuarios actuales.",
+        "Comprender la red como un conjunto duradero de relaciones y oportunidades. Las ventas puntuales son diferentes de construir conexiones que perduren. Confianza y continuidad pueden sostener intercambios de valor. Por ejemplo, una persona trata la red sólo como una lista de compradores de una campaña.",
+        "Conocimiento distribuido que puede circular entre miembros y acelerar el aprendizaje. La información no necesita depender de un único especialista. Las Comunidades permiten compartir experiencias y soluciones. Por ejemplo, un nuevo participante encuentra varias personas que enseñan buenas prácticas y resuelven dudas.",
+        "Separar valor potencial de conexión de ingresos efectivas y rentabilidad comprobada. La ecuación es una metáfora de escala en este contexto. Lucro implica costos, demanda, calidad y ejecución y no se deriva automáticamente de N2. Por ejemplo, una empresa promete retorno matemático obligatorio porque su red crece.",
+        "Una red debe respetar el derecho a rechazar. Mensajes insistentes, exposición de datos y promesas de ingresos sin contexto pueden generar una venta y destruir relaciones importantes.",
+        "La confianza crece si el beneficio existe más allá de recomendar. El producto debe ser útil al comprador y la responsabilidad debe continuar después de recibir una comisión."
+      ]
+    },
+    {
+      "title": "Procesos sencillos para crecer",
+      "paragraphs": [
+        "Un proceso describe cómo entregar de forma reproducible. Reduce variaciones innecesarias sin impedir criterio profesional cuando una situación exige adaptación.",
+        "Empieza por todo el recorrido del cliente, desde información inicial hasta atención posterior. Una etapa excelente no compensa necesariamente una falla grave en otra parte.",
+        "Duplicación significa enseñar procedimientos reproducibles; escalabilidad, ampliar la actividad sin aumentar proporcionalmente todas las exigencias. Ninguna garantiza crecimiento ilimitado.",
+        "Los procesos simples reducen la dependencia de talento excepcional. La estandarización debe conservar comprensión: repetir mensajes sin conocer producto y condiciones multiplica debilidades.",
+        "El crecimiento cambia costes, soporte y límites operativos. Un procedimiento útil a pequeña escala puede necesitar revisión y controles de calidad cuando aumenta la participación.",
+        "El objetivo es una organización enseñable y verificable. La expansión sostenible mantiene utilidad para consumidores y reconoce restricciones operativas.",
+        "La dependencia del desempeño individual restringe la expansión de la operación. El tiempo y la energía de una sola persona son finitos. La duplicación busca distribuir habilidades y procesos entre varios participantes. Por ejemplo, una empresa crece solo cuando su mejor vendedor trabaja más horas.",
+        "Ser comprensible y repetible sin exigir talentos raros. Un método que solo los expertos pueden ejecutar no se reproduce fácilmente. Simplicidad operativa facilita entrenamiento y consistencia. Por ejemplo, un principiante aprende un procedimiento simple y consigue enseñar a otra persona.",
+        "Invitar a alguien a conocer una propuesta, sin confundir invitación con obligación de participar. Invitar inicia el contacto. La decisión de la otra persona exige información suficiente y libertad de elección. Por ejemplo, una persona desea presentar una oportunidad a un posible interesado.",
+        "Transmitir información sobre la oferta y el funcionamiento del negocio de manera uniforme. Material estandarizado puede reducir improvisos y errores. Él debe ser claro y fiel a las condiciones reales. Por ejemplo, un equipo utiliza un material explicativo consistente después de invitar interesados.",
+        "Porque las dudas y las decisiones pueden exigir escucha, aclaraciones y tiempo. Acompañar no es insistir indefinidamente. La relación debe respetar el ritmo y la autonomía de quien recibió la propuesta. Por ejemplo, alguien recibe una explicación, piensa sobre ella y permanece con dudas.",
+        "Treinar competencias y procedimientos para que ella pueda actuar sin depender permanentemente de otra persona. La duplicación ocurre cuando el aprendizaje puede ser transmitido. El objetivo es formar participantes capaces, y no sólo ampliar una lista de nombres. Por ejemplo, una nueva participante quiere aprender a repetir el proceso de manera responsable.",
+        "Cuanto más complicado el método, más difícil enseñarlo y repetirlo con calidad. Reducir la complejidad operativa ayuda a los principiantes. Por ejemplo, una presentación requiere decorar cincuenta detalles y improvisar largos discursos.",
+        "La construcción de relaciones de confianza y atención a las necesidades de las personas. La tecnología amplia alcance, pero la relación humana continúa importante para comprender dudas y prestar atención. Por ejemplo, una plataforma automatización demostraciones, pero sus participantes dejan de escuchar clientes.",
+        "La escalabilidad sostenible exige una actividad económica genuina, no sólo multiplicación de registros. Un método puede repetirse y todavía ser malo. El crecimiento sólo tiene sentido empresarial cuando atiende una demanda real. Por ejemplo, una persona confunde escalabilidad con conseguir decenas de adhesiones sin cliente real.",
+        "Impedir que los demás aprendan y asuman tareas por medio de procesos simples. La duplicación depende de entrenamiento y delegación. La perfección individual no puede ser prerrequisito para cada nueva etapa. Por ejemplo, un líder centraliza todas las presentaciones porque cree que nadie hará tan bien.",
+        "Permitir comunicación consistente y reducir trabajo repetitivo de presentación. Herramientas de información ayudan a escalar una actividad. No garantizan conversiones ni reemplazan transparencia. Por ejemplo, una comunidad utiliza recursos digitales para divulgar información sin recrear todo a cada contacto.",
+        "Un sistema simple de reproducción del trabajo con apoyo humano y procesos consistentes. Escalar no es sólo multiplicar números. Es mantener la capacidad de enseñar, servir clientes y acompañar calidad mientras la actividad crece. Por ejemplo, una red expande sus actividades manteniendo atención y entrenamiento comprensibles.",
+        "Pide a alguien nuevo que use las instrucciones sin ayuda inmediata. Sus dudas muestran dónde explicar mejor, incluir ejemplos o aclarar criterios de conclusión.",
+        "Crecer con procesos amplía capacidad comprobada, no multiplica confusión. Estandariza lo que funciona, conserva espacio de revisión y elimina pasos que no aportan valor."
+      ]
+    },
+    {
+      "title": "Liderazgo que distribuye responsabilidad",
+      "paragraphs": [
+        "Liderar crea condiciones para aportar con claridad. Exige definir resultados, disponer recursos y asumir responsabilidad por decisiones que organizan el trabajo colectivo.",
+        "Delegar sin autoridad, información o tiempo adecuado transfiere ansiedad y no responsabilidad. La persona debe saber qué puede decidir y cuándo pedir orientación.",
+        "El liderazgo coordina la acción colectiva con claridad, confianza y responsabilidad. Crea condiciones para que otras personas comprendan y realicen su trabajo.",
+        "Autoridad e influencia no son iguales. El compromiso requiere coherencia, escucha y competencia. Enseñar debe explicar objetivos y ofrecer retroalimentación, evitando dependencia permanente del líder.",
+        "Un liderazgo sólido distribuye conocimiento y desarrolla criterio. Debe respetar ritmos, intereses y límites; los objetivos comerciales no justifican presión emocional.",
+        "Liderar consiste en desarrollar autonomía dentro de responsabilidades compartidas. La continuidad mejora cuando se aprenden criterios y no solo instrucciones.",
+        "El liderazgo exige competencias humanas y responsabilidad, además de conocimiento intelectual. Dominar contenido técnico ayuda, pero es insuficiente para inspirar, coordinar y orientar personas ante dificultades. Por ejemplo, una persona piensa que liderar significa sólo conocer más asuntos que todos los colegas.",
+        "Equilibrio emocional bajo presión y capacidad de responder con discernimiento. Liderar implica administrar las propias reacciones para no ampliar el conflicto. Por ejemplo, un equipo enfrenta un problema y su líder permanece serena para tomar decisiones.",
+        "La dimensión física, que sustenta resistencia y capacidad de actuación. Límites humanos y salud importan para mantener responsabilidades. Por ejemplo, una líder mantiene energía y hábitos de cuidado para conseguir trabajar con regularidad.",
+        "La dimensión espiritual en el sentido de propósito, valores y visión de vida. En ese contexto, la espiritualidad es presentada como una dimensión de la formación del líder, no como requisito de adhesión a una religión específica. Por ejemplo, una persona conecta el trabajo del grupo con principios y objetivos significativos.",
+        "La dimensión mental, relacionada a raciocinio, conocimiento y evaluación de problemas. Planificación y pensamiento crítico ayudan a tomar mejores decisiones. El líder necesita aprender y enseñar a pensar. Por ejemplo, un equipo aprende a examinar información antes de decidir.",
+        "Ayudar a otras personas a reconocer y desarrollar su propio potencial. Un liderazgo productivo no sólo concentra reconocimiento en el fundador. Ella forma nuevos líderes. Por ejemplo, una dirigente inspira participantes mostrando que ellos también pueden desarrollar competencias.",
+        "Establecer límites y orientar correcciones cuando sea necesario. Ser respetado no exige concordancia universal. Por ejemplo, una responsable evita corregir conductas perjudiciales porque quiere complacer a todos.",
+        "Falta de formación de personas capaces de asumir decisiones y responsabilidades. El objetivo es crear autonomía progresiva. Una organización excesivamente centralizada se vuelve frágil. Por ejemplo, una red solo funciona cuando su fundadora está presente para solucionar cualquier problema.",
+        "Bajo presión, el equipo necesita prioridades claras y comunicación directa. El liderazgo reduce conflictos al distinguir urgencia, importancia y lo que puede esperar.",
+        "Liderazgo implica ganar confianza, orientar y desarrollar personas, no sólo poseer un cargo. La autoridad puede imponer tareas, pero la formación de equipos sólidos exige una relación y responsabilidad. Por ejemplo, una persona recibe autoridad y pasa a dar órdenes sin escuchar a nadie.",
+        "Integridad y disposición para aprender delante del equipo. El ejemplo personal influye en la cultura del grupo. Admitir fallos y corregirlas fortalece credibilidad. Por ejemplo, una líder reconoce un error público y corrige su procedimiento.",
+        "Multiplicar capacidad de liderazgo a través de la formación de otras personas. El sexto activo está asociado al crecimiento de las personas, no sólo a la dirección cotidiana de tareas. Por ejemplo, un miembro experimentado dedica tiempo a enseñar quién está empezando.",
+        "Una falla necesita investigación antes de acusar. Comprueba si se entendieron expectativas, existían recursos y el proceso permitía cumplir lo exigido.",
+        "El liderazgo madura cuando el grupo trabaja sin intervenciones constantes. No elimina al líder: libera atención para decisiones que requieren visión del conjunto."
+      ]
+    },
+    {
+      "title": "Acceso, diversidad y contribución real",
+      "paragraphs": [
+        "Un negocio pierde capacidad al confundir un perfil tradicional con competencia. Experiencias distintas revelan necesidades ignoradas si existe participación real y evaluación justa.",
+        "El acceso no exige recursos idénticos. Horarios, responsabilidades familiares y condiciones de aprendizaje pueden necesitar organización distinta sin reducir la calidad de entrega.",
+        "La participación económica depende de oportunidades, conocimientos, autonomía y condiciones de trabajo. La capacidad empresarial no está determinada por el género.",
+        "Las barreras históricas incluyen acceso desigual al capital, carga de cuidados y reconocimiento limitado. La flexibilidad puede abrir opciones sin eliminar automáticamente esas dificultades.",
+        "Comunicación, liderazgo y cooperación pueden aprenderse en diferentes grupos. Es necesario evaluar remuneración, costes y seguridad sin suponer que un modelo conviene por identidad.",
+        "La inclusión amplía decisiones informadas y evita estereotipos. Las oportunidades deben juzgarse por condiciones concretas y posibilidades de desarrollo responsable.",
+        "Dependiendo totalmente de otra persona puede poner en peligro la seguridad financiera. Cambios familiares, desempleo o enfermedad pueden alterar la renta. Conocer recursos y desarrollar autonomía amplía la capacidad de decisión. Por ejemplo, una mujer depende totalmente de la renta del cónyuge y no conoce las finanzas de la casa.",
+        "Las responsabilidades de cuidado pueden perjudicar la continuidad profesional y la formación de patrimonio. Los períodos fuera del mercado pueden afectar la renta y la jubilación. Planificar alternativas exige considerar la realidad de cada persona. Por ejemplo, una profesional interrumpe la carrera para cuidar de la familia y luego encuentra dificultad para regresar.",
+        "Assumir participación activa en el conocimiento y en el control de las propias finanzas. Autonomía incluye comprender deudas, ingresos, reservas e inversiones. La educación financiera amplia opciones. Por ejemplo, una mujer percibe que decisiones importantes sobre dinero se toman sin su participación.",
+        "El techo de vidrio, esto es, obstáculos que dificultan el avance profesional de mujeres. Una alternativa empresarial, sin embargo, también plantea desafíos. Por ejemplo, una profesional enfrenta limitaciones de promoción a pesar de su competencia.",
+        "La posibilidad de organizar parte del tiempo de trabajo en torno a otras responsabilidades. Control de agenda puede ser valioso, pero emprender también exige tiempo y puede envolver trabajo irregular. Por ejemplo, una madre necesita actividades compatibles con horarios variables.",
+        "La autonomía económica puede fortalecer confianza y sentido de capacidad personal. Aprender a generar y administrar recursos puede ampliar la independencia. La autoestima también depende de otros factores y no debe ser reducida a la renta. Por ejemplo, una persona asocia su autoestima a la capacidad de sustentarse.",
+        "El capital necesario para empezar a experimentar un negocio. Costes bajos no son iguales a resultado asegurado, y hay que analizar la propuesta. Por ejemplo, una mujer busca una actividad empresarial con baja inversión inicial.",
+        "Formación de habilidades de liderazgo, comunicación y desarrollo personal. El proceso empresarial puede ampliar competencias. Esos aprendizajes no dependen exclusivamente de la receta obtenida. Por ejemplo, una empresaria enseña a otras personas a administrar actividades y desarrollarse.",
+        "Cada persona necesita desarrollar capacidad de comprender y participar de las decisiones financieras. Compartir responsabilidades e información reduce vulnerabilidades. Autonomía es compatible con cooperación familiar. Por ejemplo, una familia considera que cuidar de las finanzas es responsabilidad exclusiva del hombre.",
+        "Una oportunidad más abierta no asegura resultados iguales para todas las personas. Mercado, tiempo disponible, acceso a apoyo y condiciones materiales influyen en la experiencia. La promesa de ausencia de barreras no sustituye la evaluación. Por ejemplo, un participante imagina que el modelo elegido elimina automáticamente desigualdades.",
+        "La posibilidad de actuar y decidir con mayor independencia sobre la propia vida. La autora asocia la participación activa en el destino económico. No toda actividad será viable para todas, pero la autonomía es el objetivo discutido. Por ejemplo, una mujer decide iniciar una pequeña actividad para recuperar capacidad de elección.",
+        "Usar educación, autoconfianza, relaciones y organización para ampliar la libertad de elección. La narrativa une habilidades empresariales la calidad de vida. El resultado deseado no es solo trabajar más, sino construir opciones. Por ejemplo, una persona alcanza renta propia y decide reservar tiempo para lo que considera significativo.",
+        "Evita atribuir habilidades automáticamente por género, edad u origen. Observa conductas y resultados, ofreciendo orientación y oportunidades compatibles con las exigencias reales.",
+        "La inclusión debe aparecer en decisiones y no solo en mensajes públicos. Escuchar, corregir barreras y reconocer aportes fortalece justicia y atención a clientes diversos."
+      ]
+    },
+    {
+      "title": "Enseñar para desarrollar autonomía",
+      "paragraphs": [
+        "Una formación útil permite comprender y ejecutar con responsabilidad. La persona necesita finalidad de la tarea, criterios de calidad y límites de decisión.",
+        "Mostrar una vez no garantiza aprendizaje. Combina demostración, intento acompañado y devolución específica, aumentando autonomía al demostrar capacidad real.",
+        "La constancia mantiene un proceso de aprendizaje durante el tiempo necesario para evaluarlo. Es distinta de repetir una conducta sin examinar su utilidad.",
+        "Desarrollar una actividad exige organización del tiempo, capacidades y compromisos fiables. Las metas de proceso observan acciones controlables; los resultados también dependen del público y del mercado.",
+        "Persistir requiere criterios de revisión. Costes, calidad del servicio, aprendizaje y efectos personales indican si conviene continuar. Cambiar o terminar puede ser racional.",
+        "Compromiso significa disciplina y evaluación. El esfuerzo es más útil con objetivos claros y límites financieros y personales reconocidos.",
+        "Aprender a orientar, entrenar y desarrollar personas, además de comunicar productos. Un sistema que dependa sólo del mejor vendedor no se duplica bien. Por ejemplo, una persona evita emprender por no considerarse una vendedora excepcional.",
+        "Es posible empezar a aprender y construir un negocio paralelamente al trabajo actual. Mantener fuentes existentes puede ayudar a reducir la presión financiera durante el inicio. Por ejemplo, un profesional cree que necesita dejar el trabajo el día en que ingresar en un negocio.",
+        "Diploma avanzado no es prerrequisito universal para aprender a crear un negocio. Conocimiento formal y experiencia no son equivalentes. Por ejemplo, una persona piensa que necesita un MBA antes de construir una actividad comercial.",
+        "Menor inversión financiera inicial no elimina esfuerzo, disciplina o tiempo de formación. Las barreras de entrada pueden ser menores, pero todavía hay necesidad de aprendizaje, prospección legítima y manutención de relaciones. Por ejemplo, una oportunidad requiere bajo capital inicial y alguien concluye que será fácil.",
+        "Evaluar si está dispuesta a aprender, cambiar hábitos y salir de la zona de confort. Desear un resultado no significa aceptar el proceso. Por ejemplo, una persona afirma querer libertad, pero no acepta recibir entrenamiento ni corregir errores.",
+        "Tener persistencia acompañada de aprendizaje y ajuste de conducta. Las dificultades forman parte de la formación, pero la perseverancia responsable incluye verificar si la estrategia y el negocio son viables. Por ejemplo, una participante recibe negativas y piensa que cualquier dificultad significa que debe desistir inmediatamente.",
+        "Construir una operación duradera suele exigir años, y no resultados inmediatos. El resultado depende de ejecución y no está garantizado. Por ejemplo, un principiante espera renta sustancial poco después de su primer registro.",
+        "Adoptar horizonte realista de aprendizaje, cambio de valores y construcción empresarial. Cinco años no es plazo asegurado de beneficios. Es una referencia de paciencia y dedicación para desarrollar competencias.",
+        "Acción práctica acompañada de reflexión sobre resultados. Aprender y actuar son partes complementarias del proceso. Por ejemplo, un participante domina teorías, pero no conversa con clientes ni testa procedimientos.",
+        "Desaprender hábitos que dificultan iniciativa, delegación y visión a largo plazo. La transición de mentalidad es gradual. Algunas creencias útiles en el empleo pueden limitar la construcción de sistemas independientes. Por ejemplo, una persona cree que siempre actuará con los mismos hábitos de empleado al gestionar una organización.",
+        "Comparar la propia evolución con objetivos realistas de aprendizaje y práctica. Las habilidades complejas no surgen de una semana para otra. La perspectiva a largo plazo no elimina la necesidad de medir la viabilidad financiera. Por ejemplo, un principiante se compara con personas experimentadas y se rinde en el primer trimestre.",
+        "Assumir el propio trabajo, los riesgos y las decisiones de la actividad. El modelo ofrece una estructura, no sustituye opciones y esfuerzos individuales. Por ejemplo, una persona elige participar solamente porque otras prometieron que todo sucederá automáticamente.",
+        "Acompañar no significa vigilar cada movimiento. Define revisiones y situaciones que requieren ayuda para trabajar sin temor constante a intervenciones imprevisibles.",
+        "Enseñar da resultado cuando otra persona decide mejor, explica motivos y reconoce cuándo necesita apoyo. Esa autonomía amplía capacidad colectiva sin abandonar responsabilidad."
+      ]
+    },
+    {
+      "title": "Crecimiento que puede continuar",
+      "paragraphs": [
+        "Las ventas pueden crecer mientras se debilita la capacidad de cumplir. La continuidad exige observar calidad, caja, personas y riesgos con la misma atención que la expansión.",
+        "El resultado debe financiar mantenimiento y adaptación. Distribuirlo todo en una fase favorable puede impedir afrontar cambios de demanda o sustituir recursos necesarios.",
+        "Construir patrimonio convierte parte de los resultados en recursos para decisiones futuras. Facturación, beneficio, activos y efectivo tienen significados distintos.",
+        "Ventas altas pueden dejar poco después de costes y obligaciones. La acumulación depende de lo que permanece y de su distribución entre reservas, reinversión y otros activos.",
+        "Los ingresos residuales también requieren analizar demanda, costes, concentración y reglas comerciales. La misma renta puede consumirse por completo o fortalecer la resistencia financiera.",
+        "El patrimonio sostenible requiere organización y continuidad. Su utilidad incluye seguridad y opciones, no solo cifras que pasan por una cuenta.",
+        "Construir un negocio que pueda generar actividad económica y recursos. El plan comienza con la creación de una fuente productiva. Sin actividad real y controles adecuados, los próximos pasos se quedan sin base. Por ejemplo, una persona inicia un emprendimiento con objetivo de generar resultados propios.",
+        "reinvertir parte de los resultados en el desarrollo del negocio. Eliminar todo el excedente puede limitar el crecimiento y la resiliencia. Por ejemplo, un negocio comienza a dar ganancias y su dueño decide usar todo en consumo.",
+        "Es una forma de reinversión que fortalece la capacidad futura del emprendimiento. Reinvestir no es solo comprar máquinas. Entrenamiento, estructura y mejora operativa también pueden hacer la actividad más sólida. Por ejemplo, una empresa utiliza parte del resultado para capacitar equipo y mejorar procesos.",
+        "Invertir en inmuebles como una clase de activos del plan presentado. El tercer paso transforma parte de los resultados empresariales en patrimonio inmobiliario. La calidad del inmueble y el riesgo de la operación deben ser examinados. Por ejemplo, después de fortalecer la empresa, una persona evalúa comprar inmueble para producir renta.",
+        "Buscar financiar lujos de rendimiento de activos en lugar de consumir el capital principal. La idea consiste en preservar fuentes productoras de caja. Un lujo financiado sin evaluar costos puede debilitar la posición financiera. Por ejemplo, una persona desea comprar un bien de lujo usando solo lo que gana trabajando.",
+        "Porque el sistema puede permanecer sin capital para expandir y soportar gastos. La reinversión sirve para construir un activo más robusto. Por ejemplo, un nuevo negocio produce ingresos, pero necesita recursos para seguir creciendo.",
+        "Evitar confundir una primera recepción con renta duradera y suficiente. La construcción de negocios lleva tiempo. Las decisiones sobre dejar el empleo deben considerar gastos, reservas y estabilidad real de la actividad. Por ejemplo, una persona analiza si vale la pena soltar el empleo en el mes de la primera comisión.",
+        "El aumento del estándar de consumo puede absorber recursos destinados a la construcción de patrimonio. Ganar más no garantiza acumular riqueza. Por ejemplo, un emprendedor pretende enriquecer comprando cosas caras cada vez que vende más.",
+        "Tener inmueble no significa automáticamente poseer una inversión con flujo de caja positivo. La decisión debe considerar el alquiler, la financiación, la vacia, los impuestos y el mantenimiento. Por ejemplo, una persona invierte en un inmueble que exige gastos superiores a la renta recibida.",
+        "Planificar la asignación de recursos entre gastos actuales y construcción de activos. Administrar dinero requiere elecciones. La reinversión deliberada modifica la trayectoria a largo plazo. Por ejemplo, un negocio ya funciona y el dueño decide cómo distribuir resultados entre consumo y expansión.",
+        "El método organiza prioridades, pero no garantiza retorno ni dispensa análisis de riesgo. Las empresas pueden fallar e inmuebles pueden generar perjuicio. El plan debe ser tratado como estructura de reflexión y no promesa matemática de riqueza. Por ejemplo, una persona cree que seguir una secuencia de cuatro pasos elimina todos los riesgos.",
+        "Crear un ciclo en el que las actividades productivas fortalezcan activos y amplíen la libertad de elección. Negocio, reinversión y activos deben actuar juntos. El valor está en la capacidad creciente de financiar la vida sin consumir continuamente el patrimonio. Por ejemplo, alguien convierte beneficios empresariales en nuevas fuentes de ingresos a lo largo de los años.",
+        "La continuidad depende de información accesible y responsabilidades distribuidas. Una ausencia temporal no debería convertir contratos, accesos y compromisos básicos en un misterio.",
+        "Un negocio duradero conserva capacidad de servir mientras cambia. Crecer incluye poder corregir el rumbo sin destruir confianza con clientes y colaboradores."
+      ]
+    },
+    {
+      "title": "Ejecutar, revisar y construir el siguiente ciclo",
+      "paragraphs": [
+        "Un plan necesita una rutina posible. Elige una entrega prioritaria, reconoce recursos disponibles y establece un ciclo corto para observar resultados y dificultades.",
+        "El ciclo necesita criterios sencillos de calidad y una revisión final. Sin criterios previos, cualquier resultado puede llamarse éxito y los problemas no producen aprendizaje confiable.",
         "Un plan de ejecución transforma intención en decisiones observables. No necesita anticipar cada detalle del futuro. Debe aclarar a quién atenderás, qué problema resolverás, cómo entregarás la solución y con qué recursos cuentas para la primera prueba.",
         "Elige un público suficientemente específico para conversar con claridad. Una propuesta dirigida a todo el mundo suele explicar poco. Reconocer una situación común facilita comunicar, comprender objeciones e identificar las características verdaderamente importantes de la solución.",
         "Describe el problema sin aumentar artificialmente el miedo o la urgencia. Una presentación honesta explica qué ocurre, cómo puede ayudar la solución y cuáles son sus límites. La confianza crece cuando la experiencia corresponde a lo comunicado.",
@@ -62,7 +300,10 @@
         "El crecimiento debe respetar la capacidad de entrega. Más clientes también pueden significar retrasos, errores y agotamiento. Antes de ampliar volumen, verifica si existen tiempo, procedimientos y recursos para mantener el compromiso asumido.",
         "Una recomendación voluntaria puede surgir de una buena experiencia. Solicita permiso para utilizar testimonios y no atribuyas al cliente resultados que no contó. La promoción debe preservar la confianza que hizo posible la recomendación.",
         "Reinvertir exige identificar el principal obstáculo. Puede ser necesario mejorar una habilidad, una herramienta o una reserva operativa. Gastar el excedente para aparentar éxito puede dejar sin resolver el problema que limita la continuidad.",
-        "Construir un negocio combina aprendizaje, entrega y revisión. Avanza sin hacer depender tu vida de una previsión optimista. Un proceso comprensible, financieramente observable y útil al cliente proporciona una base mejor para elegir el siguiente paso."
+        "Construir un negocio combina aprendizaje, entrega y revisión. Avanza sin hacer depender tu vida de una previsión optimista. Un proceso comprensible, financieramente observable y útil al cliente proporciona una base mejor para elegir el siguiente paso.",
+        "Un equipo que prepara un lanzamiento pequeño debe acordar responsables, evidencia de conclusión y comunicación de obstáculos. Una fecha por sí sola no organiza responsabilidades.",
+        "La revisión debe producir pocas decisiones claras. Reconoce lo que funcionó, identifica la causa principal de una falla y elige una mejora posible para el siguiente ciclo.",
+        "Construir con personas mantiene juntas promesas y aprendizaje. El negocio madura cuando cada ciclo mejora entrega de valor, confianza y decisiones responsables."
       ]
     }
   ]

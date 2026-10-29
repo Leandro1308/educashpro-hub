@@ -50,3 +50,6 @@ jobs:
         run: node tests/price-action-trainer.test.mjs
 
 
+
+      - name: Verify original book collection in four languages
+        run: node tests/original-books.test.mjs
