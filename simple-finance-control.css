@@ -1,0 +1,45 @@
+/* EduCashPro — compact spending tracker; small-screen Mini App and website */
+.financeLite{width:min(100%,740px);margin:0 auto;padding:2px 2px 36px;color:var(--text,#e8f0f3);font-size:13px;line-height:1.4}
+.financeLite *{box-sizing:border-box}
+.financeLite button,.financeLite input,.financeLite select{font:inherit}
+.financeLite button{cursor:pointer}
+.eflHead{display:flex;gap:12px;align-items:center;margin:0 0 12px}
+.eflBack{padding:8px 10px;border:1px solid var(--line,rgba(128,160,170,.24));border-radius:10px;background:var(--surface,transparent);color:inherit;font-size:12px;white-space:nowrap}
+.eflBrand{display:grid;gap:2px;min-width:0}
+.eflBrand strong{font-size:17px;line-height:1.2;letter-spacing:-.01em}
+.eflBrand small,.eflFoot,.eflEntry small{color:var(--muted,#8da2b0)}
+.eflStatus{padding:8px 10px;margin-bottom:10px;border:1px solid rgba(36,181,131,.25);border-radius:10px;background:rgba(29,157,118,.075);font-weight:650;font-size:12px}
+.eflExpired{border-color:rgba(227,159,67,.35);background:rgba(227,159,67,.09)}
+.eflToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.eflToolbar label,.eflFields label{display:grid;gap:4px;font-size:11px;font-weight:650;color:var(--muted,#8da2b0);min-width:0}
+.eflToolbar input,.eflToolbar select,.eflFields input,.eflFields select{width:100%;min-width:0;height:38px;padding:7px 10px;border:1px solid var(--line,rgba(128,160,170,.28));border-radius:10px;background:var(--surface,#172634);color:var(--text,#e8f0f3);outline-offset:2px}
+.eflSummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 11px}
+.eflMetric{border:1px solid var(--line,rgba(128,160,170,.22));border-radius:12px;background:var(--surface,rgba(128,160,170,.08));padding:11px;display:grid;gap:4px;min-width:0}
+.eflMetric small{color:var(--muted,#8da2b0);font-size:11px}
+.eflMetric strong{font-size:17px;line-height:1.2;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.financeLite .eflPositive{color:#23b18b}
+.financeLite .eflNegative{color:var(--text,#e8f0f3)}
+.eflForm,.eflHistory,.eflLock{border:1px solid var(--line,rgba(128,160,170,.23));background:var(--surface,rgba(128,160,170,.07));border-radius:13px;padding:12px;margin:0 0 11px}
+.eflForm>strong,.eflHistory h3{font-size:13px;display:block;margin:0 0 10px;font-weight:750}
+.eflFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.eflFields .eflFull{grid-column:1 / -1}
+.eflActions{display:flex;gap:8px;margin-top:11px}
+.eflActions button,.eflLock button,.eflMigration button{border:1px solid var(--line,rgba(128,160,170,.28));border-radius:9px;background:var(--surface-secondary,rgba(128,160,170,.12));padding:9px 13px;color:inherit;font-weight:700}
+.eflActions .eflPrimary,.eflLock button{background:#188a70;border-color:#188a70;color:white}
+.eflActions button:disabled{opacity:.55;cursor:progress}
+.eflLock{display:grid;gap:8px}
+.eflLock p{margin:0}
+.eflMigration{margin:10px 0;padding:9px 10px;border:1px dashed var(--line,rgba(128,160,170,.28));border-radius:10px;font-size:12px}
+.eflMigration button{padding:6px 8px;margin-left:5px;font-size:11px}
+.eflEntry{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line,rgba(128,160,170,.16));min-width:0}
+.eflEntry>div:first-child{display:grid;gap:3px;min-width:0}
+.eflEntry strong{font-weight:650;overflow-wrap:anywhere}
+.eflEntry small{font-size:10px}
+.eflEntryRight{text-align:right;display:grid;gap:4px;justify-items:end;flex-shrink:0}
+.eflEntryRight b{font-size:12px;font-variant-numeric:tabular-nums}
+.eflEntryRight span{display:flex;gap:9px}
+.eflEntryRight button{background:none;border:0;padding:2px;color:var(--muted,#8da2b0);font-size:11px;text-decoration:underline}
+.eflEmpty{color:var(--muted,#8da2b0);margin:12px 0}
+.eflFoot{text-align:center;font-size:10px;margin:14px 0 0}
+.eflNotice:not(:empty){padding:7px 0;font-size:12px;font-weight:650;color:var(--text,#e8f0f3)}
+@media(max-width:390px){.eflBrand strong{font-size:16px}.eflMetric strong{font-size:15px}.eflFields{gap:7px}.eflEntry{gap:7px}}

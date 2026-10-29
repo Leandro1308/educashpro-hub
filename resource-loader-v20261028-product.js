@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261029.3";
+  const VERSION="20261029.4";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -140,13 +140,11 @@
     })().catch(error=>{accountCenterPromise=null;throw error}));
   }
   function loadFinance(){
-    if(window.EduCashProFinance&&window.EduCashProFinanceShare)return Promise.resolve(true);
+    if(window.EduCashProFinance?.render)return Promise.resolve(true);
     return financePromise||(financePromise=(async()=>{
-      await Promise.allSettled([style("./monthly-finance-control.css"),style("./tools-hub-v2.css")]);
-      await script("./pdf-documents.js");
-      await script("./monthly-finance-sharing.js");
-      await script("./finance-model.js");
-      await script("./monthly-finance-control.js");
+      await Promise.allSettled([style("./simple-finance-control.css"),style("./tools-hub-v2.css")]);
+      await script("./simple-finance-control.js");
+      if(!window.EduCashProFinance?.render)throw Error("finance_ui_unavailable");
       return true;
     })().catch(error=>{financePromise=null;throw error}));
   }

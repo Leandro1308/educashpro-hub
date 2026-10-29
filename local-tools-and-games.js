@@ -5,7 +5,7 @@
     pt: {
       qrTitle: "Gerador de QR Code", qrSub: "Transforme seu link em QR Code e baixe a imagem.",
 
-      tools: "Ferramentas", toolsSub: "Controle financeiro, cálculos, documentos informativos e utilidades.", free: "ACESSO LIVRE",
+      tools: "Ferramentas", toolsSub: "Controle financeiro, cálculos, documentos informativos e utilidades.", free: "ACESSO LIVRE", trial30: "30 DIAS GRÁTIS",
 
       affiliateCalc: "Simulador do programa de afiliados", affiliateCalcSub: "Simule os cinco níveis e os critérios de desbloqueio.",
       finance: "Controle Financeiro Mensal", financeSub: "Registre renda e gastos e acompanhe o saldo do mês.",
@@ -24,7 +24,7 @@
     en: {
       qrTitle: "QR Code Generator", qrSub: "Turn your link into a QR code and download the image.",
 
-      tools: "Tools", toolsSub: "Financial tracking, calculations, informative documents and utilities.", free: "FREE ACCESS",
+      tools: "Tools", toolsSub: "Financial tracking, calculations, informative documents and utilities.", free: "FREE ACCESS", trial30: "30 DAYS FREE",
 
       affiliateCalc: "Affiliate program simulator", affiliateCalcSub: "Simulate five levels and unlock requirements.",
       finance: "Monthly Finance Control", financeSub: "Record income and expenses and track the monthly balance.",
@@ -43,7 +43,7 @@
     es: {
       qrTitle: "Generador de QR", qrSub: "Convierte tu enlace en un código QR y descarga la imagen.",
 
-      tools: "Herramientas", toolsSub: "Control financiero, cálculos, documentos informativos y utilidades.", free: "ACCESO LIBRE",
+      tools: "Herramientas", toolsSub: "Control financiero, cálculos, documentos informativos y utilidades.", free: "ACCESO LIBRE", trial30: "30 DÍAS GRATIS",
 
       affiliateCalc: "Simulador del programa de afiliados", affiliateCalcSub: "Simula cinco niveles y los requisitos de desbloqueo.",
       finance: "Control Financiero Mensual", financeSub: "Registra ingresos y gastos y controla el saldo del mes.",
@@ -62,7 +62,7 @@
     ru: {
       qrTitle: "Генератор QR-кода", qrSub: "Создайте QR-код из ссылки и скачайте изображение.",
 
-      tools: "Инструменты", toolsSub: "Финансовый учёт, расчёты, информационные документы и утилиты.", free: "СВОБОДНЫЙ ДОСТУП",
+      tools: "Инструменты", toolsSub: "Финансовый учёт, расчёты, информационные документы и утилиты.", free: "СВОБОДНЫЙ ДОСТУП", trial30: "30 ДНЕЙ БЕСПЛАТНО",
 
       affiliateCalc: "Симулятор партнёрской программы", affiliateCalcSub: "Пять уровней и условия их открытия.",
       finance: "Ежемесячный финансовый контроль", financeSub: "Записывайте доходы и расходы и следите за остатком.",
@@ -94,6 +94,27 @@
   function content() { return document.getElementById("content"); }
   function home() { document.querySelector('#bottomNav button[data-view="home"]')?.click(); }
 
+  async function financeApi(path, payload = {}) {
+    const activeSession = currentSession();
+    const token = String(activeSession?.token || "").trim();
+    if (!token || !/^\/api\/personal-finance\/[a-z-]+$/.test(path)) throw Error("session_expired");
+    const cookieSession = token.endsWith(".cookie-session");
+    const endpoint = (cookieSession ? window.location.origin : "https://educashpro-all.onrender.com") + path;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization":cookieSession ? "Bearer cookie-session" : "Bearer " + token
+      },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+      credentials: cookieSession ? "same-origin" : "omit"
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.ok === false) throw Error(data.reason || "finance_unavailable");
+    return data;
+  }
+
   function subscriptionCard() {
     return window.EduCashProApp?.openSubscription?.();
   }
@@ -113,7 +134,7 @@
       active: activeSession?.profile?.active === true,
       back: renderToolsHub,
       subscribe: subscriptionCard,
-      api: platformApi,
+      api: financeApi,
       screen: parts[1] || "intro",
       month: parts[2],
       sharedWorkspace: parts[1] === "shared" ? parts[2] : "",
@@ -173,7 +194,7 @@
     const access = active ? tr("unlimited") : tr("limited");
     const accessClass = active ? "unlimited" : "limited";
     const financeCards = [
-      toolCard("monthly-finance","💰",tr("finance"),tr("financeSub"),tr("free"),"free"),
+      toolCard("monthly-finance","💰",tr("finance"),tr("financeSub"),tr("trial30"),"free"),
       toolCard("receivables","📥",tr("receivables"),tr("receivablesSub"),access,accessClass),
       toolCard("quote","📄",tr("quote"),tr("quoteSub"),access,accessClass)
     ];
@@ -218,7 +239,7 @@
   }
 
   async function openToolImpl(id, skipAccess=false){
-    if(!skipAccess && ACCESS_TOOLS.includes(id) && currentSession()?.profile?.active !== true && window.EduCashProAccess?.isActive?.() !== true)return renderToolAccess(id);
+    if(!skipAccess && id !== "monthly-finance" && ACCESS_TOOLS.includes(id) && currentSession()?.profile?.active !== true && window.EduCashProAccess?.isActive?.() !== true)return renderToolAccess(id);
     if(skipAccess && id === "monthly-finance")return openFinanceControl("monthly-finance:overview");
     if(id.startsWith("monthly-finance"))return openFinanceControl(id);
     if(["receivables","quote"].includes(id))return openFinancialTool(id);
