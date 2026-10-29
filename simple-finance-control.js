@@ -25,6 +25,7 @@
     try {
       const p = options.session?.profile || {};
       const key = "educashpro:monthly-finance:" + (p.userId || p.tgId || "local");
+      if (localStorage.getItem(key + ":personal-imported") === "1") return null;
       const months = JSON.parse(localStorage.getItem(key) || "{}");
       return Object.values(months).some(m => (m?.expenses?.length || 0) > 0 || Number(m?.income || 0) > 0) ? months : null;
     } catch { return null; }
@@ -68,7 +69,7 @@
     return html;
   }
   function draw() {
-    if(!response||!root())return;
+    if(!response||!root()?.querySelector(".financeLite"))return;
     root().innerHTML=markup();
     const view=root().querySelector(".financeLite"); if(!view)return;
     view.querySelector("#eflBack").onclick=()=>options.back?.();
@@ -104,7 +105,7 @@
     }
     view.querySelector("#eflImport")?.addEventListener("click",async()=>{
       if(busy)return;busy=true;
-      try{await api("import",{months:legacy()});notice=t().imported;await load();}
+      try{const months=legacy();await api("import",{months});const p=options.session?.profile||{};const key="educashpro:monthly-finance:"+(p.userId||p.tgId||"local");localStorage.setItem(key+":personal-imported","1");notice=t().imported;await load();}
       catch{notice=t().error;drawNotice();}
       finally{busy=false;}
     });
@@ -118,10 +119,10 @@
     root().querySelector("#eflBackLoading")?.addEventListener("click",()=>options.back?.());
     try{
       const data=await api("open",{month});
-      if(stamp!==epoch)return;
+      if(stamp!==epoch || !root()?.querySelector(".financeLite"))return;
       response=data;draw();
     }catch(error){
-      if(stamp!==epoch)return;
+      if(stamp!==epoch || !root()?.querySelector(".financeLite"))return;
       root().innerHTML='<main class="financeLite"><button class="eflBack" id="eflBackError" type="button">← '+escapeHtml(t().back)+'</button><p class="eflEmpty">'+escapeHtml(t().unavailable)+'</p></main>';
       root().querySelector("#eflBackError").onclick=()=>options.back?.();
     }
