@@ -11,6 +11,7 @@ const localStorage={getItem:key=>values.get(key)||null,setItem:(key,val)=>values
 const context={window:{},document:{getElementById:()=>null},navigator:{language:"pt-BR"},localStorage,confirm:()=>true};
 const execute=(i)=>vm.runInNewContext(sources[i],context,{filename:paths[i]});
 execute(0);
+for(const locale of ["pt","en","es","ru"])vm.runInNewContext(await read("course-reading-"+locale+".js"),context);
 assert.equal(context.window.EduCashProBookQuiz.version,4);
 for(let i=1;i<=8;i++)execute(i);
 const records={};
@@ -39,6 +40,8 @@ for(const [lang,c] of Object.entries(records)){
  for(const ch of c.chapters){
   assert(ch.title.length>3&&ch.overview.length>70,"Incomplete chapter "+ch.id+" in "+lang);
   assert.equal(c.questions.filter(q=>q.chapter===ch.id).length,12);
+  assert.equal(ch.reading.length,4,"Concept, development and synthesis are required");
+  assert(ch.reading.every(p=>typeof p==="string"&&p.length>=80),"Reading paragraphs must be substantive");
  }
  for(const q of c.questions){
   assert(q.intro.length>20,"Missing pre-question study: "+lang+" "+q.id);
@@ -48,6 +51,7 @@ for(const [lang,c] of Object.entries(records)){
   assert(q.answer>=0&&q.answer<4&&Number.isInteger(q.answer));
   assert(q.options.every(o=>o.length>15),"Short option: "+lang+" "+q.id);
   assert.equal(q.optionComments.length,4);
+  assert(q.study.title.length>8&&q.study.text.length>60,"Independent concept teaching is required before the quiz");
   assert(q.optionComments.every(c=>c.length>100),"Missing alternative explanation: "+lang+" "+q.id);
   assert(q.comment.length>280,"Incomplete extended commentary: "+lang+" "+q.id);
   assert.equal(q.covers.length,1);
@@ -76,7 +80,7 @@ const academyApp=await read("app.js");
 const academyLoader=await read("resource-loader.js");
 const academyCatalog=JSON.parse(await read("courses.json"));
 const freeCourse=academyCatalog.courses.find(c=>c.id==="book-business-21");
-assert(freeCourse && freeCourse.access==="free" && freeCourse.category==="free_courses","Book course must be free in Academy");
+assert(freeCourse && freeCourse.access==="subscriber" && freeCourse.category==="network_marketing","Original book must require an active subscription");
 assert(["pt","en","es","ru"].every(lang=>freeCourse.title[lang]&&freeCourse.description[lang]),"Course metadata must support every language");
 assert(academyApp.includes('courseId === "book-business-21"')&&academyApp.includes('loadBookCourse?.(state.language)'),"Academy must launch the local course");
 assert(academyApp.includes('new Set(["free_courses", "network_marketing", "financial_education", "telegram"])'),"Free courses must be an Academy learning path");
@@ -95,4 +99,5 @@ const saved=context.window.EduCashProBookQuiz.read("book-business-21",3);
 assert.equal(saved.index,1);
 assert.equal(saved.score,1);
 console.log("Book quiz four languages: 21 chapters x 12 lessons x 4 languages; 1008 questions, all answer explanations, consistent correctness and local persistence: OK");
+
 
