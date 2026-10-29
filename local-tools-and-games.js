@@ -97,12 +97,18 @@
   async function financeApi(path, payload = {}) {
     const activeSession = currentSession();
     const token = String(activeSession?.token || "").trim();
-    if (!token) throw Error("session_expired");
-    const response = await fetch("https://educashpro-all.onrender.com" + path, {
+    if (!token || !/^\/api\/personal-finance\/[a-z-]+$/.test(path)) throw Error("session_expired");
+    const cookieSession = token.endsWith(".cookie-session");
+    const endpoint = (cookieSession ? window.location.origin : "https://educashpro-all.onrender.com") + path;
+    const response = await fetch(endpoint, {
       method: "POST",
-      headers: {"Content-Type":"application/json", "Authorization":"Bearer " + token},
+      headers: {
+        "Content-Type":"application/json",
+        "Authorization":cookieSession ? "Bearer cookie-session" : "Bearer " + token
+      },
       body: JSON.stringify(payload),
-      cache: "no-store"
+      cache: "no-store",
+      credentials: cookieSession ? "same-origin" : "omit"
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.ok === false) throw Error(data.reason || "finance_unavailable");
