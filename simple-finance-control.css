@@ -13,6 +13,10 @@
 .eflToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .eflToolbar label,.eflFields label{display:grid;gap:4px;font-size:11px;font-weight:650;color:var(--muted,#8da2b0);min-width:0}
 .eflToolbar input,.eflToolbar select,.eflFields input,.eflFields select{width:100%;min-width:0;height:38px;padding:7px 10px;border:1px solid var(--line,rgba(128,160,170,.28));border-radius:10px;background:var(--surface,#172634);color:var(--text,#e8f0f3);outline-offset:2px}
+/* iOS Safari and Telegram WebView auto-zoom focused fields below 16px.
+   Keep labels and layout compact; increase only editable control text. */
+.financeLite input,.financeLite select,.financeLite textarea{font-size:16px!important}
+
 .eflSummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 11px}
 .eflMetric{border:1px solid var(--line,rgba(128,160,170,.22));border-radius:12px;background:var(--surface,rgba(128,160,170,.08));padding:11px;display:grid;gap:4px;min-width:0}
 .eflMetric small{color:var(--muted,#8da2b0);font-size:11px}
