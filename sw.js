@@ -1,4 +1,4 @@
-const BUILD="2026.10.29.4";
+const BUILD="2026.10.31.1";
 
 self.addEventListener("install",()=>self.skipWaiting());
 
