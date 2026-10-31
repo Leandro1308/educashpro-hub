@@ -693,13 +693,58 @@
     return request;
   }
 
+  async function financeApi(path, payload = {}) {
+    if (typeof path !== "string" || !new RegExp("^/api/(monthly-finance|personal-finance)/[a-z/-]+$").test(path))
+      throw new Error("invalid_finance_api_path");
+    const webSession = window.EduCashProPlatform?.isWeb?.()
+      ? window.EduCashProPlatform.readWebSession?.()
+      : null;
+    const current = webSession || syncExternalSession() || window.__EDUCASHPRO_SESSION__ || {};
+    const token = String(current?.token || state.token || "").trim();
+    if (!token) throw new Error("SESSION");
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 18000);
+    try {
+      // An HttpOnly cookie session contains only a public placeholder token.
+      // Always use the site's first-party /api route for cookie sessions,
+      // rather than relying on a lazy cross-origin fetch interception.
+      const cookieSession = token.endsWith(".cookie-session");
+      const endpoint = cookieSession
+        ? window.location.origin + path
+        : API_BASE + path;
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": cookieSession ? "Bearer cookie-session" : `Bearer ${token}`,
+        },
+        body: JSON.stringify(cookieSession ? payload : { ...payload, token }),
+        cache: "no-store",
+        credentials: cookieSession ? "same-origin" : "omit",
+        signal: controller.signal,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok === false) {
+        const reason = String(data?.reason || (response.status === 413 ? "finance_payload_too_large" : "REQUEST"));
+        if (response.status === 401) throw new Error("SESSION");
+        throw new Error(reason);
+      }
+      return data;
+    } catch (error) {
+      if (error?.name === "AbortError") throw new Error("TIMEOUT");
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
   function updateNav() {
     bottomNav.classList.toggle("hidden",!state.profile?.userId&&!state.profile?.tgId);
-    bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === (state.view === "analysis" ? "practice" : state.view)));
+    bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === (state.view === "analysis" ? "practice" : state.view === "finance" ? "home" : state.view)));
   }
 
   const LAST_ROUTE_KEY = "educashpro:last-route:v1";
-  const RESTORABLE_VIEWS = new Set(["practice","home", "learn", "explore", "benefits", "area", "tools", "course", "analysis", "presentation"]);
+  const RESTORABLE_VIEWS = new Set(["finance","practice","home", "learn", "explore", "benefits", "area", "tools", "course", "analysis", "presentation"]);
   let currentRouteDetail = "";
   let routeScrollTimer = null;
 
@@ -764,7 +809,7 @@
   async function restoreRoute(route) {
     if(route?.view!=="presentation"&&!requireProductAccount())return false;
     if(route && (['benefits','explore','games','randomizers'].includes(route.view)||(route.view==='tools'&&route.detail&&!['link-page','page'].includes(route.detail))))return renderHome();
-    if(route?.view==='analysis')return openLiveMarkets();if(route?.view==='practice'||route?.view==='price-action')return openMarkets();
+    if(route?.view==='finance')return openPersonalFinance();if(route?.view==='analysis')return openLiveMarkets();if(route?.view==='practice'||route?.view==='price-action')return openMarkets();
     if(route?.view==='area'&&route?.detail==='group')return window.EduCashProProduct.group(productContext());
     const restoreTicket=window.EduCashProNavigation?.stamp?.();
     if (!route || !RESTORABLE_VIEWS.has(route.view)) return false;
@@ -881,7 +926,7 @@
     return false;
   }
 
-  function setView(view){if(!['home','presentation'].includes(view)&&!requireProductAccount())return;stopBookTracking();if(view==='analysis')return openLiveMarkets();if(view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
+  function setView(view){if(!['home','presentation'].includes(view)&&!requireProductAccount())return;stopBookTracking();if(view==='finance')return openPersonalFinance();if(view==='analysis')return openLiveMarkets();if(view==='practice')return openMarkets();if(view==='explore'||view==='benefits')view='home';state.view=view;rememberRoute(view);updateNav();window.scrollTo({top:0,behavior:'smooth'});if(view==='learn')return renderLearn();if(view==='tools')return renderTools();if(view==='area')return renderArea();if(view==='presentation')return renderPresentation();return state.profile?renderHome():renderPublicLanding();}
 
   function navigateFromFooter(button) {
     if (!button) return;
@@ -891,6 +936,40 @@
       Promise.resolve(setView(button.dataset.view)).catch((error) => handleError(error));
     } catch (error) {
       handleError(error);
+    }
+  }
+
+  async function openPersonalFinance(returnView="home"){
+    if(!requireProductAccount())return;
+    stopBookTracking();
+    syncExternalSession();
+    state.view="finance";
+    rememberRoute("finance");
+    updateNav();
+    const ticket=window.EduCashProNavigation?.stamp?.();
+    const current=()=>state.view==="finance"&&(!window.EduCashProNavigation||window.EduCashProNavigation.isCurrent(ticket));
+    const goBack=()=>returnView==="area"?renderArea():renderHome();
+    const c=window.EduCashProProduct.copy(state.language);
+    content.innerHTML='<main class="financeLite"><p class="eflEmpty">'+escapeHtml(c.loading||"Carregando…")+'</p></main>';
+    try{
+      if(typeof window.EduCashProResources?.loadFinance!=="function")throw Error("finance_loader_unavailable");
+      await window.EduCashProResources.loadFinance();
+      if(!current())return;
+      if(typeof window.EduCashProFinance?.render!=="function")throw Error("finance_screen_unavailable");
+      const session=syncExternalSession()||window.__EDUCASHPRO_SESSION__||{};
+      return window.EduCashProFinance.render({
+        language:state.language,
+        session:{token:session.token||state.token,profile:session.profile||state.profile},
+        active:state.profile?.active===true,
+        back:goBack,
+        subscribe:openSubscription,
+        api:financeApi
+      });
+    }catch(error){
+      if(!current())return;
+      console.warn("[EduCashPro] Controle de Gastos:",error?.message||error);
+      content.innerHTML='<main class="financeLite"><button type="button" id="financeReturnHome" class="eflBack">← '+escapeHtml(c.back)+'</button><p class="eflEmpty">'+escapeHtml(c.error)+'</p></main>';
+      content.querySelector("#financeReturnHome")?.addEventListener("click",goBack);
     }
   }
 
@@ -1953,7 +2032,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
 function productContext(){
   const profile=state.profile,language=state.language;
   const ctx={root:content,language,profile,session:{token:state.token,profile},open:openUrl,
-    entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
+    entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,tracker:()=>openPersonalFinance(state.view==="area"?"area":"home"),area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
     finance:()=>renderCourseCategory('financial_education'),business:()=>renderCourseCategory('business'),technical:()=>openCourse('analise_tecnica_completa'),
     subscription:()=>openAccountCenter('openSubscription'),network:()=>openAccountCenter('openNetwork'),settings:()=>openAccountCenter('openSettings')};
   ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>window.EduCashProLocale.open();
@@ -1962,7 +2041,7 @@ function productContext(){
   ctx.telegram=()=>{const code=window.EduCashProPlatform?.pendingReferral?.()||'';const u=new URL('https://t.me/EduCashProBot');if(code)u.searchParams.set('start','ref_'+code);openUrl(u.toString())};
   return ctx;
 }
-  window.EduCashProApp = { renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openMarkets, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
+  window.EduCashProApp = { openPersonalFinance, financeApi, renderNetworkProjection, renderPresentation, renderPublicLanding, scanMembershipQr, renderMembershipProof, renderProfilePhotoEditor, renderHome, renderLearn, renderTools, renderExplore, renderBenefits, renderArea, renderSubmissionForm, openMarkets, openSubscription, setView, setSession, clearSession, openAcademyCategory, rememberRoute, readRememberedRoute, restoreRoute, resumeAuthenticatedExperience, flushRememberedRoute };
   window.EduCashProNavigation?.configure?.(restoreRoute);
   window.addEventListener("educashpro:web-hub-ready",()=>{
     tg=window.Telegram?.WebApp||tg;
