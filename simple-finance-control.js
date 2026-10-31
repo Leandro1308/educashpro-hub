@@ -131,7 +131,7 @@
     options={...args, language:DICT[args.language]?args.language:"pt"};
     month=monthOk(args.month)?args.month:currentMonth();
     editing="";notice="";response=null;
-    window.EduCashProApp?.rememberRoute?.("tools","monthly-finance");
+    window.EduCashProApp?.rememberRoute?.("finance");
     return load();
   }
   window.EduCashProFinance={render};
