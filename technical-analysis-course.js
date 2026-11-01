@@ -205,6 +205,16 @@
     return `${chart(type,index+1,title,language)}<p>${escapeHtml(text)}</p><h4>${escapeHtml(labels.key)}</h4><ul>${points.map((p)=>`<li>${escapeHtml(p)}</li>`).join("")}</ul><div class="taExample"><strong>${escapeHtml(labels.confirm)}</strong><p>${escapeHtml(confirm)}</p></div><div class="taWarning"><strong>${escapeHtml(labels.error)}</strong><p>${escapeHtml(error)}</p></div><div class="taExample"><strong>${escapeHtml(labels.example)}</strong><p>${escapeHtml(example)}</p></div>`;
   }
 
+  // Reutilizado pelo Treinador: uma única fonte de verdade para as 37 lições.
+  // Os exemplos gráficos do treinador usam candles históricos, não as ilustrações SVG do curso.
+  function getTrainerLessons(language="pt") {
+    const lang=normalizeLanguage(language);
+    return PT.map((base,index)=>{
+      const [title,type,body,points,confirmation,commonError,example]=localizedLesson(base,index,lang);
+      return {id:index,title,type,body,points:[...points],confirmation,commonError,example};
+    });
+  }
+
   function getCourseData(language="pt") {
     const lang=normalizeLanguage(language);
     window.__EDUCASHPRO_TA_LANGUAGE=lang;
@@ -248,6 +258,6 @@
   const observer=new MutationObserver(()=>syncFloatingBroker());
   window.addEventListener("DOMContentLoaded",()=>{injectTechnicalCourseEnhancements();observer.observe(document.body,{childList:true,subtree:true});syncFloatingBroker();},{once:true});
 
-  window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE={id:COURSE_ID,getCourseData};
+  window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE={id:COURSE_ID,getCourseData,getTrainerLessons};
 })();
 
