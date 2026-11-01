@@ -44,3 +44,26 @@
 .pa-wrap button:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:370px){.pa-wrap{padding:10px}.pa-chart-top{flex-direction:column;align-items:flex-start}.pa-footactions button{flex:1}.pa-heading h3{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.pa-wrap *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Curso de Análise Técnica integrado ao Treinador, mobile-first. */
+.pa-topic-select{display:flex;flex-direction:column;gap:6px;margin:14px 0 16px;color:#b6cedc;font-size:12px;font-weight:700}
+.pa-topic-select select{width:100%;max-width:100%;min-height:44px;border:1px solid #3b596b;border-radius:10px;background:#102439;color:#f0f9ff;padding:9px;font-size:14px}
+.pa-topic-label{color:#92e5bf;font-size:13px;margin:18px 0 6px;letter-spacing:.02em}
+.pa-keypoints{padding-left:21px;margin:8px 0 16px;color:#d2e0e9;font-size:13px;line-height:1.65}
+.pa-keypoints li{margin:5px 0}
+.pa-explanation{margin:10px 0;padding:12px 13px;background:#102b37;border:1px solid #285268;border-radius:10px;font-size:13px;color:#d4e5ed}
+.pa-explanation strong{display:block;color:#8de6b4;margin-bottom:4px}
+.pa-explanation p{margin:0;line-height:1.6}
+.pa-explanation.pa-caution{background:#352a24;border-color:#80613e}
+.pa-explanation.pa-caution strong{color:#ffd18b}
+.pa-chartguide{margin:0 0 14px;display:flex;flex-direction:column;gap:5px}
+.pa-chartguide label{display:flex;align-items:center;gap:8px;color:#d8eadf;font-size:13px;font-weight:700;cursor:pointer}
+.pa-chartguide input{width:17px;height:17px;accent-color:#35d7aa;flex:none}
+.pa-chartguide small{display:block;color:#9bb7c9;font-size:11px;line-height:1.55}
+.pa-figure{margin:16px 0;padding:12px;background:#0d1e2d;border:1px solid #305163;border-radius:12px}
+.pa-figure summary{cursor:pointer;font-size:13px;font-weight:800;color:#9ae8cc}
+.pa-figure .taFigure{margin:12px 0 6px;width:100%;max-width:100%;background:#080d16;border-radius:10px;padding:6px;overflow:hidden}
+.pa-figure svg{display:block;width:100%;max-width:100%;height:auto}
+.pa-figure figcaption{font-size:12px;text-align:center;color:#d8e6f4;margin:4px 0}
+.pa-figure>p{font-size:11px;color:#a9c2d5;margin:7px 0 0}
+.pa-wrap .pa-topic-select select:focus-visible,.pa-wrap .pa-figure summary:focus-visible,.pa-wrap input:focus-visible{outline:2px solid #95ead2;outline-offset:2px}
