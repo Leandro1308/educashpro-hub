@@ -273,7 +273,7 @@
           '<div class="pa-explanation"><strong>'+escapeHtml(labels.confirm)+'</strong><p>'+escapeHtml(lesson.confirmation)+'</p></div>'+
           '<div class="pa-explanation pa-caution"><strong>'+escapeHtml(labels.error)+'</strong><p>'+escapeHtml(lesson.commonError)+'</p></div>'+
           '<div class="pa-explanation"><strong>'+escapeHtml(labels.example)+'</strong><p>'+escapeHtml(lesson.example)+'</p></div>'+
-          (lesson.figure?'<details class="pa-figure"><summary>'+escapeHtml(labels.illustration)+'</summary>'+lesson.figure+'<p>'+escapeHtml(labels.figureHelp)+'</p></details>':'')+
+          (lesson.figure?'<details class="pa-figure" open><summary>'+escapeHtml(labels.illustration)+'</summary>'+lesson.figure+'<p>'+escapeHtml(labels.figureHelp)+'</p></details>':'')+
           (lesson.type==='xau'?'<p class="pa-hint">'+escapeHtml(labels.gold)+'</p>':'')+
           (lesson.type==='multi_tf'?'<p class="pa-hint">'+escapeHtml(labels.frames)+'</p>':'')
           :'')+
@@ -297,7 +297,7 @@
         '<div class="pa-footactions"><small>' + escapeHtml(copy.costs) + '</small><button type="button" data-pa-new>' + escapeHtml(copy.newChallenge) + '</button></div>';
     }
     host.innerHTML = '<div class="pa-wrap"><header class="pa-heading"><div><h3>' + escapeHtml(copy.title) + '</h3><p>' + escapeHtml(copy.desc) + '</p></div><span class="pa-offline">OFFLINE</span></header>' +
-      tab + selectors + '<div class="pa-chart-top"><strong>' + (state.pair === "BTCUSDT" ? "Bitcoin" : "Ethereum") + ' / USDT</strong><span>' + escapeHtml(copy.price) + ': ' + fmt(price) + '</span></div>' +
+      tab + selectors + (state.mode==='learn'?'<div class="pa-learning-context">'+escapeHtml(copy.lesson)+' '+(state.lesson+1)+'/'+lessons.length+': '+escapeHtml(activeLesson().title)+'</div>':'') + '<div class="pa-chart-top"><strong>' + (state.pair === "BTCUSDT" ? "Bitcoin" : "Ethereum") + ' / USDT</strong><span>' + escapeHtml(copy.price) + ': ' + fmt(price) + '</span></div>' +
       '<canvas class="pa-chart" height="230" role="img" aria-label="' + escapeHtml(copy.chartDescription) + '"></canvas>' +
       '<p class="pa-source">'+escapeHtml(copy.historical)+'</p>'+
       (state.mode==='learn'?'<div class="pa-chartguide"><label><input type="checkbox" data-pa-overlay '+(state.showGuide?'checked':'')+' /> '+escapeHtml(labels.mark)+'</label><small>'+escapeHtml(labels.historicalNote)+'</small></div>':'')+
