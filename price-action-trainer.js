@@ -112,7 +112,7 @@
     }
   };
   const state = {
-    language:"pt",mode:"learn",pair:"BTCUSDT",period:"15m",lesson:0,answer:null,
+    language:"pt",mode:"learn",pair:"BTCUSDT",period:"15m",lesson:0,answer:null,showGuide:true,
     index:120,endIndex:144,choice:"wait",cash:START_BALANCE,qty:0,tradeCount:0,steps:0,feedback:"",sessions:0
   };
   let host = null;
@@ -134,9 +134,67 @@
   function bars() {
     return SOURCE && SOURCE.pairs ? SOURCE.pairs[state.pair + "_" + state.period] : null;
   }
+  function courseLessons() {
+    const course=window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
+    if(course && typeof course.getTrainerLessons==="function") {
+      const lessons=course.getTrainerLessons(state.language);
+      if(Array.isArray(lessons) && lessons.length) return lessons;
+    }
+    return t().lessons;
+  }
+  function activeLesson() {
+    const lessons=courseLessons();
+    state.lesson=Math.min(Math.max(state.lesson,0),lessons.length-1);
+    return lessons[state.lesson];
+  }
+  function guideText() {
+    return ({
+      pt:{choose:"Escolha o conceito",key:"O que observar",confirm:"O que confirma",error:"Erro comum",example:"Exemplo prático",
+          illustration:"Figura esquemática do curso",figureHelp:"Figura ilustrativa: não representa a amostra histórica da Binance.",
+          mark:"Mostrar marcações no gráfico",historicalNote:"Candles reais da Binance. Marcações didáticas não identificam nem confirmam automaticamente a figura.",
+          question:"Qual evidência fortalece esta leitura?",noGuarantee:"O nome da figura, sozinho, garante o resultado.",
+          gold:"Esta lição explica o ouro (XAUUSD), mas o gráfico histórico disponível é BTC/USDT ou ETH/USDT. Não são dados do ouro.",
+          frames:"O curso usa 1H, 5M e 1M; aqui os históricos disponíveis são 1H e 15m. Não confunda as escalas."},
+      en:{choose:"Choose a concept",key:"What to look for",confirm:"What confirms it",error:"Common mistake",example:"Practical example",
+          illustration:"Course schematic",figureHelp:"Illustration only: these are not the actual Binance candles.",
+          mark:"Show chart annotations",historicalNote:"Real Binance candles. Teaching guides neither detect nor confirm the complete pattern automatically.",
+          question:"Which evidence strengthens this reading?",noGuarantee:"The pattern name alone guarantees the result.",
+          gold:"This topic covers gold (XAUUSD); the available historical chart displays BTC/USDT or ETH/USDT, not gold.",
+          frames:"The course uses 1H, 5M and 1M; this trainer has historical 1H and 15m only."},
+      es:{choose:"Elige un concepto",key:"Qué observar",confirm:"Qué confirma",error:"Error común",example:"Ejemplo práctico",
+          illustration:"Esquema del curso",figureHelp:"Ilustración: no representa las velas históricas de Binance.",
+          mark:"Mostrar anotaciones",historicalNote:"Velas reales de Binance. Las marcas educativas no confirman automáticamente un patrón.",
+          question:"¿Qué evidencia fortalece esta lectura?",noGuarantee:"El nombre del patrón garantiza por sí solo el resultado.",
+          gold:"Este tema trata del oro (XAUUSD); el gráfico disponible es BTC/USDT o ETH/USDT, no oro.",
+          frames:"El curso usa 1H, 5M y 1M; aquí solo están disponibles 1H y 15m."},
+      ru:{choose:"Выберите тему",key:"На что смотреть",confirm:"Подтверждение",error:"Типичная ошибка",example:"Пример",
+          illustration:"Схема из курса",figureHelp:"Это схема, а не реальные свечи Binance.",
+          mark:"Показать разметку",historicalNote:"Реальные свечи Binance. Учебная разметка сама по себе не подтверждает фигуру.",
+          question:"Что подтверждает такую интерпретацию?",noGuarantee:"Одно название фигуры гарантирует результат.",
+          gold:"Тема об XAUUSD, но доступный график показывает BTC/USDT или ETH/USDT, не золото.",
+          frames:"В курсе используются 1H, 5M и 1M; здесь доступны лишь 1H и 15m."}
+    })[state.language] || guideTextForPt();
+  }
+  function guideTextForPt() {
+    return {choose:"Escolha o conceito",key:"O que observar",confirm:"O que confirma",error:"Erro comum",
+      example:"Exemplo prático",illustration:"Figura esquemática do curso",figureHelp:"Figura ilustrativa.",
+      mark:"Mostrar marcações",historicalNote:"Candles históricos reais.",question:"O que confirma?",noGuarantee:"O nome da figura garante o resultado.",
+      gold:"Este gráfico mostra criptomoedas, não ouro.",frames:"Aqui os períodos são 1H e 15m."};
+  }
   function completed() {
-    const ids = readStore().completed;
-    return Array.isArray(ids) ? ids.filter(x => Number.isInteger(x) && x >= 0 && x < t().lessons.length) : [];
+    const lessons=courseLessons();
+    if(lessons.length===t().lessons.length) {
+      const legacy=readStore().completed;
+      return Array.isArray(legacy)?legacy.filter(x=>Number.isInteger(x)&&x>=0&&x<lessons.length):[];
+    }
+    const saved=readStore();
+    if(!Array.isArray(saved.completedV2) && Array.isArray(saved.completed)){
+      const mapping=[1,2,4,7,35,34];
+      const migrated=[...new Set(saved.completed.filter(x=>Number.isInteger(x)&&x>=0&&x<mapping.length).map(x=>mapping[x]))];
+      store({completedV2:migrated});
+      return migrated;
+    }
+    return Array.isArray(saved.completedV2)?saved.completedV2.filter(x=>Number.isInteger(x)&&x>=0&&x<lessons.length):[];
   }
   function equity() {
     const series = bars();
@@ -155,7 +213,32 @@
     store({sessions: state.sessions});
   }
   function chartIndex() {
-    return state.mode === "learn" ? Math.min(440, 140 + state.lesson * 47) : state.index;
+    if(state.mode!=="learn") return state.index;
+    const series=bars();
+    if(!series || series.length<90) return Math.min(80,(series||[]).length-1);
+    const lesson=activeLesson();
+    const type=lesson?.type || "";
+    // Janela estável, escolhida a partir dos candles já registrados. Não se fabricam preços.
+    const available=series.length-88;
+    const seed=state.lesson*37+(state.pair==="ETHUSDT"?23:0)+(state.period==="1h"?11:0);
+    const target=88+(seed%available);
+    if(!["uptrend","downtrend","bull_channel","bear_channel","breakout","fakeout"].includes(type)) return target;
+    let best=target, bestScore=-Infinity;
+    for(let end=88;end<series.length;end+=7){
+      const start=end-34, first=series[start],last=series[end], movement=(last[4]-first[4]);
+      const avgRange=series.slice(start,end+1).reduce((sum,c)=>sum+(c[2]-c[3]),0)/35||1;
+      let score=type==="uptrend"||type==="bull_channel"?movement/avgRange:
+                type==="downtrend"||type==="bear_channel"?-movement/avgRange:0;
+      if(type==="breakout"||type==="fakeout"){
+        const oldMax=Math.max(...series.slice(end-26,end-2).map(c=>c[2]));
+        const oldMin=Math.min(...series.slice(end-26,end-2).map(c=>c[3]));
+        score=type==="breakout" ? Math.max((last[4]-oldMax)/avgRange,(oldMin-last[4])/avgRange):
+          Math.max(last[2]>oldMax?(oldMax-last[4])/avgRange:-9,last[3]<oldMin?(last[4]-oldMin)/avgRange:-9);
+      }
+      score-=Math.abs(end-target)*0.002;
+      if(score>bestScore){bestScore=score;best=end;}
+    }
+    return best;
   }
   function view() {
     if (!host) return;
@@ -164,6 +247,7 @@
       host.textContent = "Historical data unavailable / Dados históricos indisponíveis.";
       return;
     }
+    const lessons=courseLessons(), labels=guideText();
     const done = state.steps >= 24 || state.index >= state.endIndex;
     const tab = '<nav class="pa-tabs" aria-label="' + escapeHtml(copy.title) + '">' +
       ['learn','train'].map(name => '<button type="button" class="' + (state.mode === name ? "active" : "") + '" data-pa-mode="' + name + '" aria-pressed="' + (state.mode === name) + '">' + escapeHtml(copy[name]) + '</button>').join("") + '</nav>';
@@ -174,14 +258,30 @@
     const price = series[i][4];
     let detail = "";
     if (state.mode === "learn") {
-      const lesson = copy.lessons[state.lesson], doneLessons = completed(), checked = state.answer !== null;
-      detail = '<div class="pa-lessonhead"><span>' + escapeHtml(copy.lesson) + ' ' + (state.lesson + 1) + ' ' + escapeHtml(copy.of) + ' ' + copy.lessons.length + '</span><span>' + doneLessons.length + '/' + copy.lessons.length + ' ' + escapeHtml(copy.completed) + '</span></div>' +
-        '<h4>' + escapeHtml(lesson.title) + '</h4><p>' + escapeHtml(lesson.body) + '</p>' +
-        '<p class="pa-hint">' + escapeHtml(copy.lessonHint) + '</p>' +
-        '<div class="pa-question"><strong>' + escapeHtml(copy.question) + '</strong><p>' + escapeHtml(lesson.question) + '</p><div class="pa-answers">' +
-        lesson.answers.map((answer, index) => '<button type="button" data-pa-answer="' + index + '" class="' + (state.answer === index ? "active" : "") + '">' + escapeHtml(answer) + '</button>').join("") +
-        '</div>' + (checked ? '<div class="pa-feedback" role="status"><strong>' + escapeHtml(state.answer === lesson.correct ? copy.correct : copy.incorrect) + '</strong> ' + escapeHtml(lesson.why) + '</div>' : "") +
-        '</div><div class="pa-footactions"><button data-pa-prev type="button" ' + (state.lesson === 0 ? "disabled" : "") + '>' + escapeHtml(copy.previous) + '</button><button type="button" data-pa-next ' + (state.lesson === copy.lessons.length - 1 ? "disabled" : "") + '>' + escapeHtml(copy.next) + '</button></div>';
+      const lesson=activeLesson(), doneLessons=completed(), checked=state.answer!==null;
+      const extended=Array.isArray(lesson.points);
+      const question=extended?labels.question:lesson.question;
+      const answers=extended?[lesson.confirmation,lesson.commonError,labels.noGuarantee]:lesson.answers;
+      const correct=extended?0:lesson.correct;
+      detail='<div class="pa-lessonhead"><span>'+escapeHtml(copy.lesson)+' '+(state.lesson+1)+' '+escapeHtml(copy.of)+' '+lessons.length+
+        '</span><span>'+doneLessons.length+'/'+lessons.length+' '+escapeHtml(copy.completed)+'</span></div>'+
+        '<label class="pa-topic-select">'+escapeHtml(labels.choose)+'<select data-pa-lesson>'+
+        lessons.map((item,index)=>'<option value="'+index+'"'+(index===state.lesson?' selected':'')+'>'+escapeHtml((index+1)+'. '+item.title)+'</option>').join('')+
+        '</select></label>'+
+        '<h4>'+escapeHtml(lesson.title)+'</h4><p>'+escapeHtml(lesson.body)+'</p>'+
+        (extended?'<h5 class="pa-topic-label">'+escapeHtml(labels.key)+'</h5><ul class="pa-keypoints">'+lesson.points.map(point=>'<li>'+escapeHtml(point)+'</li>').join('')+'</ul>'+
+          '<div class="pa-explanation"><strong>'+escapeHtml(labels.confirm)+'</strong><p>'+escapeHtml(lesson.confirmation)+'</p></div>'+
+          '<div class="pa-explanation pa-caution"><strong>'+escapeHtml(labels.error)+'</strong><p>'+escapeHtml(lesson.commonError)+'</p></div>'+
+          '<div class="pa-explanation"><strong>'+escapeHtml(labels.example)+'</strong><p>'+escapeHtml(lesson.example)+'</p></div>'+
+          (lesson.figure?'<details class="pa-figure"><summary>'+escapeHtml(labels.illustration)+'</summary>'+lesson.figure+'<p>'+escapeHtml(labels.figureHelp)+'</p></details>':'')+
+          (lesson.type==='xau'?'<p class="pa-hint">'+escapeHtml(labels.gold)+'</p>':'')+
+          (lesson.type==='multi_tf'?'<p class="pa-hint">'+escapeHtml(labels.frames)+'</p>':'')
+          :'')+
+        '<p class="pa-hint">'+escapeHtml(copy.lessonHint)+'</p>'+
+        '<div class="pa-question"><strong>'+escapeHtml(copy.question)+'</strong><p>'+escapeHtml(question)+'</p><div class="pa-answers">'+
+        answers.map((answer,index)=>'<button type="button" data-pa-answer="'+index+'" class="'+(state.answer===index?'active':'')+'">'+escapeHtml(answer)+'</button>').join('')+
+        '</div>'+(checked?'<div class="pa-feedback" role="status"><strong>'+escapeHtml(state.answer===correct?copy.correct:copy.incorrect)+'</strong> '+escapeHtml(extended?lesson.confirmation:lesson.why)+'</div>':'')+
+        '</div><div class="pa-footactions"><button data-pa-prev type="button" '+(state.lesson===0?'disabled':'')+'>'+escapeHtml(copy.previous)+'</button><button type="button" data-pa-next '+(state.lesson===lessons.length-1?'disabled':'')+'>'+escapeHtml(copy.next)+'</button></div>';
     } else {
       const qty = state.qty, change = equity() - START_BALANCE;
       detail = '<div class="pa-metrics"><div><span>' + escapeHtml(copy.capital) + '</span><strong class="' + (change < 0 ? "negative" : "positive") + '">' + fmt(equity()) + ' USDT</strong></div>' +
@@ -199,7 +299,8 @@
     host.innerHTML = '<div class="pa-wrap"><header class="pa-heading"><div><h3>' + escapeHtml(copy.title) + '</h3><p>' + escapeHtml(copy.desc) + '</p></div><span class="pa-offline">OFFLINE</span></header>' +
       tab + selectors + '<div class="pa-chart-top"><strong>' + (state.pair === "BTCUSDT" ? "Bitcoin" : "Ethereum") + ' / USDT</strong><span>' + escapeHtml(copy.price) + ': ' + fmt(price) + '</span></div>' +
       '<canvas class="pa-chart" height="230" role="img" aria-label="' + escapeHtml(copy.chartDescription) + '"></canvas>' +
-      '<p class="pa-source">' + escapeHtml(copy.historical) + '</p>' +
+      '<p class="pa-source">'+escapeHtml(copy.historical)+'</p>'+
+      (state.mode==='learn'?'<div class="pa-chartguide"><label><input type="checkbox" data-pa-overlay '+(state.showGuide?'checked':'')+' /> '+escapeHtml(labels.mark)+'</label><small>'+escapeHtml(labels.historicalNote)+'</small></div>':'')+
       '<section class="pa-detail">' + detail + '</section><footer class="pa-legal">' + escapeHtml(copy.provider) + ' ' + escapeHtml(copy.resetWarning) + '</footer></div>';
     draw();
     requestAnimationFrame(draw);
@@ -234,11 +335,72 @@
     const last=visible[visible.length-1], lastY=y(last[4]);ctx.strokeStyle="#6ba9ff";ctx.setLineDash([4,5]);ctx.beginPath();ctx.moveTo(10,lastY);ctx.lineTo(w-52,lastY);ctx.stroke();ctx.setLineDash([]);
     const label = new Date(last[0]).toLocaleDateString(LOCALES[state.language],{day:"2-digit",month:"2-digit",year:"numeric"});
     ctx.fillStyle="#a9c0d0";ctx.font="10px system-ui, sans-serif";ctx.fillText(label+" UTC",12,h-9);
-    if (state.mode==="learn" && state.lesson===2) {
-      const older=visible.slice(0,-2), sup=Math.min(...older.map(x=>x[3])), res=Math.max(...older.map(x=>x[2]));
-      [[sup,"#35d7aa"],[res,"#edba70"]].forEach(([p,color])=>{ctx.strokeStyle=color;ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(10,y(p));ctx.lineTo(w-52,y(p));ctx.stroke();ctx.setLineDash([]);});
+    if(state.mode==="learn" && state.showGuide) drawConceptGuide(ctx,visible,w,h,y,bw);
+  }
+  // Marcação sobre candles históricos verdadeiros. O esquema SVG, ao lado do texto,
+  // ensina a geometria ideal; aqui só se destacam preços e pivôs observados.
+  function drawConceptGuide(ctx,visible,w,h,y,bw) {
+    const lesson=activeLesson(), type=lesson?.type || "";
+    const left=10,right=w-60;
+    const x=i=>left+(i+0.5)*bw;
+    const upper=Math.max(...visible.slice(0,-2).map(c=>c[2]));
+    const lower=Math.min(...visible.slice(0,-2).map(c=>c[3]));
+    const mid=visible[visible.length-1][4];
+    const captions=state.language==="pt"?["RES.","SUP."]:state.language==="es"?["RES.","SOP."]:state.language==="ru"?["СОПР.","ПОДД."]:["RES.","SUP."];
+    function line(price,color,label){
+      const yy=y(price);
+      ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+      ctx.beginPath();ctx.moveTo(left,yy);ctx.lineTo(right,yy);ctx.stroke();ctx.setLineDash([]);
+      ctx.font="bold 10px system-ui,sans-serif";
+      ctx.fillText(label,right-35,Math.max(11,yy-5));
+    }
+    function segment(a,b,key,color){
+      if(!a||!b)return;
+      ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(x(a.i),y(a.price));ctx.lineTo(x(b.i),y(b.price));ctx.stroke();
+      ctx.fillStyle=color;
+      for(const p of [a,b]){ctx.beginPath();ctx.arc(x(p.i),y(p.price),3.4,0,Math.PI*2);ctx.fill();}
+    }
+    const peaks=[],valleys=[];
+    for(let i=2;i<visible.length-2;i++){
+      const c=visible[i],neighbors=visible.slice(i-2,i+3);
+      if(neighbors.every(row=>c[2]>=row[2]))peaks.push({i,price:c[2]});
+      if(neighbors.every(row=>c[3]<=row[3]))valleys.push({i,price:c[3]});
+    }
+    const horizontal=["context","support","resistance","range","breakout","fakeout","pullback","bull_flag","bear_flag",
+      "asc_triangle","desc_triangle","sym_triangle","double_top","double_bottom","triple_top","triple_bottom",
+      "head_shoulders","inv_head_shoulders","rounded_top","rounded_bottom","measured_move","xau"].includes(type);
+    if(horizontal){
+      if(type!=="support")line(upper,"#e9b46c",captions[0]);
+      if(type!=="resistance")line(lower,"#35d7aa",captions[1]);
+    }
+    const structure=["uptrend","downtrend","bull_channel","bear_channel","bull_flag","bear_flag","asc_triangle",
+      "desc_triangle","sym_triangle","rising_wedge","falling_wedge","double_top","double_bottom","triple_top",
+      "triple_bottom","head_shoulders","inv_head_shoulders","rounded_top","rounded_bottom","h2","l2","pullback"].includes(type);
+    if(structure){
+      const p=peaks.slice(-3),v=valleys.slice(-3);
+      if(p.length>=2)segment(p[0],p[p.length-1],"high","#f5c167");
+      if(v.length>=2)segment(v[0],v[v.length-1],"low","#58ddba");
+      if(["h2","l2","double_top","double_bottom","triple_top","triple_bottom","head_shoulders","inv_head_shoulders"].includes(type)){
+        const points=["h2","double_bottom","triple_bottom","inv_head_shoulders"].includes(type)?v:p;
+        ctx.fillStyle="#f5c167";ctx.font="bold 11px system-ui,sans-serif";
+        points.forEach((point,i)=>ctx.fillText(String(i+1),x(point.i)+3,Math.max(15,y(point.price)-5)));
+      }
+    }
+    if(type==="candle" || type==="climax"){
+      let index=visible.length-1;
+      if(type==="climax"){let max=-1;visible.forEach((c,i)=>{const body=Math.abs(c[4]-c[1]);if(body>max){max=body;index=i;}});}
+      const bar=visible[index];
+      ctx.strokeStyle="#ffd666";ctx.lineWidth=2;
+      ctx.strokeRect(x(index)-Math.max(5,bw*.52),y(bar[2])-5,Math.max(10,bw*1.05),y(bar[3])-y(bar[2])+10);
+    }
+    if(["risk","risk_reward","checklist","demo"].includes(type)){
+      const dist=Math.max((upper-lower)*.14,mid*.001);
+      line(mid+dist,"#35d7aa",state.language==="pt"?"ALVO*":"TARGET*");
+      line(mid-dist,"#ed7481","STOP*");
     }
   }
+
   function nextCandle() {
     const copy=t(), series=bars();
     if (!series || state.index>=state.endIndex || state.steps>=24) return;
@@ -266,8 +428,10 @@
     if(btn.dataset.paMode){state.mode=btn.dataset.paMode;state.answer=null;view();return;}
     if(btn.hasAttribute("data-pa-answer")){
       state.answer=Number(btn.dataset.paAnswer);
-      if(state.answer===t().lessons[state.lesson].correct){
-        const ids=new Set(completed()); ids.add(state.lesson);store({completed:[...ids]});
+      const extended=Array.isArray(activeLesson().points);
+      if(state.answer===(extended?0:activeLesson().correct)){
+        const ids=new Set(completed());ids.add(state.lesson);
+        store(extended?{completedV2:[...ids]}:{completed:[...ids]});
       }
       view();return;
     }
@@ -278,6 +442,8 @@
     if(btn.hasAttribute("data-pa-new")){newChallenge();view();}
   }
   function onChange(event) {
+    if(event.target.matches("[data-pa-lesson]")){state.lesson=Math.min(Math.max(Number(event.target.value)||0,0),courseLessons().length-1);state.answer=null;view();return;}
+    if(event.target.matches("[data-pa-overlay]")){state.showGuide=event.target.checked;view();return;}
     if(event.target.matches("[data-pa-pair]")){state.pair=PAIRS.includes(event.target.value)?event.target.value:"BTCUSDT";newChallenge();view();}
     if(event.target.matches("[data-pa-period]")){state.period=PERIODS.includes(event.target.value)?event.target.value:"15m";newChallenge();view();}
   }
