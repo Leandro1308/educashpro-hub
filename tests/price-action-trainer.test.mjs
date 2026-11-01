@@ -69,3 +69,37 @@ for(const lang of ["en","es","ru"]){
   api.render({target:host,language:lang});
   assert(host.innerHTML.includes(lang==="en"?"Virtual equity":lang==="es"?"Patrimonio virtual":"Виртуальный капитал"),"Missing localized simulator: "+lang);
 }
+
+
+// Integration: the historical trainer inherits the same 37 lessons as the Academy.
+const courseSource=await readFile(path.join(root,"technical-analysis-course.js"),"utf8");
+context.MutationObserver=class {observe(){} disconnect(){}};
+runInNewContext(courseSource,context,{filename:"technical-analysis-course.js"});
+const course=window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE;
+assert.equal(typeof course.getTrainerLessons,"function");
+for(const lang of ["pt","en","es","ru"]){
+  const lessons=course.getTrainerLessons(lang);
+  assert.equal(lessons.length,37,"Full Academy content must be available: "+lang);
+  assert(lessons.every(lesson=>lesson.title&&lesson.body&&lesson.confirmation&&lesson.commonError&&lesson.example&&lesson.figure.includes("<svg")),
+    "Every course topic needs explanation, confirmation, mistake, example and visual figure");
+}
+press({paMode:"learn"},"none");
+api.render({target:host,language:"pt"});
+assert(host.innerHTML.includes("37"),"Lesson total must come from Academy");
+assert(host.innerHTML.includes("O que a análise técnica realmente faz"),"Trainer must load original first concept");
+assert(host.innerHTML.includes("Candles reais da Binance"),"Historical sample must be identified");
+assert(host.innerHTML.includes("data-pa-overlay"),"Annotations must be controllable");
+assert(host.innerHTML.includes("Figura esquemática do curso"),"Course diagram must be accessible");
+host.handlers.change({target:{value:"32",matches(query){return query==="[data-pa-lesson]";}}});
+assert(host.innerHTML.includes("XAUUSD"),"The gold lesson must be available");
+assert(host.innerHTML.includes("Não são dados do ouro"),"Crypto candles must never be misrepresented as gold data");
+host.handlers.change({target:{value:"1",matches(query){return query==="[data-pa-lesson]";}}});
+assert(host.innerHTML.includes("Anatomia do candle"),"Lesson selector must navigate");
+press({paAnswer:"0"},"data-pa-answer");
+assert(host.innerHTML.includes("Muito bem!"),"Academy-based quiz should accept a correct response");
+assert(JSON.parse(store.get("educashpro:price-action:v1")).completedV2.includes(1),"Full-course progress must be persisted separately");
+host.handlers.change({target:{checked:false,matches(query){return query==="[data-pa-overlay]";}}});
+assert(!host.innerHTML.includes("data-pa-overlay checked"),"Overlay checkbox must be toggleable");
+press({paMode:"train"},"none");
+assert(host.innerHTML.includes("Patrimônio virtual"),"Spot practice remains independent after integration");
+console.log("37 Academy concepts, historical data, schematic figures, progress, four locales and spot practice OK");
