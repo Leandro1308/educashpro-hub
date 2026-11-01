@@ -211,7 +211,7 @@
     const lang=normalizeLanguage(language);
     return PT.map((base,index)=>{
       const [title,type,body,points,confirmation,commonError,example]=localizedLesson(base,index,lang);
-      return {id:index,title,type,body,points:[...points],confirmation,commonError,example};
+      return {id:index,title,type,body,points:[...points],confirmation,commonError,example,figure:chart(type,index+1,title,lang)};
     });
   }
 
