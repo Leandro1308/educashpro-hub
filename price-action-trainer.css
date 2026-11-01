@@ -67,3 +67,6 @@
 .pa-figure figcaption{font-size:12px;text-align:center;color:#d8e6f4;margin:4px 0}
 .pa-figure>p{font-size:11px;color:#a9c2d5;margin:7px 0 0}
 .pa-wrap .pa-topic-select select:focus-visible,.pa-wrap .pa-figure summary:focus-visible,.pa-wrap input:focus-visible{outline:2px solid #95ead2;outline-offset:2px}
+
+.pa-learning-context{margin:0 0 9px;padding:9px 11px;border-left:3px solid #35d7aa;border-radius:6px;background:#122e35;font-size:13px;line-height:1.45;color:#d9fff2;font-weight:700}
+.pa-selectors select,.pa-topic-select select{font-size:16px}
