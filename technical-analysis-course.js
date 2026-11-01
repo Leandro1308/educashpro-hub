@@ -207,9 +207,11 @@
 
   // Reutilizado pelo Treinador: uma única fonte de verdade para as 37 lições.
   // Os exemplos gráficos do treinador usam candles históricos, não as ilustrações SVG do curso.
+  const TRAINER_LESSON_CACHE=Object.create(null);
   function getTrainerLessons(language="pt") {
     const lang=normalizeLanguage(language);
-    return PT.map((base,index)=>{
+    if(TRAINER_LESSON_CACHE[lang]) return TRAINER_LESSON_CACHE[lang];
+    return TRAINER_LESSON_CACHE[lang]=PT.map((base,index)=>{
       const [title,type,body,points,confirmation,commonError,example]=localizedLesson(base,index,lang);
       return {id:index,title,type,body,points:[...points],confirmation,commonError,example,figure:chart(type,index+1,title,lang)};
     });
