@@ -29,6 +29,11 @@ assert(!account.includes('sendTransaction('));
 assert(links.includes('page.affiliateUrl || page.officialUrl')&&links.includes('link.affiliateUrl || link.officialUrl'));
 assert(links.includes('const limit = 4;')&&links.includes('page.links.slice(0, 4)'));
 assert(!links.includes('id="lcCampaigns"'));
+assert(links.includes('function renderQrGenerator(options = {})') && links.includes('function safeQrUrl(value)'));
+assert(links.includes('id="qrPublished"') && links.includes('id="qrDownload"'));
+assert(app.includes('openQrTool(backAction = renderHome)') && app.includes('route.detail === "qr"'));
+assert(shell.includes("card('qr','▦',c.qr,c.qrSub)") && shell.includes("row('qr',c.qr)"));
+for (const lang of ['pt','en','es','ru']) assert(links.includes(lang + ': { qrTitle:'), 'QR language: '+lang);
 assert(shell.includes('loadPriceAction()')&&!shell.includes('loadMarkets()'));
 const ctx={window:{},navigator:{language:'pt'},document:{documentElement:{lang:'pt'}}};vm.runInNewContext(shell,ctx);
 for(const lang of ['pt','en','es','ru']){const c=ctx.window.EduCashProProduct.copy(lang);for(const key of ['learn','practice','links','payment','subscription','network','profile','group','channel'])assert(c[key],lang+'/'+key);assert(!/smart contract|contrato inteligente|блокчейн|blockchain/i.test(Object.values(c).join(' ')));}
