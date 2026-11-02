@@ -258,6 +258,59 @@
     modal.classList.remove("hidden");
   }
 
+
+  function inlineQrMarkup() {
+    return '<section class="toolCard linkQrInline" id="pageQrTool">' +
+      '<h2>▦ ' + esc(text("qrTitle")) + '</h2><p>' + esc(text("qrLead")) + '</p>' +
+      field(text("qrInput"), "pageQrInput", "", 'type="url" inputmode="url" autocapitalize="off" spellcheck="false" maxlength="1200" placeholder="https://"') +
+      '<button type="button" id="pageQrGenerate" class="primaryButton">' + esc(text("qrCreate")) + '</button>' +
+      '<div id="pageQrOutput" class="linkQrResult hidden" aria-live="polite">' +
+      '<div id="pageQrCanvas" class="linkQrPreview" role="img" aria-label="QR Code"></div>' +
+      '<p id="pageQrLink" class="publishedUrl"></p><div class="cardActions">' +
+      '<button id="pageQrDownload" type="button" class="primaryButton">⬇ ' + esc(text("qrDownload")) + '</button>' +
+      '<button id="pageQrCopy" type="button" class="secondaryButton">' + esc(text("qrCopy")) + '</button>' +
+      '</div></div></section>';
+  }
+
+  function bindInlineQr() {
+    const input = document.getElementById("pageQrInput");
+    const button = document.getElementById("pageQrGenerate");
+    const output = document.getElementById("pageQrOutput");
+    const host = document.getElementById("pageQrCanvas");
+    if (!input || !button || !output || !host) return;
+    let generatedUrl = "";
+    const generate = async () => {
+      const url = safeQrUrl(input.value);
+      if (!url) { output.classList.add("hidden"); return toast(text("qrInvalid")); }
+      button.disabled = true;
+      output.classList.add("hidden");
+      try {
+        await window.EduCashProResources?.loadQr?.();
+        if (!window.QRCode) throw new Error("QR_UNAVAILABLE");
+        if (!host.isConnected) return;
+        host.replaceChildren();
+        new window.QRCode(host, { text: url, width: 280, height: 280, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+        generatedUrl = url;
+        document.getElementById("pageQrLink").textContent = url;
+        output.classList.remove("hidden");
+      } catch {
+        if (output.isConnected) { output.classList.add("hidden"); toast(text("qrError")); }
+      } finally { if (button.isConnected) button.disabled = false; }
+    };
+    button.onclick = generate;
+    input.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); void generate(); } });
+    document.getElementById("pageQrCopy").onclick = () => { if (generatedUrl) copyText(generatedUrl); };
+    document.getElementById("pageQrDownload").onclick = () => {
+      try {
+        if (!generatedUrl) return;
+        const link = document.createElement("a");
+        link.href = qrPngCanvas(host).toDataURL("image/png");
+        link.download = "educashpro-qrcode.png";
+        document.body.appendChild(link); link.click(); link.remove();
+      } catch { toast(text("qrError")); }
+    };
+  }
+
   async function renderPageEditor(options = {}) {
     returnTo = typeof options?.back === "function" ? options.back : null;
     content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><div class="empty">${esc(text("loading"))}</div>`;
@@ -275,8 +328,9 @@
     const visibleLinks = storedLinks.slice(0, limit);
     while (visibleLinks.length < limit) visibleLinks.push({ title: "", url: "" });
     const savedUrl = page.slug ? publicUrl("page", page.slug) : "";
-    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(window.EduCashProProduct.copy(language()).publishedLimit)}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section><article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug ? pageSlug(page.slug,page.name) : "", 'maxlength="160" autocomplete="off" spellcheck="false" placeholder="leandro"')}<p class="notice">${esc(lc("pageAddressHint"))}</p><p id="lcAddressPreview" class="publishedUrl"></p>${active()?`<label>${esc(lc("theme"))}<select id="lcTheme">${["midnight","light","forest"].map(x=>`<option value="${x}" ${page.appearance?.theme===x?"selected":""}>${esc(lc(x))}</option>`).join("")}</select></label>`:""}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${active()?`<label>${esc(lc("featured"))}<select id="lcFeatured"><option value="-1">${esc(lc("none"))}</option>${visibleLinks.map((l,i)=>`<option value="${i}" ${Number(page.appearance?.featured)===i?"selected":""}>${i+1}. ${esc(l.title||text("linkTitle"))}</option>`).join("")}</select></label>`:""}<h3>${esc(lc("preview"))}</h3><div id="lcPreview" class="lcPreview"></div>${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
+    content().innerHTML = `<button id="linkBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(window.EduCashProProduct.copy(language()).publishedLimit)}</span><h1>🔗 ${esc(text("pageTitle"))}</h1><p>${esc(text("pageLead"))}</p></section>${inlineQrMarkup()}<article class="toolCard linkEditor">${imagePicker(text("profilePhoto"), "profile", page.profileImage)}${field(text("name"), "linkName", page.name || session?.profile?.firstName || "", 'maxlength="70"')}${field(text("bio"), "linkBio", page.bio || "", 'maxlength="180"')}${field(text("slug"), "linkSlug", page.slug ? pageSlug(page.slug,page.name) : "", 'maxlength="160" autocomplete="off" spellcheck="false" placeholder="leandro"')}<p class="notice">${esc(lc("pageAddressHint"))}</p><p id="lcAddressPreview" class="publishedUrl"></p>${active()?`<label>${esc(lc("theme"))}<select id="lcTheme">${["midnight","light","forest"].map(x=>`<option value="${x}" ${page.appearance?.theme===x?"selected":""}>${esc(lc(x))}</option>`).join("")}</select></label>`:""}<div id="linkRows" class="linkRows">${visibleLinks.map(linkRow).join("")}</div><button id="addLinkRow" class="secondaryButton linkAdd" type="button">＋ ${esc(text("add"))}</button>${active()?`<label>${esc(lc("featured"))}<select id="lcFeatured"><option value="-1">${esc(lc("none"))}</option>${visibleLinks.map((l,i)=>`<option value="${i}" ${Number(page.appearance?.featured)===i?"selected":""}>${i+1}. ${esc(l.title||text("linkTitle"))}</option>`).join("")}</select></label>`:""}<h3>${esc(lc("preview"))}</h3><div id="lcPreview" class="lcPreview"></div>${responsibility()}<button id="saveLinkPage" class="wideButton" type="button">${esc(text("save"))}</button><div id="publishedLink" class="${savedUrl ? "publishedLink" : "hidden"}">${savedUrl ? publishedMarkup(savedUrl) : ""}</div></article>`;
     document.getElementById("linkBack").onclick = backToOrigin;
+    bindInlineQr();
     document.getElementById("addLinkRow").onclick = () => { const rows = document.querySelectorAll(".linkRow"); if (rows.length >= limit) return toast(window.EduCashProProduct.copy(language()).publishedLimit); document.getElementById("linkRows").insertAdjacentHTML("beforeend", linkRow({})); bindRowButtons(); document.getElementById("linkRows").dispatchEvent(new Event("input",{bubbles:true})); };
     const addressInput=document.getElementById("linkSlug");
     const addressPreview=()=>{const slug=pageSlug(addressInput.value,document.getElementById("linkName").value);document.getElementById("lcAddressPreview").textContent=slug ? `go.educashpro.vip/p/${slug}` : "";};

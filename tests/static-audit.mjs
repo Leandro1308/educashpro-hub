@@ -4,11 +4,16 @@ import {execFileSync} from 'node:child_process';
 import vm from 'node:vm';
 const read=name=>fs.readFileSync(name,'utf8');
 for(const name of fs.readdirSync('.').filter(x=>x.endsWith('.js'))){execFileSync(process.execPath,['--check',name]);assert(!read(name).includes('searchParams.get("api")'),name+' must not accept an arbitrary API origin');}
-const index=read('index.html'),app=read('app.js'),shell=read('product-shell.js'),loader=read('resource-loader.js'),idle=read('idle-features-v11.js'),links=read('link-tools.js'),account=read('account-center.js'),version=JSON.parse(read('version.json')).build;
+const index=read('index.html'),app=read('app.js'),shell=read('product-shell.js'),loader=read('resource-loader-v20261028-product.js'),idle=read('idle-features-v11.js'),links=read('link-tools.js'),account=read('account-center.js'),version=JSON.parse(read('version.json')).build;
 const asset=version.split('.').slice(0,3).join('')+'.'+version.split('.')[3];
 assert(app.includes('APP_RUNTIME_BUILD = "'+version+'"'));
 assert(index.includes('__EDUCASHPRO_PAGE_BUILD__="'+version+'"'));
 assert(loader.includes('const VERSION="'+asset+'"'));
+assert.equal(read('resource-loader.js'), loader, 'Both resource loader paths must remain synchronized');
+assert(index.includes('src="./resource-loader-v20261028-product.js?v='+asset+'"'));
+assert(links.includes('${inlineQrMarkup()}') && links.includes('function bindInlineQr()') && links.includes('bindInlineQr();'));
+assert(links.includes('id="pageQrGenerate"') && links.includes('id="pageQrDownload"'));
+
 assert(read('sw.js').includes('BUILD="'+version+'"'));
 for(const match of index.matchAll(/\.\/[^"'?]+\.(?:js|css|webmanifest)\?v=([^"'&<>\s]+)/g))assert.equal(match[1],asset);
 for(const view of ['home','learn','practice','tools','area'])assert(index.includes('data-view="'+view+'"'),view);
