@@ -12,3 +12,11 @@
 .linkQrResult .publishedUrl{display:block;overflow-wrap:anywhere;word-break:break-word;margin:16px 0}
 .linkQrResult .cardActions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 .linkQrResult .cardActions button{min-width:140px;flex:1 1 160px}
+
+/* Acesso permanente ao QR Code na própria página de links. */
+.linkQrInline{margin:16px auto;max-width:760px}
+.linkQrInline h2{margin:0 0 8px;font-size:clamp(18px,4vw,24px)}
+.linkQrInline p{margin:0 0 14px;color:#abc0d0;line-height:1.5}
+.linkQrInline .field input{box-sizing:border-box;width:100%;max-width:100%;min-width:0;font-size:16px}
+.linkQrInline #pageQrGenerate{width:100%;min-height:46px;margin-top:12px}
+.linkQrInline .linkQrResult{padding-top:20px;border-top:1px solid #25415a;margin-top:20px}
