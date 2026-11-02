@@ -62,6 +62,15 @@
   Object.assign(COPY.es,{profilePhoto:"Foto de perfil de la página",linkPhoto:"Miniatura del enlace",choosePhoto:"Elegir foto",removePhoto:"Eliminar foto",imageError:"No fue posible enviar la imagen. Usa JPG, PNG o WebP.",imageUploading:"Subiendo imágenes…"});
   Object.assign(COPY.ru,{profilePhoto:"Фото профиля страницы",linkPhoto:"Миниатюра ссылки",choosePhoto:"Выбрать фото",removePhoto:"Удалить фото",imageError:"Не удалось загрузить изображение. Используйте JPG, PNG или WebP.",imageUploading:"Загрузка изображений…"});
 
+
+  const QR_COPY = {
+    pt: { qrTitle:"Gerador de QR Code", qrLead:"Cole um link e transforme-o em QR Code gratuitamente, diretamente no seu aparelho.", qrInput:"Link para transformar em QR Code", qrCreate:"Gerar QR Code", qrDownload:"Baixar PNG", qrCopy:"Copiar link", qrInvalid:"Informe um endereço completo iniciado por https:// ou http:// (máximo de 1.200 caracteres).", qrError:"Não foi possível gerar o QR Code. Tente um link mais curto.", qrPublished:"QR Code da minha página", qrReady:"Aponte a câmera para abrir o link.", qrLocal:"Sem cadastro adicional e sem guardar o link no servidor." },
+    en: { qrTitle:"QR Code Generator", qrLead:"Paste a link and turn it into a QR code for free, right on your device.", qrInput:"Link to convert to QR code", qrCreate:"Generate QR code", qrDownload:"Download PNG", qrCopy:"Copy link", qrInvalid:"Enter a full http:// or https:// address (up to 1,200 characters).", qrError:"Unable to generate this QR code. Try a shorter link.", qrPublished:"QR code for my page", qrReady:"Scan to open the link.", qrLocal:"No extra registration. Your link is not stored on a server." },
+    es: { qrTitle:"Generador de códigos QR", qrLead:"Pega un enlace y conviértelo en código QR gratis, directamente en tu dispositivo.", qrInput:"Enlace para convertir en código QR", qrCreate:"Generar código QR", qrDownload:"Descargar PNG", qrCopy:"Copiar enlace", qrInvalid:"Introduce una dirección completa http:// o https:// (hasta 1.200 caracteres).", qrError:"No fue posible generar el código QR. Prueba con un enlace más corto.", qrPublished:"Código QR de mi página", qrReady:"Escanea para abrir el enlace.", qrLocal:"Sin registro adicional y sin guardar el enlace en el servidor." },
+    ru: { qrTitle:"Генератор QR-кодов", qrLead:"Вставьте ссылку и бесплатно создайте QR-код прямо на устройстве.", qrInput:"Ссылка для QR-кода", qrCreate:"Создать QR-код", qrDownload:"Скачать PNG", qrCopy:"Копировать ссылку", qrInvalid:"Введите полный адрес http:// или https:// (до 1200 символов).", qrError:"Не удалось создать QR-код. Попробуйте более короткую ссылку.", qrPublished:"QR-код моей страницы", qrReady:"Отсканируйте, чтобы открыть ссылку.", qrLocal:"Без дополнительной регистрации и сохранения ссылки на сервере." }
+  };
+  for (const [locale, labels] of Object.entries(QR_COPY)) Object.assign(COPY[locale], labels);
+
   const LC = {
     pt:{edit:"Editar",title:"Campanhas e resultados",lead:"Crie um endereço para cada divulgação e acompanhe a interação.",premium:"Exclusivo para assinantes",name:"Nome da campanha",slug:"Nome no endereço",destination:"Destino",source:"Origem (ex.: Instagram)",medium:"Local (ex.: bio)",save:"Salvar campanha",list:"Minhas campanhas",results:"Resultados",copy:"Copiar link",qr:"QR Code",empty:"Nenhuma campanha criada.",active:"Ativa",closed:"Encerrada",toggle:"Ativar / encerrar",days:"Período",refresh:"Atualizar",total:"Cliques acumulados",period:"Cliques no período",locations:"Localização aproximada",country:"País",region:"Região",city:"Cidade",unknown:"Não identificada",others:"Outras",clicks:"Cliques",date:"Data",note:"Contagem aproximada. VPNs, operadoras e acessos repetidos podem influenciar os resultados. Detalhes por 90 dias; resultados em cache por até 5 minutos. Em picos de tráfego, a contagem pode ser limitada.",geo:"Localização estimada com dados GeoLite da MaxMind.",privacy:"Registramos totais de interação e localização aproximada. Não guardamos seu IP completo nestes relatórios.",back:"Voltar",error:"Não foi possível concluir. Confira o endereço e tente novamente.",taken:"Esse endereço já está em uso.",limit:"Limite de 100 campanhas guardadas atingido.",theme:"Tema",preview:"Prévia",featured:"Destacar botão",none:"Nenhum",pageResults:"Resultados da página",views:"Visitas à página",buttons:"Cliques nos botões",midnight:"Noturno",light:"Claro",forest:"Verde",pageDestination:"Minha página de links",open:"Abrir",order:"Ordem",address:"Use de 3 a 48 letras, números ou hífens. O endereço permanece o mesmo ao editar a campanha."},
     en:{edit:"Edit",title:"Campaigns and results",lead:"Create an address for each promotion and track engagement.",premium:"Subscribers only",name:"Campaign name",slug:"Address name",destination:"Destination",source:"Source (e.g. Instagram)",medium:"Placement (e.g. bio)",save:"Save campaign",list:"My campaigns",results:"Results",copy:"Copy link",qr:"QR code",empty:"No campaigns yet.",active:"Active",closed:"Closed",toggle:"Activate / close",days:"Period",refresh:"Refresh",total:"All-time clicks",period:"Clicks in period",locations:"Approximate location",country:"Country",region:"Region",city:"City",unknown:"Unidentified",others:"Others",clicks:"Clicks",date:"Date",note:"Approximate counts. VPNs, carriers and repeated visits may affect results. Details retained for 90 days; results cached for up to 5 minutes. Counting may be limited during traffic peaks.",geo:"Location estimated using MaxMind GeoLite data.",privacy:"We record interaction totals and approximate locations. Full IP addresses are not stored in these reports.",back:"Back",error:"Unable to complete. Check the address and try again.",taken:"This address is already in use.",limit:"Limit of 100 saved campaigns reached.",theme:"Theme",preview:"Preview",featured:"Featured button",none:"None",pageResults:"Page results",views:"Page visits",buttons:"Button clicks",midnight:"Midnight",light:"Light",forest:"Forest",pageDestination:"My link page",open:"Open",order:"Order",address:"Use 3–48 letters, numbers or hyphens. The address stays unchanged when editing a campaign."},
@@ -197,12 +206,13 @@
   }
 
   function publishedMarkup(url) {
-    return `<strong>${esc(text("saved"))}</strong><a class="publishedUrl" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a><div class="cardActions"><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button><button id="sharePublished" class="primaryButton">${esc(text("share"))}</button></div>`;
+    return `<strong>${esc(text("saved"))}</strong><a class="publishedUrl" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a><div class="cardActions"><button id="copyPublished" class="secondaryButton">${esc(text("copy"))}</button><button id="sharePublished" class="primaryButton">${esc(text("share"))}</button><button id="qrPublished" class="secondaryButton">▦ ${esc(text("qrPublished"))}</button></div>`;
   }
 
   function bindPublishedActions(url, title) {
     document.getElementById("copyPublished")?.addEventListener("click", () => copyText(url));
     document.getElementById("sharePublished")?.addEventListener("click", () => sharePage(url, title));
+    document.getElementById("qrPublished")?.addEventListener("click", () => { const editorBack = returnTo; renderQrGenerator({ url, back: () => renderPageEditor({ back: editorBack }) }); });
   }
 
   function showPublishedLink(url, title) {
@@ -318,6 +328,87 @@
   function bindImagePickers(root = document) { root.querySelectorAll(".imagePicker").forEach((picker) => { if (picker.dataset.bound) return; picker.dataset.bound = "1"; const input = picker.querySelector("[data-image-input]"), preview = picker.querySelector(".imagePreview"); input.onchange = () => { const file = input.files?.[0]; if (!file) return; if (!/^image\/(jpeg|png|webp)$/i.test(file.type) || file.size > 8 * 1024 * 1024) { input.value = ""; return toast(text("imageError")); } input.selectedFile = file; preview.innerHTML = `<img src="${esc(URL.createObjectURL(file))}" alt="">`; }; picker.querySelector(".imageRemove").onclick = () => { input.value = ""; input.selectedFile = null; picker.dataset.imageUrl = ""; picker.dataset.imagePublicId = ""; preview.innerHTML = "<div>📷</div>"; }; }); }
   function bindRowButtons() { document.querySelectorAll(".lcMove").forEach(b=>b.onclick=()=>{const row=b.closest(".linkRow"),other=Number(b.dataset.direction)<0?row.previousElementSibling:row.nextElementSibling;if(other){if(Number(b.dataset.direction)<0)row.parentNode.insertBefore(row,other);else row.parentNode.insertBefore(other,row);row.dispatchEvent(new Event("input",{bubbles:true}))}}); document.querySelectorAll(".linkRemove").forEach((button) => button.onclick = () => { const row=button.closest(".linkRow"),parent=row?.parentNode;row?.remove();parent?.dispatchEvent(new Event("input",{bubbles:true})); }); bindImagePickers(document.getElementById("linkRows")); }
 
+
+  function safeQrUrl(value) {
+    const input = String(value || "").trim();
+    if (!input || input.length > 1200) return "";
+    try {
+      const url = new URL(/^www\./i.test(input) ? "https://" + input : input);
+      if (!["https:", "http:"].includes(url.protocol) || !url.hostname || url.username || url.password) return "";
+      return url.href;
+    } catch { return ""; }
+  }
+
+  function qrPngCanvas(host) {
+    const source = host?.querySelector("canvas") || host?.querySelector("img");
+    if (!source) throw new Error("QR_IMAGE");
+    const image = document.createElement("canvas");
+    image.width = image.height = 640;
+    const ctx = image.getContext("2d");
+    if (!ctx) throw new Error("QR_CANVAS");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, 640, 640);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(source, 48, 48, 544, 544);
+    return image;
+  }
+
+  function renderQrGenerator(options = {}) {
+    returnTo = typeof options.back === "function" ? options.back : null;
+    const initialUrl = String(options.url || "").trim();
+    content().innerHTML =
+      '<button id="qrBack" class="textButton">← ' + esc(text("back")) + '</button>' +
+      '<section class="hero"><span class="eyebrow">' + esc(text("free")) + '</span><h1>▦ ' + esc(text("qrTitle")) + '</h1><p>' + esc(text("qrLead")) + '</p></section>' +
+      '<article class="toolCard linkQrEditor">' +
+      field(text("qrInput"), "qrInput", initialUrl, 'type="url" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" maxlength="1200" placeholder="https://"') +
+      '<p class="notice">' + esc(text("qrLocal")) + '</p>' +
+      '<button id="qrCreate" type="button" class="wideButton">' + esc(text("qrCreate")) + '</button></article>' +
+      '<section id="qrResult" class="toolCard linkQrResult hidden" aria-live="polite"><h2>' + esc(text("qrReady")) + '</h2>' +
+      '<div id="qrPreview" class="linkQrPreview" role="img" aria-label="QR Code"></div>' +
+      '<p id="qrDestination" class="publishedUrl"></p>' +
+      '<div class="cardActions"><button id="qrDownload" class="primaryButton" type="button">⬇ ' + esc(text("qrDownload")) + '</button>' +
+      '<button id="qrCopy" class="secondaryButton" type="button">' + esc(text("qrCopy")) + '</button></div></section>';
+    const input = document.getElementById("qrInput");
+    const button = document.getElementById("qrCreate");
+    const result = document.getElementById("qrResult");
+    const preview = document.getElementById("qrPreview");
+    let generatedUrl = "";
+    document.getElementById("qrBack").onclick = backToOrigin;
+    const generate = async () => {
+      const url = safeQrUrl(input.value);
+      if (!url) { result.classList.add("hidden"); return toast(text("qrInvalid")); }
+      button.disabled = true;
+      result.classList.add("hidden");
+      try {
+        await window.EduCashProResources?.loadQr?.();
+        if (!window.QRCode) throw new Error("QR_UNAVAILABLE");
+        if (!preview.isConnected) return;
+        preview.replaceChildren();
+        new window.QRCode(preview, { text: url, width: 280, height: 280, colorDark: "#07111f", colorLight: "#ffffff", correctLevel: window.QRCode.CorrectLevel.M });
+        generatedUrl = url;
+        document.getElementById("qrDestination").textContent = url;
+        result.classList.remove("hidden");
+      } catch {
+        if (result.isConnected) { result.classList.add("hidden"); toast(text("qrError")); }
+      } finally { if (button.isConnected) button.disabled = false; }
+    };
+    button.onclick = generate;
+    input.addEventListener("keydown", event => { if (event.key === "Enter") { event.preventDefault(); void generate(); } });
+    document.getElementById("qrCopy").onclick = () => { if (generatedUrl) copyText(generatedUrl); };
+    document.getElementById("qrDownload").onclick = () => {
+      try {
+        if (!generatedUrl) return;
+        const link = document.createElement("a");
+        link.href = qrPngCanvas(preview).toDataURL("image/png");
+        link.download = "educashpro-qrcode.png";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch { toast(text("qrError")); }
+    };
+    if (safeQrUrl(initialUrl)) void generate();
+  }
+
   async function renderShortener(options = {}) {
     returnTo = typeof options?.back === "function" ? options.back : null;
     content().innerHTML = `<button id="shortBack" class="textButton">← ${esc(text("back"))}</button><section class="hero"><span class="eyebrow">${esc(text("free"))}</span><h1>✂️ ${esc(text("shortTitle"))}</h1><p>${esc(text("shortLead"))}</p></section><article class="toolCard linkEditor">${field(text("destination"), "shortDestination", "", 'type="url" inputmode="url" placeholder="https://"')}${field(text("buttonLabel"), "shortLabel", "", 'maxlength="60"')}${responsibility()}<button id="createShort" class="wideButton">${esc(text("create"))}</button></article><section class="sectionHead"><div><h2>${esc(text("myLinks"))}</h2></div></section><div id="shortList" class="cardList"><div class="empty">${esc(text("loading"))}</div></div>`;
@@ -360,7 +451,7 @@
     document.getElementById("shortDestinationButton").onclick = () => openUrl(link.destination); document.getElementById("shortAffiliateButton").onclick = () => openUrl(link.affiliateUrl || link.officialUrl);
   }
 
-  window.EduCashProLinks = { normalizePageAddress:pageSlug, text, renderPageEditor, renderShortener, bootPublic, setSession(value){ session = value || session; } };
+  window.EduCashProLinks = { normalizePageAddress:pageSlug, text, renderPageEditor, renderShortener, renderQrGenerator, bootPublic, setSession(value){ session = value || session; } };
 })();
 
 

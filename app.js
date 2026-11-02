@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.11.01.1";
+  const APP_RUNTIME_BUILD = "2026.11.01.2";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -845,6 +845,7 @@
       restoreRememberedScroll(route);
       return true;
     }
+    if (route.view === "area" && route.detail === "qr") { await openQrTool(renderArea); restoreRememberedScroll(route); return true; }
     if (route.view === "area" && ["professional", "links", "smart-link"].includes(route.detail)) {
       if (route.detail === "professional") await openAreaProfessional();
       else await openAreaLinks(route.detail === "smart-link" ? "short" : "page");
@@ -1405,6 +1406,23 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
     } catch (error) {
       if (container.isConnected) handleError(error, container);
     }
+  }
+
+  async function openQrTool(backAction = renderHome) {
+    if (!requireProductAccount()) return;
+    state.view = "area";
+    rememberRoute("area", "qr");
+    updateNav();
+    syncExternalSession();
+    const ticket = window.EduCashProNavigation?.stamp?.();
+    content.innerHTML = navigationShell("▦", window.EduCashProProduct.copy(state.language).qr);
+    try {
+      await window.EduCashProResources.loadLinks();
+      if (window.EduCashProNavigation && !window.EduCashProNavigation.isCurrent(ticket)) return;
+      const effectiveSession = syncExternalSession() || window.__EDUCASHPRO_SESSION__ || window.EduCashProWebEntry?.getSession?.();
+      window.EduCashProLinks.setSession(effectiveSession || {token:state.token,profile:state.profile});
+      window.EduCashProLinks.renderQrGenerator({back:backAction});
+    } catch(error) {handleError(error);}
   }
 
   async function renderTools(){if(!requireProductAccount())return;state.view='tools';rememberRoute('tools');updateNav();syncExternalSession();if(!state.profile?.userId&&!state.profile?.tgId)return window.EduCashProWebEntry?.open?.();const ticket=window.EduCashProNavigation?.stamp?.();content.innerHTML=navigationShell('🔗',window.EduCashProProduct.copy(state.language).links);try{await window.EduCashProResources.loadLinks();if(window.EduCashProNavigation&&!window.EduCashProNavigation.isCurrent(ticket))return;window.EduCashProLinks.setSession({token:state.token,profile:state.profile});return window.EduCashProLinks.renderPageEditor({back:renderHome})}catch(error){handleError(error)}}
@@ -2032,7 +2050,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
 function productContext(){
   const profile=state.profile,language=state.language;
   const ctx={root:content,language,profile,session:{token:state.token,profile},open:openUrl,
-    entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,tracker:()=>openPersonalFinance(state.view==="area"?"area":"home"),area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
+    entry:()=>window.EduCashProWebEntry?.open?.(),home:()=>profile?renderHome():renderPublicLanding(),learn:renderLearn,practice:openMarkets,links:renderTools,qr:()=>openQrTool(state.view==="area"?renderArea:renderHome),tracker:()=>openPersonalFinance(state.view==="area"?"area":"home"),area:renderArea,presentation:renderPresentation,subscribe:openSubscription,
     finance:()=>renderCourseCategory('financial_education'),business:()=>renderCourseCategory('business'),technical:()=>openCourse('analise_tecnica_completa'),
     subscription:()=>openAccountCenter('openSubscription'),network:()=>openAccountCenter('openNetwork'),settings:()=>openAccountCenter('openSettings')};
   ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>window.EduCashProLocale.open();
