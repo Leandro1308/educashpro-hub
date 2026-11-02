@@ -55,36 +55,52 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verificar publicação sem expor conteúdo e infraestrutura
+      - name: Validar entrega real do domínio e diagnosticar DNS
         shell: bash
         run: |
           set -uo pipefail
+          host="go.educashpro.vip"
+          expected="$(python3 -c 'import json; print(json.load(open("version.json"))["build"])')"
+          echo "Build esperado: ${expected}"
+          echo "DNS CNAME: $(dig +short CNAME "${host}" | tr '\n' ' ')"
+          echo "DNS A: $(dig +short A "${host}" | tr '\n' ' ')"
+          echo "DNS AAAA: $(dig +short AAAA "${host}" | tr '\n' ' ')"
           failed=0
-          for path in "" "version.json" "resource-loader.js"; do
-            code="$(curl -L -sS --connect-timeout 10 --max-time 20 -o /dev/null -w '%{http_code}' "https://go.educashpro.vip/${path}?probe=${GITHUB_SHA}" || true)"
-            echo "Resource /${path} HTTP ${code}"
-            if [[ "${code}" != "200" ]]; then failed=1; fi
-          done
-          if [[ "${failed}" != "0" ]]; then
-            echo "::warning::Domínio ainda não serve todos os recursos; verifique DNS/Render. Nenhum corpo HTML, cookie ou cabeçalho sensível será registrado."
-          fi
-
-          # HTTP 200 alone is insufficient: custom domains may return stale scripts
-          # or an HTML fallback for assets that are absent.
-          trainer_live=0
-          for attempt in 1 2 3 4; do
-            if curl -L -f -sS --connect-timeout 10 --max-time 25 \
-                -o /tmp/educashpro-market-live.js \
-                "https://go.educashpro.vip/market-learning-center-v20261027.js?deploy=${GITHUB_SHA}&attempt=${attempt}" \
-              && grep -Fq 'id="marketPriceAction"' /tmp/educashpro-market-live.js; then
-              trainer_live=1
-              echo "Price Action Trainer confirmed in published versioned market asset"
-              break
+          for attempt in 1 2 3; do
+            echo "Verificação de entrega ${attempt}/3"
+            for path in "index.html" "version.json" "product-shell.js" "link-tools.js" "resource-loader-v20261028-product.js"; do
+              output="/tmp/ecp-live-$(basename "${path}")"
+              url="https://${host}/${path}?build=${expected}&attempt=${attempt}&sha=${GITHUB_SHA}"
+              code="$(curl -L -sS --connect-timeout 10 --max-time 20 -o "${output}" -w '%{http_code}' "${url}" || true)"
+              echo "GET /${path}: HTTP ${code}"
+              if [[ "${code}" != "200" ]]; then
+                failed=1
+                continue
+              fi
+              case "${path}" in
+                index.html)
+                  grep -Fq "__EDUCASHPRO_PAGE_BUILD__=\"${expected}\"" "${output}" || { echo "::warning::HTML está desatualizado"; failed=1; }
+                  ;;
+                version.json)
+                  grep -Fq "\"build\":\"${expected}\"" "${output}" || { echo "::warning::version.json desatualizado ou inválido"; failed=1; }
+                  ;;
+                product-shell.js)
+                  grep -Fq "card('qr','▦',c.qr,c.qrSub)" "${output}" || { echo "::warning::Menu QR ausente na entrega"; failed=1; }
+                  ;;
+                link-tools.js)
+                  grep -Fq 'function bindInlineQr()' "${output}" || { echo "::warning::QR da Página de Links ausente na entrega"; failed=1; }
+                  ;;
+                resource-loader-v20261028-product.js)
+                  grep -Fq 'const VERSION="20261101.3"' "${output}" || { echo "::warning::Carregador desatualizado"; failed=1; }
+                  ;;
+              esac
+            done
+            if [[ "${failed}" -eq 0 ]]; then
+              echo "Domínio confirmou o build e os dois acessos ao QR Code."
+              exit 0
             fi
-            echo "Price Action Trainer not confirmed on custom domain (attempt ${attempt}/4)"
-            if [[ "${attempt}" != "4" ]]; then sleep 10; fi
+            [[ "${attempt}" == "3" ]] || sleep 8
+            failed=0
           done
-          if [[ "${trainer_live}" != "1" ]]; then
-            echo "::warning::Novo Treinador de Price Action ainda não está visível pelo domínio; verifique cache/CDN/DNS."
-          fi
-
+          echo "::error::GitHub Pages publicou, mas o domínio personalizado não entregou os arquivos esperados. Verifique o DNS/proxy/hosting do domínio."
+          exit 1
