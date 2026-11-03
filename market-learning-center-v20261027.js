@@ -458,6 +458,22 @@
       .marketTimeframePanel{display:grid;gap:8px;margin:0 0 12px}.marketTimeframePanel>strong{font-size:12px;color:#b8c8da}.marketTimeframes{display:flex;gap:7px;overflow-x:auto;padding:2px 1px 7px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.marketTimeframes button{flex:0 0 auto;min-width:48px;min-height:38px;padding:7px 10px;border:1px solid rgba(255,255,255,.11);border-radius:10px;color:#b8c8da;background:#071322;font-size:12px;font-weight:900}.marketTimeframes button.active{border-color:#30e6a6;color:#071322;background:#30e6a6}.marketTimeframes button[data-timeframe="1D"]{min-width:72px}
       .marketSymbolPicker{display:grid;gap:8px;margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#0a1728}.marketSymbolPicker>strong{font-size:12px;color:#f7fbff}.marketSymbolForm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.marketSymbolForm input{min-width:0;height:42px;padding:0 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#f7fbff;background:#071322;font:700 13px inherit;text-transform:uppercase}.marketSymbolForm button{min-height:42px;padding:8px 14px;border:0;border-radius:10px;color:#071322;background:#30e6a6;font-size:12px;font-weight:950}.marketSymbolPicker small{color:#9db0c6;font-size:10px;line-height:1.45}
       .marketFibPanel{display:grid;gap:10px;margin:0 0 12px;padding:13px;border:1px solid rgba(255,200,92,.24);border-radius:15px;background:linear-gradient(145deg,#0a1728,#0b1421)}.marketFibHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.marketFibHead strong{color:#ffc85c;font-size:14px}.marketFibHead span{color:#9db0c6;font-size:10px}.marketFibStatus{color:#b8c8da;font-size:11px;line-height:1.5}.marketFibMetrics{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.marketFibMetrics article,.marketFibLevels article{padding:8px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:#071322}.marketFibMetrics small,.marketFibLevels small{display:block;color:#9db0c6;font-size:9px}.marketFibMetrics b,.marketFibLevels b{display:block;margin-top:3px;color:#f7fbff;font-size:11px}.marketFibLevels{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.marketFibPanel.positive .marketFibHead strong{color:#30e6a6}.marketFibPanel.negative .marketFibHead strong{color:#ff7d89}.marketFibFoot{color:#7f93aa;font-size:9px;line-height:1.4}
+
+      .marketMtfPanel{margin:12px 0 16px;padding:12px;background:#0a1728;border:1px solid #315465;border-radius:14px;display:grid;gap:9px}
+      .marketMtfHead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+      .marketMtfHead strong{color:#dcefff;font-size:14px}
+      .marketMtfHead button,.marketMtfAdd,.marketMtfRemove{border:1px solid #3a6174;border-radius:8px;background:#102c3b;color:#dcefff;min-height:36px;padding:5px 10px;cursor:pointer}
+      .marketMtfRows{display:grid;gap:7px}
+      .marketMtfRow{display:grid;grid-template-columns:78px minmax(0,1fr) 32px;align-items:center;gap:7px;min-height:44px;background:#0d2232;border-radius:9px;padding:5px}
+      .marketMtfRow select{width:100%;height:36px;font-size:16px;background:#112d40;color:#fff;border:1px solid #3d6478;border-radius:7px}
+      .marketMtfResult{font-size:12px;color:#b5c9d7;line-height:1.35;overflow-wrap:anywhere}
+      .marketMtfResult.up,.marketMtfSummary.up{color:#35d7aa}
+      .marketMtfResult.down,.marketMtfSummary.down{color:#ff8390}
+      .marketMtfResult.neutral,.marketMtfSummary.neutral{color:#ffcc78}
+      .marketMtfRemove{min-height:32px;padding:0;font-size:20px}
+      .marketMtfAdd{justify-self:start;font-size:12px}
+      .marketMtfSummary{font-size:13px;font-weight:800;color:#d6e7f2}
+      .marketMtfNote{font-size:10px;color:#a7bbcd;line-height:1.55}
       .marketPairsIntro{margin:0 0 12px;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:13px;background:#0a1728}.marketPairsIntro strong{display:block;font-size:14px}.marketPairsIntro small{display:block;margin-top:5px;color:#9db0c6;font-size:10px;line-height:1.45}.marketPairsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.marketPairGroup{min-width:0;padding:10px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:#0d1b2d}.marketPairGroup h3{display:flex;justify-content:space-between;gap:8px;margin:0 0 9px;font-size:12px}.marketPairGroup.up h3{color:#30e6a6}.marketPairGroup.down h3{color:#ff7d89}.marketPairGroup.sideways h3{color:#ffc85c}.marketPairList{display:grid;gap:6px}.marketPairList button{min-height:36px;padding:7px 8px;border:1px solid rgba(255,255,255,.08);border-radius:9px;color:#f7fbff;background:#071322;font-size:10px;font-weight:850;text-align:left}.marketPairList button small{float:right;color:#9db0c6}.marketPairEmpty{color:#9db0c6;font-size:10px;line-height:1.4}
       .marketAnalysisSection.expanded .marketWidget{overflow:auto}.marketAnalysisSection.expanded .marketChartFrame{height:calc(100dvh - 315px);min-height:430px}.marketAnalysisSection.expanded .marketTechnicalFrame,.marketAnalysisSection.expanded .marketGenericFrame{height:calc(100dvh - 190px);min-height:430px}
       @media(max-width:560px){.marketDirectionColumns,.marketPairsGrid{grid-template-columns:1fr}.marketInstantMeter{grid-template-columns:repeat(2,1fr)}.marketChartFrame{height:68vh;min-height:500px}}
@@ -887,6 +903,108 @@
     return `<section class="marketFibPanel" data-market-fibonacci></section>`;
   }
 
+
+  // Independent, user-configurable multi-timeframe directional dashboard.
+  // Closed Binance candles only; neutral is a valid result, never a trade instruction.
+  const MTF_TIMEFRAMES=["1m","3m","5m","15m","30m","1h","2h","4h","1d"];
+  const MTF_STORAGE="educashpro:mtf-directions:v1";
+  let mtfFrames=["5m","15m","1h","4h"],mtfRequest=0,mtfUpdatedAt=0;
+  try {
+    const saved=JSON.parse(localStorage.getItem(MTF_STORAGE)||"null");
+    if(Array.isArray(saved)&&saved.length>=1&&saved.length<=4&&saved.every(x=>MTF_TIMEFRAMES.includes(x)))mtfFrames=saved;
+  }catch{}
+  const MTF_LABELS={
+    pt:{title:"Alinhamento de tendência",add:"+ Período",refresh:"Atualizar",up:"Alta",down:"Baixa",neutral:"Neutro",loading:"Consultando candles fechados…",unavailable:"Sem dados disponíveis",unsupported:"Indicador disponível para pares Spot da Binance.",aligned:"Todos os períodos concordam",mixed:"Períodos divergentes",none:"Sem confirmação conjunta",volume:"Volume",ema:"MME 9 / 21 / 50",note:"Leitura educativa, não é previsão. Utiliza somente candles fechados, médias exponenciais e volume relativo. Alinhamento não garante o próximo movimento.",high:"Acima da média",low:"Abaixo da média"},
+    en:{title:"Trend alignment",add:"+ Timeframe",refresh:"Refresh",up:"Bullish",down:"Bearish",neutral:"Neutral",loading:"Loading closed candles…",unavailable:"Data unavailable",unsupported:"Available for Binance Spot pairs.",aligned:"All timeframes agree",mixed:"Timeframes disagree",none:"No joint confirmation",volume:"Volume",ema:"EMA 9 / 21 / 50",note:"Educational reading, not a forecast. Uses closed candles, exponential moving averages and relative volume. Alignment cannot guarantee the next move.",high:"Above average",low:"Below average"},
+    es:{title:"Alineación de tendencia",add:"+ Período",refresh:"Actualizar",up:"Alcista",down:"Bajista",neutral:"Neutral",loading:"Consultando velas cerradas…",unavailable:"Datos no disponibles",unsupported:"Disponible para pares Spot de Binance.",aligned:"Todos los períodos coinciden",mixed:"Períodos divergentes",none:"Sin confirmación conjunta",volume:"Volumen",ema:"EMA 9 / 21 / 50",note:"Lectura educativa, no es una predicción. Usa velas cerradas, medias exponenciales y volumen relativo. La alineación no garantiza resultados.",high:"Superior al promedio",low:"Inferior al promedio"},
+    ru:{title:"Согласованность трендов",add:"+ Таймфрейм",refresh:"Обновить",up:"Рост",down:"Падение",neutral:"Нейтрально",loading:"Загрузка закрытых свечей…",unavailable:"Данные недоступны",unsupported:"Доступно для спотовых пар Binance.",aligned:"Все интервалы совпадают",mixed:"Интервалы расходятся",none:"Нет общего подтверждения",volume:"Объём",ema:"EMA 9 / 21 / 50",note:"Учебная оценка, не прогноз. Используются закрытые свечи, EMA и относительный объём. Совпадение не гарантирует движение.",high:"Выше среднего",low:"Ниже среднего"}
+  };
+  const mtfCopy=()=>MTF_LABELS[options?.language]||MTF_LABELS.pt;
+  function mtfMarkup(){
+    const t=mtfCopy();
+    return '<section class="marketMtfPanel" data-market-mtf><div class="marketMtfHead"><strong>↗ '+esc(t.title)+'</strong><button type="button" data-mtf-refresh>↻ '+esc(t.refresh)+'</button></div>'+
+      '<div class="marketMtfRows">'+mtfFrames.map((frame,i)=>'<div class="marketMtfRow"><label><select data-mtf-frame="'+i+'" aria-label="'+esc(t.title)+' '+(i+1)+'">'+MTF_TIMEFRAMES.map(tf=>'<option value="'+tf+'"'+(tf===frame?' selected':'')+'>'+tf+'</option>').join('')+'</select></label><span data-mtf-result="'+i+'" class="marketMtfResult">'+esc(t.loading)+'</span>'+(mtfFrames.length>1?'<button type="button" class="marketMtfRemove" data-mtf-remove="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join('')+'</div>'+
+      (mtfFrames.length<4?'<button type="button" class="marketMtfAdd" data-mtf-add>'+esc(t.add)+'</button>':'')+
+      '<div class="marketMtfSummary" data-mtf-summary>'+esc(t.loading)+'</div><small class="marketMtfNote">'+esc(t.note)+'</small></section>';
+  }
+  function mtfRead(rows){
+    const now=Date.now();
+    const candles=rows.filter(row=>Array.isArray(row)&&Number(row[6])<=now&&Number.isFinite(Number(row[4]))&&Number.isFinite(Number(row[5])));
+    if(candles.length<75)throw new Error("insufficient_closed_candles");
+    const closes=candles.map(row=>Number(row[4]));
+    const volumes=candles.map(row=>Number(row[5]));
+    const last=closes[closes.length-1], fast=ema(closes,9), medium=ema(closes,21), slow=ema(closes,50);
+    const previous=ema(closes.slice(0,-3),21);
+    const currentVolume=volumes[volumes.length-1];
+    const averageVolume=volumes.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
+    const ratio=averageVolume>0?currentVolume/averageVolume:0;
+    const up=last>fast&&fast>medium&&medium>slow&&medium>previous;
+    const down=last<fast&&fast<medium&&medium<slow&&medium<previous;
+    const direction=up?"up":down?"down":"neutral";
+    return {direction,ratio,volumeSupported:ratio>=1,closeTime:Number(candles[candles.length-1][6])};
+  }
+  function mtfRenderResults(panel,results){
+    const t=mtfCopy(), directions=results.map(x=>x?.direction||"unavailable");
+    results.forEach((item,i)=>{
+      const el=panel.querySelector('[data-mtf-result="'+i+'"]');if(!el)return;
+      el.className="marketMtfResult "+(item?.direction||"unavailable");
+      if(!item){el.textContent=t.unavailable;return;}
+      const name=item.direction==="up"?t.up:item.direction==="down"?t.down:t.neutral;
+      const arrow=item.direction==="up"?"▲":item.direction==="down"?"▼":"●";
+      el.textContent=arrow+" "+name+" · "+t.volume+" "+item.ratio.toFixed(2)+"×"+(item.volumeSupported?" ✓":"");
+      el.title=t.ema+" | "+t.volume+" "+item.ratio.toFixed(2)+"×";
+    });
+    const summary=panel.querySelector("[data-mtf-summary]");
+    const consensus=directions.length>0&&directions.every(x=>x===directions[0])&&["up","down"].includes(directions[0]);
+    const divergent=directions.includes("up")&&directions.includes("down");
+    const volumeConfirmed=results.every(x=>x&&x.volumeSupported);
+    summary.className="marketMtfSummary "+(consensus?(directions[0]):"neutral");
+    summary.textContent=consensus?(t.aligned+" · "+(directions[0]==="up"?"▲ "+t.up:"▼ "+t.down)+(volumeConfirmed?" · "+t.volume+" ✓":" · "+t.volume+" ↓")):(divergent?t.mixed:t.none);
+  }
+  async function mtfUpdate(host){
+    const panel=host?.querySelector("[data-market-mtf]");
+    if(!panel)return;
+    const request=++mtfRequest,t=mtfCopy(),asset=selectedAsset;
+    if(!asset?.api||!String(asset.tv).startsWith("BINANCE:")){
+      panel.querySelectorAll("[data-mtf-result]").forEach(el=>{el.textContent=t.unsupported;el.className="marketMtfResult unavailable";});
+      panel.querySelector("[data-mtf-summary]").textContent=t.unsupported;
+      return;
+    }
+    panel.querySelectorAll("[data-mtf-result]").forEach(el=>{el.textContent=t.loading;el.className="marketMtfResult";});
+    const frames=[...mtfFrames];
+    const readings=await Promise.all(frames.map(async frame=>{
+      try{
+        const response=await marketFetch(BINANCE_MARKET_DATA+"?symbol="+encodeURIComponent(asset.api)+"&interval="+encodeURIComponent(frame)+"&limit=130",{cache:"no-store"});
+        if(!response.ok)throw new Error("market_"+response.status);
+        const rows=await response.json();
+        return mtfRead(rows);
+      }catch{return null;}
+    }));
+    if(request!==mtfRequest||!panel.isConnected||selectedAsset!==asset)return;
+    mtfUpdatedAt=Date.now();mtfRenderResults(panel,readings);
+  }
+  function mtfBind(host){
+    const panel=host.querySelector("[data-market-mtf]");if(!panel)return;
+    panel.addEventListener("change",event=>{
+      const index=Number(event.target?.dataset?.mtfFrame);
+      if(!event.target?.matches("[data-mtf-frame]")||!Number.isInteger(index))return;
+      mtfFrames[index]=event.target.value;
+      try{localStorage.setItem(MTF_STORAGE,JSON.stringify(mtfFrames));}catch{}
+      panel.outerHTML=mtfMarkup();mtfBind(host);void mtfUpdate(host);
+    });
+    panel.addEventListener("click",event=>{
+      const add=event.target.closest("[data-mtf-add]");
+      const remove=event.target.closest("[data-mtf-remove]");
+      const refresh=event.target.closest("[data-mtf-refresh]");
+      if(refresh){void mtfUpdate(host);return;}
+      if(add&&mtfFrames.length<4)mtfFrames.push(MTF_TIMEFRAMES.find(x=>!mtfFrames.includes(x))||"1h");
+      else if(remove&&mtfFrames.length>1)mtfFrames.splice(Number(remove.dataset.mtfRemove),1);
+      else return;
+      try{localStorage.setItem(MTF_STORAGE,JSON.stringify(mtfFrames));}catch{}
+      panel.outerHTML=mtfMarkup();mtfBind(host);void mtfUpdate(host);
+    });
+  }
+
   function symbolPickerMarkup(copy) {
     return `<div class="marketSymbolPicker"><strong>⌕ ${esc(copy.searchAsset)}</strong><form class="marketSymbolForm" data-market-symbol-form><input name="symbol" value="${esc(selectedAsset?.label || "")}" placeholder="${esc(copy.searchPlaceholder)}" autocomplete="off" autocapitalize="characters" spellcheck="false"><button type="submit">${esc(copy.openAsset)}</button></form><small>${esc(copy.searchHelp)}</small></div>`;
   }
@@ -942,6 +1060,9 @@
     host.insertAdjacentHTML("beforeend", timeframeMarkup(copy));
     host.insertAdjacentHTML("beforeend", fibonacciPanelMarkup());
     host.appendChild(tradingViewContainer("marketChartFrame", WIDGETS.chart, selectedAsset?.tv || WIDGETS.chart.config.symbol));
+    host.insertAdjacentHTML("beforeend",mtfMarkup());
+    mtfBind(host);
+    void mtfUpdate(host);
     bindScanner(host, snapshot);
     bindSymbolPicker(host);
     bindTimeframes(host);
@@ -1020,7 +1141,7 @@
         host.querySelector(".marketTechnicalFrame")?.replaceWith(tradingViewContainer("marketTechnicalFrame", WIDGETS.technical, selectedAsset?.tv || WIDGETS.technical.config.symbol));
         loadFibonacci(host);
       }
-      else { await refreshDirections(host, true); if (host.isConnected && currentWidget === "chart") loadFibonacci(host); }
+      else { await refreshDirections(host, true); if (host.isConnected && currentWidget === "chart") {loadFibonacci(host);void mtfUpdate(host);} }
     } finally { liveRefreshing = false; }
   }
   setInterval(() => void refreshLiveTools(), 60000);

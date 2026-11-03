@@ -1,7 +1,7 @@
 (function(){
   "use strict";
 
-  const VERSION="20261101.3";
+  const VERSION="20261103.1";
   const ASSET_TIMEOUT_MS=6000;
   const scripts=new Map();
   const styles=new Map();
@@ -73,9 +73,10 @@
 
   let trainerPromise=null;
   function loadPriceAction(){
-    if(window.EduCashProPriceAction?.render)return Promise.resolve(true);
+    if(window.EduCashProPriceAction?.render && window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE?.getTrainerLessons)return Promise.resolve(true);
     return trainerPromise||(trainerPromise=(async()=>{
-      await Promise.all([style("./price-action-trainer.css"),script("./price-action-data.js"),loadCourses().catch(error=>{console.warn("[EduCashPro] Curso de Análise Técnica indisponível:",error);return false;})]);
+      await Promise.all([style("./price-action-trainer.css"),script("./price-action-data.js"),loadCourses()]);
+      if(!window.EDUCASHPRO_TECHNICAL_ANALYSIS_COURSE?.getTrainerLessons)throw new Error("trainer_lessons_missing");
       await script("./price-action-trainer.js");
       if(!window.EduCashProPriceAction?.render)throw new Error("trainer_module_unavailable");
       return true;
