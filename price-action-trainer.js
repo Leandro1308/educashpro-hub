@@ -140,7 +140,7 @@
       const lessons=course.getTrainerLessons(state.language);
       if(Array.isArray(lessons) && lessons.length) return lessons;
     }
-    return t().lessons;
+    return [];
   }
   function activeLesson() {
     const lessons=courseLessons();
@@ -248,6 +248,7 @@
       return;
     }
     const lessons=courseLessons(), labels=guideText();
+    if(lessons.length!==37){host.innerHTML='<div class="pa-wrap" role="alert"><h3>37 lições / 37 lessons</h3><p>O conteúdo da Academy ainda não carregou. Atualize a página e tente novamente.</p><button type="button" data-pa-reload>Recarregar / Reload</button></div>';return;}
     const done = state.steps >= 24 || state.index >= state.endIndex;
     const tab = '<nav class="pa-tabs" aria-label="' + escapeHtml(copy.title) + '">' +
       ['learn','train'].map(name => '<button type="button" class="' + (state.mode === name ? "active" : "") + '" data-pa-mode="' + name + '" aria-pressed="' + (state.mode === name) + '">' + escapeHtml(copy[name]) + '</button>').join("") + '</nav>';
@@ -424,6 +425,7 @@
     view();
   }
   function onClick(event) {
+    if(event.target.closest("[data-pa-reload]")){window.location.reload();return;}
     const btn=event.target.closest("button");if(!btn||!host.contains(btn))return;
     if(btn.dataset.paMode){state.mode=btn.dataset.paMode;state.answer=null;view();return;}
     if(btn.hasAttribute("data-pa-answer")){
