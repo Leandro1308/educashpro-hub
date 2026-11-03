@@ -424,7 +424,6 @@
     view();
   }
   function onClick(event) {
-    if(event.target?.closest?.("[data-pa-reload]")){window.location?.reload?.();return;}
     const btn=event.target.closest("button");if(!btn||!host.contains(btn))return;
     if(btn.dataset.paMode){state.mode=btn.dataset.paMode;state.answer=null;view();return;}
     if(btn.hasAttribute("data-pa-answer")){
