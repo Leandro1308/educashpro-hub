@@ -129,7 +129,7 @@ $('rules').innerHTML=C.rules.map(x=>'<li>'+esc(x)+'</li>').join('');$('status').
 $('agree').onchange=updateJoin;$('connectWallet').onclick=connectWallet;
 $('join').onclick=async()=>{if(!conditionsVerified||!$('agree').checked||!session||!cfg?.walletLinked)return;$('join').disabled=true;try{await post('/api/affiliate/enroll',{token:session.token,agree:true,version:cfg.termsVersion,language:lang});await privateConfig();$('status').textContent=C.accepted;}catch{$('status').textContent=C.error;updateJoin();}};
 $('copy').onclick=async()=>{if(!link)return;try{await navigator.clipboard.writeText(link);$('status').textContent=C.copied}catch{$('status').textContent=link}};
-$('share').onclick=async()=>{if(!link)return;try{if(navigator.share)await navigator.share({title:'EduCashPro',url:link});else await navigator.clipboard.writeText(link)}catch{}};
+$('share').onclick=async()=>{if(!link)return;const result=await window.EduCashProAffiliateShare.share(link,lang);if(result.status==='copied')$('status').textContent=C.copied;else if(result.status==='unavailable')$('status').textContent=result.message;};
 const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token)session=stored;
 cfg=referenceConfig();render();
 if(session)void privateConfig().catch(()=>{});
