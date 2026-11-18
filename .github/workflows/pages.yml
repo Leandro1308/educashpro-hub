@@ -61,7 +61,8 @@ jobs:
           set -uo pipefail
           host="go.educashpro.vip"
           expected="$(python3 -c 'import json; print(json.load(open("version.json"))["build"])')"
-          echo "Build esperado: ${expected}"
+          expected_asset="$(python3 -c 'import json; p=json.load(open("version.json"))["build"].split("."); print("".join(p[:3])+"."+p[3])')"
+          echo "Build esperado: ${expected} (assets: ${expected_asset})"
           echo "DNS CNAME: $(dig +short CNAME "${host}" | tr '\n' ' ')"
           echo "DNS A: $(dig +short A "${host}" | tr '\n' ' ')"
           echo "DNS AAAA: $(dig +short AAAA "${host}" | tr '\n' ' ')"
@@ -91,7 +92,7 @@ jobs:
                   grep -Fq 'function bindInlineQr()' "${output}" || { echo "::warning::QR da Página de Links ausente na entrega"; failed=1; }
                   ;;
                 resource-loader-v20261028-product.js)
-                  grep -Fq 'const VERSION="20261101.3"' "${output}" || { echo "::warning::Carregador desatualizado"; failed=1; }
+                  grep -Fq "const VERSION=\"${expected_asset}\"" "${output}" || { echo "::warning::Carregador desatualizado"; failed=1; }
                   ;;
               esac
             done
