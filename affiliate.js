@@ -3,6 +3,7 @@ const lang=window.EduCashProLocale?.resolve?.()||'pt',C=window.EduCashProAffilia
 const WALT_URL='https://telegram.me/walt/start?startapp=ref-4-QhxQcMqCsfw';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cfg=null,session=null,link='',walletUi=null,connecting=false,verifying=false,unsubscribe=null,conditionsVerified=false;
+let verifiedSessionToken='';
 const STATUS_COPY={
 pt:['Percentuais de referência: adesão de 30% para inativos e 60% para ativos; renovações de 30%, 20%, 10%, 5% e 5% para ativos. Aguardando confirmação das condições atuais.','Não foi possível confirmar as condições atuais. A comparação permanece disponível; tente novamente antes de participar.','Tentar novamente'],
 en:['Reference rates: 30% initial commission for inactive members and 60% for active members; active renewal rates of 30%, 20%, 10%, 5% and 5%. Awaiting confirmation of current terms.','Current terms could not be confirmed. The comparison remains available; try again before joining.','Try again'],
@@ -38,11 +39,31 @@ const pct=n=>Number.isFinite(n)?Number(n)+'%':'—';
 async function post(path,body={}){const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(10000)});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.reason||'request_failed');return d;}
 function acceptedSession(){const s=window.EduCashProPlatform?.readWebSession?.();if(s?.token)window.EduCashProPlatform.writeWebSession?.({...s,profile:{...s.profile,affiliateAccepted:true}});}
 function updateJoin(){ $('join').disabled=!conditionsVerified||!session||!cfg?.walletLinked||!$('agree').checked; }
+function syncMainMenuReturn(){
+ const button=$('mainMenuBack');
+ if(button)button.hidden=!(verifiedSessionToken&&session?.token===verifiedSessionToken&&session?.profile?.userId);
+}
+function renderLevelGuide(){
+ const target=$('levels');
+ if(!target)return;
+ target.hidden=!conditionsVerified;
+ if(!conditionsVerified){target.textContent='';return;}
+ const requirements=Object.entries(cfg?.levelRequirements||{})
+  .filter(([level,n])=>/^[2-5]$/.test(String(level))&&Number.isFinite(Number(n))&&Number(n)>0)
+  .sort(([a],[b])=>Number(a)-Number(b));
+ const enabled=cfg?.qualificationEnabled===true;
+ const status=enabled?(requirements.length?C.qualificationOn:C.qualificationUnknown):C.qualificationOff;
+ const chips=enabled&&requirements.length
+  ?'<div class="levelRequirements">'+requirements.map(([level,n])=>'<span>'+esc(C.level)+' '+esc(level)+': '+esc(n)+' '+esc(C.direct)+'</span>').join('')+'</div>'
+  :'';
+ target.innerHTML='<section class="card affiliateLevelGuide"><h2>'+esc(C.levelsTitle)+'</h2><p>'+esc(C.levelsDescription)+'</p><div class="levelQualification">'+esc(status)+'</div>'+chips+'<p class="levelNote">'+esc(C.levelsNote)+'</p></section>';
+}
 function render(){
 const amount=n=>new Intl.NumberFormat(lang,{maximumFractionDigits:6}).format(n);
 const sale=Number(cfg.priceUsdt),hasExample=Number.isFinite(sale)&&sale>0;
 const exampleEarn=percent=>hasExample&&Number.isFinite(percent)?'<p class="commissionExample">'+esc(C.exampleEarn.replace('{amount}',amount(sale*percent/100)))+'</p>':'';
-$('conditions').innerHTML=`<section class="card commissionOffer"><h2>${esc(C.plans)}</h2><p>${esc(C.initialHint)}</p><div class="commissionCards"><article><h3>${esc(C.free)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.inactiveJoinPercent)}</strong>${exampleEarn(cfg.inactiveJoinPercent)}<p>${esc(C.freeDetail)}</p></article><article class="commissionActive"><span class="eyebrow">${esc(C.activeKicker)}</span><h3>${esc(C.paid)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.joinPercent)}</strong>${exampleEarn(cfg.joinPercent)}<p>${esc(C.paidDetail)}</p></article></div>${hasExample?'<p class="note">'+esc(C.example.replace('{amount}',amount(sale)))+'</p>':''}<h3 class="renewalTitle">${esc(C.renew)}</h3><div class="tableWrap"><table class="renewalTable"><thead><tr><th scope="col">${esc(C.level)}</th><th scope="col">${esc(C.free)}</th><th scope="col">${esc(C.paid)}</th></tr></thead><tbody>${cfg.renewalPercents.map((n,i)=>'<tr><th scope="row">'+esc(C.level)+' '+(i+1)+(i===0?' — '+esc(C.direct):'')+'</th><td>'+esc(C.zeroRenew)+'</td><td class="activeRenewal">'+pct(n)+'</td></tr>').join('')}</tbody></table></div><p class="note">${esc(C.renewHint)}</p><aside class="subscriberBenefits"><p>${esc(C.activeBenefit)}</p>${cfg.active?'<strong>'+esc(C.alreadyActive)+'</strong>':'<a class="activateButton" href="./?subscribe=pay&amp;lang='+encodeURIComponent(lang)+'">'+esc(C.subscribeCta)+'</a>'}</aside>${!cfg.freeReferralEnabled?'<p class="note">'+esc(C.pending)+'</p>':''}${cfg.qualificationEnabled?'<p>'+esc(C.requirements)+': '+Object.entries(cfg.levelRequirements).map(([l,n])=>l+': '+n).join(' · ')+'</p>':''}</section>`;
+$('conditions').innerHTML=`<section class="card commissionOffer"><h2>${esc(C.plans)}</h2><p>${esc(C.initialHint)}</p><div class="commissionCards"><article><h3>${esc(C.free)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.inactiveJoinPercent)}</strong>${exampleEarn(cfg.inactiveJoinPercent)}<p>${esc(C.freeDetail)}</p></article><article class="commissionActive"><span class="eyebrow">${esc(C.activeKicker)}</span><h3>${esc(C.paid)}</h3><span>${esc(C.first)}</span><strong class="commissionRate">${pct(cfg.joinPercent)}</strong>${exampleEarn(cfg.joinPercent)}<p>${esc(C.paidDetail)}</p></article></div>${hasExample?'<p class="note">'+esc(C.example.replace('{amount}',amount(sale)))+'</p>':''}<h3 class="renewalTitle">${esc(C.renew)}</h3><div class="tableWrap"><table class="renewalTable"><thead><tr><th scope="col">${esc(C.level)}</th><th scope="col">${esc(C.free)}</th><th scope="col">${esc(C.paid)}</th></tr></thead><tbody>${cfg.renewalPercents.map((n,i)=>'<tr><th scope="row">'+esc(C.level)+' '+(i+1)+(i===0?' — '+esc(C.direct):'')+'</th><td>'+esc(C.zeroRenew)+'</td><td class="activeRenewal">'+pct(n)+'</td></tr>').join('')}</tbody></table></div><p class="note">${esc(C.renewHint)}</p><aside class="subscriberBenefits"><p>${esc(C.activeBenefit)}</p>${cfg.active?'<strong>'+esc(C.alreadyActive)+'</strong>':'<a class="activateButton" href="./?subscribe=pay&amp;lang='+encodeURIComponent(lang)+'">'+esc(C.subscribeCta)+'</a>'}</aside>${!cfg.freeReferralEnabled?'<p class="note">'+esc(C.pending)+'</p>':''}</section>`;
+renderLevelGuide();syncMainMenuReturn();
 $('enrollment').hidden=!!cfg.accepted||!!cfg.canShare;$('agree').checked=false;updateJoin();$('join').hidden=!session;$('login').hidden=!!session;$('agree').disabled=!conditionsVerified||!session||!cfg.walletLinked;
 $('login').href='./?affiliateReturn=1&lang='+lang;$('member').hidden=!cfg.accepted&&!cfg.canShare;
 $('walletLogin').href='./?affiliateReturn=1&lang='+lang;$('walletLogin').hidden=!!session;
@@ -60,6 +81,7 @@ async function privateConfig(){
  if(memberPromise)return memberPromise;
  memberPromise=(async()=>{
    const member=await post('/api/affiliate/member',{token:session.token});
+   verifiedSessionToken=session.token;syncMainMenuReturn();
    cfg={...cfg,...member};
    const saved=window.EduCashProPlatform?.readWebSession?.();
    if(saved?.token===session.token)window.EduCashProPlatform.writeWebSession?.({...saved,profile:{...saved.profile,walletLinked:member.walletLinked,affiliateAccepted:member.accepted,referralCode:member.referralCode||saved.profile?.referralCode,active:member.active===true||saved.profile?.active===true,...(member.lifetime?{subscription:{...saved.profile?.subscription,lifetime:true,active:true}}:{})}});
@@ -131,6 +153,9 @@ $('join').onclick=async()=>{if(!conditionsVerified||!$('agree').checked||!sessio
 $('copy').onclick=async()=>{if(!link)return;try{await navigator.clipboard.writeText(link);$('status').textContent=C.copied}catch{$('status').textContent=link}};
 $('share').onclick=async()=>{if(!link)return;const result=await window.EduCashProAffiliateShare.share(link,lang);if(result.status==='copied')$('status').textContent=C.copied;else if(result.status==='unavailable')$('status').textContent=result.message;};
 const stored=window.EduCashProPlatform?.readWebSession?.();if(stored?.token)session=stored;
+$('back').href='./?view=presentation&lang='+encodeURIComponent(lang);
+$('mainMenuBack').href='./?view=home&lang='+encodeURIComponent(lang);
+syncMainMenuReturn();
 cfg=referenceConfig();render();
 if(session)void privateConfig().catch(()=>{});
 void refreshConditions();
