@@ -80,8 +80,10 @@ async function privateConfig(){
  if(!session)return;
  if(memberPromise)return memberPromise;
  memberPromise=(async()=>{
-   const member=await post('/api/affiliate/member',{token:session.token});
-   verifiedSessionToken=session.token;syncMainMenuReturn();
+   const requestedToken=session.token;
+   const member=await post('/api/affiliate/member',{token:requestedToken});
+   if(session?.token!==requestedToken)return;
+   verifiedSessionToken=requestedToken;syncMainMenuReturn();
    cfg={...cfg,...member};
    const saved=window.EduCashProPlatform?.readWebSession?.();
    if(saved?.token===session.token)window.EduCashProPlatform.writeWebSession?.({...saved,profile:{...saved.profile,walletLinked:member.walletLinked,affiliateAccepted:member.accepted,referralCode:member.referralCode||saved.profile?.referralCode,active:member.active===true||saved.profile?.active===true,...(member.lifetime?{subscription:{...saved.profile?.subscription,lifetime:true,active:true}}:{})}});
