@@ -11,13 +11,13 @@
     "first": "Comissão de adesão",
     "renew": "Comissões em cada renovação elegível",
     "none": "Sem comissão de renovação",
-    "rulesTitle": "Leia antes de participar",
+    "rulesTitle": "Regras essenciais",
     "rules": [
-      "O primeiro link válido fica registrado na conta por e-mail. Na primeira assinatura paga, o sistema verifica a atividade do indicador e aplica o percentual correspondente naquele momento. Cadastro gratuito, concessão administrativa e sua própria assinatura não geram comissão.",
-      "Os vínculos de rede já estabelecidos permanecem. Durante a inatividade, não há comissões de renovação. Ao reativar, o afiliado pode voltar a receber renovações futuras da rede que já possuía; valores não recebidos durante a inatividade não se acumulam.",
-      "Os pagamentos são feitos em USDT na rede TON, na carteira conectada à sua conta, e dependem da confirmação da rede.",
-      "Divulgue os produtos com informações verdadeiras e informe que a indicação pode gerar comissão. Não prometa renda, retorno do preço da assinatura ou resultados garantidos. Não faça autoindicações, cadastros artificiais ou spam.",
-      "Os percentuais exibidos refletem as condições atuais e podem ser alterados para operações futuras. Consulte esta página antes de divulgar. Participar não garante vendas, crescimento de rede ou ganhos. A plataforma pode ser utilizada sem participar do programa."
+      "O primeiro link válido registra a indicação. Só a primeira assinatura paga elegível gera comissão de adesão; cadastro gratuito, concessão e assinatura própria não geram pagamento.",
+      "Renovações dependem de assinatura ativa e vínculo válido. Na inatividade, não há comissões; a reativação vale apenas para renovações futuras da rede já preservada.",
+      "O pagamento é em USDT na rede TON, na carteira conectada, após confirmação da rede.",
+      "Divulgue com transparência e informe possíveis comissões. Sem promessas de ganhos; autoindicações, contas artificiais e spam são proibidos.",
+      "As condições podem mudar para operações futuras. Não há vendas ou renda garantidas. Participar é opcional."
     ],
     "agree": "Li e concordo com as regras e com as condições de comissão para assinantes ativos e usuários inativos.",
     "join": "Quero participar do programa",
@@ -27,7 +27,7 @@
     "copy": "Copiar link",
     "share": "Compartilhar",
     "network": "Ver minha rede",
-    "back": "Voltar à plataforma",
+    "back": "Voltar à apresentação",
     "accepted": "Participação confirmada",
     "loading": "Carregando condições atuais…",
     "unavailable": "Não foi possível confirmar as condições atuais. Tente novamente antes de participar.",
@@ -64,7 +64,14 @@
     "exampleEarn": "Você recebe {amount} USDT",
     "subscribeCta": "Assinar e ampliar minhas possibilidades",
     "alreadyActive": "Sua assinatura já está ativa",
-    "zeroRenew": "Não recebe"
+    "zeroRenew": "Não recebe",
+    "menuBack": "Voltar ao menu principal",
+    "levelsTitle": "Como funcionam os níveis",
+    "levelsDescription": "Nível 1: seus indicados diretos. Níveis 2 a 5: indicações sucessivas da sua rede. Os níveis indicam a distância na rede, não um cargo ou promoção pessoal.",
+    "qualificationOff": "A exigência de quantidade mínima de diretos ativos está desativada atualmente.",
+    "qualificationOn": "Para receber renovações por nível, é necessário ter estes diretos ativos:",
+    "qualificationUnknown": "A quantidade de diretos ativos exigida ainda não está disponível.",
+    "levelsNote": "Renovações só geram comissões elegíveis enquanto a sua assinatura estiver ativa."
   },
   "en": {
     "title": "Refer and Earn",
@@ -77,13 +84,13 @@
     "first": "Initial subscription commission",
     "renew": "Commissions on each eligible renewal",
     "none": "No renewal commission",
-    "rulesTitle": "Read before joining",
+    "rulesTitle": "Essential rules",
     "rules": [
-      "The first valid referral link is recorded with the email account. At the first paid subscription, the referrer’s activity determines the applicable rate. Free registration, administrative grants and your own subscription earn no commission.",
-      "Existing network relationships remain. Inactive affiliates do not earn renewals. Reactivation may restore eligibility for future renewals of their existing network; missed commissions do not accumulate.",
-      "Payments use USDT on TON, to the wallet linked to your account, and require network confirmation.",
-      "Promote products truthfully and disclose that referrals may earn you a commission. Do not promise income, recovery of the subscription price or guaranteed results. Self-referrals, artificial accounts and spam are prohibited.",
-      "Displayed rates reflect current conditions and may change for future transactions. Review this page before promoting. Participation does not guarantee sales, network growth or earnings. Using the platform does not require joining the program."
+      "The first valid link records the referral. Only a qualifying first paid subscription generates an initial commission; free accounts, grants and your own subscription do not.",
+      "Renewals require an active subscription and eligible network links. Inactive affiliates earn none; reactivation applies only to future renewals of the existing network.",
+      "Payments are made in USDT on TON to the connected wallet, after network confirmation.",
+      "Disclose referral commissions and promote truthfully. No earnings promises, self-referrals, artificial accounts or spam.",
+      "Terms can change for future transactions. No sales or income are guaranteed. Joining is optional."
     ],
     "agree": "I have read and agree to the rules and commission conditions for active subscribers and inactive users.",
     "join": "Join the referral program",
@@ -93,7 +100,7 @@
     "copy": "Copy link",
     "share": "Share",
     "network": "View my network",
-    "back": "Back to the platform",
+    "back": "Back to presentation",
     "accepted": "Participation confirmed",
     "loading": "Loading current conditions…",
     "unavailable": "Current conditions could not be confirmed. Try again before joining.",
@@ -130,7 +137,14 @@
     "exampleEarn": "You receive {amount} USDT",
     "subscribeCta": "Subscribe and expand my possibilities",
     "alreadyActive": "Your subscription is already active",
-    "zeroRenew": "No commission"
+    "zeroRenew": "No commission",
+    "menuBack": "Back to main menu",
+    "levelsTitle": "How network levels work",
+    "levelsDescription": "Level 1: your direct referrals. Levels 2–5: successive referrals in your network. These levels describe network depth, not personal rank.",
+    "qualificationOff": "Minimum active direct referral requirements are currently disabled.",
+    "qualificationOn": "To qualify for renewal commissions by level, these active direct referrals are required:",
+    "qualificationUnknown": "Required active direct referral counts are not currently available.",
+    "levelsNote": "Renewal commissions require an active subscription and an eligible renewal."
   },
   "es": {
     "title": "Recomienda y Gana",
@@ -143,13 +157,13 @@
     "first": "Comisión inicial",
     "renew": "Comisiones en cada renovación válida",
     "none": "Sin comisión de renovación",
-    "rulesTitle": "Lee antes de participar",
+    "rulesTitle": "Reglas esenciales",
     "rules": [
-      "El primer enlace válido queda registrado con el correo. En la primera suscripción pagada se comprueba la actividad del referente para aplicar la tasa. El registro gratuito, las concesiones y tu propia suscripción no generan comisión.",
-      "Los vínculos existentes permanecen. Durante la inactividad no se cobran renovaciones. Reactivar puede recuperar el derecho a renovaciones futuras de la red ya vinculada; las comisiones no recibidas no se acumulan.",
-      "Los pagos se realizan en USDT en TON, a la cartera conectada a tu cuenta, y requieren confirmación de red.",
-      "Divulga con información verdadera e informa que puedes recibir comisión. No prometas ingresos, recuperación del precio o resultados garantizados. Se prohíben autorreferidos, cuentas artificiales y spam.",
-      "Los porcentajes reflejan las condiciones actuales y pueden cambiar para operaciones futuras. Consulta esta página antes de divulgar. No se garantizan ventas, crecimiento de red o ingresos. Puedes usar la plataforma sin participar."
+      "El primer enlace válido registra la recomendación. Solo la primera suscripción pagada válida genera comisión inicial; el registro gratuito, las concesiones y la suscripción propia no generan pagos.",
+      "Las renovaciones requieren suscripción activa y vínculos válidos. Durante la inactividad no hay comisiones; la reactivación solo habilita renovaciones futuras de la red existente.",
+      "El pago se hace en USDT por TON a la cartera conectada, tras la confirmación de red.",
+      "Divulga de forma transparente e informa de posibles comisiones. Sin promesas de ganancias, autorreferidos, cuentas artificiales ni spam.",
+      "Las condiciones pueden cambiar en operaciones futuras. No se garantizan ventas ni ingresos. Participar es opcional."
     ],
     "agree": "He leído y acepto las reglas y las condiciones de comisión para usuarios activos e inactivos.",
     "join": "Quiero participar",
@@ -159,7 +173,7 @@
     "copy": "Copiar enlace",
     "share": "Compartir",
     "network": "Ver mi red",
-    "back": "Volver a la plataforma",
+    "back": "Volver a la presentación",
     "accepted": "Participación confirmada",
     "loading": "Cargando condiciones actuales…",
     "unavailable": "No fue posible confirmar las condiciones. Inténtalo antes de participar.",
@@ -196,7 +210,14 @@
     "exampleEarn": "Recibes {amount} USDT",
     "subscribeCta": "Suscribirme y ampliar mis posibilidades",
     "alreadyActive": "Tu suscripción ya está activa",
-    "zeroRenew": "Sin comisión"
+    "zeroRenew": "Sin comisión",
+    "menuBack": "Volver al menú principal",
+    "levelsTitle": "Cómo funcionan los niveles",
+    "levelsDescription": "Nivel 1: tus referidos directos. Niveles 2 a 5: recomendaciones sucesivas de tu red. Los niveles indican profundidad, no rango personal.",
+    "qualificationOff": "Actualmente no se exige un mínimo de referidos directos activos.",
+    "qualificationOn": "Para recibir renovaciones por nivel se requieren estos referidos directos activos:",
+    "qualificationUnknown": "No están disponibles los mínimos de referidos directos activos.",
+    "levelsNote": "Las comisiones de renovación requieren suscripción activa y renovación válida."
   },
   "ru": {
     "title": "Рекомендуй и получай комиссию",
@@ -209,13 +230,13 @@
     "first": "Комиссия за первую подписку",
     "renew": "Комиссии за каждое подходящее продление",
     "none": "Без комиссии за продления",
-    "rulesTitle": "Прочитайте до участия",
+    "rulesTitle": "Основные правила",
     "rules": [
-      "Первая действительная ссылка сохраняется в аккаунте с e-mail. При первой оплате активность пригласившего определяет ставку. Бесплатная регистрация, административный доступ и собственная подписка не приносят комиссию.",
-      "Существующие связи сохраняются. В неактивном статусе комиссии за продления не начисляются. После активации можно вновь получать будущие продления существующей сети; пропущенные комиссии не накапливаются.",
-      "Выплаты выполняются в USDT в сети TON на подключённый кошелёк и требуют подтверждения сети.",
-      "Продвигайте продукты правдиво и сообщайте о возможной комиссии. Не обещайте доход, возврат стоимости подписки или гарантированные результаты. Самоприглашения, искусственные аккаунты и спам запрещены.",
-      "Показаны текущие ставки; для будущих операций они могут измениться. Проверяйте условия перед продвижением. Продажи, рост сети и доход не гарантируются. Платформой можно пользоваться без участия в программе."
+      "Первая действительная ссылка фиксирует приглашение. Комиссия за вход возможна только при первой оплаченной подходящей подписке; бесплатная регистрация, льготы и собственная подписка не оплачиваются.",
+      "Продления оплачиваются при активной подписке и допустимых связях. В неактивном статусе комиссий нет; повторная активация действует лишь для будущих продлений прежней сети.",
+      "Выплаты — USDT в TON на подключённый кошелёк после подтверждения сети.",
+      "Сообщайте о комиссии и продвигайте продукты честно. Не обещайте заработок; самоприглашения, фиктивные аккаунты и спам запрещены.",
+      "Условия будущих сделок могут меняться. Продажи и доход не гарантируются. Участие добровольное."
     ],
     "agree": "Я прочитал и принимаю правила и условия комиссий для активных подписчиков и неактивных пользователей.",
     "join": "Участвовать в программе",
@@ -225,7 +246,7 @@
     "copy": "Копировать",
     "share": "Поделиться",
     "network": "Моя сеть",
-    "back": "Вернуться на платформу",
+    "back": "К презентации",
     "accepted": "Участие подтверждено",
     "loading": "Загрузка текущих условий…",
     "unavailable": "Не удалось подтвердить условия. Повторите попытку до участия.",
@@ -262,7 +283,14 @@
     "exampleEarn": "Вы получаете {amount} USDT",
     "subscribeCta": "Подписаться и расширить возможности",
     "alreadyActive": "Ваша подписка уже активна",
-    "zeroRenew": "Без комиссии"
+    "zeroRenew": "Без комиссии",
+    "menuBack": "В главное меню",
+    "levelsTitle": "Как работают уровни",
+    "levelsDescription": "Уровень 1 — приглашённые вами напрямую. Уровни 2–5 — последовательные приглашения вашей сети. Это глубина сети, а не личный ранг.",
+    "qualificationOff": "Требование минимального числа активных прямых приглашённых сейчас отключено.",
+    "qualificationOn": "Для комиссий за продления по уровням требуются активные прямые приглашённые:",
+    "qualificationUnknown": "Данные о необходимом числе активных прямых приглашённых пока недоступны.",
+    "levelsNote": "Комиссии за продления возможны только при активной подписке и подходящем продлении."
   }
 };
 })();
