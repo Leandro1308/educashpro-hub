@@ -51,4 +51,17 @@ assert(read('technical-analysis-course.js').includes('campaign=43340'));
 assert(read('affiliate.js').includes('/api/affiliate/enroll'));
 assert(fs.existsSync('affiliate-program-copy.js'));
 for(const name of ['marketplace.html','publish.html']){assert(read(name).includes('location.replace'));assert(read(name).includes('ref'));}
+const desktopMenu=read('web-site-menu.js'), affiliatePage=read('affiliate.html'), affiliateUi=read('affiliate.js'), affiliateCopy=read('affiliate-program-copy.js');
+assert(read('style.css').includes('html.educashproWeb .bottomNav { display:none!important; }'), 'desktop must not duplicate home cards with side navigation');
+assert(desktopMenu.includes("app?.renderHome?.()"), 'desktop header must offer home navigation');
+assert(shell.includes('const TIPS='), 'product cards must explain actions on hover');
+assert(affiliatePage.includes('id="mainMenuBack"') && affiliatePage.includes('href="./?view=home" hidden'), 'main-menu return must start hidden');
+assert(affiliateUi.includes('verifiedSessionToken=requestedToken') && affiliateUi.includes('syncMainMenuReturn()'), 'affiliate return must require verified session');
+assert(affiliateUi.includes('function renderLevelGuide()') && affiliateUi.includes('cfg?.qualificationEnabled===true'), 'level criteria must follow current rules');
+vm.runInNewContext(affiliateCopy,ctx);
+for(const lang of ['pt','en','es','ru']){
+  const c=ctx.window.EduCashProAffiliateCopy[lang];
+  assert(c.levelsTitle && c.levelsDescription && c.qualificationOff && c.qualificationOn && c.menuBack,'affiliate locales: '+lang);
+  assert(c.rules.length===5 && c.rules.every(rule=>rule.length<230),'affiliate rules should stay concise: '+lang);
+}
 console.log('Lean product: four locales, retired navigation, four-link policy, local learning, identity, referral, account and cache safety OK');

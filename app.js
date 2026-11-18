@@ -446,7 +446,7 @@
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.11.03.1";
+  const APP_RUNTIME_BUILD = "2026.11.18.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -739,8 +739,12 @@
   }
 
   function updateNav() {
-    bottomNav.classList.toggle("hidden",!state.profile?.userId&&!state.profile?.tgId);
+    const authenticated=Boolean(state.profile?.userId||state.profile?.tgId);
+    bottomNav.classList.toggle("hidden",!authenticated);
     bottomNav.querySelectorAll("button").forEach((button) => button.classList.toggle("active", button.dataset.view === (state.view === "analysis" ? "practice" : state.view === "finance" ? "home" : state.view)));
+    document.documentElement.dataset.ecpAuth=authenticated?"1":"0";
+    document.documentElement.dataset.ecpView=state.view;
+    window.EduCashProSiteMenu?.sync?.(state.view,state.profile);
   }
 
   const LAST_ROUTE_KEY = "educashpro:last-route:v1";
@@ -1886,7 +1890,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
     document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   }
 
-  function renderPublicLanding(){syncExternalSession();state.language=window.EduCashProLocale?.resolve?.({language:state.profile?.language})||window.EduCashProProduct.locale(navigator.language);applyLanguage();state.view='presentation';window.EduCashProProduct.landing(productContext());bottomNav.classList.toggle('hidden',!state.profile);markAppReady('public-landing');}
+  function renderPublicLanding(){syncExternalSession();state.language=window.EduCashProLocale?.resolve?.({language:state.profile?.language})||window.EduCashProProduct.locale(navigator.language);applyLanguage();state.view='presentation';updateNav();window.EduCashProProduct.landing(productContext());bottomNav.classList.toggle('hidden',!state.profile);markAppReady('public-landing');}
 
   async function runInit() {
     window.__EDUCASHPRO_INIT_STARTED__ = true;
