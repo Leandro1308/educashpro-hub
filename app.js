@@ -2058,6 +2058,7 @@ function productContext(){
     finance:()=>renderCourseCategory('financial_education'),business:()=>renderCourseCategory('business'),technical:()=>openCourse('analise_tecnica_completa'),
     subscription:()=>openAccountCenter('openSubscription'),network:()=>openAccountCenter('openNetwork'),settings:()=>openAccountCenter('openSettings')};
   ctx.market=openLiveMarkets;ctx.language=language;ctx.languageAction=()=>window.EduCashProLocale.open();
+  ctx.clubs=()=>{const u=new URL('./clubes.html',window.location.href);window.location.assign(u.toString());};
   ctx.program=()=>{const u=new URL('./affiliate.html',location.href);u.searchParams.set('lang',language);const ref=profile?.referralCode||window.EduCashProPlatform?.pendingReferral?.();if(ref)u.searchParams.set('ref',ref);openUrl(u.toString())};
   ctx.help=()=>window.EduCashProProduct.help(productContext());ctx.channel=()=>openUrl('https://t.me/+1mP5ad7vJH5lOGNh');ctx.group=()=>window.EduCashProProduct.group(ctx);
   ctx.telegram=()=>{const code=window.EduCashProPlatform?.pendingReferral?.()||'';const u=new URL('https://t.me/EduCashProBot');if(code)u.searchParams.set('start','ref_'+code);openUrl(u.toString())};
