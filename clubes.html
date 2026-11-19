@@ -1,19 +1,67 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Clube de Assinantes — EduCashPro</title><style>
-:root{font-family:system-ui,sans-serif;color-scheme:dark;background:#07111f;color:#effaff}*{box-sizing:border-box}body{margin:0}main{max-width:780px;margin:auto;padding:20px 16px 60px}a{color:#55e3bb}h1{font-size:30px}p,li{line-height:1.55;color:#b9cadc}.panel{background:#102238;border:1px solid #294357;border-radius:18px;padding:22px;margin:18px 0}label{display:block;margin:15px 0 7px;font-weight:600}input:not([type=checkbox]):not([type=radio]),textarea,select{width:100%;padding:13px;background:#071829;color:#fff;border:1px solid #537083;border-radius:10px;font:inherit}textarea{min-height:90px}.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}.options label{border:1px solid #537083;padding:15px;border-radius:12px}.options small{display:block;color:#afc5d4;margin-top:6px}.check{display:flex;align-items:start;gap:10px;margin:14px 0}.check input{margin-top:5px}.check label{margin:0;font-weight:400}button{background:#46e3ae;color:#09201b;border:0;padding:13px 18px;border-radius:11px;font:inherit;font-weight:750;cursor:pointer}.notice{border-left:3px solid #46e3ae;background:#113334;padding:14px;border-radius:8px}.warn{color:#ffd39a}.small{font-size:13px}output{display:block;padding:12px 0}@media(max-width:550px){.options{grid-template-columns:1fr}}
-</style></head><body><main><a href="./index.html?view=area">← Voltar à minha área</a><h1>Clube de Assinantes</h1><p>Cadastro de canais privados e supergrupos privados. Nenhum clube será ativado até o proprietário e as permissões do bot serem verificados pelo servidor.</p>
-<form id="form" class="panel"><h2>1. Identificação do clube</h2><div class="options"><label><input type="radio" name="type" value="channel" required> Canal privado<small>Publicação exclusiva de conteúdos pelo proprietário.</small></label><label><input type="radio" name="type" value="supergroup" required> Supergrupo privado<small>Comunidade com interação entre participantes.</small></label></div>
-<label for="name">Nome do clube</label><input id="name" maxlength="100" required>
-<label for="about">Descrição e benefícios</label><textarea id="about" maxlength="600" required></textarea>
-<label for="chat">ID numérico do chat</label><input id="chat" inputmode="numeric" pattern="-100[0-9]{5,}" placeholder="-1001234567890" required><p class="small">Não forneça o token de nenhum bot, senhas ou links de convite. O ID ainda deverá ser validado pela API oficial.</p>
-<h2>2. Direitos mínimos solicitados ao bot</h2><div class="notice">O bot deverá ser administrador e ter apenas os direitos para <strong>convidar usuários</strong> e <strong>banir/restringir usuários</strong>. O Telegram concede também o direito básico de gerenciamento do chat, implícito na administração.</div>
-<ul><li><strong>Convidar usuários (can_invite_users):</strong> criar links de ingresso e aprovar solicitações dos assinantes.</li><li><strong>Banir/restringir usuários (can_restrict_members):</strong> remover os que perderam o direito de acesso e desbloquear a reentrada após renovação.</li><li><strong>Gerenciar chat (can_manage_chat):</strong> direito implícito, incluindo acesso a certas informações de membros e registros administrativos.</li></ul>
-<p>Não pediremos acesso a publicar, editar ou excluir mensagens; alterar dados do chat; promover administradores; gerenciar tópicos, chamadas ou histórias.</p>
-<h2>3. Consentimento obrigatório</h2>
-<div class="check"><input type="checkbox" id="consent" required><label for="consent">Autorizo o bot EduCashPro a gerenciar entradas, remoções, convites e consultas de participação, exclusivamente para administrar assinaturas deste clube.</label></div>
-<div class="check"><input type="checkbox" id="authority" required><label for="authority">Declaro que sou o proprietário ou administrador autorizado a integrar esta comunidade.</label></div>
-<div class="check"><input type="checkbox" id="pending" required><label for="pending">Entendo que esta fase apenas prepara a solicitação. A ativação requer verificação técnica do servidor e não ocorrerá neste formulário.</label></div>
-<button type="submit">Preparar solicitação</button><output id="status" role="status" aria-live="polite"></output></form>
-<section class="panel"><h2>Verificações antes da ativação</h2><p>O backend deverá autenticar o solicitante, consultar <code>getChat</code> e <code>getChatMember</code> para comprovar o tipo privado e a administração autorizada, e conferir via <code>getChatMember</code> os direitos do bot. Somente após isso poderá persistir o clube e habilitar controle de convites e permanência.</p><p class="warn">Integração com a API e gravação do cadastro ainda pendentes. Este formulário não registra nem ativa clubes no servidor.</p></section></main>
-<script>
-document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();const f=e.currentTarget;if(!f.reportValidity())return;const chat=document.getElementById('chat').value.trim();if(!/^-100\d{5,}$/.test(chat)){document.getElementById('status').textContent='Informe um ID válido iniciado por -100.';return}const draft={type:f.elements.type.value,name:document.getElementById('name').value.trim(),description:document.getElementById('about').value.trim(),chatId:chat,requiredBotRights:['can_invite_users','can_restrict_members'],consentConfirmed:true,status:'pending_backend_verification'};const o=document.getElementById('status');o.replaceChildren();const p=document.createElement('p');p.textContent='Solicitação preparada, não cadastrada. Os dados não foram enviados. Baixe o rascunho para futura ativação após integração do servidor.';o.append(p);const b=document.createElement('button');b.type='button';b.textContent='Baixar solicitação';b.onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(draft,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='clube-solicitacao.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),500)};o.append(b)});
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Clube de Assinantes — EduCashPro</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,sans-serif;background:#07111f;color:#f3faff}*{box-sizing:border-box}body{margin:0}main{max-width:830px;margin:auto;padding:20px 16px 70px}a{color:#52e7b7}header{display:flex;align-items:center;justify-content:space-between;gap:15px}h1{font-size:clamp(26px,5vw,38px);margin:20px 0 8px}h2{font-size:19px;margin-top:0}p,li{color:#b9cad8;line-height:1.55}label{display:block;font-weight:650;margin:13px 0 7px}input:not([type=checkbox]):not([type=radio]),textarea{width:100%;background:#091a2d;border:1px solid #4b6377;border-radius:10px;padding:12px;color:inherit;font:inherit}textarea{min-height:95px}.panel{background:#102238;border:1px solid #284458;border-radius:17px;padding:20px;margin:16px 0}.intro{border-left:3px solid #40e5b0;padding:13px;background:#143337;border-radius:8px}.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}.choice label{border:1px solid #3f6071;padding:15px;border-radius:12px;margin:0}.choice small{display:block;font-weight:400;color:#b8cddd;margin:8px 0 0}.check{display:flex;gap:10px;align-items:flex-start;margin:14px 0}.check input{margin-top:6px}.check label{margin:0;font-weight:450}button,.button{min-height:44px;padding:11px 16px;border-radius:10px;background:#1d354a;color:#f3faff;border:1px solid #466075;font:inherit;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.primary{background:#3fe4ad;color:#072019;border:0;font-weight:750}button:disabled{opacity:.55;cursor:default}.small{font-size:13px}.status{padding:12px;border-radius:10px;background:#172d3e;margin-top:12px}.ok{color:#80eac0}.error{color:#ffb6ad}.warn{color:#ffcf8b}.hidden{display:none}ul{padding-left:22px}.club{border:1px solid #345266;border-radius:12px;padding:12px;margin-top:10px}.club b{display:block}.club small{color:#a9bfcd}code{word-break:break-all}@media(max-width:580px){.choice{grid-template-columns:1fr}.panel{padding:15px}header{align-items:flex-start}}
+</style></head>
+<body><main><header><b>EduCashPro · Clube de Assinantes</b><a href="./index.html?view=area">← Minha área</a></header>
+<h1>Cadastre sua comunidade</h1><p>Transforme um canal privado ou supergrupo privado em clube de assinantes. Para conectar o Telegram, precisamos confirmar que você é o proprietário e que nosso bot recebeu apenas as permissões necessárias.</p>
+<section class="panel"><h2>Etapa 1 · Identificação</h2><p id="sessionInfo" class="small">Verificando sua conta EduCashPro…</p><p id="telegramHint" class="small"></p>
+<div class="intro">Nesta fase o cadastro e a autorização do bot são reais. <strong>Cobranças e remoção automática por vencimento continuam desativadas</strong> até a integração financeira futura.</div></section>
+<section class="panel" id="connectInstructions"><h2>Etapa 2 · Adicione nosso bot</h2><p>Abra a comunidade privada no Telegram, entre em <b>Administradores → Adicionar administrador</b>, procure o bot oficial indicado abaixo e conceda somente as duas permissões informadas.</p><p id="botInfo">Consultando o bot oficial…</p><ul>
+<li><b>Convidar usuários</b> (<code>can_invite_users</code>): permite criar convites e aprovar pedidos de entrada.</li>
+<li><b>Banir/restringir membros</b> (<code>can_restrict_members</code>): permite remover assinantes vencidos e desbloquear sua reentrada.</li>
+<li><b>Gerenciar chat</b> (<code>can_manage_chat</code>): direito administrativo implícito, incluindo acesso a determinadas informações e eventos.</li>
+</ul><p class="small">Não solicitamos direitos para publicar ou apagar mensagens, alterar nome ou descrição, promover administradores, gerir tópicos, chamadas ou histórias. O bot poderá ter acesso a eventos e informações de membros dentro dos recursos administrativos concedidos. O proprietário pode revogar as permissões a qualquer momento, o que suspenderá o controle automatizado de acesso.</p>
+</section>
+<form id="clubForm" class="panel"><h2>Etapa 3 · Cadastro e consentimento</h2><div class="choice"><label><input type="radio" name="type" value="channel" required> Canal privado<small>Conteúdos publicados pelo proprietário.</small></label><label><input type="radio" name="type" value="supergroup" required> Supergrupo privado<small>Comunidade com interação entre os participantes.</small></label></div>
+<label for="chatId">ID do canal/supergrupo</label><input id="chatId" inputmode="numeric" pattern="-100[0-9]{5,18}" placeholder="-1001234567890" required><p class="small">É o identificador numérico iniciado por -100. Não envie tokens de bot, senhas ou links de convite.</p>
+<label for="description">Descrição e benefícios</label><textarea id="description" minlength="10" maxlength="600" placeholder="Descreva a finalidade do clube e seus benefícios" required></textarea>
+<div class="check"><input id="permissions" type="checkbox" required><label for="permissions">Autorizo o EduCashPro a verificar a comunidade e utilizar as permissões de convite, aprovação, remoção, desbloqueio e consulta de status dos membros exclusivamente para administrar acesso e permanência.</label></div>
+<div class="check"><input id="ownership" type="checkbox" required><label for="ownership">Declaro ser o proprietário deste canal ou supergrupo e autorizo a conexão do bot.</label></div>
+<div class="check"><input id="scope" type="checkbox" required><label for="scope">Entendo que esta integração não autoriza o EduCashPro a publicar ou apagar conteúdos e que não haverá cobranças nem remoções automáticas até a ativação dos recursos futuros.</label></div>
+<button class="primary" type="submit" id="submit">Verificar permissões e cadastrar</button><div class="status hidden" id="feedback" role="status" aria-live="polite"></div></form>
+<section class="panel"><h2>Meus clubes cadastrados</h2><div id="clubsList">Carregando…</div></section>
+</main><script>
+(()=>{
+'use strict';
+const API='https://educashpro-all.onrender.com',CONSENT='2026-11-19.telegram-access.v1';
+const by=id=>document.getElementById(id);
+const readSession=()=>{try{return JSON.parse(localStorage.getItem('educashpro:web-session')||'null')}catch{return null}};
+const session=readSession();
+const token=session?.token||'';
+function status(msg,error=false){const el=by('feedback');el.classList.remove('hidden');el.className='status '+(error?'error':'ok');el.textContent=msg;}
+async function api(path,method='GET',body){
+ const response=await fetch(API+path,{method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+ const data=await response.json().catch(()=>({reason:'invalid_response'}));
+ if(!response.ok)throw Error(data.reason||'request_failed');
+ return data;
+}
+const errors={invalid_session:'Sua sessão expirou. Entre novamente no EduCashPro.',telegram_account_not_linked:'Vincule sua conta do Telegram à conta EduCashPro antes de cadastrar.',telegram_ownership_not_verified:'Esta conta Telegram não é a proprietária da comunidade. Verifique o vínculo.',missing_bot_permissions:'O bot não recebeu todas as permissões necessárias.',bot_must_be_administrator:'Adicione o bot como administrador do canal ou supergrupo.',private_chat_type_required:'Apenas canais privados e supergrupos privados podem ser cadastrados.',telegram_chat_or_membership_unavailable:'O Telegram não encontrou a comunidade ou não permitiu a consulta. Confira o ID e adicione o bot.',chat_registered_by_another_owner:'Esta comunidade já foi cadastrada por outro proprietário.',telegram_bot_unavailable:'O bot oficial está indisponível no servidor.',database_unavailable:'O cadastro está temporariamente indisponível.',verification_temporarily_unavailable:'Não foi possível verificar agora. Tente novamente.'};
+function message(e){return errors[e?.message]||e?.message||'Ocorreu um erro.'}
+async function load(){
+ if(!token){by('sessionInfo').textContent='Entre com seu e-mail na página principal antes de continuar.';by('submit').disabled=true;by('clubsList').textContent='Faça login para consultar seus clubes.';return;}
+ by('sessionInfo').textContent='Sessão Web localizada. O cadastro exige também uma conta Telegram vinculada.';
+ try {
+  const data=await api('/api/subscriber-clubs/bot');
+  by('botInfo').replaceChildren();
+  const link=document.createElement('a');link.href='https://t.me/'+encodeURIComponent(data.botUsername);link.target='_blank';link.rel='noopener noreferrer';link.textContent='@'+data.botUsername;
+  by('botInfo').append('Bot oficial: ',link);
+ }catch(e){by('telegramHint').textContent=message(e);by('telegramHint').className='warn small';by('submit').disabled=true;}
+ try {
+  const data=await api('/api/subscriber-clubs/mine');const host=by('clubsList');host.replaceChildren();
+  if(!data.clubs.length){host.textContent='Você ainda não cadastrou nenhum clube.';return;}
+  data.clubs.forEach(c=>{const div=document.createElement('div');div.className='club';const title=document.createElement('b');title.textContent=c.title;const detail=document.createElement('small');detail.textContent=(c.type==='channel'?'Canal privado':'Supergrupo privado')+' · Verificado · Cobranças não habilitadas';div.append(title,detail);host.append(div)});
+ } catch(e){by('clubsList').textContent=message(e);}
+}
+by('clubForm').addEventListener('submit',async event=>{
+ event.preventDefault();const f=event.currentTarget;if(!f.reportValidity())return;
+ by('submit').disabled=true;status('Conferindo comunidade, propriedade e permissões do bot…');
+ try {
+ const data=await api('/api/subscriber-clubs/register','POST',{type:f.elements.type.value,chatId:by('chatId').value.trim(),description:by('description').value.trim(),acceptPermissions:by('permissions').checked,confirmOwnership:by('ownership').checked,consentVersion:CONSENT});
+ status('Clube cadastrado e verificado: '+data.club.title+'. O controle de assinaturas permanece desativado.');
+ f.reset();await load();
+ }catch(e){status(message(e),true);}finally{by('submit').disabled=false;}
+});
+void load();
+})();
 </script></body></html>
