@@ -107,12 +107,12 @@
     tonConnectLoadPromise=(async()=>{
       const resources=window.EduCashProResources;
       if(resources?.script){
-        await resources.script("https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js",{external:true});
+        await resources.script("https://unpkg.com/@tonconnect/ui@5.0.4/dist/tonconnect-ui.min.js",{external:true});
         try{await resources.script("./ton-connect-session-recovery.js")}catch(_){}
       }else{
         await new Promise((resolve,reject)=>{
           const node=document.createElement("script");
-          node.src="https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js";
+          node.src="https://unpkg.com/@tonconnect/ui@5.0.4/dist/tonconnect-ui.min.js";
           node.async=true;
           node.onload=resolve;
           node.onerror=()=>reject(new Error("ton_connect_ui_load_failed"));
