@@ -40,7 +40,7 @@
     if(busy || closed)return; busy=true; status(copy().connecting);
     try{
       if(!window.TON_CONNECT_UI){
-        await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://unpkg.com/@tonconnect/ui@3.0.0/dist/tonconnect-ui.min.js";script.onload=resolve;script.onerror=reject;document.head.appendChild(script)});
+        await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src="https://unpkg.com/@tonconnect/ui@5.0.4/dist/tonconnect-ui.min.js";script.onload=resolve;script.onerror=reject;document.head.appendChild(script)});
       }
       if(closed)return;
       if(!ui) {
@@ -85,20 +85,35 @@
     if(attempt>=39){status(copy().wait);return;}
     pollTimer=setTimeout(()=>confirmPayment(previousUntil,previousActive,attempt+1),3000);
   }
+  let checkoutConfig = null;
   async function pay(){
     if(busy || !verifiedWallet || closed)return;
     if(ui?.wallet?.account?.address!==verifiedWallet){status(copy().connecting);return;}
     busy=true;const button=layer.querySelector("[data-pay]");button.disabled=true;layer.querySelector("[data-plan]").disabled=true;
+    let submissionStarted = false;
     try{
       const before=await request("/api/platform-account/overview",{method:"POST",body:"{}"});
       const qs=new URLSearchParams({owner:verifiedWallet,action:selectedAction});
+      if (checkoutConfig?.gasless) qs.set('gasless','1');
       const data=await request("/api/ton/build-tx?"+qs);
       const tx=data.tx;
       if(!tx?.messages?.length || !tx.validUntil)throw new Error("invalid_transaction");
-      await ui.sendTransaction({validUntil:tx.validUntil,messages:tx.messages.map(({address,amount,payload,stateInit})=>({address,amount,payload,stateInit}))});
+      const price = Number(checkoutConfig?.[selectedAction === 'annual' ? 'annualPriceUsdt' : 'planPriceUsdt']);
+      const amount = String(Math.round((price + Number(checkoutConfig?.serviceFeeUsdt ?? 0)) * 1_000_000));
+      if (amount !== data.preflight?.requiredUsdtUnits) throw Error("checkout_terms_changed");
+      const transaction = {validUntil:tx.validUntil,messages:tx.messages.map(({address,amount,payload,stateInit})=>({address,amount,payload,stateInit}))};
+      if (checkoutConfig?.gasless) {
+        if (typeof ui.signMessage !== 'function') throw Error("gasless_wallet_unsupported");
+        const signed = await ui.signMessage({...transaction, network:'-239', from:verifiedWallet});
+        if(closed)return;
+        submissionStarted = true;
+        await request('/api/ton/gasless-submit',{method:'POST',body:JSON.stringify({pendingId:data.pendingId,internalBoc:signed.internalBoc})});
+      } else {
+        await ui.sendTransaction(transaction);
+      }
       status(copy().sent);
       await confirmPayment(Number(before.subscription?.activeUntil||0),before.subscription?.active===true);
-    }catch(error){status(copy().error+" "+error.message);button.disabled=false}finally{busy=false}
+    }catch(error){if(submissionStarted){status(copy().wait)}else{status(copy().error+" "+error.message);button.disabled=false}}finally{busy=false}
   }
   async function open(action="pay"){
     if(!platform.isWeb())return false;
@@ -112,6 +127,7 @@
     document.body.appendChild(layer);layer.querySelector("[data-close]").onclick=close;layer.querySelector("[data-back]").onclick=close;layer.querySelector("[data-connect]").onclick=connect;layer.querySelector("[data-pay]").onclick=pay;
     const selector=layer.querySelector("[data-plan]");
     selector.value=selectedAction==="annual"?"annual":"monthly";
+    checkoutConfig=null;
     let config=null;
     function showPlan(){
       const annual=selector.value==="annual";
@@ -140,7 +156,7 @@
     }
     selector.onchange=showPlan;
     showPlan();
-    try{config=await request("/api/webapp/config");const terms=await request("/api/affiliate/public-config",{method:"POST",body:"{}"});if(terms.configSource!=="contract"||!(Number(terms.priceUsdt)>0&&Number(terms.cycleSeconds)>0))throw Error("terms_unavailable");config.planPriceUsdt=Number(terms.priceUsdt);config.cycleSeconds=Number(terms.cycleSeconds);selector.options[0].textContent=String(config.cycleSeconds/86400)+" "+({pt:"dias",en:"days",es:"días",ru:"дней"}[language()]||"days");if(!closed)showPlan();}
+    try{config=await request("/api/webapp/config");const terms=await request("/api/affiliate/public-config",{method:"POST",body:"{}"});if(terms.configSource!=="contract"||!(Number(terms.priceUsdt)>0&&Number(terms.cycleSeconds)>0))throw Error("terms_unavailable");config.planPriceUsdt=Number(terms.priceUsdt);config.cycleSeconds=Number(terms.cycleSeconds);checkoutConfig=config;if(config.gasless){layer?.querySelectorAll('ol li:nth-child(2),ol li:nth-child(3),a.wideButton').forEach(el=>el.hidden=true);}selector.options[0].textContent=String(config.cycleSeconds/86400)+" "+({pt:"dias",en:"days",es:"días",ru:"дней"}[language()]||"days");if(!closed)showPlan();}
     catch(error){status(c.error);layer?.querySelector("[data-connect]")?.setAttribute("disabled","");}
     return true;
   }
