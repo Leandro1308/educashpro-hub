@@ -14,7 +14,7 @@ function chaptersFor(lang){
  return (window.EduCashProBookQuizTranslations?.[lang]||[]).slice().sort((a,b)=>a.id-b.id);
 }
 function build(language){
- const lang=LANGS.includes(String(language).slice(0,2).toLowerCase())?String(language).slice(0,2).toLowerCase():"pt";
+ const lang=LANGS.includes(String(language).slice(0,2).toLowerCase())?String(language).slice(0,2).toLowerCase():"en";
  const chapters=chaptersFor(lang);
  if(!isValid(chapters))throw new Error("book_quiz_missing_or_incomplete_locale_"+lang);
  const strings=S[lang],questions=[];

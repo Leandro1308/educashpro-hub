@@ -84,7 +84,7 @@
 
   const bookLanguageLoads=new Map();
   function loadBookCourse(lang="pt"){
-    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"pt";
+    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"en";
     if(bookLanguageLoads.has(selected))return bookLanguageLoads.get(selected);
     const task=(async()=>{
       await Promise.all([style("./book-quiz.css"),style("./book-quiz-v3.css"),script("./book-quiz-engine-v4.js")]);
@@ -105,7 +105,7 @@
   }
   const setForLifeLanguageLoads=new Map();
   function loadSetForLifeCourse(lang="pt"){
-    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"pt";
+    const selected=["pt","en","es","ru"].includes(String(lang).slice(0,2).toLowerCase())?String(lang).slice(0,2).toLowerCase():"en";
     if(setForLifeLanguageLoads.has(selected))return setForLifeLanguageLoads.get(selected);
     const task=(async()=>{
       await Promise.all([style("./book-quiz.css"),style("./book-quiz-v3.css"),script("./book-quiz-engine-v4.js")]);

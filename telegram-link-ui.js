@@ -8,14 +8,14 @@
   let lastLinked=false;
 
   function session(){return platform.readWebSession?.()||null}
-  function language(){const raw=String(session()?.profile?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
+  function language(){ return window.EduCashProLocale?.resolve({session:session()}) || "en"; }
   const copy={
     pt:{title:"Telegram",linked:"Vinculado à sua conta",body:"Vincule seu Telegram para usar o Bot e o Mini App com a mesma conta EduCashPro.",button:"Vincular Telegram",opening:"Abrindo Telegram…",error:"Não foi possível gerar o vínculo agora. Tente novamente."},
     en:{title:"Telegram",linked:"Linked to your account",body:"Link Telegram to use the Bot and Mini App with the same EduCashPro account.",button:"Link Telegram",opening:"Opening Telegram…",error:"Could not create the link right now. Please try again."},
     es:{title:"Telegram",linked:"Vinculado a tu cuenta",body:"Vincula Telegram para usar el Bot y la Mini App con la misma cuenta EduCashPro.",button:"Vincular Telegram",opening:"Abriendo Telegram…",error:"No fue posible generar el vínculo. Inténtalo de nuevo."},
     ru:{title:"Telegram",linked:"Привязан к аккаунту",body:"Привяжите Telegram, чтобы использовать бота и Mini App с тем же аккаунтом EduCashPro.",button:"Привязать Telegram",opening:"Открываем Telegram…",error:"Сейчас не удалось создать привязку. Попробуйте ещё раз."}
   };
-  function t(key){return copy[language()]?.[key]||copy.pt[key]||key}
+  function t(key){return copy[language()]?.[key]||copy.en[key]||key}
 
   async function beginLink(button,status){
     const current=session();

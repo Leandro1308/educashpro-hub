@@ -85,7 +85,7 @@
   Object.assign(LC.en,{pageAddressHint:"Choose a short address name, such as leandro or my-business. Use letters, numbers and hyphens. Save to publish the change."});
   Object.assign(LC.es,{pageAddressHint:"Elige un nombre corto, como leandro o mi-empresa. Usa letras, números y guiones. Guarda para publicar el cambio."});
   Object.assign(LC.ru,{pageAddressHint:"Выберите короткое имя, например leandro или my-business. Используйте латинские буквы, цифры и дефисы. Сохраните для публикации изменений."});
-  const lc = key => LC[language()][key] || LC.pt[key] || key;
+  const lc = key => LC[language()][key] || LC.en[key] || key;
   const campaignsUrl = slug => `https://go.educashpro.vip/c/${encodeURIComponent(slug)}`;
   const number = n => Number(n||0).toLocaleString({pt:'pt-BR',en:'en-US',es:'es-ES',ru:'ru-RU'}[language()]);
   const countryName = code => {try{return code ? new Intl.DisplayNames([language()],{type:'region'}).of(code) : lc('unknown')}catch{return code||lc('unknown')}};
@@ -135,8 +135,8 @@
     host.querySelector('#lcRefresh').onclick=load;host.querySelector('#lcDays').onchange=load;host.scrollIntoView?.({behavior:'smooth'});await load();
   }
 
-  function language() { const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;const value = String(session?.profile?.language || params.get("lang") || "pt").toLowerCase(); return COPY[value] ? value : "pt"; }
-  function text(key, values = {}) { return Object.entries(values).reduce((value, [name, item]) => value.replace(`{${name}}`, item), COPY[language()][key] || COPY.pt[key] || key); }
+  function language() { const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;const value = String(session?.profile?.language || params.get("lang") || "en").toLowerCase(); return COPY[value] ? value : "pt"; }
+  function text(key, values = {}) { return Object.entries(values).reduce((value, [name, item]) => value.replace(`{${name}}`, item), COPY[language()][key] || COPY.en[key] || key); }
   function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]); }
   function content() { return document.getElementById("content"); }
   function active() { return session?.profile?.active === true; }

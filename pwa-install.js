@@ -12,10 +12,10 @@
   function lang(){
     const canonical=window.EduCashProLocale?.resolve?.();
     if(canonical&&COPY[canonical])return canonical;
-    const raw=String(document.documentElement.lang||navigator.language||"pt").toLowerCase();
-    return raw.startsWith("en")?"en":raw.startsWith("es")?"es":raw.startsWith("ru")?"ru":"pt";
+    const raw=String(document.documentElement.lang||navigator.language||"en").toLowerCase();
+    return window.EduCashProLocale?.resolve() || (raw.startsWith("pt")?"pt":raw.startsWith("es")?"es":raw.startsWith("ru")?"ru":"en");
   }
-  function copy(){return COPY[lang()]||COPY.pt}
+  function copy(){return COPY[lang()]||COPY.en}
   function isInstalled(){
     return window.matchMedia?.("(display-mode: standalone)")?.matches===true||
       window.navigator.standalone===true||

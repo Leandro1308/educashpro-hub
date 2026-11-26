@@ -5,14 +5,14 @@
   const BOT_USERNAME="EduCashProBot";
 
   function session(){return platform.readWebSession?.()||null}
-  function language(){const raw=String(session()?.profile?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
+  function language(){ return window.EduCashProLocale?.resolve({session:session()}) || "en"; }
   const copy={
     pt:{site:"Compartilhar pelo site",telegram:"Compartilhar pelo Telegram",copy:"Copiar",copied:"Copiado",hint:"Os dois links usam o mesmo código de indicação e apontam para a mesma conta patrocinadora."},
     en:{site:"Share website link",telegram:"Share Telegram link",copy:"Copy",copied:"Copied",hint:"Both links use the same referral code and point to the same sponsor account."},
     es:{site:"Compartir por el sitio",telegram:"Compartir por Telegram",copy:"Copiar",copied:"Copiado",hint:"Ambos enlaces usan el mismo código de referido y apuntan a la misma cuenta patrocinadora."},
     ru:{site:"Поделиться ссылкой сайта",telegram:"Поделиться через Telegram",copy:"Копировать",copied:"Скопировано",hint:"Обе ссылки используют один реферальный код и ведут к одному аккаунту спонсора."}
   };
-  function t(key){return copy[language()]?.[key]||copy.pt[key]||key}
+  function t(key){return copy[language()]?.[key]||copy.en[key]||key}
 
   async function copyValue(value,button){
     try{await navigator.clipboard.writeText(value)}catch{}

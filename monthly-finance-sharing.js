@@ -75,7 +75,7 @@
   let viewedWorkspace = null;
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
-  const c = () => COPY[options?.language] || COPY.pt;
+  const c = () => COPY[options?.language] || COPY.en;
   const fmt = (value) => new Intl.NumberFormat(options?.language === "pt" ? "pt-BR" : options?.language || "en", { style: "currency", currency: displayCurrency, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0));
   const totals = (record) => { const spent = (record?.expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0); return { spent, balance: Number(record?.income || 0) - spent }; };
   const categoryName = (id) => { const source = lastCategories.length ? lastCategories.map((item) => [item[0], item[2]]) : c().categories; return source.find((item) => item[0] === id)?.[1] || id; };

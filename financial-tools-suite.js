@@ -73,10 +73,10 @@ helpCompound:"Укажите начальную сумму, ежемесячны
 }
 };
 
-let opt={language:"pt",session:null,back:null,toolBack:null,subscribe:null};
+let opt={language:"en",session:null,back:null,toolBack:null,subscribe:null};
 const state={quoteItems:[{name:"",qty:1,price:0}]};
-function lang(){const c=String(opt.language||window.EduCashProLocale?.resolve?.()||"pt").slice(0,2);return LANGS.includes(c)?c:"pt"}
-function t(k){return COPY[lang()][k]||COPY.pt[k]||k}
+function lang(){const c=String(opt.language||window.EduCashProLocale?.resolve?.()||"en").slice(0,2);return LANGS.includes(c)?c:"en"}
+function t(k){return COPY[lang()][k]||COPY.en[k]||k}
 function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function active(){return window.EduCashProAccess?.isActive?.()===true||opt.active===true}
 function uid(){return opt.session?.profile?.userId||opt.session?.profile?.tgId||"local"}
@@ -117,7 +117,7 @@ function renderQuote(){
 }
 
 function setOptions(args={},toolBack=null){
- opt={language:LANGS.includes(args.language)?args.language:(window.EduCashProLocale?.resolve?.()||"pt"),session:args.session||window.__EDUCASHPRO_SESSION__||{},active:args.active===true,back:args.back,toolBack,subscribe:args.subscribe};
+ opt={language:LANGS.includes(args.language)?args.language:(window.EduCashProLocale?.resolve?.()||"en"),session:args.session||window.__EDUCASHPRO_SESSION__||{},active:args.active===true,back:args.back,toolBack,subscribe:args.subscribe};
 }
 function render(args={}){setOptions(args,null);renderHub()}
 function open(id,args={}){

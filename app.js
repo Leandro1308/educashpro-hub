@@ -21,7 +21,7 @@
     referrerId: "",
     planPriceUsdt: 12,
     botUrl: "",
-    language: "pt",
+    language: window.EduCashProLocale?.resolve() || "en",
     view: "home",
     directoryPage: 1,
     directoryType: "",
@@ -126,7 +126,7 @@
     es: { back: "Volver", save: "Enviar para evaluación", saving: "Enviando…", sent: "Registro enviado para evaluación.", remove: "Eliminar", confirmRemove: "¿Eliminar este registro definitivamente?", removed: "Registro eliminado.", required: "Completa todos los campos obligatorios.", project: "Registrar proyecto", benefit: "Ofrecer beneficio gratuito", partner: "Registrar socio", name: "Nombre", description: "Descripción", url: "Enlace completo (https://)", type: "Tipo", category: "Categoría", language: "Idioma", company: "Nombre de la empresa", segment: "Segmento", discount: "Rango de descuento", rules: "Reglas del descuento", storeType: "Atención", city: "Ciudad", region: "Estado/Región", contact: "Contacto", affiliate: "Enlace de afiliado o grupo exclusivo (opcional)", deleteError: "No fue posible eliminar." },
     ru: { back: "Назад", save: "Отправить на проверку", saving: "Отправка…", sent: "Заявка отправлена на проверку.", remove: "Удалить", confirmRemove: "Удалить эту заявку навсегда?", removed: "Заявка удалена.", required: "Заполните все обязательные поля.", project: "Добавить проект", benefit: "Предложить бесплатное преимущество", partner: "Добавить партнёра", name: "Название", description: "Описание", url: "Полная ссылка (https://)", type: "Тип", category: "Категория", language: "Язык", company: "Название компании", segment: "Сегмент", discount: "Размер скидки", rules: "Правила скидки", storeType: "Формат обслуживания", city: "Город", region: "Регион", contact: "Контакт", affiliate: "Партнёрская ссылка или закрытая группа (необязательно)", deleteError: "Не удалось удалить." },
   };
-  const fc = (key) => (FORM_COPY[state.language] || FORM_COPY.pt)[key] || FORM_COPY.pt[key] || key;
+  const fc = (key) => (FORM_COPY[state.language] || FORM_COPY.en)[key] || FORM_COPY.en[key] || key;
   const PARTNER_SEGMENTS = ["pharmacy", "clinic", "physiotherapy", "gym", "dental", "laboratory", "nutrition", "psychology", "beauty", "education", "restaurants", "retail", "services", "technology", "other"];
   const PARTNER_SEGMENT_COPY = {
     pt: { all: "Todos", pharmacy: "Farmácias", clinic: "Clínicas", physiotherapy: "Fisioterapia", gym: "Academias", dental: "Odontologia", laboratory: "Laboratórios", nutrition: "Nutrição", psychology: "Psicologia", beauty: "Beleza e estética", education: "Educação", restaurants: "Alimentação", retail: "Comércio", services: "Serviços", technology: "Tecnologia", other: "Outros" },
@@ -134,7 +134,7 @@
     es: { all: "Todos", pharmacy: "Farmacias", clinic: "Clínicas", physiotherapy: "Fisioterapia", gym: "Gimnasios", dental: "Odontología", laboratory: "Laboratorios", nutrition: "Nutrición", psychology: "Psicología", beauty: "Belleza y estética", education: "Educación", restaurants: "Alimentación", retail: "Comercio", services: "Servicios", technology: "Tecnología", other: "Otros" },
     ru: { all: "Все", pharmacy: "Аптеки", clinic: "Клиники", physiotherapy: "Физиотерапия", gym: "Спортзалы", dental: "Стоматология", laboratory: "Лаборатории", nutrition: "Питание", psychology: "Психология", beauty: "Красота и уход", education: "Образование", restaurants: "Питание", retail: "Торговля", services: "Услуги", technology: "Технологии", other: "Другое" },
   };
-  const partnerSegmentLabel = (segment) => (PARTNER_SEGMENT_COPY[state.language] || PARTNER_SEGMENT_COPY.pt)[segment] || PARTNER_SEGMENT_COPY.pt[segment] || segment;
+  const partnerSegmentLabel = (segment) => (PARTNER_SEGMENT_COPY[state.language] || PARTNER_SEGMENT_COPY.en)[segment] || PARTNER_SEGMENT_COPY.en[segment] || segment;
   const partnerSegmentOptions = () => PARTNER_SEGMENTS.map((segment) => [segment, partnerSegmentLabel(segment)]);
 
   const EXTRA_COPY = {
@@ -376,9 +376,9 @@
   };
 
 
-  function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.pt[key] || COPY.pt[key] || key; }
-  function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.pt[key] ?? key; }
-  function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.pt[key] ?? key; }
+  function t(key) { return EXTRA_COPY[state.language]?.[key] || COPY[state.language]?.[key] || EXTRA_COPY.en[key] || COPY.en[key] || key; }
+  function presentationCopy(key) { return PRESENTATION_COPY[state.language]?.[key] ?? PRESENTATION_COPY.en[key] ?? key; }
+  function featureCopy(key) { return FEATURE_COPY[state.language]?.[key] ?? FEATURE_COPY.en[key] ?? key; }
   function benefitNavigationCopy(key) {
     const copy = {
       pt: { exclusive: "Benefícios Exclusivos", exclusiveSub: "Vantagens gratuitas e oportunidades aprovadas.", stores: "Lojas Parceiras", storesSub: "Empresas, descontos e condições para assinantes." },
@@ -386,7 +386,7 @@
       es: { exclusive: "Beneficios Exclusivos", exclusiveSub: "Ventajas gratuitas y oportunidades aprobadas.", stores: "Tiendas Asociadas", storesSub: "Empresas, descuentos y condiciones para suscriptores." },
       ru: { exclusive: "Эксклюзивные преимущества", exclusiveSub: "Одобренные бесплатные возможности.", stores: "Магазины-партнёры", storesSub: "Компании, скидки и условия для подписчиков." },
     };
-    return copy[state.language]?.[key] || copy.pt[key] || key;
+    return copy[state.language]?.[key] || copy.en[key] || key;
   }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function formatDate(epoch) { if (!epoch) return "—"; return new Date(Number(epoch) * 1000).toLocaleDateString(state.language === "pt" ? "pt-BR" : state.language); }
@@ -397,7 +397,7 @@
   function showGlobalLoading(message = t("loading")) {
     if (!globalLoading) return;
     globalLoadingText.textContent = message || t("loading");
-    globalLoadingHint.textContent = ({ pt: "Aguarde um instante", en: "Please wait a moment", es: "Espera un momento", ru: "Пожалуйста, подождите" })[state.language] || "Aguarde um instante";
+    globalLoadingHint.textContent = ({ pt: "Aguarde um instante", en: "Please wait a moment", es: "Espera un momento", ru: "Пожалуйста, подождите" })[state.language] || "Please wait a moment";
     globalLoading.classList.remove("hidden");
     document.documentElement.setAttribute("aria-busy", "true");
     window.clearTimeout(loadingFailsafe);
@@ -441,12 +441,12 @@
     return openUrl(url);
   }
 
-  function localized(value) { return value?.[state.language] || value?.pt || ""; }
+  function localized(value) { return value?.[state.language] || value?.en || ""; }
   function catalogKey() { return "educashpro:courses:catalog:v1"; }
   function courseCacheKey(courseId) { return `educashpro:course-cache:${state.language}:${courseId}`; }
 
   const APP_BUILD_KEY = "educashpro:app-build";
-  const APP_RUNTIME_BUILD = "2026.11.18.1";
+  const APP_RUNTIME_BUILD = "2026.11.26.1";
   let updateCheckPromise = null;
 
   function clearPublishedContentCache() {
@@ -615,7 +615,7 @@
     document.getElementById("modalIcon").textContent = item.icon || "🔒";
     document.getElementById("modalTitle").textContent = localized(item.title) || item.title || t("locked");
     document.getElementById("modalDescription").textContent = localized(item.description) || item.description || t("locked");
-    const points = Array.isArray(item.preview?.[state.language]) ? item.preview[state.language] : Array.isArray(item.preview?.pt) ? item.preview.pt : [];
+    const points = Array.isArray(item.preview?.[state.language]) ? item.preview[state.language] : Array.isArray(item.preview?.en) ? item.preview.en : [];
     document.getElementById("modalLearning").innerHTML = points.map((point) => `<li>${escapeHtml(point)}</li>`).join("");
     document.getElementById("modalSubscribe").textContent = `⚡ ${t("subscribe")}`;
     document.querySelector(".modalCancel").textContent = t("close");
@@ -1057,7 +1057,7 @@
     const marketTicket=window.EduCashProNavigation?.stamp?.();
     const current=()=>!window.EduCashProNavigation||window.EduCashProNavigation.isCurrent(marketTicket);
     updateNav();
-    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Profissão Trader: Como Ganhar na Bolsa de Valores");
+    content.innerHTML = navigationShell("📈", window.EduCashProFeatures?.label?.("technical", state.language) || "Trading as a Career: How to Make Money in the Stock Market");
     // Verification continues independently; it must not hold the public analysis screen.
     const accessPromise=Promise.resolve().then(()=>window.EduCashProAccess?.refresh?.()).catch(()=>null);
     let rendered=false,lastActive=null;
@@ -1755,7 +1755,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
       es: ["Verificar credencial", "Apunta la cámara al QR mostrado por el suscriptor.", "Volver", "No se pudo abrir la cámara. Comprueba el permiso del navegador."],
       ru: ["Проверить карту", "Наведите камеру на QR-код подписчика.", "Назад", "Не удалось открыть камеру. Проверьте разрешение браузера."],
     };
-    const copy = copies[state.language] || copies.pt;
+    const copy = copies[state.language] || copies.en;
     content.innerHTML = `<button id="webScannerBack" class="textButton">← ${escapeHtml(copy[2])}</button><section class="profileCard scannerCard"><h1>📷 ${escapeHtml(copy[0])}</h1><p>${escapeHtml(copy[1])}</p><div id="webQrReader"></div><div id="webQrStatus" class="accountStatus" role="status"></div></section>`;
     const back = async () => { try { await webQrScanner?.clear?.(); } catch {} webQrScanner = null; renderPublicLanding(); };
     document.getElementById("webScannerBack").onclick = () => void back();
@@ -1791,7 +1791,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
       en: "Point the camera at the subscriber's QR Code",
       es: "Apunta la cámara al código QR del suscriptor",
       ru: "Наведите камеру на QR-код подписчика",
-    }[state.language] || "Aponte a câmera para o QR Code do assinante";
+    }[state.language] || "Point the camera at the subscriber’s QR code";
     const initData = String(tg?.initData || "");
     const isNativeTelegram = Boolean(initData && initData !== "__EDUCASHPRO_PLATFORM_WEB_SESSION_V1__");
     if (!isNativeTelegram || !tg?.showScanQrPopup) {
@@ -1830,7 +1830,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
         en: ["Credential unavailable", "Your QR Code could not be loaded right now. Refresh the credential and try again.", "Try again"],
         es: ["Credencial no disponible", "No se pudo cargar tu código QR ahora. Actualiza la credencial e inténtalo de nuevo.", "Intentar de nuevo"],
         ru: ["Карта недоступна", "Не удалось загрузить QR-код. Обновите данные и попробуйте снова.", "Попробовать снова"],
-      }[state.language] || ["Credencial indisponível", "Não foi possível carregar seu QR Code agora.", "Tentar novamente"];
+      }[state.language] || ["Credential unavailable", "Your QR code could not be loaded.", "Try again"];
       content.innerHTML = `<button id="proofBack" class="textButton">← ${escapeHtml(t("back"))}</button><section class="profileCard verificationCard"><div class="verificationIcon">⚠️</div><h1>${escapeHtml(unavailable[0])}</h1><p>${escapeHtml(unavailable[1])}</p><button id="proofRetry" class="wideButton">↻ ${escapeHtml(unavailable[2])}</button></section>`;
       document.getElementById("proofBack").onclick = returnTo;
       document.getElementById("proofRetry").onclick = () => void renderMembershipProof(returnTo);
@@ -1846,7 +1846,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
   }
 
   async function verifyMembershipCredential(credential, language, embedded = false, backAction = null) {
-    state.language = ["pt", "en", "es", "ru"].includes(language) ? language : "pt";
+    state.language = window.EduCashProLocale.preference() || window.EduCashProLocale.normalize(language) || window.EduCashProLocale.resolve();
     applyLanguage();
     const parts = String(credential || "").split(".");
     const payload = decodeCredential(credential);
@@ -1873,7 +1873,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
       es:{professional:"Perfil Profesional",links:"Página de enlaces",smart:"Enlace Inteligente",account:"Mi cuenta"},
       ru:{professional:"Профессиональный профиль",links:"Страница ссылок",smart:"Умная ссылка",account:"Мой аккаунт"}
     };
-    return labels[state.language]?.[kind] || labels.pt[kind] || "EduCashPro";
+    return labels[state.language]?.[kind] || labels.en[kind] || "EduCashPro";
   }
   function navigationShell(icon, title) {
     hideGlobalLoading(true);
@@ -1883,7 +1883,6 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
   function handleError(error, target = content) { const message = error?.message === "SESSION" ? t("expires") : t("error"); target.innerHTML = `<div class="empty error">${escapeHtml(message)}</div>`; }
 
   function applyLanguage() {
-    state.language = window.EduCashProLocale.resolve({language:state.language});
     if (window.EduCashProLocale?.apply) window.EduCashProLocale.apply(state.language);
     else document.documentElement.lang = state.language;
     headerSubtitle.textContent = t("subtitle");window.EduCashProProduct.applyLanguage(state.language);
@@ -2013,7 +2012,7 @@ async function openMarkets(){if(!requireProductAccount())return;stopBookTracking
     } catch (error) {
       console.error("[EduCashPro] Sessão inicial:", error);
       if (!window.__EDUCASHPRO_APP_READY__) renderPublicLanding();
-      showToast(error?.message === "SESSION" ? COPY.pt.telegramOnly : t("error"));
+      showToast(error?.message === "SESSION" ? t("telegramOnly") : t("error"));
     }
   }
 

@@ -1,5 +1,5 @@
 (function(){
-const lang=window.EduCashProLocale?.resolve?.()||'pt',C=window.EduCashProAffiliateCopy[lang]||window.EduCashProAffiliateCopy.pt,API='https://educashpro-all.onrender.com';
+const lang=window.EduCashProLocale?.resolve?.()||'en',C=window.EduCashProAffiliateCopy[lang]||window.EduCashProAffiliateCopy.en,API='https://educashpro-all.onrender.com';
 const WALT_URL='https://telegram.me/walt/start?startapp=ref-4-QhxQcMqCsfw';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cfg=null,session=null,link='',walletUi=null,connecting=false,verifying=false,unsubscribe=null,conditionsVerified=false;

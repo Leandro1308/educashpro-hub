@@ -11,8 +11,8 @@
   };
   let identity = "", layer = null, card = null, items = [], next = null, refreshing = null, unreadCount = 0;
   const session = () => platform.readWebSession?.();
-  const language = () => window.EduCashProLocale?.resolve?.({session:session()}) || String(session()?.profile?.language || "pt").slice(0,2);
-  const copy = () => COPY[language()] || COPY.pt;
+  const language = () => window.EduCashProLocale?.resolve?.({session:session()}) || String(session()?.profile?.language || "en").slice(0,2);
+  const copy = () => COPY[language()] || COPY.en;
   const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function safeLink(value) { try { const url=new URL(value);return ["http:","https:"].includes(url.protocol)&&!url.username&&!url.password?url.href:""; } catch { return ""; } }
   function linkedText(text) {

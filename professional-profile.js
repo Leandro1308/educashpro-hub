@@ -15,8 +15,8 @@
   Object.assign(COPY.es,{configure:"Configurar perfil profesional",configureTitle:"Configura tu página pública",configureLead:"Todo lo que necesitas está organizado en las etapas siguientes.",infoStep:"Información y foto",infoStepSub:"Nombre, presentación, dirección pública y foto",contactsStep:"Contactos y enlaces",contactsStepSub:"WhatsApp, Telegram, redes sociales y otros botones",appearanceStep:"Apariencia y revisión",appearanceStepSub:"Tarjeta digital, colores y vista previa",done:"Completado",pending:"Configurar",nextPageAction:"Configurar información y contactos",nextShareAction:"Revisar y compartir",quickActions:"Accesos rápidos"});
   Object.assign(COPY.ru,{configure:"Настроить профессиональный профиль",configureTitle:"Настройте публичную страницу",configureLead:"Все необходимые настройки собраны по шагам ниже.",infoStep:"Информация и фото",infoStepSub:"Имя, описание, публичный адрес и фото",contactsStep:"Контакты и ссылки",contactsStepSub:"WhatsApp, Telegram, соцсети и другие кнопки",appearanceStep:"Оформление и проверка",appearanceStepSub:"Цифровая визитка, цвета и предпросмотр",done:"Готово",pending:"Настроить",nextPageAction:"Настроить информацию и контакты",nextShareAction:"Проверить и поделиться",quickActions:"Быстрый доступ"});
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const lang = () => ["pt","en","es","ru"].includes(session?.profile?.language) ? session.profile.language : "pt";
-  const t = key => COPY[lang()][key] || COPY.pt[key] || key;
+  const lang = () => window.EduCashProLocale?.resolve({session}) || "en";
+  const t = key => COPY[lang()][key] || COPY.en[key] || key;
   const content = () => document.getElementById("content");
 
   function injectStyles() {

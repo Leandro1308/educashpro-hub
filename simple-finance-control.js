@@ -11,7 +11,7 @@
   const CATS_EXPENSE = ["food","housing","transport","health","education","shopping","leisure","bills","other"];
   const CATS_INCOME = ["salary","work","other"];
   let options = {}, response = null, month = "", editing = "", busy = false, notice = "", epoch = 0;
-  const lang = () => DICT[options.language] ? options.language : "pt";
+  const lang = () => DICT[options.language] ? options.language : "en";
   const t = () => DICT[lang()];
   const escapeHtml = (v) => String(v ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   const today = () => { const d = new Date(); const p = n => String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); };
@@ -128,7 +128,7 @@
     }
   }
   function render(args={}){
-    options={...args, language:DICT[args.language]?args.language:"pt"};
+    options={...args, language:DICT[args.language]?args.language:"en"};
     month=monthOk(args.month)?args.month:currentMonth();
     editing="";notice="";response=null;
     window.EduCashProApp?.rememberRoute?.("finance");

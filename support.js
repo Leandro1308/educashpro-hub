@@ -8,7 +8,7 @@
   const toast=document.getElementById("toast");
 
   let token="";
-  let lang=window.EduCashProLocale?.resolve?.()||"pt";
+  let lang=window.EduCashProLocale?.resolve?.()||"en";
   let items=[];
   let adminItems=[];
   let adminAvailable=false;
@@ -136,11 +136,11 @@
     troubleshoot:[]
   };
 
-  const t=(key)=>COPY[lang]?.[key]||COPY.pt[key]||key;
+  const t=(key)=>COPY[lang]?.[key]||COPY.en[key]||key;
   const esc=(value)=>String(value??"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const show=(message)=>{if(!toast)return;toast.textContent=message;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2400)};
-  const categoryLabel=(value)=>CATEGORY[lang]?.[value]||CATEGORY.pt[value]||value;
-  const featureLabel=(value)=>FEATURE_LABELS[lang]?.[value]||FEATURE_LABELS.pt[value]||value;
+  const categoryLabel=(value)=>CATEGORY[lang]?.[value]||CATEGORY.en[value]||value;
+  const featureLabel=(value)=>FEATURE_LABELS[lang]?.[value]||FEATURE_LABELS.en[value]||value;
   const statusLabel=(value)=>t(`status_${value}`);
   const ticketLabel=(item)=>item?.ticketNumber?`#${String(item.ticketNumber).padStart(6,"0")}`:`#${String(item?.id||"").slice(-6).toUpperCase()}`;
   const locale=()=>lang==="pt"?"pt-BR":lang==="en"?"en-US":lang==="es"?"es-ES":"ru-RU";
@@ -467,12 +467,12 @@
     try{
       const stored=window.EduCashProPlatform?.readWebSession?.();
       if(stored?.token&&stored?.profile?.userId){
-        token=stored.token;lang=["pt","en","es","ru"].includes(stored.profile?.language)?stored.profile.language:lang;
+        token=stored.token;lang=window.EduCashProLocale?.resolve({session:stored}) || lang;
       }else{
         const initData=window.EduCashProPlatform?.telegramInitData?.()||"";
         if(!initData)throw new Error("session_required");
         const session=await api("/api/hub/session",{initData});
-        token=session.token;lang=["pt","en","es","ru"].includes(session.profile?.language)?session.profile.language:lang;
+        token=session.token;lang=window.EduCashProLocale?.resolve({session:session}) || lang;
       }
       document.documentElement.lang=lang;
       document.getElementById("subtitle").textContent=t("subtitle");

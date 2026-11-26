@@ -6,8 +6,8 @@
   };
 
   function language(){
-    const value=String(window.EduCashProRuntime?.session?.profile?.language||navigator.language||"pt").slice(0,2).toLowerCase();
-    return COPY[value]?value:"pt";
+    const value=String(window.EduCashProRuntime?.session?.profile?.language||navigator.language||"en").slice(0,2).toLowerCase();
+    return COPY[value]?value:"en";
   }
 
   function goBack(){

@@ -8,8 +8,8 @@
   };
   const root=document.documentElement;
   function translation(){
-    const lang=String(root.lang||navigator.language||'pt').slice(0,2).toLowerCase();
-    return LABELS[lang]||LABELS.pt;
+    const lang=window.EduCashProLocale?.resolve() || 'en';
+    return LABELS[lang]||LABELS.en;
   }
   function open(){
     const app=window.EduCashProApp;

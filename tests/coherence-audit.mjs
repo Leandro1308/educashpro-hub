@@ -10,10 +10,10 @@ const pairing = read("device-pairing-ux.js");
 const index = read("index.html");
 
 assert(locale.includes('localStorage.getItem("educashpro:web-session")'), "Idioma deve consultar a sessão Web persistida");
-assert(locale.indexOf("session?.profile?.language") < locale.indexOf('query.get("lang")'), "Idioma da conta deve prevalecer sobre URL e navegador");
+assert(locale.indexOf("session?.profile?.language") < locale.indexOf('url.searchParams.get("lang")'), "Idioma da conta deve prevalecer sobre URL e navegador");
 assert(app.includes("EduCashProLocale?.resolve"), "Página principal deve usar o resolvedor canônico de idioma");
 assert(!app.includes('const browserLanguage = String(navigator.language || "pt")'), "Página principal não pode depender diretamente do idioma do navegador");
-assert(app.includes("resolve?.({ language: state.profile?.language })"), "Visitante sem conta deve poder usar idioma da URL ou do navegador");
+assert(app.includes("resolve?.({language:state.profile?.language})"), "Visitante sem conta deve poder usar idioma da URL ou do navegador");
 assert(menu.includes("EduCashProLocale?.resolve"), "Menu deve seguir o idioma canônico da conta");
 assert(webAuth.includes("EduCashProLocale?.resolve"), "Entrada Web deve seguir o idioma canônico");
 assert(pairing.includes("EduCashProLocale?.resolve"), "Pareamento deve seguir o idioma canônico");
@@ -22,8 +22,13 @@ assert(app.includes("/api/platform-public/config"), "Apresentação deve consult
 assert(app.includes("contractRules.direct"), "Comissão direta exibida deve vir da configuração vigente");
 assert(!app.includes('<div class="directCommission"><b>60%</b>'), "Apresentação não pode fixar a comissão direta em 60%");
 
-for (const page of ["affiliate.html", "marketplace.html", "publish.html",  "support.html"]) {
+for (const page of ["affiliate.html", "support.html"]) {
   assert(read(page).includes("locale-resolver.js"), `${page} deve carregar o idioma canônico`);
+}
+
+
+for (const page of ["marketplace.html", "publish.html"]) {
+  assert(read(page).includes("location.replace") && read(page).includes("'lang'"), `${page} deve preservar idioma no redirecionamento`);
 }
 
 console.log("EduCashPro coherence audit: OK");

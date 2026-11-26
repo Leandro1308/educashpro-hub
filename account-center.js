@@ -325,16 +325,11 @@
   function session(){return platform.isTelegram?.()?telegramSession:platform.readWebSession?.()||null;}
 
   function lang() {
-    const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;
-    const raw = String(session()?.profile?.language || navigator.language || "pt").toLowerCase();
-    if (raw.startsWith("en")) return "en";
-    if (raw.startsWith("es")) return "es";
-    if (raw.startsWith("ru")) return "ru";
-    return "pt";
+    return window.EduCashProLocale?.resolve({session:session()}) || "en";
   }
 
   function t(key) {
-    return COPY[lang()]?.[key] || COPY.pt[key] || key;
+    return COPY[lang()]?.[key] || COPY.en[key] || key;
   }
 
   function esc(value) {
@@ -582,6 +577,7 @@
         try {
           const code = button.dataset.lang;
           await api("/api/platform-account/language", { language: code });
+          window.EduCashProLocale?.remember(code);
           const current = session();
           if (current?.profile) {
             current.profile.language = code;
@@ -789,7 +785,7 @@
         note: "На iPhone, где EduCashPro уже установлен, может потребоваться удалить его и добавить на главный экран снова."
       }
     };
-    return copy[lang()] || copy.pt;
+    return copy[lang()] || copy.en;
   }
 
   function imageSquareBlob(file) {

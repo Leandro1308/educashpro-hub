@@ -643,7 +643,7 @@
   }
 
   function tradingViewContainer(frameClass, item, symbol) {
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const frame = document.createElement("div");
     frame.className = frameClass;
     const container = document.createElement("div");
@@ -677,7 +677,7 @@
   }
 
   function genericTradingViewContainer(item) {
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const frame = document.createElement("div");
     frame.className = "marketGenericFrame";
     frame.style.height = `${Number(item?.height || 620)}px`;
@@ -813,7 +813,7 @@
 
   async function loadPairs(force = false) {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     if (!host) return;
     if (!options.active) return lockedView("pairs");
     document.getElementById("marketExpand").hidden = false;
@@ -876,7 +876,7 @@
   async function loadFibonacci(host) {
     const panel = host.querySelector("[data-market-fibonacci]");
     if (!panel) return;
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const asset = selectedAsset;
     if (!asset?.api || !String(asset.tv).startsWith("BINANCE:")) {
       panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(selectedTimeframe)}</span></div><div class="marketFibStatus">${esc(copy.fibUnavailable)}</div>`;
@@ -942,7 +942,7 @@
 
   function lockedView(kind) {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     host.style.height = "auto";
     host.innerHTML = `<div class="marketLocked"><span>🔒</span><h3>${esc(copy.locked)}</h3><p>${esc(copy.lockedText)}</p><button id="marketSubscribe">${esc(copy.subscribe)}</button></div>`;
     document.getElementById("marketSubscribe").onclick = () => options.subscribe?.();
@@ -952,7 +952,7 @@
   function renderChart(snapshot, error = false) {
     const host = document.getElementById("marketWidget");
     if (!host || currentWidget !== "chart") return;
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     host.style.height = "auto";
     host.innerHTML = scannerMarkup(snapshot, copy, error);
     host.insertAdjacentHTML("beforeend", symbolPickerMarkup(copy));
@@ -984,14 +984,14 @@
     const panel = host.querySelector(".marketDirectionPanel");
     if (!panel) return;
     const replacement = document.createElement("div");
-    replacement.innerHTML = scannerMarkup(snapshot, COPY[options.language] || COPY.pt, error);
+    replacement.innerHTML = scannerMarkup(snapshot, COPY[options.language] || COPY.en, error);
     panel.replaceWith(replacement.firstElementChild);
     bindScanner(host, snapshot);
   }
 
   function loadTechnical() {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     if (!host) return;
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
@@ -1046,7 +1046,7 @@
   function toggleExpand() {
     const section = document.getElementById("marketAnalysisSection");
     const button = document.getElementById("marketExpand");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const expanded = section.classList.toggle("expanded");
     button.textContent = expanded ? `✕ ${copy.shrink}` : `⛶ ${copy.expand}`;
     document.body.classList.toggle("marketExpandedOpen", expanded);
@@ -1081,9 +1081,9 @@
 
   function renderLearningCenter(){
     if(!options)return;
-    const copy=COPY[options.language]||COPY.pt;
-    const trainerCopy=TRAINER_COPY[options.language]||TRAINER_COPY.pt;
-    const centerCopy=LEARNING_CENTER_COPY[options.language]||LEARNING_CENTER_COPY.pt;
+    const copy=COPY[options.language]||COPY.en;
+    const trainerCopy=TRAINER_COPY[options.language]||TRAINER_COPY.en;
+    const centerCopy=LEARNING_CENTER_COPY[options.language]||LEARNING_CENTER_COPY.en;
     const target=document.getElementById("content");
     if(!target)return;
     document.body.classList.remove("marketExpandedOpen");
@@ -1130,7 +1130,7 @@
 
   function openLearningCenter(args = {}) {
     options = {
-      language:["pt","en","es","ru"].includes(args.language)?args.language:"pt",
+      language:["pt","en","es","ru"].includes(args.language)?args.language:"en",
       active:args.active===true,
       back:args.back,
       openCourse:args.openCourse,
@@ -1147,7 +1147,7 @@
   function render(args = {}) {
     window.__EDUCASHPRO_MARKETS_OPEN__ = true;
     options = {
-      language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "pt",
+      language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "en",
       active: args.active === true,
       back: args.back,
       openCourse: args.openCourse,
@@ -1161,7 +1161,7 @@
     selectedTimeframe = "1h";
     restoreMarketState();
     const copy = COPY[options.language];
-    const centerCopy = LEARNING_CENTER_COPY[options.language] || LEARNING_CENTER_COPY.pt;
+    const centerCopy = LEARNING_CENTER_COPY[options.language] || LEARNING_CENTER_COPY.en;
     const target = document.getElementById("content");
     if (!target) return;
 

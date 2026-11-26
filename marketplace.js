@@ -8,7 +8,7 @@
   const CACHE_TTL = 5 * 60 * 1000;
 
   const qs = new URLSearchParams(location.search);
-  const lang = window.EduCashProLocale?.resolve?.() || "pt";
+  const lang = window.EduCashProLocale?.resolve?.() || "en";
 
   const copy = {
     pt: {

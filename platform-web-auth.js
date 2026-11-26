@@ -53,7 +53,7 @@
       method:"POST",
       body:JSON.stringify({
         email:String(email||"").trim().toLowerCase(),
-        language:String(language||navigator.language||"pt").slice(0,8),
+        language:window.EduCashProLocale?.resolve({language}) || "en",
       }),
     });
   }
@@ -69,7 +69,7 @@
         email:String(email||"").trim().toLowerCase(),
         code:String(code||"").replace(/\D/g,"").slice(0,6),
         referralCode:ref,
-        language:String(language||navigator.language||"pt").slice(0,8),
+        language:window.EduCashProLocale?.resolve({language}) || "en",
       }),
     });
     saveSession(result);
@@ -97,7 +97,7 @@
         challengeId,
         account:wallet.account,
         proof:tonProof.proof,
-        language:String(language||navigator.language||"pt").slice(0,8),
+        language:window.EduCashProLocale?.resolve({language}) || "en",
       }),
     });
     saveSession(result);

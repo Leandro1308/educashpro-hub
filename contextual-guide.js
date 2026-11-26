@@ -72,10 +72,10 @@ let current="",openId="",generation=0,root=null,dismissedFor="";
 const loaded=new Map();
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function lang(){
- const value=String(window.EduCashProLocale?.resolve?.()||window.__EDUCASHPRO_SESSION__?.profile?.language||document.documentElement.lang||navigator.language||"pt").toLowerCase().slice(0,2);
- return COPY[value]?value:"pt";
+ const value=String(window.EduCashProLocale?.resolve?.()||window.__EDUCASHPRO_SESSION__?.profile?.language||document.documentElement.lang||navigator.language||"en").toLowerCase().slice(0,2);
+ return COPY[value]?value:"en";
 }
-const ui=(name,l=lang())=>COPY[l]?.[name]||COPY.pt[name]||name;
+const ui=(name,l=lang())=>COPY[l]?.[name]||COPY.en[name]||name;
 function script(src){
  if(window.EduCashProResources?.script)return window.EduCashProResources.script("./"+src);
  return new Promise((res,rej)=>{const e=document.createElement("script");e.src="./"+src;e.onload=res;e.onerror=rej;document.head.appendChild(e)});

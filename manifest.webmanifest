@@ -1,8 +1,8 @@
 {
   "name": "EduCashPro",
   "short_name": "EduCashPro",
-  "description": "Ecossistema de educação, negócios e ferramentas digitais.",
-  "lang": "pt-BR",
+  "description": "Education, business, and digital tools.",
+  "lang": "en",
   "id": "/",
   "start_url": "/",
   "scope": "/",

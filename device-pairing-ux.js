@@ -47,15 +47,9 @@
 
   function lang(){
     const session=window.EduCashProWebEntry?.getSession?.()||platform.readWebSession?.();
-    const canonical=window.EduCashProLocale?.resolve?.({session});
-    if(canonical)return canonical;
-    const raw=String(session?.profile?.language||navigator.language||"pt").toLowerCase();
-    if(raw.startsWith("en"))return"en";
-    if(raw.startsWith("es"))return"es";
-    if(raw.startsWith("ru"))return"ru";
-    return"pt";
+    return window.EduCashProLocale?.resolve({session}) || "en";
   }
-  function s(key){return STRINGS[lang()]?.[key]||STRINGS.pt[key]||key}
+  function s(key){return STRINGS[lang()]?.[key]||STRINGS.en[key]||key}
 
   function ensureStyles(){
     if(document.getElementById("devicePairingUxStyles"))return;
