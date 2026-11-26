@@ -118,7 +118,22 @@
       selectedAction=annual?"annual":"pay";
       const value=Number(annual?config?.annualPriceUsdt:config?.planPriceUsdt);
       layer.querySelector("[data-period]").textContent=annual?plans.yearNote:(config?.cycleSeconds?String(config.cycleSeconds/86400)+" "+({pt:"dias",en:"days",es:"días",ru:"дней"}[language()]||"days"):c.loading);
-      layer.querySelector("[data-price]").textContent=Number.isFinite(value)&&value>0?`${c.price}: ${value.toFixed(2)} USDT`:c.loading;
+      const fee = config?.serviceFeeUsdt;
+      const labels = {
+        pt: ["Taxa de serviços", "Total"],
+        en: ["Service fee", "Total"],
+        es: ["Tarifa de servicio", "Total"],
+        ru: ["Плата за обслуживание", "Итого"],
+      }[language()] || ["Service fee", "Total"];
+      const formatUsdt = amount => new Intl.NumberFormat(language(), {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6,
+      }).format(amount) + " USDT";
+      let priceText = Number.isFinite(value) && value > 0 ? c.price + " · " + formatUsdt(value) : c.loading;
+      if (Number.isFinite(value) && value > 0 && Number.isFinite(fee) && fee > 0) {
+        priceText += " · " + labels[0] + " " + formatUsdt(fee) + " · " + labels[1] + " " + formatUsdt(value + fee);
+      }
+      layer.querySelector("[data-price]").textContent = priceText;
       const unavailable=!Number.isFinite(value)||value<=0;
       layer.querySelector("[data-connect]").disabled=unavailable;
       layer.querySelector("[data-pay]").disabled=unavailable||!verifiedWallet;
