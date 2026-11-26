@@ -91,7 +91,7 @@ jobs:
                   grep -Fq 'function bindInlineQr()' "${output}" || { echo "::warning::QR da Página de Links ausente na entrega"; failed=1; }
                   ;;
                 resource-loader-v20261028-product.js)
-                  grep -Fq 'const VERSION="20261101.3"' "${output}" || { echo "::warning::Carregador desatualizado"; failed=1; }
+                  grep -Fq 'const VERSION="20261126.1"' "${output}" || { echo "::warning::Carregador desatualizado"; failed=1; }
                   ;;
               esac
             done

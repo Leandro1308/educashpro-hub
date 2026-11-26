@@ -11,8 +11,8 @@
   };
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
-  function language(){const value=String(latestSession?.profile?.language||navigator.language||"pt").slice(0,2).toLowerCase();return COPY[value]?value:"pt"}
-  function c(key){return COPY[language()][key]||COPY.pt[key]}
+  function language(){ return window.EduCashProLocale?.resolve({session:latestSession}) || "en"; }
+  function c(key){return COPY[language()][key]||COPY.en[key]}
 
   function openUrl(url){
     if(!url) return;

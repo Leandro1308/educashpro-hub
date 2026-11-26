@@ -642,7 +642,7 @@
   }
 
   function tradingViewContainer(frameClass, item, symbol) {
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const frame = document.createElement("div");
     frame.className = frameClass;
     const container = document.createElement("div");
@@ -676,7 +676,7 @@
   }
 
   function genericTradingViewContainer(item) {
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const frame = document.createElement("div");
     frame.className = "marketGenericFrame";
     frame.style.height = `${Number(item?.height || 620)}px`;
@@ -812,7 +812,7 @@
 
   async function loadPairs(force = false) {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     if (!host) return;
     if (!options.active) return lockedView("pairs");
     document.getElementById("marketExpand").hidden = false;
@@ -875,7 +875,7 @@
   async function loadFibonacci(host) {
     const panel = host.querySelector("[data-market-fibonacci]");
     if (!panel) return;
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const asset = selectedAsset;
     if (!asset?.api || !String(asset.tv).startsWith("BINANCE:")) {
       panel.innerHTML = `<div class="marketFibHead"><strong>ϕ ${esc(copy.fibTitle)}</strong><span>${esc(selectedTimeframe)}</span></div><div class="marketFibStatus">${esc(copy.fibUnavailable)}</div>`;
@@ -919,7 +919,7 @@
     es:{title:"Alineación de tendencia",add:"+ Período",refresh:"Actualizar",up:"Alcista",down:"Bajista",neutral:"Neutral",loading:"Consultando velas cerradas…",unavailable:"Datos no disponibles",unsupported:"Disponible para pares Spot de Binance.",aligned:"Todos los períodos coinciden",mixed:"Períodos divergentes",none:"Sin confirmación conjunta",volume:"Volumen",ema:"EMA 9 / 21 / 50",note:"Lectura educativa, no es una predicción. Usa velas cerradas, medias exponenciales y volumen relativo. La alineación no garantiza resultados.",high:"Superior al promedio",low:"Inferior al promedio"},
     ru:{title:"Согласованность трендов",add:"+ Таймфрейм",refresh:"Обновить",up:"Рост",down:"Падение",neutral:"Нейтрально",loading:"Загрузка закрытых свечей…",unavailable:"Данные недоступны",unsupported:"Доступно для спотовых пар Binance.",aligned:"Все интервалы совпадают",mixed:"Интервалы расходятся",none:"Нет общего подтверждения",volume:"Объём",ema:"EMA 9 / 21 / 50",note:"Учебная оценка, не прогноз. Используются закрытые свечи, EMA и относительный объём. Совпадение не гарантирует движение.",high:"Выше среднего",low:"Ниже среднего"}
   };
-  const mtfCopy=()=>MTF_LABELS[options?.language]||MTF_LABELS.pt;
+  const mtfCopy=()=>MTF_LABELS[options?.language]||MTF_LABELS.en;
   function mtfMarkup(){
     const t=mtfCopy();
     return '<section class="marketMtfPanel" data-market-mtf><div class="marketMtfHead"><strong>↗ '+esc(t.title)+'</strong><button type="button" data-mtf-refresh>↻ '+esc(t.refresh)+'</button></div>'+
@@ -1043,7 +1043,7 @@
 
   function lockedView(kind) {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     host.style.height = "auto";
     host.innerHTML = `<div class="marketLocked"><span>🔒</span><h3>${esc(copy.locked)}</h3><p>${esc(copy.lockedText)}</p><button id="marketSubscribe">${esc(copy.subscribe)}</button></div>`;
     document.getElementById("marketSubscribe").onclick = () => options.subscribe?.();
@@ -1053,7 +1053,7 @@
   function renderChart(snapshot, error = false) {
     const host = document.getElementById("marketWidget");
     if (!host || currentWidget !== "chart") return;
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     host.style.height = "auto";
     host.innerHTML = scannerMarkup(snapshot, copy, error);
     host.insertAdjacentHTML("beforeend", symbolPickerMarkup(copy));
@@ -1088,14 +1088,14 @@
     const panel = host.querySelector(".marketDirectionPanel");
     if (!panel) return;
     const replacement = document.createElement("div");
-    replacement.innerHTML = scannerMarkup(snapshot, COPY[options.language] || COPY.pt, error);
+    replacement.innerHTML = scannerMarkup(snapshot, COPY[options.language] || COPY.en, error);
     panel.replaceWith(replacement.firstElementChild);
     bindScanner(host, snapshot);
   }
 
   function loadTechnical() {
     const host = document.getElementById("marketWidget");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     if (!host) return;
     if (!options.active) return lockedView("technical");
     document.getElementById("marketExpand").hidden = false;
@@ -1150,7 +1150,7 @@
   function toggleExpand() {
     const section = document.getElementById("marketAnalysisSection");
     const button = document.getElementById("marketExpand");
-    const copy = COPY[options.language] || COPY.pt;
+    const copy = COPY[options.language] || COPY.en;
     const expanded = section.classList.toggle("expanded");
     button.textContent = expanded ? `✕ ${copy.shrink}` : `⛶ ${copy.expand}`;
     document.body.classList.toggle("marketExpandedOpen", expanded);
@@ -1159,7 +1159,7 @@
   function render(args = {}) {
     window.__EDUCASHPRO_MARKETS_OPEN__ = true;
     options = {
-      language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "pt",
+      language: ["pt", "en", "es", "ru"].includes(args.language) ? args.language : "en",
       active: args.active === true,
       back: args.back,
       openCourse: args.openCourse,
@@ -1172,7 +1172,7 @@
     selectedTimeframe = "1h";
     restoreMarketState();
     const copy = COPY[options.language];
-    const trainerCopy = TRAINER_COPY[options.language] || TRAINER_COPY.pt;
+    const trainerCopy = TRAINER_COPY[options.language] || TRAINER_COPY.en;
     const target = document.getElementById("content");
     if (!target) return;
 

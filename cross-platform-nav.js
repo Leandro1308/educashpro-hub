@@ -7,11 +7,7 @@
   const platform = window.EduCashProPlatform;
 
   function language() {
-    const value = String(document.documentElement.lang || navigator.language || "pt").toLowerCase();
-    if (value.startsWith("en")) return "en";
-    if (value.startsWith("es")) return "es";
-    if (value.startsWith("ru")) return "ru";
-    return "pt";
+    return window.EduCashProLocale?.resolve() || "en";
   }
 
   const copy = {

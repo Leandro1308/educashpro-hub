@@ -35,8 +35,8 @@
     ]
   };
   function locale(language) {
-    const value = String(language || "pt").toLowerCase().split("-")[0];
-    return Object.prototype.hasOwnProperty.call(messages, value) ? value : "pt";
+    const value = String(language || "en").toLowerCase().split("-")[0];
+    return Object.prototype.hasOwnProperty.call(messages, value) ? value : "en";
   }
   function build(link, language) {
     const url = String(link || "").trim();

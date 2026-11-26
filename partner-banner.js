@@ -31,7 +31,7 @@
     form.dataset.partnerBanner="1";
     form.querySelector(".partnerMediaFields")?.remove();
     form.querySelector(".partnerLogoField")?.remove();
-    const copy=COPY[document.documentElement.lang.slice(0,2)]||COPY.pt;
+    const copy=COPY[document.documentElement.lang.slice(0,2)]||COPY.en;
     const hidden=(id,value)=>{let node=form.querySelector("#"+id);if(!node){node=document.createElement("input");node.type="hidden";node.id=id;form.append(node);}node.value=value;return node;};
     // Existing logo and gallery assets are retained, with no new gallery editor.
     for(const id of ["logoUrl","logoPublicId"])hidden(id,form.dataset[id]||"");

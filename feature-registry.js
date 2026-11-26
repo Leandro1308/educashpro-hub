@@ -31,17 +31,13 @@
   };
 
   function locale(value) {
-    const raw = String(value || window.__EDUCASHPRO_SESSION__?.profile?.language || navigator.language || "pt").toLowerCase();
-    if (raw.startsWith("en")) return "en";
-    if (raw.startsWith("es")) return "es";
-    if (raw.startsWith("ru")) return "ru";
-    return "pt";
+    return window.EduCashProLocale?.normalize(value) || (value ? "en" : window.EduCashProLocale?.resolve()) || "en";
   }
 
   function localize(value, language) {
     if (!value || typeof value !== "object") return String(value || "");
     const lang = locale(language);
-    return String(value[lang] || value.pt || Object.values(value)[0] || "");
+    return String(value[lang] || value.en || "");
   }
 
   function list(group) {

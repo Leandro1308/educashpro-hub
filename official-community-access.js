@@ -16,8 +16,8 @@
     ru:{free:"СВОБОДНЫЙ ДОСТУП",channelTitle:"Официальный образовательный канал",channelText:"Бесплатные образовательные материалы для подписчиков и гостей.",channelButton:"📚 Войти в бесплатный канал",groupTitle:"Эксклюзивная группа подписчиков",groupText:"Готовые материалы для публикации и эксклюзивный контент для активных подписчиков.",groupButton:"👥 Войти в закрытую группу",subscribe:"⚡ Активировать подписку",inviteError:"Сейчас не удалось открыть доступ."}
   };
 
-  function language(){const value=String(session?.profile?.language||"pt").toLowerCase();return COPY[value]?value:"pt"}
-  function tr(key){return COPY[language()][key]||COPY.pt[key]||key}
+  function language(){ return window.EduCashProLocale?.resolve({session}) || "en"; }
+  function tr(key){return COPY[language()][key]||COPY.en[key]||key}
   function isActive(){return session?.profile?.active===true}
 
   function showAccessError(){

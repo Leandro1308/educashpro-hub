@@ -455,8 +455,8 @@
           "'": "&#39;",
         })[c],
     );
-  const t = () => TEXT[options.language] || TEXT.pt;
-  const c = () => COPY[options.language] || COPY.pt;
+  const t = () => TEXT[options.language] || TEXT.en;
+  const c = () => COPY[options.language] || COPY.en;
   const currentMonth = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -850,7 +850,7 @@
       ...args,
       language: ["pt", "en", "es", "ru"].includes(args.language)
         ? args.language
-        : "pt",
+        : "en",
       active: args.active === true,
       session: args.session || {},
     };

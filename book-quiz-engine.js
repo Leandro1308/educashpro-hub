@@ -13,10 +13,10 @@
   };
 
   function lang(value){
-    const raw=String(value||window.__EDUCASHPRO_SESSION__?.profile?.language||navigator.language||"pt").slice(0,2).toLowerCase();
-    return COPY[raw]?raw:"pt";
+    const raw=String(value||window.__EDUCASHPRO_SESSION__?.profile?.language||navigator.language||"en").slice(0,2).toLowerCase();
+    return COPY[raw]?raw:"en";
   }
-  function text(key,l){return COPY[lang(l)]?.[key]||COPY.pt[key]||key}
+  function text(key,l){return COPY[lang(l)]?.[key]||COPY.en[key]||key}
   function userKey(){
     const id=window.__EDUCASHPRO_SESSION__?.profile?.userId||window.__EDUCASHPRO_SESSION__?.profile?.telegramId||"device";
     return String(id).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,80)||"device";

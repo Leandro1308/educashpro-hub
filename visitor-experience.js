@@ -97,10 +97,9 @@
   };
 
   function language() {
-    const value = String(visitorState.session?.profile?.language || "pt").toLowerCase();
-    return COPY[value] ? value : "pt";
+    return window.EduCashProLocale?.resolve({session:visitorState.session}) || "en";
   }
-  function tr(key) { return COPY[language()][key] || COPY.pt[key] || key; }
+  function tr(key) { return COPY[language()][key] || COPY.en[key] || key; }
   function escapeHtml(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
   function isVisitor() { return visitorState.session && visitorState.session.profile?.active !== true; }
 

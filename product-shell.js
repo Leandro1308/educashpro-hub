@@ -18,8 +18,12 @@
     ru: { qr:"Создать QR-код", qrSub:"Преобразуйте ссылку в QR-код для скачивания." }
   })) Object.assign(COPY[locale], labels);
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const locale=v=>{const l=String(v||document.documentElement.lang||navigator.language||'pt').trim().toLowerCase().slice(0,2);return COPY[l]?l:'pt'};
-  const copy=v=>COPY[locale(v)];
+  const locale = value => {
+    if (!value) return window.EduCashProLocale?.resolve() || "en";
+    const code = String(value).trim().toLowerCase().split(/[-_]/)[0];
+    return Object.hasOwn(COPY, code) ? code : "en";
+  };
+  const copy = value => ({ ...COPY.en, ...COPY[locale(value)] });
   // Hover/focus explanations are localised and describe the action, not only its name.
   const TIPS={
     pt:{clubs:"Cadastre canais privados e supergrupos privados como clubes de assinantes.",tracker:'Registre receitas e despesas e consulte o saldo.',learn:'Acesse cursos e conteúdos da Academy.',practice:'Pratique leitura de gráficos e price action.',market:'Consulte gráficos e estudos de mercado.',links:'Crie e compartilhe sua página de links.',qr:'Crie um QR Code para compartilhar.',area:'Acesse assinatura, rede e configurações.',finance:'Estude conceitos de educação financeira.',business:'Aprenda fundamentos de negócios.',technical:'Veja os conteúdos de análise técnica.',program:'Consulte regras, comissões e níveis de indicação.',subscription:'Consulte sua assinatura.',network:'Acompanhe sua rede de indicações.',settings:'Altere suas configurações de conta.',help:'Veja orientações de como utilizar os recursos.',channel:'Acesse o canal oficial do EduCashPro.',group:'Acesse o grupo oficial do EduCashPro.',presentation:'Veja a apresentação do EduCashPro.'},

@@ -16,12 +16,7 @@
   }
 
   function language() {
-    const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;
-    const raw = String(session()?.profile?.language || navigator.language || "pt").toLowerCase();
-    if (raw.startsWith("en")) return "en";
-    if (raw.startsWith("es")) return "es";
-    if (raw.startsWith("ru")) return "ru";
-    return "pt";
+    return window.EduCashProLocale?.resolve({session:session()}) || "en";
   }
 
   const TEXT = {
@@ -31,7 +26,7 @@
     ru:{title:"Администрирование",sub:"Управление EduCashPro на сайте. Этот раздел скрыт от обычных пользователей.",overview:"Обзор",users:"Пользователи",active:"Активная подписка",inactive:"Неактивная подписка",nonSubscriber:"Без подписки",calculatedAt:"Рассчитано",communities:"Сообщества",benefits:"Преимущества",partners:"Партнёры",reviewers:"Проверяющие",support:"Сообщения и поддержка",broadcast:"Отправить сообщение",channel:"Публикация в канал",invite:"Приглашение партнёра",branding:"Оформление приложения",contract:"Контракт V6",manual:"Руководство контракта",back:"Назад",loading:"Загрузка…",error:"Не удалось выполнить операцию.",approve:"Одобрить",reject:"Отклонить",suspend:"Приостановить",disable:"Отключить",remove:"Удалить",save:"Сохранить",close:"Закрыть",copy:"Копировать",copied:"Скопировано",confirmDelete:"Это действие необратимо. Продолжить?",noItems:"Записей нет.",status:"Статус",open:"Открыть"}
   };
 
-  function t(key){return TEXT[language()]?.[key] || TEXT.pt[key] || key}
+  function t(key){return TEXT[language()]?.[key] || TEXT.en[key] || key}
   function esc(value){return String(value ?? "").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
   function clearPoll(){if(pollTimer){clearTimeout(pollTimer);pollTimer=0}}
   function close(){clearPoll();tonUi=null;document.querySelector(".adminCenterLayer")?.remove()}

@@ -62,7 +62,7 @@
       privacy:"E-mail используется для идентификации аккаунта и входа с других устройств."
     }
   };
-  function emailCopy(){return EMAIL_COPY[locale()]||EMAIL_COPY.pt}
+  function emailCopy(){return EMAIL_COPY[locale()]||EMAIL_COPY.en}
 
   function normalizedEntryText(value){
     return String(value||"")
@@ -125,8 +125,8 @@
     return tonConnectLoadPromise;
   }
 
-  function locale(){const canonical=window.EduCashProLocale?.resolve?.({language:profile()?.language});if(canonical)return canonical;const raw=String(profile()?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
-  function t(key){return I18N[locale()]?.[key]||I18N.pt[key]||key}
+  function locale(){return window.EduCashProLocale?.resolve({language:profile()?.language}) || "en"}
+  function t(key){return I18N[locale()]?.[key]||I18N.en[key]||key}
   function esc(value){return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]))}
   function profile(){return state.session?.profile||null}
   function shortId(value){const v=String(value||"");return v.length>18?`${v.slice(0,9)}…${v.slice(-6)}`:v}

@@ -112,7 +112,7 @@
     }
   };
   const state = {
-    language:"pt",mode:"learn",pair:"BTCUSDT",period:"15m",lesson:0,answer:null,showGuide:true,
+    language:"en",mode:"learn",pair:"BTCUSDT",period:"15m",lesson:0,answer:null,showGuide:true,
     index:120,endIndex:144,choice:"wait",cash:START_BALANCE,qty:0,tradeCount:0,steps:0,feedback:"",sessions:0
   };
   let host = null;
@@ -124,7 +124,7 @@
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(Object.assign(readStore(), partial))); }
     catch (_) {}
   }
-  function t() { return TEXT[state.language] || TEXT.pt; }
+  function t() { return TEXT[state.language] || TEXT.en; }
   function fmt(n, digits) {
     return new Intl.NumberFormat(LOCALES[state.language], {minimumFractionDigits:digits || 0,maximumFractionDigits:digits === undefined ? 2 : digits}).format(Number(n));
   }
@@ -448,8 +448,8 @@
     if(event.target.matches("[data-pa-period]")){state.period=PERIODS.includes(event.target.value)?event.target.value:"15m";newChallenge();view();}
   }
   function render(args){
-    const language=String(args && args.language || "pt").toLowerCase();
-    state.language=TEXT[language]?language:"pt";
+    const language=String(args && args.language || "en").toLowerCase();
+    state.language=TEXT[language]?language:"en";
     const target=args && args.target ? args.target : document.getElementById("marketTrainerMount");
     if(!target)return;
     if(host!==target){host=target;host.addEventListener("click",onClick);host.addEventListener("change",onChange);}

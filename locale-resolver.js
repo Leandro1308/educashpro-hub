@@ -1,22 +1,80 @@
 (function () {
   "use strict";
-  const SUPPORTED = new Set(["pt", "en", "es", "ru"]);
-  function normalize(value) { const code=String(value||"").trim().toLowerCase().slice(0,2);return SUPPORTED.has(code)?code:""; }
-  const KEY="educashpro:language";
-  function preference(){try{return normalize(localStorage.getItem(KEY))}catch{return ""}}
-  function storedSession(){try{return JSON.parse(localStorage.getItem("educashpro:web-session")||"null")}catch{return null}}
-  function resolve(options={}){
-    const query=new URL(location.href).searchParams;
-    const session=options.session||window.__EDUCASHPRO_SESSION__||storedSession();
-    const candidates=[preference(),options.language,session?.profile?.language,session?.account?.language,query.get("lang"),window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code,navigator.language,"pt"];
-    for(const candidate of candidates){const code=normalize(candidate);if(code)return code}
-    return "pt";
+  const SUPPORTED = new Set(["en", "pt", "es", "ru"]);
+  const DEFAULT = "en";
+  const KEY = "educashpro:language";
+
+  function normalize(value) {
+    const code = String(value || "").trim().toLowerCase().split(/[-_]/)[0];
+    return SUPPORTED.has(code) ? code : "";
   }
-  function apply(language){const code=normalize(language)||resolve();document.documentElement.lang=code==="pt"?"pt-BR":code;document.documentElement.dataset.educashproLanguage=code;return code}
+
+  function preference() {
+    try { return normalize(localStorage.getItem(KEY)); } catch { return ""; }
+  }
+
+  function storedSession() {
+    try { return JSON.parse(localStorage.getItem("educashpro:web-session") || "null"); } catch { return null; }
+  }
+
+  function telegramLanguage(url) {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (user?.language_code) return user.language_code;
+
+    // Telegram launch data is available before the asynchronously loaded SDK.
+    // Use it only for locale detection. Authentication still validates initData.
+    const hash = new URLSearchParams(url.hash.slice(1));
+    const launchData = hash.get("tgWebAppData") || url.searchParams.get("tgWebAppData");
+    try {
+      const rawUser = new URLSearchParams(launchData || "").get("user");
+      return JSON.parse(rawUser || "null")?.language_code;
+    } catch { return undefined; }
+  }
+
+  function resolve(options = {}) {
+    const url = new URL(location.href);
+    const session = options.session || window.__EDUCASHPRO_SESSION__ || storedSession();
+    const preferred = preference() || normalize(options.language) ||
+      normalize(session?.profile?.language) || normalize(session?.account?.language) ||
+      normalize(url.searchParams.get("lang"));
+    if (preferred) return preferred;
+
+    const detected = telegramLanguage(url) || navigator.language || navigator.languages?.[0];
+    return normalize(detected) || DEFAULT;
+  }
+
+  function apply(language) {
+    const code = normalize(language) || resolve();
+    document.documentElement.lang = code === "pt" ? "pt-BR" : code;
+    document.documentElement.dataset.educashproLanguage = code;
+    return code;
+  }
+
+  const STARTUP = {
+    en: ["Education, business, and digital tools", "Close", "Growth and promotion", "Affiliate Program", "Getting things ready…", "Loading…", "Please wait a moment", "The app is available. Refresh if a feature is still syncing.", "Refresh"],
+    pt: ["Educação, negócios e ferramentas digitais", "Fechar", "Crescimento e divulgação", "Programa de Afiliados", "Organizando sua experiência…", "Carregando…", "Aguarde um instante", "A página foi liberada. Tente novamente se algum recurso ainda estiver sincronizando.", "Atualizar"],
+    es: ["Educación, negocios y herramientas digitales", "Cerrar", "Crecimiento y promoción", "Programa de Afiliados", "Preparando todo…", "Cargando…", "Espera un momento", "La aplicación está disponible. Actualiza si alguna función sigue sincronizándose.", "Actualizar"],
+    ru: ["Образование, бизнес и цифровые инструменты", "Закрыть", "Рост и продвижение", "Партнёрская программа", "Подготовка приложения…", "Загрузка…", "Пожалуйста, подождите", "Приложение доступно. Обновите страницу, если синхронизация ещё продолжается.", "Обновить"]
+  };
+
+  function localizeStartup(root = document) {
+    const copy = STARTUP[document.documentElement.dataset.educashproLanguage] || STARTUP.en;
+    root?.querySelectorAll("[data-locale-startup]").forEach(element => {
+      const value = copy[Number(element.dataset.localeStartup)];
+      if (element.hasAttribute("aria-label")) element.setAttribute("aria-label", value);
+      else element.textContent = value;
+    });
+  }
+
+  function remember(language) {
+    const code = normalize(language);
+    if (!code) return "";
+    try { localStorage.setItem(KEY, code); } catch {}
+    return code;
+  }
+
   function choose(language){
-    const code=normalize(language);if(!code)return;
-    try{localStorage.setItem(KEY,code);const saved=storedSession();if(saved?.profile){saved.profile.language=code;localStorage.setItem("educashpro:web-session",JSON.stringify(saved));}}catch{}
-    if(window.__EDUCASHPRO_SESSION__?.profile)window.__EDUCASHPRO_SESSION__.profile.language=code;
+    const code=remember(language);if(!code)return;
     apply(code);
     window.EduCashProApp?.flushRememberedRoute?.();
     const url=new URL(location.href);url.searchParams.set("lang",code);location.replace(url.toString());
@@ -38,7 +96,7 @@
     document.addEventListener('click',event=>{if(!control.contains(event.target)){menu.hidden=true;toggle.setAttribute('aria-expanded','false');}});
     document.addEventListener('keydown',event=>{if(event.key==='Escape'){menu.hidden=true;toggle.focus();}});
   }
-  window.EduCashProLocale={normalize,resolve,apply,choose,open,preference};apply(resolve());
+  window.EduCashProLocale={normalize,resolve,apply,choose,open,preference,remember,localizeStartup};apply(resolve());
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 

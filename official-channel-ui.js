@@ -6,14 +6,14 @@
   let loading=false;
 
   function session(){return platform.readWebSession?.()||null}
-  function language(){const raw=String(session()?.profile?.language||navigator.language||"pt").toLowerCase();if(raw.startsWith("en"))return"en";if(raw.startsWith("es"))return"es";if(raw.startsWith("ru"))return"ru";return"pt"}
+  function language(){ return window.EduCashProLocale?.resolve({session:session()}) || "en"; }
   const copy={
     pt:{title:"Avisos oficiais",body:"Entre no Canal Oficial do EduCashPro para receber comunicados importantes, inclusive mudanças de acesso entre Telegram e site.",button:"Entrar no Canal Oficial",opening:"Abrindo canal…",error:"Canal indisponível no momento."},
     en:{title:"Official updates",body:"Join the official EduCashPro channel for important notices, including access changes between Telegram and the website.",button:"Join Official Channel",opening:"Opening channel…",error:"Channel is unavailable right now."},
     es:{title:"Avisos oficiales",body:"Únete al canal oficial de EduCashPro para recibir avisos importantes, incluidos cambios de acceso entre Telegram y el sitio web.",button:"Entrar al Canal Oficial",opening:"Abriendo canal…",error:"El canal no está disponible ahora."},
     ru:{title:"Официальные уведомления",body:"Вступите в официальный канал EduCashPro, чтобы получать важные сообщения, включая изменения доступа между Telegram и сайтом.",button:"Открыть официальный канал",opening:"Открываем канал…",error:"Канал сейчас недоступен."}
   };
-  function t(key){return copy[language()]?.[key]||copy.pt[key]||key}
+  function t(key){return copy[language()]?.[key]||copy.en[key]||key}
 
   async function openOfficialChannel(button,status){
     if(loading)return;

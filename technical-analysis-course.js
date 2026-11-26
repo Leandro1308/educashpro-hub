@@ -6,8 +6,8 @@
   const VIDEO_COURSE_URL = "https://t.me/boost?c=3706880680";
 
   function normalizeLanguage(value) {
-    const language = String(value || "pt").toLowerCase();
-    return ["en", "es", "ru"].includes(language) ? language : "pt";
+    const language = String(value || "en").toLowerCase();
+    return ["pt", "en", "es", "ru"].includes(language) ? language : "en";
   }
 
   function escapeHtml(value) {
@@ -208,7 +208,7 @@
   // Reutilizado pelo Treinador: uma única fonte de verdade para as 37 lições.
   // Os exemplos gráficos do treinador usam candles históricos, não as ilustrações SVG do curso.
   const TRAINER_LESSON_CACHE=Object.create(null);
-  function getTrainerLessons(language="pt") {
+  function getTrainerLessons(language="en") {
     const lang=normalizeLanguage(language);
     if(TRAINER_LESSON_CACHE[lang]) return TRAINER_LESSON_CACHE[lang];
     return TRAINER_LESSON_CACHE[lang]=PT.map((base,index)=>{
@@ -217,10 +217,10 @@
     });
   }
 
-  function getCourseData(language="pt") {
+  function getCourseData(language="en") {
     const lang=normalizeLanguage(language);
     window.__EDUCASHPRO_TA_LANGUAGE=lang;
-    const labels=I18N[lang]||I18N.pt;
+    const labels=I18N[lang]||I18N.en;
     const lessons=PT.map((base,index)=>localizedLesson(base,index,lang));
     return { id:COURSE_ID,title:labels.title,home:labels.home,theme:"exness",partner:labels.partner,chapters:lessons.map((lesson,index)=>({id:index+1,title:`${index+1}. ${lesson[0]}`})),lessons:lessons.map((lesson,index)=>({ch:index+1,part:1,totalParts:1,body:lessonBody(lesson,labels,index,lang)})),books:[] };
   }
@@ -246,8 +246,8 @@
     if (!isCourse) { if(bar) bar.remove(); return; }
     if (sessionStorage.getItem("educashpro:ta-broker-closed")==="1") return;
     if (bar) return;
-    const lang=normalizeLanguage(window.__EDUCASHPRO_TA_LANGUAGE || "pt");
-    const p=I18N[lang]?.partner || I18N.pt.partner;
+    const lang=normalizeLanguage(window.__EDUCASHPRO_TA_LANGUAGE || "en");
+    const p=I18N[lang]?.partner || I18N.en.partner;
     bar=document.createElement("aside");
     bar.id="taFloatingBroker";
     bar.className="taFloatingBroker";

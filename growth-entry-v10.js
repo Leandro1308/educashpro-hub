@@ -1,7 +1,7 @@
 (function(){
   const tg=window.Telegram?.WebApp;
-  const raw=String(tg?.initDataUnsafe?.user?.language_code||navigator.language||document.documentElement.lang||"pt").toLowerCase();
-  const lang=raw.startsWith("en")?"en":raw.startsWith("es")?"es":raw.startsWith("ru")?"ru":"pt";
+  const raw=String(tg?.initDataUnsafe?.user?.language_code||navigator.language||document.documentElement.lang||"en").toLowerCase();
+  const lang=window.EduCashProLocale?.resolve() || (raw.startsWith("pt")?"pt":raw.startsWith("es")?"es":raw.startsWith("ru")?"ru":"en");
   const copy={
     pt:{affiliate:"Meu Link de Afiliado",publish:"Publicar projeto"},
     en:{affiliate:"My Affiliate Link",publish:"Publish project"},

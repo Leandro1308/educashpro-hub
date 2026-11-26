@@ -28,15 +28,10 @@
   };
 
   function language() {
-    const preferred=window.EduCashProLocale?.resolve?.();if(preferred)return preferred;
-    const raw = String(navigator.language || "pt").toLowerCase();
-    if (raw.startsWith("en")) return "en";
-    if (raw.startsWith("es")) return "es";
-    if (raw.startsWith("ru")) return "ru";
-    return "pt";
+    return window.EduCashProLocale?.resolve() || "en";
   }
 
-  function t(key) { return COPY[language()]?.[key] || COPY.pt[key] || key; }
+  function t(key) { return COPY[language()]?.[key] || COPY.en[key] || key; }
   function esc(value) { return String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
 
   function injectStyle() {

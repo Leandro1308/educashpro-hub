@@ -14,7 +14,7 @@ const chaptersFor=lang=>{
 };
 const valid=arr=>Array.isArray(arr)&&arr.length===15&&arr.every((ch,i)=>ch.id===i+1&&ch.title?.length>5&&ch.overview?.length>80&&ch.lessons?.length===12&&ch.lessons.every(a=>a.length===3&&a.every((v,i)=>typeof v==="string"&&v.length>(i===0?8:i===1?70:40))));
 function build(value){
- const lang=LANGS.includes(String(value||"pt").slice(0,2).toLowerCase())?String(value).slice(0,2).toLowerCase():"pt";
+ const lang=LANGS.includes(String(value||"en").slice(0,2).toLowerCase())?String(value).slice(0,2).toLowerCase():"en";
  const chapters=chaptersFor(lang);if(!valid(chapters))throw Error("set_for_life_missing_locale_"+lang);
  const labels=S[lang],questions=[];
  chapters.forEach((ch,ci)=>ch.lessons.forEach((lesson,li)=>{
